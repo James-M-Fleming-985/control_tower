@@ -1,0 +1,32 @@
+# Control Tower .gitignore
+
+# Cloned repositories (separate git repos)
+cloned_repos/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data files (temporary)
+*.csv
+*.json
+development_tracking.json
+
+# Reports (generated)
+todos/
+
+# Logs
+*.log
