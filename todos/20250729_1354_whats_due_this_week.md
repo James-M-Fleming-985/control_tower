@@ -1,1 +1,0 @@
-No tasks due in the next 7 days! 🎉

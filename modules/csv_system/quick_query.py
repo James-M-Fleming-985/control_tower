@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 """
-Quick Query Tool for Control Tower
-Find tasks, see upcoming work, check milestones
-Uses proper column mapping to handle CSV structure
+Quick Todo Queries for Control Tower
+Fast commands for everyday project management questions
 """
 
-import csv
 import os
+import sys
+import csv
 import pandas as pd
 from datetime import datetime, timedelta
 import glob
-import sys
 import argparse
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the parent directories to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from utils.date_utils import parse_date_flexible, format_date
-from column_mapping import (TaskColumns, get_task_name, get_duration, 
+from .column_mapping import (TaskColumns, get_task_name, get_duration, 
                           get_start_date, get_finish_date, get_resource_names, 
                           get_percent_complete, is_milestone, get_project_name_from_path)
 
@@ -58,59 +57,56 @@ def parse_date(date_str):
     return None
 
 def load_all_tasks():
-    """Load all tasks from all repositories using proper column mapping"""
-    import pandas as pd
+    """Load all task CSV files and combine into one DataFrame"""
     
     task_files = glob.glob("cloned_repos/**/tasks.csv", recursive=True)
+    if not task_files:
+        print("❌ No task files found!")
+        return pd.DataFrame()
+    
     all_tasks = []
     
     for file_path in task_files:
         try:
-            # Read CSV with proper column handling
-            with open(file_path, 'r') as f:
-                lines = f.readlines()
+            df = pd.read_csv(file_path)
+            df['file'] = file_path
             
-            if not lines:
-                continue
+            # Extract project name from file path
+            path_parts = file_path.split('/')
+            if 'projects' in path_parts:
+                proj_idx = path_parts.index('projects')
+                if proj_idx + 1 < len(path_parts):
+                    project_name = path_parts[proj_idx + 1]
+                    project_detail = path_parts[-2] if len(path_parts) > proj_idx + 2 else ""
+                    df['project_name'] = project_name
+                    df['project_detail'] = project_detail
+                    df['full_project_name'] = f"{project_name}/{project_detail}"
+            else:
+                df['project_name'] = path_parts[-2] if len(path_parts) > 1 else "unknown"
+                df['project_detail'] = ""
+                df['full_project_name'] = df['project_name']
             
-            # Parse the CSV manually for better control
-            reader = csv.reader(lines)
-            rows = list(reader)
-            
-            if not rows:
-                continue
-            
-            # Skip header row and process data
-            data_rows = rows[1:] if rows[0][0] == '% Complete' else rows
-            
-            for row in data_rows:
-                if len(row) < 20:  # Ensure we have enough columns
-                    continue
-                
-                # Extract data using proper column mapping
-                task_data = {
-                    'task_name': get_task_name(row),
-                    'duration': get_duration(row),
-                    'start_date': get_start_date(row),
-                    'finish_date': get_finish_date(row),
-                    'resource_names': get_resource_names(row),
-                    'percent_complete': get_percent_complete(row),
-                    'is_milestone': is_milestone(row),
-                    'project_name': get_project_name_from_path(file_path),
-                    'file_path': file_path
-                }
-                
-                # Parse dates
-                task_data['start_parsed'] = parse_date(task_data['start_date'])
-                task_data['finish_parsed'] = parse_date(task_data['finish_date'])
-                
-                all_tasks.append(task_data)
+            all_tasks.append(df)
             
         except Exception as e:
-            print(f"Warning: Could not load {file_path}: {e}")
+            print(f"⚠️  Error reading {file_path}: {e}")
     
-    # Convert to DataFrame
-    return pd.DataFrame(all_tasks) if all_tasks else pd.DataFrame()
+    if not all_tasks:
+        return pd.DataFrame()
+    
+    combined_df = pd.concat(all_tasks, ignore_index=True)
+    
+    # Parse dates for all tasks
+    if 'Working Start' in combined_df.columns:
+        combined_df['Working_Start_parsed'] = combined_df['Working Start'].apply(parse_date)
+    if 'Working Finish' in combined_df.columns:
+        combined_df['Working_Finish_parsed'] = combined_df['Working Finish'].apply(parse_date)
+    if 'Start' in combined_df.columns:
+        combined_df['Start_parsed'] = combined_df['Start'].apply(parse_date)
+    if 'Finish' in combined_df.columns:
+        combined_df['Finish_parsed'] = combined_df['Finish'].apply(parse_date)
+    
+    return combined_df
 
 def whats_due_today():
     """Show what's due today"""
@@ -133,14 +129,8 @@ def whats_due_today():
     result += "=" * 40 + "\n"
     
     for _, task in due_today.iterrows():
-        # Check if it's a milestone (0 days duration and 0 hrs work)
-        is_milestone = (str(task.get('Task Mode', '')).find('0 days') != -1 and 
-                       str(task.get('Finish', '')).find('0 hrs') != -1)
-        milestone = "🎯 " if is_milestone else ""
-        
-        # Task names are in the Milestone column due to column shift
-        task_name = task.get('Milestone', 'Unnamed')
-        result += f"{milestone}{task_name}\n"
+        milestone = "🎯 " if task.get('Is Milestone', '') == 'Yes' else ""
+        result += f"{milestone}{task.get('Task Name', 'Unnamed')}\n"
         result += f"  📂 {task['full_project_name']}\n"
         result += f"  📊 {task.get('% Complete', '0%')} complete\n"
         if pd.notna(task.get('Resource Names', '')):
@@ -179,14 +169,8 @@ def whats_due_this_week():
             result += f"\n{task_date}:\n"
             current_date = task_date
         
-        # Check if it's a milestone (0 days duration and 0 hrs work)
-        is_milestone = (str(task.get('Task Mode', '')).find('0 days') != -1 and 
-                       str(task.get('Finish', '')).find('0 hrs') != -1)
-        milestone = "🎯 " if is_milestone else ""
-        
-        # Task names are in the Milestone column due to column shift
-        task_name = task.get('Milestone', 'Unnamed')
-        result += f"  {milestone}{task_name}\n"
+        milestone = "🎯 " if task.get('Is Milestone', '') == 'Yes' else ""
+        result += f"  {milestone}{task.get('Task Name', 'Unnamed')}\n"
         result += f"    📂 {task['full_project_name']}\n"
         
         if pd.notna(task.get('Resource Names', '')):
@@ -217,9 +201,7 @@ def show_overdue():
     for _, task in overdue.iterrows():
         days_overdue = (today - task['Finish_parsed']).days
         
-        # Task names are in the Milestone column due to column shift
-        task_name = task.get('Milestone', 'Unnamed')
-        result += f"🔴 {task_name}\n"
+        result += f"🔴 {task.get('Task Name', 'Unnamed')}\n"
         result += f"   📅 Due: {task['Finish_parsed'].strftime('%Y-%m-%d')} ({days_overdue} days ago)\n"
         result += f"   📂 {task['full_project_name']}\n"
         result += f"   📊 {task.get('% Complete', '0%')} complete\n"
@@ -239,11 +221,9 @@ def show_milestones(days=30):
     today = datetime.now()
     future = today + timedelta(days=days)
     
-    # Milestones are identified by 0 days duration and 0 hrs work
-    # Due to column shift: Duration is in 'Task Mode' column, Work is in 'Finish' column
     milestones = df[
-        (df['Task Mode'].str.contains('0 days', case=False, na=False)) &
-        (df['Finish'].str.contains('0 hrs', case=False, na=False)) &
+        ((df['Is Milestone'] == 'Yes') | 
+         (df['Task Name'].str.contains('milestone|gate|approval|complete', case=False, na=False))) &
         (df['Finish_parsed'].notna()) & 
         (df['Finish_parsed'] >= today) & 
         (df['Finish_parsed'] <= future)
@@ -259,19 +239,13 @@ def show_milestones(days=30):
         days_until = (milestone['Finish_parsed'] - today).days
         urgency = "🔴" if days_until <= 3 else "🟡" if days_until <= 7 else "🟢"
         
-        # Task names are in the Milestone column due to column shift
-        task_name = milestone.get('Milestone', 'Unnamed')
-        result += f"{urgency} {task_name}\n"
+        result += f"{urgency} {milestone.get('Task Name', 'Unnamed')}\n"
         result += f"   📅 {milestone['Finish_parsed'].strftime('%Y-%m-%d')} ({days_until} days)\n"
         result += f"   📂 {milestone['full_project_name']}\n"
         result += f"   📊 {milestone.get('% Complete', '0%')} complete\n"
         
-        # Resource names are in the shifted position (Predecessors column)
-        owner = milestone.get('Predecessors', '')
-        if pd.notna(owner) and owner != '' and not str(owner).startswith(('FS', 'SS', 'FF', 'SF')):
-            # Clean up the owner name (remove [%] brackets if present)  
-            clean_owner = str(owner).split('[')[0].strip() if '[' in str(owner) else str(owner).strip()
-            result += f"   👤 {clean_owner}\n"
+        if pd.notna(milestone.get('Resource Names', '')):
+            result += f"   👤 {milestone['Resource Names']}\n"
         result += "\n"
     
     return result
@@ -298,9 +272,7 @@ def show_my_tasks(person_name):
     result += "=" * 35 + "\n"
     
     for _, task in my_tasks.iterrows():
-        # Task names are in the Milestone column due to column shift
-        task_name = task.get('Milestone', 'Unnamed')
-        result += f"📋 {task_name}\n"
+        result += f"📋 {task.get('Task Name', 'Unnamed')}\n"
         result += f"   📂 {task['full_project_name']}\n"
         result += f"   📊 {task.get('% Complete', '0%')} complete\n"
         
