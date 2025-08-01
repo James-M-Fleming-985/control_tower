@@ -13,6 +13,56 @@
 
 ---
 
+## 🚨 CRITICAL ISSUES - NEXT PRIORITY (August 1, 2025)
+
+**Status**: 🔴 URGENT - Multiple Workflow Failures  
+**Impact**: High - Core automation functionality non-operational  
+**Priority**: P0 - Block all other development until resolved
+
+### 🔥 Issue #1: MS Project XML Updates Not Being Applied
+- **Problem**: MS Project XML files are not being updated during "MS Project & Slide Deck Update Workflow"
+- **Evidence**: SF Investment Strategy OEE & OLE Application project exists in XML but changes not reflected in MS Project
+- **Root Cause**: XML changes not being pushed to MS Project or integration layer failing
+- **Files Affected**:
+  - `/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml`
+  - `push_project_update.py` workflow
+- **Next Steps**:
+  1. Investigate XML → MS Project synchronization mechanism
+  2. Debug file update/push process in workflow
+  3. Verify MS Project integration is receiving XML changes
+
+### 🔥 Issue #2: Timeline Slide Missing New Projects  
+- **Problem**: SF Investment Strategy OEE & OLE Application not appearing on PowerPoint timeline slide
+- **Evidence**: Project exists in data (980 tasks loaded) but absent from generated timeline
+- **Root Cause**: Timeline generation logic not including new project data
+- **Files Affected**:
+  - `modules/milestone_management/reporting/safran_powerpoint_generator.py`
+  - Timeline slide generation logic
+- **Next Steps**:
+  1. Debug timeline data filtering and inclusion logic
+  2. Verify project categorization for timeline display
+  3. Check phase assignment for SF Investment Strategy tasks
+
+### 🔥 Issue #3: Change Management Data Not Captured
+- **Problem**: Change management information entered during workflow not updating presentation slides
+- **Evidence**: ZnNi Line optimization change management slide missing user-entered data
+- **Root Cause**: Change management data capture/integration failing in workflow
+- **Files Affected**:
+  - `modules/ms_project/contract_project_manager.py`
+  - Change management slide generation in PowerPoint generator
+- **Next Steps**:
+  1. Debug change management data capture process
+  2. Verify data persistence between workflow steps
+  3. Fix change management slide population logic
+
+### 📊 Workflow Failure Summary
+- **Success Rate**: 0/3 core functions operational
+- **Workflow Tested**: "MS Project & Slide Deck Update Workflow"
+- **User Impact**: Complete automation failure requiring manual intervention
+- **Business Impact**: Presentations not reflecting current project status
+
+---
+
 ## 🎯 COMPLETED FEATURES (v0.1 - v0.3)
 
 ### ✅ Core Infrastructure (v0.1) - July 2025
