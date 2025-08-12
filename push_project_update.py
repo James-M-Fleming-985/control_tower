@@ -31,14 +31,15 @@ def execute_complete_update_workflow(description: str = None):
     """Execute the complete project update workflow"""
     
     print("\n" + "=" * 80)
-    print("🚀 MS PROJECT & SLIDE DECK UPDATE WORKFLOW")
+    print("🚀 COMPLETE MS PROJECT & POWERPOINT WORKFLOW")
     print("=" * 80)
     print("This will execute:")
-    print("1. 🔗 Integrate XML changes into ZnNi Line Development Plan-08")
-    print("2. 📋 Open change management form")
-    print("3. 🔄 Update MS Project integration")
-    print("4. 📊 Update PowerPoint presentations")
-    print("5. 📤 Commit changes to repository")
+    print("1. 📊 Convert CSV to XML for any Level 3 project")
+    print("2. 🔗 Integrate XML changes into ZnNi Line Development Plan-08")
+    print("3. 📋 Open change management form")
+    print("4. 🔄 Update MS Project integration")
+    print("5. 📊 Update PowerPoint presentations")
+    print("6. 📤 Commit changes to repository")
     print("=" * 80)
     
     # Import required modules
@@ -63,12 +64,57 @@ def execute_complete_update_workflow(description: str = None):
     print(f"📝 Description: {description}")
     print()
     
-    # Step 1: Integrate current XML file into ZnNi master plan
-    print("\n🔸 STEP 1: Integrate XML Changes")
+    # Step 1: Generate XML from CSV (for any Level 3 project)
+    print("\n🔸 STEP 1: Generate XML from CSV Data")
+    print("-" * 50)
+    
+    # Check for SF Investment Strategy CSV (can be extended for other projects)
+    csv_file = "/workspaces/control_tower/data/SF_Investment_Strategy_OEE_OLE_Import_CORRECTED.csv"
+    
+    if os.path.exists(csv_file):
+        print(f"📊 Found SF Investment Strategy CSV: {os.path.basename(csv_file)}")
+        
+        # Generate timestamped XML file
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        xml_output = f"/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule_{timestamp}.xml"
+        
+        # Execute CSV to XML conversion
+        try:
+            converter_script = "/workspaces/control_tower/scripts/simple_csv_to_xml.py"
+            conversion_cmd = [
+                'python3', converter_script,
+                '--csv', csv_file,
+                '--output', xml_output,
+                '--project-name', 'SF Investment Strategy - OEE/OLE Implementation'
+            ]
+            
+            print(f"🔄 Converting CSV to XML...")
+            result = subprocess.run(conversion_cmd, capture_output=True, text=True, cwd='/workspaces/control_tower')
+            
+            if result.returncode == 0:
+                print(f"✅ CSV to XML conversion successful!")
+                print(f"📁 Generated: {os.path.basename(xml_output)}")
+                # Update the standalone XML path for integration
+                standalone_xml = xml_output
+            else:
+                print(f"⚠️  CSV conversion warning: {result.stderr}")
+                print("Using existing standalone XML...")
+                standalone_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml"
+                
+        except Exception as e:
+            print(f"⚠️  CSV conversion error: {e}")
+            print("Using existing standalone XML...")
+            standalone_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml"
+    else:
+        print("ℹ️  No CSV file found, using existing standalone XML")
+        standalone_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml"
+    
+    # Step 2: Integrate current XML file into ZnNi master plan
+    print("\n🔸 STEP 2: Integrate XML Changes")
     print("-" * 50)
     
     # Check if the standalone XML file exists
-    standalone_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml"
     znni_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/ZnNi Line Development Plan-08.xml"
     
     if os.path.exists(standalone_xml):
@@ -94,8 +140,8 @@ def execute_complete_update_workflow(description: str = None):
     else:
         print("ℹ️  No standalone XML file found, using existing ZnNi plan")
     
-    # Step 2: Execute Contract Project Manager with Change Management
-    print("\n🔸 STEP 2: Change Management & MS Project Update")
+    # Step 3: Execute Contract Project Manager with Change Management
+    print("\n🔸 STEP 3: Change Management & MS Project Update")
     print("-" * 50)
     
     try:
@@ -116,8 +162,8 @@ def execute_complete_update_workflow(description: str = None):
         print(f"❌ Error in change management: {e}")
         return False
     
-    # Step 3: Update PowerPoint Presentations
-    print("\n🔸 STEP 3: Update PowerPoint Presentations")
+    # Step 4: Update PowerPoint Presentations
+    print("\n🔸 STEP 4: Update PowerPoint Presentations")
     print("-" * 50)
     
     try:
@@ -136,8 +182,8 @@ def execute_complete_update_workflow(description: str = None):
     except Exception as e:
         print(f"⚠️  PowerPoint error: {e}, continuing...")
     
-    # Step 4: Show Change Summary
-    print("\n🔸 STEP 4: Change Summary")
+    # Step 5: Show Change Summary
+    print("\n🔸 STEP 5: Change Summary")
     print("-" * 50)
     
     try:

@@ -12,7 +12,7 @@ This module provides:
 
 from .core.repository_scanner import RepositoryScanner
 from .core.milestone_detector import MilestoneChangeDetector
-from .reporting.powerpoint_generator import PowerPointGenerator
+from .reporting.safran_powerpoint_generator import SafranPowerPointGenerator
 from .automation.workflow_manager import WorkflowManager
 
 __version__ = "1.0.0"

@@ -2,6 +2,6 @@
 Reporting components for milestone management
 """
 
-from .powerpoint_generator import PowerPointGenerator
+from .safran_powerpoint_generator import SafranPowerPointGenerator
 
-__all__ = ['PowerPointGenerator']
+__all__ = ['SafranPowerPointGenerator']

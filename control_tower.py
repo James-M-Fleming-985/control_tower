@@ -19,7 +19,7 @@ def main():
     # MS Project System
     ms_parser = subparsers.add_parser('ms-project', help='MS Project integration commands')
     ms_parser.add_argument('--action', 
-                          choices=['sync', 'milestones', 'update', 'export', 'status', 'force-sync', 'overdue', 'reports'],
+                          choices=['sync', 'milestones', 'update', 'export', 'status', 'force-sync', 'overdue', 'reports', 'remote-sync'],
                           required=True,
                           help='Action to perform')
     ms_parser.add_argument('--period', choices=['current', 'next', 'both'], 
@@ -136,6 +136,103 @@ def run_ms_project_commands(args):
                 print("  🎉 No overdue tasks found!")
             return 0
         
+        elif args.action == 'remote-sync':
+            # Enhanced workflow command matching WORKFLOW.md documentation
+            import subprocess
+            
+            print("\n🚀 MS PROJECT DIRECT IMPORT WORKFLOW")
+            print("=" * 60)
+            print("Complete workflow: Direct XML Import → MS Project → Change Management → PowerPoint")
+            print("💡 Benefit: Skips XML integration step for faster, more reliable imports")
+            print()
+            
+            # Show available standalone XML projects
+            xml_workspace = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace"
+            standalone_projects = []
+            
+            print("📋 Available standalone projects for MS Project import:")
+            if os.path.exists(os.path.join(xml_workspace, "SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml")):
+                standalone_projects.append({
+                    'file': 'SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml',
+                    'name': 'SF Investment Strategy OEE & OLE Application',
+                    'display': 'SF Investment Strategy OEE & OLE Application',
+                    'level4_descriptor': 'OEE_OLE_Application_Schedule'
+                })
+                print("   1. SF Investment Strategy OEE & OLE Application")
+                print("      📄 File: SF_Investment_Strategy_OEE_OLE_Application_Schedule.xml")
+                print("      🎯 Level 4: OEE & OLE Application Schedule")
+            
+            # Add other standalone files as they're created
+            for f in os.listdir(xml_workspace):
+                if f.endswith('.xml') and 'Strategy' in f and f not in [p['file'] for p in standalone_projects]:
+                    display_name = f.replace('.xml', '').replace('_', ' ')
+                    level4_part = f.replace('SF_Investment_Strategy_', '').replace('.xml', '')
+                    standalone_projects.append({
+                        'file': f,
+                        'name': display_name,
+                        'display': display_name,
+                        'level4_descriptor': level4_part
+                    })
+                    print(f"   {len(standalone_projects)}. {display_name}")
+                    print(f"      📄 File: {f}")
+                    print(f"      🎯 Level 4: {level4_part.replace('_', ' ')}")
+            
+            if not standalone_projects:
+                print("   ⚠️  No standalone XML projects found")
+                print("   💡 Create standalone XML files for Level 4 projects in xml_workspace/")
+                return 1
+            
+            # Get user selection
+            print()
+            choice = input("🎯 Select project number (or press Enter for #1): ").strip()
+            if not choice:
+                choice = "1"
+            
+            try:
+                project_index = int(choice) - 1
+                if project_index < 0 or project_index >= len(standalone_projects):
+                    print("❌ Invalid selection")
+                    return 1
+                
+                selected_project = standalone_projects[project_index]
+                selected_file = selected_project['file']
+                project_name = selected_project['name']
+                
+            except ValueError:
+                print("❌ Please enter a valid number")
+                return 1
+            
+            # Get Level 4 description as documented in workflow
+            print(f"\n📝 SELECTED FOR MS PROJECT IMPORT:")
+            print(f"   🎯 Project: {project_name}")
+            print(f"   📄 XML File: {selected_file}")
+            print(f"   🏗️  Level 4 Descriptor: {selected_project['level4_descriptor']}")
+            print()
+            description = input("📋 Enter Level 4 update description (what changed in implementation): ").strip()
+            if not description:
+                print("❌ Level 4 description is required for workflow execution")
+                return 1
+            
+            # Execute the complete workflow
+            try:
+                # Use the original documented command structure with explicit file reference
+                cmd = f'python push_project_update.py --description "{description}" --project "{project_name}" --file "{selected_file}"'
+                print(f"\n🚀 EXECUTING DIRECT IMPORT WORKFLOW:")
+                print(f"   📄 Direct Import File: {selected_file}")
+                print(f"   🎯 Level 4 Project: {project_name}")
+                print(f"   🏗️  Level 4 Descriptor: {selected_project['level4_descriptor']}")
+                print(f"   📝 Implementation Update: {description}")
+                print(f"   ⚡ Command: {cmd}")
+                print(f"   💡 Note: Importing standalone XML directly to MS Project (faster method)")
+                print()
+                
+                result = subprocess.run(cmd, shell=True, cwd='/workspaces/control_tower')
+                return result.returncode
+                
+            except Exception as e:
+                print(f"❌ Workflow execution failed: {e}")
+                return 1
+                
         elif args.action == 'reports':
             manager.reporting.show_query_stats()
             print(f"\n📁 Find all reports in: /workspaces/control_tower/reporting/")

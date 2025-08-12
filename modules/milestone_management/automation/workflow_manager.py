@@ -31,7 +31,7 @@ except ImportError:
 sys.path.append("/workspaces/control_tower")
 from ..core.repository_scanner import RepositoryScanner
 from ..core.milestone_detector import MilestoneChangeDetector
-from ..reporting.powerpoint_generator import PowerPointGenerator
+from ..reporting.safran_powerpoint_generator import SafranPowerPointGenerator
 
 class UniversalXMLHandler(FileSystemEventHandler):
     """Handles XML file changes across all repositories"""
@@ -110,7 +110,7 @@ class WorkflowManager:
         # Initialize components
         self.scanner = RepositoryScanner(str(self.base_path))
         self.detector = MilestoneChangeDetector(str(self.data_path))
-        self.generator = PowerPointGenerator(str(self.base_path / "reports" / "milestone_presentations"))
+        self.generator = SafranPowerPointGenerator(str(self.base_path / "reports" / "milestone_presentations"))
         
         # File monitoring
         self.monitored_files = set()

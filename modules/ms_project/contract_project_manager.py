@@ -18,12 +18,16 @@ from typing import Dict, List, Optional, Any
 import argparse
 
 # Import from the same module directory
-from .ms_project_integration import MSProjectIntegration
+import sys
+import os
+sys.path.append('/workspaces/control_tower/modules/ms_project')
+from ms_project_integration import MSProjectIntegration
+from change_management import ChangeManagementSystem
 
 # Import reporting manager
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from reporting.reporting_manager import ReportingManager
+sys.path.append('/workspaces/control_tower/modules/reporting')
+from reporting_manager import ReportingManager
 
 class ContractProjectManager:
     """
@@ -34,13 +38,17 @@ class ContractProjectManager:
         """Initialize the contract project manager"""
         self.project_name = "ZnNi Line Development Plan"
         self.xml_workspace = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace"
-        self.current_xml = os.path.join(self.xml_workspace, "ZnNi Line Development Plan-08.xml")
+        # UPDATED: Use new folder structure with /current/ subdirectory as per Friday workflow
+        self.current_xml = os.path.join(self.xml_workspace, "current", "ZnNi_Line_Development_Plan-08.xml")
         self.source_mpp = r"D:\Downloads\ZnNi Line Development Plan-08.mpp"
         self.ms_project = None
         self.auto_sync_enabled = True
         
         # Initialize reporting manager
         self.reporting = ReportingManager()
+        
+        # Initialize change management system
+        self.change_management = ChangeManagementSystem("ZnNi Line Development Plan-08")
         
     def auto_sync_from_mpp(self) -> bool:
         """
@@ -311,19 +319,264 @@ try {{
         
         return results
     
+    def update_project_with_change_management(self, update_description: str = None, auto_approve: bool = False) -> bool:
+        """
+        Update project with integrated change management form and milestone/risk tracking
+        
+        Args:
+            update_description: Description of the update being performed
+            auto_approve: If True, auto-approve change for system updates
+            
+        Returns:
+            bool: True if successful
+        """
+        print("\n🔄 PROJECT UPDATE WITH CHANGE MANAGEMENT & MILESTONE TRACKING")
+        print("="*70)
+        
+        # Trigger change management form
+        if update_description:
+            print(f"Update: {update_description}")
+        
+        change_data = self.change_management.capture_change_request(auto_approve=auto_approve)
+        
+        # Proceed with the project update only if approved
+        if change_data['approval_status'] in ['Approved', 'Auto-Approved']:
+            print(f"\n✅ Change {change_data['change_id']} approved - proceeding with update...")
+            
+            # Step 1: Track milestone/risk changes before update
+            milestone_risk_changes = self._track_milestone_risk_changes()
+            
+            # Step 2: Perform the actual project sync/update
+            success = self.load_project(force_sync=True)
+            
+            if success:
+                print(f"📊 Project updated successfully")
+                print(f"📋 Change documented in: {self.change_management.changes_csv}")
+                
+                # Step 3: Export updated XML for MS Project import
+                export_success = self.export_for_ms_project()
+                if export_success:
+                    print(f"📤 Updated XML exported for MS Project import")
+                
+                # Step 4: Update PowerPoint with milestone/risk changes
+                self._update_presentation_with_changes(milestone_risk_changes)
+                
+                print(f"📈 PowerPoint data updated with milestone/risk changes")
+                return True
+            else:
+                print(f"❌ Project update failed")
+                return False
+        else:
+            print(f"⏸️  Change {change_data['change_id']} not approved - update cancelled")
+            return False
+
+    def _track_milestone_risk_changes(self) -> Dict:
+        """Track milestone and risk changes during project update"""
+        try:
+            # Import milestone tracker
+            import sys
+            sys.path.append('/workspaces/control_tower/modules/milestone_management')
+            from milestone_tracker import MilestoneTracker
+            
+            tracker = MilestoneTracker()
+            
+            # Import PowerPoint generator for phase data
+            sys.path.append('/workspaces/control_tower/modules/milestone_management/reporting')
+            from safran_powerpoint_generator import SafranPowerPointGenerator
+            
+            generator = SafranPowerPointGenerator()
+            phases = generator.safran_phases
+            
+            total_changes = {
+                'milestone_changes': [],
+                'risk_changes': [],
+                'phases_with_changes': [],
+                'has_changes': False
+            }
+            
+            print("\n📊 Tracking milestone and risk changes...")
+            
+            for phase_key, phase_info in phases.items():
+                # Get current milestone and risk data
+                current_milestones = generator._get_msproject_milestone_data("current", phase_info)
+                current_risks = generator._get_control_tower_risk_data(phase_info)
+                
+                # Track changes for this phase
+                change_summary = generator.track_presentation_changes(
+                    phase_info, current_milestones, current_risks
+                )
+                
+                if change_summary['requires_update']:
+                    total_changes['phases_with_changes'].append(phase_info['name'])
+                    total_changes['milestone_changes'].extend(
+                        change_summary['milestone_changes'].get('new_milestones', [])
+                    )
+                    total_changes['risk_changes'].extend(
+                        change_summary['risk_changes'].get('new_risks', [])
+                    )
+                    total_changes['has_changes'] = True
+                    
+            if total_changes['has_changes']:
+                print(f"📈 Changes detected in phases: {', '.join(total_changes['phases_with_changes'])}")
+            else:
+                print("✅ No milestone/risk changes detected")
+                
+            return total_changes
+            
+        except Exception as e:
+            print(f"⚠️  Error tracking milestone/risk changes: {e}")
+            return {'has_changes': False, 'error': str(e)}
+            
+    def _update_presentation_with_changes(self, milestone_risk_changes: Dict):
+        """Update presentation with tracked milestone/risk changes"""
+        try:
+            # Import PowerPoint generator
+            sys.path.append('/workspaces/control_tower/modules/milestone_management/reporting')
+            from safran_powerpoint_generator import SafranPowerPointGenerator
+            
+            generator = SafranPowerPointGenerator()
+            
+            # Generate presentation with change tracking
+            presentation_path = generator.generate_presentation()
+            
+            if presentation_path:
+                print(f"📊 Presentation updated: {presentation_path}")
+                
+                # Update snapshots if changes were detected
+                if milestone_risk_changes.get('has_changes'):
+                    phases = generator.safran_phases
+                    for phase_key, phase_info in phases.items():
+                        current_milestones = generator._get_msproject_milestone_data("current", phase_info)
+                        current_risks = generator._get_control_tower_risk_data(phase_info)
+                        generator.update_presentation_snapshots(phase_info, current_milestones, current_risks)
+                    print("📸 Milestone/risk snapshots updated")
+                    
+                print("✅ Complete workflow finished successfully!")
+                print(f"\n📋 Summary:")
+                print(f"   • Change Management: ✅ Captured")
+                print(f"   • MS Project: ✅ Updated")
+                print(f"   • Presentation: ✅ Generated")
+                print(f"   • Milestone/Risk Tracking: ✅ {'Updated' if milestone_risk_changes.get('has_changes') else 'Current'}")
+                print(f"\n💡 Note: Repository commit not included - handle separately when ready")
+                return True
+                    
+            else:
+                print("⚠️  Presentation generation failed")
+                return False
+                
+        except Exception as e:
+            print(f"⚠️  Error updating presentation: {e}")
+
+    def get_change_management_data_for_powerpoint(self, phase: str = None) -> List[Dict]:
+        """
+        Get change management data formatted for PowerPoint presentations
+        
+        Args:
+            phase: Specific phase to filter changes (optional)
+            
+        Returns:
+            List of change records formatted for presentation
+        """
+        return self.change_management.get_presentation_changes(phase)
+        """
+        Query milestones for current/next month with reporting
+        
+        Args:
+            period: "current", "next", or "both"
+            
+        Returns:
+            Dictionary with milestone lists
+        """
+        # Track this query for reporting
+        command = f"python3 control_tower.py ms-project --action milestones --period {period}"
+        parameters = {"period": period}
+        query_hash, is_new = self.reporting.track_query("milestones", command, parameters)
+        
+        if not self.load_project():
+            return {}
+            
+        today = datetime.now()
+        
+        # Current month range - ensure we include the last day of the month
+        current_month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        # Get last day of current month more reliably
+        if today.month == 12:
+            current_month_end = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
+        else:
+            current_month_end = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        # Set to end of day
+        current_month_end = current_month_end.replace(hour=23, minute=59, second=59)
+        
+        # Next month range - fixed calculation
+        if today.month == 12:
+            next_month_start = today.replace(year=today.year + 1, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            next_month_end = today.replace(year=today.year + 1, month=1, day=31, hour=23, minute=59, second=59)
+        else:
+            next_month_start = today.replace(month=today.month + 1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            # Get last day of next month
+            if today.month + 1 in [1, 3, 5, 7, 8, 10, 12]:
+                last_day = 31
+            elif today.month + 1 in [4, 6, 9, 11]:
+                last_day = 30
+            else:  # February
+                last_day = 29 if (today.year + (1 if today.month == 12 else 0)) % 4 == 0 else 28
+            next_month_end = today.replace(month=today.month + 1, day=last_day, hour=23, minute=59, second=59)
+        
+        results = {}
+        
+        if period in ["current", "both"]:
+            current_milestones = self.ms_project.get_milestones(
+                start_date=current_month_start,
+                end_date=current_month_end
+            )
+            results['current_month'] = current_milestones
+            
+        if period in ["next", "both"]:
+            next_milestones = self.ms_project.get_milestones(
+                start_date=next_month_start, 
+                end_date=next_month_end
+            )
+            results['next_month'] = next_milestones
+        
+        # Generate and save report
+        report_content = self._format_milestones_report(results, period)
+        report_name = f"milestones_{period}"
+        self.reporting.save_report(report_name, report_content, query_hash)
+        
+        if is_new:
+            print(f"🆕 New query tracked! Check control_tower_commands.md for reusable command.")
+        
+        return results
+    
     def _format_milestones_report(self, milestones_data: Dict[str, List], period: str) -> str:
         """Format milestones data for report generation"""
         content = []
+        today = datetime.now()
         
         if 'current_month' in milestones_data:
             count = len(milestones_data['current_month'])
-            content.append(f"## Milestones This Month (July 2025) - {count} Total")
+            current_month_name = today.strftime('%B %Y')  # e.g., "August 2025"
+            content.append(f"## Milestones This Month ({current_month_name}) - {count} Total")
             if milestones_data['current_month']:
                 for milestone in milestones_data['current_month']:
                     date_str = milestone['date'].strftime('%d/%m/%Y') if milestone['date'] else 'No date'
-                    status_icon = "✅" if milestone['status'] == 'Complete' else "⏳"
+                    
+                    # Check if milestone is overdue
+                    is_overdue = False
+                    if milestone['date'] and milestone['status'] != 'Complete':
+                        is_overdue = milestone['date'].date() < today.date()
+                    
+                    # Set appropriate icon
+                    if milestone['status'] == 'Complete':
+                        status_icon = "✅"
+                    elif is_overdue:
+                        status_icon = "🚨"  # Overdue
+                    else:
+                        status_icon = "⏳"  # Pending
+                    
                     resource = milestone.get('resource', '') or 'Not assigned'
-                    content.append(f"- {status_icon} **{milestone['name']}**")
+                    overdue_text = " (OVERDUE)" if is_overdue else ""
+                    content.append(f"- {status_icon} **{milestone['name']}**{overdue_text}")
                     content.append(f"  - Due: {date_str}")
                     content.append(f"  - Status: {milestone['status']}")
                     content.append(f"  - Resource: {resource}")
@@ -333,7 +586,14 @@ try {{
         
         if 'next_month' in milestones_data:
             count = len(milestones_data['next_month'])
-            content.append(f"## Milestones Next Month (August 2025) - {count} Total")
+            # Calculate next month name
+            if today.month == 12:
+                next_month = today.replace(year=today.year + 1, month=1)
+            else:
+                next_month = today.replace(month=today.month + 1)
+            next_month_name = next_month.strftime('%B %Y')  # e.g., "September 2025"
+            
+            content.append(f"## Milestones Next Month ({next_month_name}) - {count} Total")
             if milestones_data['next_month']:
                 for milestone in milestones_data['next_month']:
                     date_str = milestone['date'].strftime('%d/%m/%Y') if milestone['date'] else 'No date'
@@ -351,23 +611,46 @@ try {{
     
     def display_milestones(self, milestones_data: Dict[str, List]):
         """Display milestones in a formatted way"""
+        today = datetime.now()
         
         if 'current_month' in milestones_data:
             count = len(milestones_data['current_month'])
-            print(f"\n📅 MILESTONES THIS MONTH (July 2025) - {count} Total:")
+            current_month_name = today.strftime('%B %Y')  # e.g., "August 2025"
+            print(f"\n📅 MILESTONES THIS MONTH ({current_month_name}) - {count} Total:")
             if milestones_data['current_month']:
                 for milestone in milestones_data['current_month']:
                     date_str = milestone['date'].strftime('%d/%m/%Y') if milestone['date'] else 'No date'
-                    status_icon = "✅" if milestone['status'] == 'Complete' else "⏳"
+                    
+                    # Check if milestone is overdue
+                    is_overdue = False
+                    if milestone['date'] and milestone['status'] != 'Complete':
+                        is_overdue = milestone['date'].date() < today.date()
+                    
+                    # Set appropriate icon
+                    if milestone['status'] == 'Complete':
+                        status_icon = "✅"
+                    elif is_overdue:
+                        status_icon = "🚨"  # Overdue
+                    else:
+                        status_icon = "⏳"  # Pending
+                    
                     resource = milestone.get('resource', '') or 'Not assigned'
-                    print(f"  {status_icon} {milestone['name']}")
+                    overdue_text = " (OVERDUE)" if is_overdue else ""
+                    print(f"  {status_icon} {milestone['name']}{overdue_text}")
                     print(f"     Due: {date_str} | Status: {milestone['status']} | Resource: {resource}")
             else:
                 print("  No milestones found for this month")
                 
         if 'next_month' in milestones_data:
             count = len(milestones_data['next_month'])
-            print(f"\n📅 MILESTONES NEXT MONTH (August 2025) - {count} Total:")
+            # Calculate next month name
+            if today.month == 12:
+                next_month = today.replace(year=today.year + 1, month=1)
+            else:
+                next_month = today.replace(month=today.month + 1)
+            next_month_name = next_month.strftime('%B %Y')  # e.g., "September 2025"
+            
+            print(f"\n📅 MILESTONES NEXT MONTH ({next_month_name}) - {count} Total:")
             if milestones_data['next_month']:
                 for milestone in milestones_data['next_month']:
                     date_str = milestone['date'].strftime('%d/%m/%Y') if milestone['date'] else 'No date'
@@ -432,28 +715,147 @@ try {{
     
     def export_for_ms_project(self) -> bool:
         """
-        Export updated XML for import back into MS Project
+        Automatically import updated XML back into MS Project
+        This completes the single-command workflow automation
         
         Returns:
             bool: True if successful
         """
-        if not self.load_project():
+        print(f"\n🔄 AUTOMATIC MS PROJECT SYNC")
+        print("="*50)
+        
+        # The main XML file has already been updated by the integration script
+        # We just need to import it back into MS Project automatically
+        
+        if not os.path.exists(self.current_xml):
+            print(f"❌ Updated XML file not found: {self.current_xml}")
             return False
             
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        export_path = os.path.join(self.xml_workspace, f"updated_project_{timestamp}.xml")
+        print(f"📁 Importing updated XML: {os.path.basename(self.current_xml)}")
         
-        if self.ms_project.export_updated_xml(export_path):
-            print(f"\n📤 EXPORT COMPLETE:")
-            print(f"Updated XML saved to: {export_path}")
-            print(f"\n📋 TO UPDATE MS PROJECT:")
-            print(f"1. Open MS Project")
-            print(f"2. Go to: File → Open → {export_path}")
-            print(f"3. Choose 'Merge the data' to update existing project")
-            print(f"4. Save your .mpp file")
+        # Try automatic MS Project import using COM interface
+        success = self._import_xml_to_ms_project()
+        
+        if success:
+            print(f"✅ MS Project automatically updated with latest changes")
+            print(f"� Imported from: {self.current_xml}")
+            print(f"💾 MS Project file: {self.source_mpp}")
             return True
         else:
+            print(f"⚠️  Automatic import failed, providing manual fallback instructions")
+            print(f"\n📋 MANUAL FALLBACK - TO UPDATE MS PROJECT:")
+            print(f"1. Open MS Project")
+            print(f"2. Go to: File → Open → {self.current_xml}")
+            print(f"3. Choose 'Merge the data' to update existing project")
+            print(f"4. Save your .mpp file to: {self.source_mpp}")
             return False
+    
+    def _import_xml_to_ms_project(self) -> bool:
+        """
+        Automatically import updated XML into MS Project using COM interface
+        
+        Returns:
+            bool: True if successful
+        """
+        try:
+            print(f"🔗 Attempting automatic MS Project import...")
+            
+            # Try PowerShell COM interface first
+            if self._import_via_powershell():
+                return True
+                
+            # Fallback to other methods if PowerShell fails
+            print("⚠️  PowerShell import failed, trying alternative methods...")
+            return self._import_via_alternative_methods()
+                
+        except Exception as e:
+            print(f"❌ Automatic import failed: {e}")
+            return False
+    
+    def _import_via_powershell(self) -> bool:
+        """
+        Import XML using MS Project COM interface via PowerShell
+        
+        Returns:
+            bool: True if successful
+        """
+        try:
+            # PowerShell script to import XML into existing MS Project file
+            powershell_script = f'''
+Add-Type -AssemblyName "Microsoft.Office.Interop.MSProject"
+$msp = New-Object -ComObject MSProject.Application
+$msp.Visible = $false
+
+try {{
+    # Open the existing .mpp file
+    if (Test-Path "{self.source_mpp}") {{
+        $project = $msp.FileOpen("{self.source_mpp}")
+        
+        # Import/merge the updated XML data
+        $project.FileOpen("{self.current_xml}", $false)  # Open as merge
+        
+        # Save the updated project
+        $project.Save()
+        $project.Close($false)
+        $msp.Quit()
+        Write-Output "SUCCESS: XML imported and MS Project updated"
+    }} else {{
+        # If .mpp doesn't exist, create new project from XML
+        $project = $msp.FileOpen("{self.current_xml}")
+        $project.SaveAs("{self.source_mpp}")
+        $project.Close($false)
+        $msp.Quit()
+        Write-Output "SUCCESS: New MS Project created from XML"
+    }}
+}} catch {{
+    Write-Output "ERROR: $_"
+    $msp.Quit()
+}}
+'''
+            
+            # Write PowerShell script to temporary file
+            ps_script_path = os.path.join(self.xml_workspace, "import_temp.ps1")
+            with open(ps_script_path, 'w') as f:
+                f.write(powershell_script)
+            
+            # Execute PowerShell script
+            result = subprocess.run([
+                "powershell.exe", "-ExecutionPolicy", "Bypass", 
+                "-File", ps_script_path
+            ], capture_output=True, text=True, timeout=60)
+            
+            # Clean up temporary script
+            os.remove(ps_script_path)
+            
+            if "SUCCESS" in result.stdout:
+                print(f"✅ PowerShell import successful")
+                return True
+            else:
+                print(f"❌ PowerShell import failed: {result.stdout}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            print("⚠️  PowerShell import timed out")
+            return False
+        except Exception as e:
+            print(f"⚠️  PowerShell import error: {e}")
+            return False
+    
+    def _import_via_alternative_methods(self) -> bool:
+        """
+        Try alternative import methods if COM interface fails
+        
+        Returns:
+            bool: True if successful
+        """
+        # Method 1: Try direct file copy if .mpp doesn't exist
+        if not os.path.exists(self.source_mpp):
+            print("ℹ️  Creating new .mpp file from XML (requires manual MS Project open)")
+            return False
+            
+        # Method 2: Could try other automation libraries here
+        print("ℹ️  No alternative import methods available")
+        return False
     
     def generate_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive project status with reporting"""
@@ -573,7 +975,7 @@ def main():
     """Main function for command line usage"""
     parser = argparse.ArgumentParser(description='Contract Project Manager for Control Tower')
     parser.add_argument('--action', 
-                       choices=['sync', 'milestones', 'update', 'export', 'status', 'force-sync', 'overdue', 'reports'],
+                       choices=['sync', 'milestones', 'update', 'export', 'status', 'force-sync', 'overdue', 'reports', 'change-update'],
                        required=True,
                        help='Action to perform')
     parser.add_argument('--period', choices=['current', 'next', 'both'], 
@@ -583,6 +985,9 @@ def main():
     parser.add_argument('--progress', type=int, help='Progress percentage (0-100)')
     parser.add_argument('--start-date', help='Actual start date (YYYY-MM-DD)')
     parser.add_argument('--finish-date', help='Actual finish date (YYYY-MM-DD)')
+    parser.add_argument('--description', help='Description of the update/change')
+    parser.add_argument('--auto-approve', action='store_true', 
+                       help='Auto-approve change for system updates')
     
     args = parser.parse_args()
     
@@ -594,6 +999,14 @@ def main():
             print("✅ Sync complete! Project data is now current.")
         else:
             print("❌ Sync failed. Check MS Project file accessibility.")
+    
+    elif args.action == 'change-update':
+        # Update with change management form
+        description = args.description or "Manual project update via Control Tower"
+        if manager.update_project_with_change_management(description, args.auto_approve):
+            print("✅ Project updated with change management documentation.")
+        else:
+            print("❌ Project update failed or cancelled.")
             
     elif args.action == 'force-sync':
         # Force sync even if XML exists

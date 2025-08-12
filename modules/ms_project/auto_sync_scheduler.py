@@ -7,6 +7,7 @@ This runs in the background and automatically:
 - Syncs MS Project files to XML every hour
 - Updates contract project data
 - Logs sync status
+- Uses remote execution for Linux/Codespaces environments
 """
 
 import os
@@ -15,6 +16,9 @@ import time
 import schedule
 from datetime import datetime
 import logging
+import configparser
+import subprocess
+import platform
 
 # Import from the same module directory
 from .contract_project_manager import ContractProjectManager
@@ -22,12 +26,46 @@ from .contract_project_manager import ContractProjectManager
 class AutoSyncScheduler:
     """
     Automated sync scheduler for contract projects
+    Enhanced with remote execution for Linux/Codespaces environments
     """
     
     def __init__(self):
         """Initialize the scheduler"""
         self.manager = ContractProjectManager()
         self.setup_logging()
+        self.windows_config = self.load_windows_target_config()
+        self.is_containerized = self.detect_containerized_environment()
+        
+    def detect_containerized_environment(self):
+        """Detect if running in containerized environment (Linux/Codespaces)"""
+        # Check if we're in a Linux environment without direct Windows access
+        if platform.system() != "Windows":
+            return True
+        # Check if the expected Windows path exists
+        return not os.path.exists(r"D:\Downloads\ZnNi Line Development Plan-08.mpp")
+    
+    def load_windows_target_config(self):
+        """Load Windows machine target configuration for remote sync"""
+        config_path = "/workspaces/control_tower/config/windows_target.conf"
+        
+        if not os.path.exists(config_path):
+            return None
+        
+        config = configparser.ConfigParser()
+        try:
+            config.read(config_path)
+            return {
+                'host': config['windows_machine']['host'],
+                'username': config.get('windows_machine', 'username', fallback=None),
+                'xml_workspace': config['windows_machine']['xml_workspace'],
+                'main_project_file': config['ms_project']['main_project_file'],
+                'ssh_key': config.get('network', 'ssh_key', fallback='~/.ssh/id_rsa'),
+                'use_admin_shares': config.getboolean('network', 'use_admin_shares', fallback=False),
+                'codespaces_xml_workspace': config['codespaces']['xml_workspace']
+            }
+        except Exception as e:
+            self.logger.warning(f"⚠️  Could not load Windows config: {e}")
+            return None
         
     def setup_logging(self):
         """Setup logging for sync operations"""
@@ -45,11 +83,20 @@ class AutoSyncScheduler:
         self.logger = logging.getLogger(__name__)
     
     def sync_project_data(self):
-        """Perform scheduled sync of project data"""
+        """Perform scheduled sync of project data with multiple fallback methods"""
         try:
             self.logger.info("🔄 Starting scheduled sync...")
             
-            if self.manager.auto_sync_from_mpp():
+            if self.is_containerized:
+                # Try multiple sync methods for containerized environments
+                self.logger.info("🐧 Containerized environment detected - using file-based sync methods")
+                success = self.containerized_sync_project_data()
+            else:
+                # Use local sync for Windows environments
+                self.logger.info("🔧 Using local sync (Windows environment)")
+                success = self.manager.auto_sync_from_mpp()
+            
+            if success:
                 self.logger.info("✅ Scheduled sync successful")
                 
                 # Verify data quality
@@ -64,6 +111,117 @@ class AutoSyncScheduler:
                 
         except Exception as e:
             self.logger.error(f"❌ Sync error: {e}")
+    
+    def containerized_sync_project_data(self):
+        """Perform sync in containerized environment using multiple methods"""
+        
+        # Method 1: Check for newer files in ms_project_data folder
+        success = self.sync_from_ms_project_data()
+        if success:
+            self.logger.info("✅ Sync successful via ms_project_data folder")
+            return True
+        
+        # Method 2: Try remote execution if configured
+        if self.windows_config:
+            self.logger.info("📡 Attempting remote execution sync...")
+            success = self.remote_sync_project_data()
+            if success:
+                self.logger.info("✅ Remote sync successful")
+                return True
+            else:
+                self.logger.warning("⚠️  Remote sync failed")
+        
+        # Method 3: Use existing XML (no sync needed)
+        self.logger.info("📄 Using existing XML file (no newer source found)")
+        return True  # Not a failure - just no sync needed
+    
+    def sync_from_ms_project_data(self):
+        """Check ms_project_data folder for newer XML files and sync them"""
+        try:
+            ms_project_data_dir = "/workspaces/control_tower/cloned_repos/contract_projects/ms_project_data"
+            current_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/ZnNi Line Development Plan-08.xml"
+            
+            if not os.path.exists(ms_project_data_dir):
+                return False
+            
+            # Find XML files in ms_project_data
+            xml_files = [f for f in os.listdir(ms_project_data_dir) if f.endswith('.xml')]
+            
+            if not xml_files:
+                return False
+            
+            # Find the newest XML file
+            newest_file = None
+            newest_time = 0
+            
+            for xml_file in xml_files:
+                file_path = os.path.join(ms_project_data_dir, xml_file)
+                file_time = os.path.getmtime(file_path)
+                if file_time > newest_time:
+                    newest_time = file_time
+                    newest_file = file_path
+            
+            # Check if the newest file is newer than current XML
+            if os.path.exists(current_xml):
+                current_xml_time = os.path.getmtime(current_xml)
+                if newest_time <= current_xml_time:
+                    self.logger.info("📄 Current XML is up to date")
+                    return True
+            
+            # Copy the newer file to XML workspace
+            import shutil
+            backup_path = f"{current_xml}.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
+            if os.path.exists(current_xml):
+                shutil.copy2(current_xml, backup_path)
+                self.logger.info(f"📦 Backup created: {os.path.basename(backup_path)}")
+            
+            shutil.copy2(newest_file, current_xml)
+            self.logger.info(f"✅ XML updated from: {os.path.basename(newest_file)}")
+            self.logger.info(f"📅 Source file date: {datetime.fromtimestamp(newest_time).strftime('%Y-%m-%d %H:%M:%S')}")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ ms_project_data sync error: {e}")
+            return False
+    
+    def remote_sync_project_data(self):
+        """Perform remote sync using Windows target configuration"""
+        try:
+            if not self.windows_config:
+                self.logger.warning("⚠️  No Windows configuration available for remote sync")
+                return False
+            
+            local_xml = os.path.join(self.windows_config['codespaces_xml_workspace'], 
+                                   "ZnNi Line Development Plan-08.xml")
+            
+            self.logger.info(f"🔄 Remote sync: {self.windows_config['host']}")
+            
+            # Use the remote execution framework to sync XML
+            # This will copy XML to Windows, launch MS Project, export updated XML, and copy back
+            from . import remote_execution_utils
+            
+            success = remote_execution_utils.execute_remote_sync(
+                self.windows_config, 
+                local_xml, 
+                "Automated background sync"
+            )
+            
+            if success:
+                self.logger.info("✅ Remote sync completed successfully")
+                return True
+            else:
+                self.logger.warning("⚠️  Remote sync failed, using existing XML")
+                return False
+                
+        except ImportError:
+            # Fallback to manual request if remote execution not available
+            self.logger.warning("⚠️  Remote execution not available, requesting manual sync")
+            return False
+        except Exception as e:
+            self.logger.error(f"❌ Remote sync error: {e}")
+            return False
     
     def check_project_health(self):
         """Check project data health and currency"""
