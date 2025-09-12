@@ -117,37 +117,34 @@ if [ -d "cloned_repos" ]; then
             repo_name=$(basename "$repo")
             echo "  📁 Checking $repo_name..."
             
-            cd "$repo"
-            
-    # Check if it's a git repository
-    if [ -d "$repo_path/.git" ] || git -C "$repo_path" status >/dev/null 2>&1; then
-        echo "  📁 Checking $repo_name..."
-        
-        cd "$repo_path" || continue
-        
-        if [ -n "$(git status --porcelain)" ]; then
-            echo "    🔄 Syncing requirements updates..."
-            git add requirements/ 2>/dev/null || git add . 2>/dev/null
-            if git commit -m "Requirements update: $(date '+%Y-%m-%d %H:%M:%S') - Timeline data sync" 2>/dev/null; then
-                echo "    ✅ Changes committed successfully"
-                echo "    🚀 Pushing to remote repository..."
-                if git push origin main 2>/dev/null; then
-                    echo "    ✅ Successfully pushed to $repo_name repository"
+            # Check if it's a git repository
+            if git -C "$repo" status >/dev/null 2>&1; then
+                cd "$repo" || continue
+                
+                if [ -n "$(git status --porcelain)" ]; then
+                    echo "    🔄 Syncing requirements updates..."
+                    git add requirements/ 2>/dev/null || git add . 2>/dev/null
+                    if git commit -m "Requirements update: $(date '+%Y-%m-%d %H:%M:%S') - Timeline data sync" 2>/dev/null; then
+                        echo "    ✅ Changes committed successfully"
+                        echo "    🚀 Pushing to remote repository..."
+                        if git push origin main 2>/dev/null; then
+                            echo "    ✅ Successfully pushed to $repo_name repository"
+                        else
+                            echo "    ⚠️  Push failed - may need authentication or manual review"
+                        fi
+                    else
+                        echo "    ⚠️  Commit failed - manual review needed"
+                    fi
                 else
-                    echo "    ⚠️  Push failed - may need authentication or manual review"
+                    echo "    ✅ Requirements up to date"
                 fi
+                
+                cd - >/dev/null
             else
-                echo "    ⚠️  Commit failed - manual review needed"
+                echo "    ⏭️  Not a git repository"
             fi
-        else
-            echo "    ✅ Requirements up to date"
         fi
-        
-        cd - >/dev/null
-    else
-        echo "    ⏭️  Not a git repository"
-    fi
-done
+    done
 else
     echo "  ℹ️  No cloned repositories found"
 fi
