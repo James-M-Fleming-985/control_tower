@@ -17,40 +17,30 @@ class XMLWorkspaceManager:
         self.control_tower_root = "/workspaces/control_tower"
         self.repos_root = "/workspaces/control_tower/cloned_repos"
         
-        # Repository-specific configurations
+        # Repository-specific configurations (Updated for North Star structure)
         self.repositories = {
-            "contract_projects": {
+            "professional_excellence/contract_projects": {
                 "xml_files": ["ZnNi Line Development Plan-08.xml"],  # Safran-specific
                 "project_type": "Safran Contract"
             },
-            "domain_specific-network_dev": {
-                "xml_files": ["Network Development Plan.xml"],
-                "project_type": "Network Development"
-            },
-            "financial_optimizer": {
+            "business_ventures/financial_optimizer": {
                 "xml_files": ["Financial Optimization Project.xml"],
                 "project_type": "Financial Analysis"
             },
-            "financial_security_dev": {
-                "xml_files": ["Financial Security Project.xml"],
-                "project_type": "Security Development"
-            },
-            "home_improvements": {
+            "life_quality/home_improvements": {
                 "xml_files": ["Home Improvement Projects.xml"],
                 "project_type": "Home Management"
             },
-            "LIMS_concept_actual": {
-                "xml_files": ["LIMS Implementation Plan.xml"],  # Independent LIMS project
-                "project_type": "LIMS System"
-            },
-            "opti_royale": {
+            "business_ventures/opti_royale": {
                 "xml_files": ["Optimization Royale Project.xml"],
                 "project_type": "Optimization Platform"
             },
-            "relationship_building": {
-                "xml_files": ["Relationship Building Plan.xml"],
-                "project_type": "Relationship Management"
+            "business_ventures/Causal_affect": {
+                "xml_files": ["MVP Builder Project.xml"],
+                "project_type": "MVP Development"
             }
+            # Note: Deleted repositories (domain_specific-network_dev, financial_security_dev, 
+            # LIMS_concept_actual, relationship_building) are now covered by North Star structure
         }
     
     def setup_all_xml_workspaces(self):

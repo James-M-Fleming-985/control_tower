@@ -1,0 +1,1788 @@
+# 📊 REQUIREMENTS HIERARCHY COMPLIANCE REPORT
+**Generated**: validate_requirements_hierarchy.py
+**Date**: September 12, 2025
+
+## 🎯 Requirements Management Hierarchy
+```
+Level 1: North Star Domain → Strategic requirements
+├── Level 2: Projects → Project-level requirements
+    ├── Level 3: Systems/Workpackages → Functional requirements
+        ├── Level 4: Features/Milestones → Detailed requirements
+            ├── Level 5: Layers/Tasks → Implementation requirements
+                └── Level 6: Components → Technical requirements
+```
+
+## 📈 Requirements Structure Summary
+- **Total North Star Repositories**: 6
+- **Properly Structured**: 0
+- **Need Restructuring**: 6
+- **Total Structure Issues**: 573
+- **Structure Compliance**: 0.0%
+
+## 📁 investment_strategy
+⚠️ **NEEDS ATTENTION** - 1 structure issues:
+
+### Level 2 (Project):
+- **no_projects**: No projects found in North Star repository
+  - *Recommendation*: Create project folders to organize work at Level 2
+  - *Path*: `/workspaces/control_tower/cloned_repos/investment_strategy`
+
+## 📁 financial_security
+⚠️ **NEEDS ATTENTION** - 1 structure issues:
+
+### Level 2 (Project):
+- **no_projects**: No projects found in North Star repository
+  - *Recommendation*: Create project folders to organize work at Level 2
+  - *Path*: `/workspaces/control_tower/cloned_repos/financial_security`
+
+## 📁 business_ventures
+⚠️ **NEEDS ATTENTION** - 565 structure issues:
+
+### Level 3 (System/Workpackage):
+- **missing_level3_structure**: Project 'Causal_affect' missing Level 3 (Systems/Workpackages) organization
+  - *Recommendation*: Create systems/ or workpackages/ folders to organize Level 3 requirements structure
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/Causal_affect`
+
+### Level 5 (Layer/Task):
+- **missing_next_level_structure**: Feature/Milestone 'market_data' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/financial_optimizer/services/market_data`
+- **missing_next_level_structure**: Feature/Milestone 'market_analysis' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/financial_optimizer/services/market_analysis`
+- **missing_next_level_structure**: Feature/Milestone 'data_integration' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/financial_optimizer/services/data_integration`
+- **missing_next_level_structure**: Feature/Milestone 'reporting' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/financial_optimizer/services/reporting`
+- **missing_next_level_structure**: Feature/Milestone 'card-data-manager' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/services/card-data-manager`
+- **missing_next_level_structure**: Feature/Milestone 'clash-royale-api' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/services/clash-royale-api`
+- **missing_next_level_structure**: Feature/Milestone 'ml-pipeline' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/services/ml-pipeline`
+- **missing_next_level_structure**: Feature/Milestone 'cv-analyzer' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/services/cv-analyzer`
+- **missing_next_level_structure**: Feature/Milestone 'fastparallel' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fastparallel`
+- **missing_next_level_structure**: Feature/Milestone 'strip-final-newline' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/strip-final-newline`
+- **missing_next_level_structure**: Feature/Milestone 'fill-range' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fill-range`
+- **missing_next_level_structure**: Feature/Milestone 'expand-template' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/expand-template`
+- **missing_next_level_structure**: Feature/Milestone 'tar-stream' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/tar-stream`
+- **missing_next_level_structure**: Feature/Milestone 'merge-stream' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/merge-stream`
+- **missing_next_level_structure**: Feature/Milestone 'split2' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/split2`
+- **missing_next_level_structure**: Feature/Milestone 'acorn-jsx' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/acorn-jsx`
+- **missing_next_level_structure**: Feature/Milestone 'is-arrayish' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-arrayish`
+- **missing_next_level_structure**: Feature/Milestone 'has-flag' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/has-flag`
+- **missing_next_level_structure**: Feature/Milestone 'mimic-response' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/mimic-response`
+- **missing_next_level_structure**: Feature/Milestone 'rimraf' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/rimraf`
+- **missing_next_level_structure**: Feature/Milestone 'once' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/once`
+- **missing_next_level_structure**: Feature/Milestone 'lodash.defaults' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/lodash.defaults`
+- **missing_next_level_structure**: Feature/Milestone 'helmet' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/helmet`
+- **missing_next_level_structure**: Feature/Milestone 'picocolors' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/picocolors`
+- **missing_next_level_structure**: Feature/Milestone 'is-number' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-number`
+- **missing_next_level_structure**: Feature/Milestone 'graceful-fs' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/graceful-fs`
+- **missing_next_level_structure**: Feature/Milestone 'mkdirp-classic' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/mkdirp-classic`
+- **missing_next_level_structure**: Feature/Milestone 'detect-newline' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/detect-newline`
+- **missing_next_level_structure**: Feature/Milestone 'yallist' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/yallist`
+- **missing_next_level_structure**: Feature/Milestone 'file-entry-cache' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/file-entry-cache`
+- **missing_next_level_structure**: Feature/Milestone 'imurmurhash' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/imurmurhash`
+- **missing_next_level_structure**: Feature/Milestone 'minimalistic-assert' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/minimalistic-assert`
+- **missing_next_level_structure**: Feature/Milestone 'escape-string-regexp' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/escape-string-regexp`
+- **missing_requirements_folder**: Layer/Task 'middleware-flexible-checksums' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-flexible-checksums`
+- **missing_requirements_folder**: Layer/Task 'util-format-url' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/util-format-url`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-web-identity' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/credential-provider-web-identity`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-env' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/credential-provider-env`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-http' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/credential-provider-http`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-process' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/credential-provider-process`
+- **missing_requirements_folder**: Layer/Task 'util-user-agent-node' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/util-user-agent-node`
+- **missing_requirements_folder**: Layer/Task 'token-providers' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/token-providers`
+- **missing_requirements_folder**: Layer/Task 'xml-builder' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/xml-builder`
+- **missing_requirements_folder**: Layer/Task 'signature-v4-multi-region' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/signature-v4-multi-region`
+- **missing_requirements_folder**: Layer/Task 'nested-clients' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/nested-clients`
+- **missing_requirements_folder**: Layer/Task 'core' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/core`
+- **missing_requirements_folder**: Layer/Task 'client-sso' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/client-sso`
+- **missing_requirements_folder**: Layer/Task 'middleware-bucket-endpoint' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-bucket-endpoint`
+- **missing_requirements_folder**: Layer/Task 'middleware-sdk-s3' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-sdk-s3`
+- **missing_requirements_folder**: Layer/Task 'middleware-ssec' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-ssec`
+- **missing_requirements_folder**: Layer/Task 'util-locate-window' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/util-locate-window`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-sso' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/credential-provider-sso`
+- **missing_requirements_folder**: Layer/Task 'client-s3' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/client-s3`
+- **missing_requirements_folder**: Layer/Task 'middleware-user-agent' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-user-agent`
+- **missing_requirements_folder**: Layer/Task 'types' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/types`
+- **missing_requirements_folder**: Layer/Task 'middleware-expect-continue' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/middleware-expect-continue`
+- **missing_requirements_folder**: Layer/Task 's3-request-presigner' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@aws-sdk/s3-request-presigner`
+- **missing_next_level_structure**: Feature/Milestone 'stream-wormhole' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/stream-wormhole`
+- **missing_next_level_structure**: Feature/Milestone 'abstract-logging' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/abstract-logging`
+- **missing_next_level_structure**: Feature/Milestone 'esrecurse' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/esrecurse`
+- **missing_next_level_structure**: Feature/Milestone 'estraverse' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/estraverse`
+- **missing_next_level_structure**: Feature/Milestone 'steed' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/steed`
+- **missing_next_level_structure**: Feature/Milestone 'find-up' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/find-up`
+- **missing_next_level_structure**: Feature/Milestone 'glob-parent' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/glob-parent`
+- **missing_next_level_structure**: Feature/Milestone 'path-parse' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/path-parse`
+- **missing_next_level_structure**: Feature/Milestone 'slash' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/slash`
+- **missing_next_level_structure**: Feature/Milestone 'lru-cache' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/lru-cache`
+- **missing_next_level_structure**: Feature/Milestone 'color' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/color`
+- **missing_next_level_structure**: Feature/Milestone 'cookiejar' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/cookiejar`
+- **missing_next_level_structure**: Feature/Milestone 'is-extglob' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-extglob`
+- **missing_next_level_structure**: Feature/Milestone 'inflight' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/inflight`
+- **missing_next_level_structure**: Feature/Milestone 'p-limit' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/p-limit`
+- **missing_next_level_structure**: Feature/Milestone 'ini' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ini`
+- **missing_next_level_structure**: Feature/Milestone 'natural-compare' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/natural-compare`
+- **missing_next_level_structure**: Feature/Milestone 'normalize-path' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/normalize-path`
+- **missing_next_level_structure**: Feature/Milestone 'p-locate' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/p-locate`
+- **missing_next_level_structure**: Feature/Milestone 'path-key' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/path-key`
+- **missing_next_level_structure**: Feature/Milestone 'methods' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/methods`
+- **missing_next_level_structure**: Feature/Milestone 'postgres-interval' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/postgres-interval`
+- **missing_next_level_structure**: Feature/Milestone 'hasown' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/hasown`
+- **missing_next_level_structure**: Feature/Milestone 'path-is-absolute' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/path-is-absolute`
+- **missing_next_level_structure**: Feature/Milestone 'yocto-queue' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/yocto-queue`
+- **missing_next_level_structure**: Feature/Milestone 'set-function-length' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/set-function-length`
+- **missing_next_level_structure**: Feature/Milestone 'supports-color' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/supports-color`
+- **missing_next_level_structure**: Feature/Milestone 'bytes' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/bytes`
+- **missing_next_level_structure**: Feature/Milestone 'fs.realpath' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fs.realpath`
+- **missing_next_level_structure**: Feature/Milestone 'strip-json-comments' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/strip-json-comments`
+- **missing_next_level_structure**: Feature/Milestone 'js-tokens' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/js-tokens`
+- **missing_next_level_structure**: Feature/Milestone 'tunnel-agent' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/tunnel-agent`
+- **missing_requirements_folder**: Layer/Task 'deepmerge' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@fastify/deepmerge`
+- **missing_requirements_folder**: Layer/Task 'error' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@fastify/error`
+- **missing_requirements_folder**: Layer/Task 'websocket' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@fastify/websocket`
+- **missing_requirements_folder**: Layer/Task 'fast-json-stringify-compiler' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@fastify/fast-json-stringify-compiler`
+- **missing_next_level_structure**: Feature/Milestone 'collect-v8-coverage' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/collect-v8-coverage`
+- **missing_next_level_structure**: Feature/Milestone 'component-emitter' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/component-emitter`
+- **missing_next_level_structure**: Feature/Milestone 'color-convert' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/color-convert`
+- **missing_next_level_structure**: Feature/Milestone 'parent-module' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/parent-module`
+- **missing_next_level_structure**: Feature/Milestone 'babel-preset-jest' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/babel-preset-jest`
+- **missing_next_level_structure**: Feature/Milestone 'browserslist' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/browserslist`
+- **missing_next_level_structure**: Feature/Milestone 'events' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/events`
+- **missing_next_level_structure**: Feature/Milestone 'require-from-string' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/require-from-string`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-bigint' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-bigint`
+- **missing_requirements_folder**: Layer/Task 'helper-module-transforms' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-module-transforms`
+- **missing_requirements_folder**: Layer/Task 'code-frame' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/code-frame`
+- **missing_requirements_folder**: Layer/Task 'compat-data' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/compat-data`
+- **missing_requirements_folder**: Layer/Task 'parser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/parser`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-jsx' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-jsx`
+- **missing_requirements_folder**: Layer/Task 'helper-plugin-utils' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-plugin-utils`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-optional-catch-binding' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-optional-catch-binding`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-optional-chaining' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-optional-chaining`
+- **missing_requirements_folder**: Layer/Task 'helper-string-parser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-string-parser`
+- **missing_requirements_folder**: Layer/Task 'template' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/template`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-class-static-block' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-class-static-block`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-private-property-in-object' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-private-property-in-object`
+- **missing_requirements_folder**: Layer/Task 'traverse' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/traverse`
+- **missing_requirements_folder**: Layer/Task 'helper-module-imports' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-module-imports`
+- **missing_requirements_folder**: Layer/Task 'helper-validator-identifier' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-validator-identifier`
+- **missing_requirements_folder**: Layer/Task 'helper-validator-option' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helper-validator-option`
+- **missing_requirements_folder**: Layer/Task 'generator' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/generator`
+- **missing_requirements_folder**: Layer/Task 'core' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/core`
+- **missing_requirements_folder**: Layer/Task 'runtime' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/runtime`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-object-rest-spread' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-object-rest-spread`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-class-properties' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-class-properties`
+- **missing_requirements_folder**: Layer/Task 'plugin-syntax-top-level-await' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/plugin-syntax-top-level-await`
+- **missing_requirements_folder**: Layer/Task 'types' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/types`
+- **missing_requirements_folder**: Layer/Task 'helpers' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@babel/helpers`
+- **missing_next_level_structure**: Feature/Milestone 'inherits' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/inherits`
+- **missing_requirements_folder**: Layer/Task 'cookiejar' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/cookiejar`
+- **missing_requirements_folder**: Layer/Task 'mime' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/mime`
+- **missing_requirements_folder**: Layer/Task 'http-errors' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/http-errors`
+- **missing_requirements_folder**: Layer/Task 'uuid' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/uuid`
+- **missing_requirements_folder**: Layer/Task 'babel__generator' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/babel__generator`
+- **missing_requirements_folder**: Layer/Task 'methods' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/methods`
+- **missing_requirements_folder**: Layer/Task 'node' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/node`
+- **missing_requirements_folder**: Layer/Task 'stack-utils' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/stack-utils`
+- **missing_requirements_folder**: Layer/Task 'compression' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/compression`
+- **missing_requirements_folder**: Layer/Task 'babel__template' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/babel__template`
+- **missing_requirements_folder**: Layer/Task 'istanbul-lib-report' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/istanbul-lib-report`
+- **missing_requirements_folder**: Layer/Task 'body-parser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/body-parser`
+- **missing_requirements_folder**: Layer/Task 'babel__core' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/babel__core`
+- **missing_requirements_folder**: Layer/Task 'istanbul-lib-coverage' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/istanbul-lib-coverage`
+- **missing_requirements_folder**: Layer/Task 'lodash' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/lodash`
+- **missing_requirements_folder**: Layer/Task 'babel__traverse' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/babel__traverse`
+- **missing_requirements_folder**: Layer/Task 'yargs' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/yargs`
+- **missing_requirements_folder**: Layer/Task 'yargs-parser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/yargs-parser`
+- **missing_requirements_folder**: Layer/Task 'express-serve-static-core' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/express-serve-static-core`
+- **missing_requirements_folder**: Layer/Task 'superagent' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/superagent`
+- **missing_requirements_folder**: Layer/Task 'nodemailer' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/nodemailer`
+- **missing_requirements_folder**: Layer/Task 'istanbul-reports' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/istanbul-reports`
+- **missing_requirements_folder**: Layer/Task 'json-schema' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/json-schema`
+- **missing_requirements_folder**: Layer/Task 'express' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@types/express`
+- **missing_next_level_structure**: Feature/Milestone 'dezalgo' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/dezalgo`
+- **missing_next_level_structure**: Feature/Milestone 'char-regex' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/char-regex`
+- **missing_next_level_structure**: Feature/Milestone 'queue-microtask' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/queue-microtask`
+- **missing_next_level_structure**: Feature/Milestone 'type-detect' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type-detect`
+- **missing_next_level_structure**: Feature/Milestone 'color-name' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/color-name`
+- **missing_next_level_structure**: Feature/Milestone 'xtend' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/xtend`
+- **missing_next_level_structure**: Feature/Milestone 'create-require' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/create-require`
+- **missing_next_level_structure**: Feature/Milestone 'balanced-match' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/balanced-match`
+- **missing_next_level_structure**: Feature/Milestone 'mime-db' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/mime-db`
+- **missing_next_level_structure**: Feature/Milestone 'fast-safe-stringify' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fast-safe-stringify`
+- **missing_next_level_structure**: Feature/Milestone 'vary' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/vary`
+- **missing_next_level_structure**: Feature/Milestone 'npm-run-path' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/npm-run-path`
+- **missing_next_level_structure**: Feature/Milestone 'os' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/os`
+- **missing_next_level_structure**: Feature/Milestone 'node-int64' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/node-int64`
+- **missing_next_level_structure**: Feature/Milestone 'brace-expansion' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/brace-expansion`
+- **missing_next_level_structure**: Feature/Milestone 'require-directory' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/require-directory`
+- **missing_next_level_structure**: Feature/Milestone 'atomic-sleep' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/atomic-sleep`
+- **missing_next_level_structure**: Feature/Milestone 'merge2' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/merge2`
+- **missing_next_level_structure**: Feature/Milestone 'process' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/process`
+- **missing_next_level_structure**: Feature/Milestone 'safer-buffer' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/safer-buffer`
+- **missing_next_level_structure**: Feature/Milestone 'denque' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/denque`
+- **missing_next_level_structure**: Feature/Milestone 'fastfall' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fastfall`
+- **missing_next_level_structure**: Feature/Milestone 'fs-constants' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fs-constants`
+- **missing_next_level_structure**: Feature/Milestone 'string-length' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/string-length`
+- **missing_next_level_structure**: Feature/Milestone 'ms' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ms`
+- **missing_next_level_structure**: Feature/Milestone 'follow-redirects' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/follow-redirects`
+- **missing_next_level_structure**: Feature/Milestone 'node-releases' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/node-releases`
+- **missing_next_level_structure**: Feature/Milestone 'binary-extensions' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/binary-extensions`
+- **missing_next_level_structure**: Feature/Milestone 'compressible' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/compressible`
+- **missing_next_level_structure**: Feature/Milestone 'shebang-command' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/shebang-command`
+- **missing_next_level_structure**: Feature/Milestone 'fb-watchman' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fb-watchman`
+- **missing_next_level_structure**: Feature/Milestone 'locate-path' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/locate-path`
+- **missing_next_level_structure**: Feature/Milestone 'resolve-from' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/resolve-from`
+- **missing_next_level_structure**: Feature/Milestone 'jest-pnp-resolver' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/jest-pnp-resolver`
+- **missing_next_level_structure**: Feature/Milestone 'strip-ansi' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/strip-ansi`
+- **missing_next_level_structure**: Feature/Milestone 'on-headers' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/on-headers`
+- **missing_requirements_folder**: Layer/Task 'value' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/value`
+- **missing_requirements_folder**: Layer/Task 'natural-number' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/natural-number`
+- **missing_requirements_folder**: Layer/Task 'promise' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/promise`
+- **missing_requirements_folder**: Layer/Task 'big-int' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/big-int`
+- **missing_requirements_folder**: Layer/Task 'thenable' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/thenable`
+- **missing_requirements_folder**: Layer/Task 'map' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/map`
+- **missing_requirements_folder**: Layer/Task 'safe-integer' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/safe-integer`
+- **missing_requirements_folder**: Layer/Task 'array' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/array`
+- **missing_requirements_folder**: Layer/Task 'array-like' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/array-like`
+- **missing_requirements_folder**: Layer/Task 'array-length' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/array-length`
+- **missing_requirements_folder**: Layer/Task 'error' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/error`
+- **missing_requirements_folder**: Layer/Task 'prototype' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/prototype`
+- **missing_requirements_folder**: Layer/Task 'constructor' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/constructor`
+- **missing_requirements_folder**: Layer/Task 'ts-types' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/ts-types`
+- **missing_requirements_folder**: Layer/Task 'reg-exp' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/reg-exp`
+- **missing_requirements_folder**: Layer/Task 'iterable' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/iterable`
+- **missing_requirements_folder**: Layer/Task 'integer' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/integer`
+- **missing_requirements_folder**: Layer/Task 'object' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/object`
+- **missing_requirements_folder**: Layer/Task 'plain-object' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/type/plain-object`
+- **missing_next_level_structure**: Feature/Milestone 'electron-to-chromium' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/electron-to-chromium`
+- **missing_next_level_structure**: Feature/Milestone 'streamx' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/streamx`
+- **missing_requirements_folder**: Layer/Task 'previousDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousDay`
+- **missing_requirements_folder**: Layer/Task 'isFriday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isFriday`
+- **missing_requirements_folder**: Layer/Task 'differenceInSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInSeconds`
+- **missing_requirements_folder**: Layer/Task 'isLastDayOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isLastDayOfMonth`
+- **missing_requirements_folder**: Layer/Task 'isBefore' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isBefore`
+- **missing_requirements_folder**: Layer/Task 'endOfWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfWeek`
+- **missing_requirements_folder**: Layer/Task 'set' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/set`
+- **missing_requirements_folder**: Layer/Task 'previousTuesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousTuesday`
+- **missing_requirements_folder**: Layer/Task 'secondsToMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/secondsToMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'minutesToMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/minutesToMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'yearsToMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/yearsToMonths`
+- **missing_requirements_folder**: Layer/Task 'getTime' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getTime`
+- **missing_requirements_folder**: Layer/Task 'getOverlappingDaysInIntervals' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getOverlappingDaysInIntervals`
+- **missing_requirements_folder**: Layer/Task 'closestIndexTo' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/closestIndexTo`
+- **missing_requirements_folder**: Layer/Task 'setMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setMinutes`
+- **missing_requirements_folder**: Layer/Task 'subSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subSeconds`
+- **missing_requirements_folder**: Layer/Task 'isAfter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isAfter`
+- **missing_requirements_folder**: Layer/Task 'isMonday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isMonday`
+- **missing_requirements_folder**: Layer/Task 'eachYearOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachYearOfInterval`
+- **missing_requirements_folder**: Layer/Task 'addBusinessDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addBusinessDays`
+- **missing_requirements_folder**: Layer/Task 'endOfYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfYear`
+- **missing_requirements_folder**: Layer/Task 'differenceInYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInYears`
+- **missing_requirements_folder**: Layer/Task 'quartersToMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/quartersToMonths`
+- **missing_requirements_folder**: Layer/Task 'formatRFC7231' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatRFC7231`
+- **missing_requirements_folder**: Layer/Task 'isThisHour' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisHour`
+- **missing_requirements_folder**: Layer/Task 'nextSaturday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextSaturday`
+- **missing_requirements_folder**: Layer/Task 'previousSaturday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousSaturday`
+- **missing_requirements_folder**: Layer/Task 'daysToWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/daysToWeeks`
+- **missing_requirements_folder**: Layer/Task 'previousSunday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousSunday`
+- **missing_requirements_folder**: Layer/Task 'getDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDay`
+- **missing_requirements_folder**: Layer/Task 'startOfToday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfToday`
+- **missing_requirements_folder**: Layer/Task 'hoursToMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/hoursToMinutes`
+- **missing_requirements_folder**: Layer/Task 'isSameYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameYear`
+- **missing_requirements_folder**: Layer/Task 'getISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'isSunday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSunday`
+- **missing_requirements_folder**: Layer/Task 'fromUnixTime' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/fromUnixTime`
+- **missing_requirements_folder**: Layer/Task 'format' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/format`
+- **missing_requirements_folder**: Layer/Task 'getISODay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getISODay`
+- **missing_requirements_folder**: Layer/Task 'subMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subMinutes`
+- **missing_requirements_folder**: Layer/Task 'secondsToMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/secondsToMinutes`
+- **missing_requirements_folder**: Layer/Task 'setQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setQuarter`
+- **missing_requirements_folder**: Layer/Task 'addQuarters' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addQuarters`
+- **missing_requirements_folder**: Layer/Task 'eachWeekendOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachWeekendOfMonth`
+- **missing_requirements_folder**: Layer/Task 'differenceInWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInWeeks`
+- **missing_requirements_folder**: Layer/Task 'formatRelative' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatRelative`
+- **missing_requirements_folder**: Layer/Task 'isSaturday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSaturday`
+- **missing_requirements_folder**: Layer/Task 'clamp' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/clamp`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarQuarters' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarQuarters`
+- **missing_requirements_folder**: Layer/Task 'isPast' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isPast`
+- **missing_requirements_folder**: Layer/Task 'isTuesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isTuesday`
+- **missing_requirements_folder**: Layer/Task 'getDecade' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDecade`
+- **missing_requirements_folder**: Layer/Task 'setMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setMonth`
+- **missing_requirements_folder**: Layer/Task 'setISODay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setISODay`
+- **missing_requirements_folder**: Layer/Task 'startOfSecond' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfSecond`
+- **missing_requirements_folder**: Layer/Task 'subBusinessDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subBusinessDays`
+- **missing_requirements_folder**: Layer/Task 'locale' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/locale`
+- **missing_requirements_folder**: Layer/Task 'isSameISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameISOWeek`
+- **missing_requirements_folder**: Layer/Task 'getYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getYear`
+- **missing_requirements_folder**: Layer/Task 'addHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addHours`
+- **missing_requirements_folder**: Layer/Task 'setDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setDay`
+- **missing_requirements_folder**: Layer/Task 'endOfMinute' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfMinute`
+- **missing_requirements_folder**: Layer/Task 'startOfISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfISOWeek`
+- **missing_requirements_folder**: Layer/Task 'getDayOfYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDayOfYear`
+- **missing_requirements_folder**: Layer/Task 'isWednesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isWednesday`
+- **missing_requirements_folder**: Layer/Task 'subMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subMonths`
+- **missing_requirements_folder**: Layer/Task 'endOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfMonth`
+- **missing_requirements_folder**: Layer/Task 'isSameDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameDay`
+- **missing_requirements_folder**: Layer/Task 'getISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getISOWeek`
+- **missing_requirements_folder**: Layer/Task 'getMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'monthsToYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/monthsToYears`
+- **missing_requirements_folder**: Layer/Task 'subMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'nextDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextDay`
+- **missing_requirements_folder**: Layer/Task 'formatDuration' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatDuration`
+- **missing_requirements_folder**: Layer/Task 'formatISO9075' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatISO9075`
+- **missing_requirements_folder**: Layer/Task 'parse' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/parse`
+- **missing_requirements_folder**: Layer/Task 'eachMinuteOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachMinuteOfInterval`
+- **missing_requirements_folder**: Layer/Task 'startOfISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'setDayOfYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setDayOfYear`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarDays`
+- **missing_requirements_folder**: Layer/Task 'isThisQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisQuarter`
+- **missing_requirements_folder**: Layer/Task 'eachWeekOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachWeekOfInterval`
+- **missing_requirements_folder**: Layer/Task 'addMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addMinutes`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarWeeks`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfWeek`
+- **missing_requirements_folder**: Layer/Task 'getWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getWeekYear`
+- **missing_requirements_folder**: Layer/Task 'subISOWeekYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subISOWeekYears`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfISOWeek`
+- **missing_requirements_folder**: Layer/Task 'eachQuarterOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachQuarterOfInterval`
+- **missing_requirements_folder**: Layer/Task 'startOfWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfWeek`
+- **missing_requirements_folder**: Layer/Task 'startOfMinute' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfMinute`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarYears`
+- **missing_requirements_folder**: Layer/Task 'getISOWeeksInYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getISOWeeksInYear`
+- **missing_requirements_folder**: Layer/Task 'secondsToHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/secondsToHours`
+- **missing_requirements_folder**: Layer/Task 'endOfISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarMonths`
+- **missing_requirements_folder**: Layer/Task 'endOfISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfISOWeek`
+- **missing_requirements_folder**: Layer/Task 'minutesToHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/minutesToHours`
+- **missing_requirements_folder**: Layer/Task 'addDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addDays`
+- **missing_requirements_folder**: Layer/Task 'setISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setISOWeek`
+- **missing_requirements_folder**: Layer/Task 'nextMonday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextMonday`
+- **missing_requirements_folder**: Layer/Task 'getWeekOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getWeekOfMonth`
+- **missing_requirements_folder**: Layer/Task 'minutesToSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/minutesToSeconds`
+- **missing_requirements_folder**: Layer/Task 'isYesterday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isYesterday`
+- **missing_requirements_folder**: Layer/Task 'fp' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/fp`
+- **missing_requirements_folder**: Layer/Task 'getWeeksInMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getWeeksInMonth`
+- **missing_requirements_folder**: Layer/Task 'quartersToYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/quartersToYears`
+- **missing_requirements_folder**: Layer/Task 'add' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/add`
+- **missing_requirements_folder**: Layer/Task 'getDaysInYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDaysInYear`
+- **missing_requirements_folder**: Layer/Task 'areIntervalsOverlapping' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/areIntervalsOverlapping`
+- **missing_requirements_folder**: Layer/Task 'setWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setWeekYear`
+- **missing_requirements_folder**: Layer/Task 'max' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/max`
+- **missing_requirements_folder**: Layer/Task 'setDefaultOptions' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setDefaultOptions`
+- **missing_requirements_folder**: Layer/Task 'eachHourOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachHourOfInterval`
+- **missing_requirements_folder**: Layer/Task 'eachMonthOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachMonthOfInterval`
+- **missing_requirements_folder**: Layer/Task 'getHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getHours`
+- **missing_requirements_folder**: Layer/Task 'formatDistanceToNow' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatDistanceToNow`
+- **missing_requirements_folder**: Layer/Task 'isSameISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfQuarter`
+- **missing_requirements_folder**: Layer/Task 'setISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'formatDistanceToNowStrict' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatDistanceToNowStrict`
+- **missing_requirements_folder**: Layer/Task 'lightFormat' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lightFormat`
+- **missing_requirements_folder**: Layer/Task 'setHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setHours`
+- **missing_requirements_folder**: Layer/Task 'eachWeekendOfYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachWeekendOfYear`
+- **missing_requirements_folder**: Layer/Task 'addMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addMonths`
+- **missing_requirements_folder**: Layer/Task 'roundToNearestMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/roundToNearestMinutes`
+- **missing_requirements_folder**: Layer/Task 'getQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getQuarter`
+- **missing_requirements_folder**: Layer/Task 'eachWeekendOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachWeekendOfInterval`
+- **missing_requirements_folder**: Layer/Task 'isFuture' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isFuture`
+- **missing_requirements_folder**: Layer/Task 'addMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'isWeekend' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isWeekend`
+- **missing_requirements_folder**: Layer/Task 'startOfQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfQuarter`
+- **missing_requirements_folder**: Layer/Task 'formatDistance' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatDistance`
+- **missing_requirements_folder**: Layer/Task 'parseISO' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/parseISO`
+- **missing_requirements_folder**: Layer/Task 'min' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/min`
+- **missing_requirements_folder**: Layer/Task 'millisecondsToHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/millisecondsToHours`
+- **missing_requirements_folder**: Layer/Task 'addSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addSeconds`
+- **missing_requirements_folder**: Layer/Task 'hoursToMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/hoursToMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'getUnixTime' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getUnixTime`
+- **missing_requirements_folder**: Layer/Task 'sub' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/sub`
+- **missing_requirements_folder**: Layer/Task 'millisecondsToSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/millisecondsToSeconds`
+- **missing_requirements_folder**: Layer/Task 'getDaysInMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDaysInMonth`
+- **missing_requirements_folder**: Layer/Task 'setSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setSeconds`
+- **missing_requirements_folder**: Layer/Task 'subWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subWeeks`
+- **missing_requirements_folder**: Layer/Task 'parseJSON' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/parseJSON`
+- **missing_requirements_folder**: Layer/Task 'isExists' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isExists`
+- **missing_requirements_folder**: Layer/Task 'getDate' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDate`
+- **missing_requirements_folder**: Layer/Task 'formatISO' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatISO`
+- **missing_requirements_folder**: Layer/Task 'eachDayOfInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/eachDayOfInterval`
+- **missing_requirements_folder**: Layer/Task 'intervalToDuration' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/intervalToDuration`
+- **missing_requirements_folder**: Layer/Task 'endOfHour' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfHour`
+- **missing_requirements_folder**: Layer/Task 'startOfYesterday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfYesterday`
+- **missing_requirements_folder**: Layer/Task 'formatRFC3339' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatRFC3339`
+- **missing_requirements_folder**: Layer/Task 'isWithinInterval' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isWithinInterval`
+- **missing_requirements_folder**: Layer/Task 'previousWednesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousWednesday`
+- **missing_requirements_folder**: Layer/Task 'isDate' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isDate`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarISOWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarISOWeeks`
+- **missing_requirements_folder**: Layer/Task 'getSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getSeconds`
+- **missing_requirements_folder**: Layer/Task '_lib' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/_lib`
+- **missing_requirements_folder**: Layer/Task 'isThisYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisYear`
+- **missing_requirements_folder**: Layer/Task 'setWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setWeek`
+- **missing_requirements_folder**: Layer/Task 'constants' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/constants`
+- **missing_requirements_folder**: Layer/Task 'endOfYesterday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfYesterday`
+- **missing_requirements_folder**: Layer/Task 'nextFriday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextFriday`
+- **missing_requirements_folder**: Layer/Task 'startOfWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfWeekYear`
+- **missing_requirements_folder**: Layer/Task 'isFirstDayOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isFirstDayOfMonth`
+- **missing_requirements_folder**: Layer/Task 'startOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfMonth`
+- **missing_requirements_folder**: Layer/Task 'endOfQuarter' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfQuarter`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfMonth`
+- **missing_requirements_folder**: Layer/Task 'formatISODuration' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatISODuration`
+- **missing_requirements_folder**: Layer/Task 'isValid' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isValid`
+- **missing_requirements_folder**: Layer/Task 'isToday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isToday`
+- **missing_requirements_folder**: Layer/Task 'esm' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/esm`
+- **missing_requirements_folder**: Layer/Task 'isTomorrow' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isTomorrow`
+- **missing_requirements_folder**: Layer/Task 'isSameSecond' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameSecond`
+- **missing_requirements_folder**: Layer/Task 'isEqual' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isEqual`
+- **missing_requirements_folder**: Layer/Task 'getWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getWeek`
+- **missing_requirements_folder**: Layer/Task 'addISOWeekYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addISOWeekYears`
+- **missing_requirements_folder**: Layer/Task 'setDate' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setDate`
+- **missing_requirements_folder**: Layer/Task 'previousMonday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousMonday`
+- **missing_requirements_folder**: Layer/Task 'getDefaultOptions' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getDefaultOptions`
+- **missing_requirements_folder**: Layer/Task 'isMatch' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isMatch`
+- **missing_requirements_folder**: Layer/Task 'endOfDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfDay`
+- **missing_requirements_folder**: Layer/Task 'compareDesc' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/compareDesc`
+- **missing_requirements_folder**: Layer/Task 'weeksToDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/weeksToDays`
+- **missing_requirements_folder**: Layer/Task 'hoursToSeconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/hoursToSeconds`
+- **missing_requirements_folder**: Layer/Task 'nextSunday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextSunday`
+- **missing_requirements_folder**: Layer/Task 'setMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'startOfDecade' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfDecade`
+- **missing_requirements_folder**: Layer/Task 'differenceInDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInDays`
+- **missing_requirements_folder**: Layer/Task 'isThisMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisMonth`
+- **missing_requirements_folder**: Layer/Task 'isThisSecond' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisSecond`
+- **missing_requirements_folder**: Layer/Task 'previousThursday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousThursday`
+- **missing_requirements_folder**: Layer/Task 'previousFriday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/previousFriday`
+- **missing_requirements_folder**: Layer/Task 'startOfDay' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfDay`
+- **missing_requirements_folder**: Layer/Task 'isLeapYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isLeapYear`
+- **missing_requirements_folder**: Layer/Task 'getMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/getMonth`
+- **missing_requirements_folder**: Layer/Task 'isThisMinute' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisMinute`
+- **missing_requirements_folder**: Layer/Task 'isSameWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameWeek`
+- **missing_requirements_folder**: Layer/Task 'nextWednesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextWednesday`
+- **missing_requirements_folder**: Layer/Task 'milliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/milliseconds`
+- **missing_requirements_folder**: Layer/Task 'differenceInHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInHours`
+- **missing_requirements_folder**: Layer/Task 'compareAsc' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/compareAsc`
+- **missing_requirements_folder**: Layer/Task 'startOfTomorrow' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfTomorrow`
+- **missing_requirements_folder**: Layer/Task 'endOfToday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfToday`
+- **missing_requirements_folder**: Layer/Task 'subHours' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subHours`
+- **missing_requirements_folder**: Layer/Task 'closestTo' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/closestTo`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfYear`
+- **missing_requirements_folder**: Layer/Task 'differenceInMilliseconds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInMilliseconds`
+- **missing_requirements_folder**: Layer/Task 'differenceInQuarters' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInQuarters`
+- **missing_requirements_folder**: Layer/Task 'subDays' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subDays`
+- **missing_requirements_folder**: Layer/Task 'yearsToQuarters' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/yearsToQuarters`
+- **missing_requirements_folder**: Layer/Task 'isThisWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisWeek`
+- **missing_requirements_folder**: Layer/Task 'differenceInMonths' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInMonths`
+- **missing_requirements_folder**: Layer/Task 'toDate' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/toDate`
+- **missing_requirements_folder**: Layer/Task 'nextTuesday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextTuesday`
+- **missing_requirements_folder**: Layer/Task 'addWeeks' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/addWeeks`
+- **missing_requirements_folder**: Layer/Task 'formatDistanceStrict' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/formatDistanceStrict`
+- **missing_requirements_folder**: Layer/Task 'isThursday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThursday`
+- **missing_requirements_folder**: Layer/Task 'setYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/setYear`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfISOWeekYear' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfISOWeekYear`
+- **missing_requirements_folder**: Layer/Task 'endOfDecade' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfDecade`
+- **missing_requirements_folder**: Layer/Task 'isSameHour' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameHour`
+- **missing_requirements_folder**: Layer/Task 'isSameMinute' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameMinute`
+- **missing_requirements_folder**: Layer/Task 'isThisISOWeek' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isThisISOWeek`
+- **missing_requirements_folder**: Layer/Task 'endOfTomorrow' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/endOfTomorrow`
+- **missing_requirements_folder**: Layer/Task 'monthsToQuarters' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/monthsToQuarters`
+- **missing_requirements_folder**: Layer/Task 'millisecondsToMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/millisecondsToMinutes`
+- **missing_requirements_folder**: Layer/Task 'lastDayOfDecade' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/lastDayOfDecade`
+- **missing_requirements_folder**: Layer/Task 'isSameMonth' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/isSameMonth`
+- **missing_requirements_folder**: Layer/Task 'subYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/subYears`
+- **missing_requirements_folder**: Layer/Task 'differenceInMinutes' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInMinutes`
+- **missing_requirements_folder**: Layer/Task 'startOfHour' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/startOfHour`
+- **missing_requirements_folder**: Layer/Task 'differenceInCalendarISOWeekYears' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/differenceInCalendarISOWeekYears`
+- **missing_requirements_folder**: Layer/Task 'nextThursday' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/date-fns/nextThursday`
+- **missing_next_level_structure**: Feature/Milestone 'path-exists' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/path-exists`
+- **missing_next_level_structure**: Feature/Milestone 'ansi-regex' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ansi-regex`
+- **missing_next_level_structure**: Feature/Milestone 'colorette' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/colorette`
+- **missing_next_level_structure**: Feature/Milestone 'run-parallel' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/run-parallel`
+- **missing_next_level_structure**: Feature/Milestone 'path-type' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/path-type`
+- **missing_next_level_structure**: Feature/Milestone 'fastseries' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fastseries`
+- **missing_next_level_structure**: Feature/Milestone 'cookie' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/cookie`
+- **missing_next_level_structure**: Feature/Milestone 'is-binary-path' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-binary-path`
+- **missing_next_level_structure**: Feature/Milestone 'is-glob' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-glob`
+- **missing_next_level_structure**: Feature/Milestone 'simple-get' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/simple-get`
+- **missing_next_level_structure**: Feature/Milestone 'pump' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/pump`
+- **missing_next_level_structure**: Feature/Milestone 'ansi-escapes' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ansi-escapes`
+- **missing_next_level_structure**: Feature/Milestone 'kleur' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/kleur`
+- **missing_next_level_structure**: Feature/Milestone 'shebang-regex' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/shebang-regex`
+- **missing_next_level_structure**: Feature/Milestone 'word-wrap' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/word-wrap`
+- **missing_next_level_structure**: Feature/Milestone 'end-of-stream' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/end-of-stream`
+- **missing_next_level_structure**: Feature/Milestone 'strip-bom' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/strip-bom`
+- **missing_next_level_structure**: Feature/Milestone 'is-stream' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-stream`
+- **missing_next_level_structure**: Feature/Milestone 'p-try' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/p-try`
+- **missing_next_level_structure**: Feature/Milestone 'to-regex-range' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/to-regex-range`
+- **missing_next_level_structure**: Feature/Milestone 'strnum' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/strnum`
+- **missing_next_level_structure**: Feature/Milestone 'co' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/co`
+- **missing_next_level_structure**: Feature/Milestone 'ignore' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ignore`
+- **missing_next_level_structure**: Feature/Milestone 'get-caller-file' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/get-caller-file`
+- **missing_next_level_structure**: Feature/Milestone 'error-ex' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/error-ex`
+- **missing_next_level_structure**: Feature/Milestone 'camelcase' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/camelcase`
+- **missing_next_level_structure**: Feature/Milestone 'is-generator-fn' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-generator-fn`
+- **missing_next_level_structure**: Feature/Milestone 'd' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/d`
+- **missing_next_level_structure**: Feature/Milestone 'base64-js' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/base64-js`
+- **missing_next_level_structure**: Feature/Milestone 'safe-buffer' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/safe-buffer`
+- **missing_next_level_structure**: Feature/Milestone 'isarray' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/isarray`
+- **missing_next_level_structure**: Feature/Milestone 'decompress-response' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/decompress-response`
+- **missing_next_level_structure**: Feature/Milestone 'node-abi' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/node-abi`
+- **missing_next_level_structure**: Feature/Milestone 'postgres-date' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/postgres-date`
+- **missing_next_level_structure**: Feature/Milestone 'fast-decode-uri-component' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fast-decode-uri-component`
+- **missing_next_level_structure**: Feature/Milestone 'import-fresh' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/import-fresh`
+- **missing_next_level_structure**: Feature/Milestone 'proxy-addr' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/proxy-addr`
+- **missing_next_level_structure**: Feature/Milestone 'undici-types' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/undici-types`
+- **missing_next_level_structure**: Feature/Milestone 'get-package-type' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/get-package-type`
+- **missing_next_level_structure**: Feature/Milestone 'obliterator' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/obliterator`
+- **missing_next_level_structure**: Feature/Milestone 'postgres-array' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/postgres-array`
+- **missing_requirements_folder**: Layer/Task 'transform' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@jest/transform`
+- **missing_requirements_folder**: Layer/Task 'types' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@jest/types`
+- **missing_requirements_folder**: Layer/Task 'test-result' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@jest/test-result`
+- **missing_requirements_folder**: Layer/Task 'console' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@jest/console`
+- **missing_next_level_structure**: Feature/Milestone 'emittery' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/emittery`
+- **missing_next_level_structure**: Feature/Milestone 'ignore-by-default' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ignore-by-default`
+- **missing_next_level_structure**: Feature/Milestone 'json-parse-even-better-errors' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/json-parse-even-better-errors`
+- **missing_next_level_structure**: Feature/Milestone 'fast-fifo' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/fast-fifo`
+- **missing_requirements_folder**: Layer/Task 'protocol-http' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/protocol-http`
+- **missing_requirements_folder**: Layer/Task 'util-endpoints' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-endpoints`
+- **missing_requirements_folder**: Layer/Task 'util-stream' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-stream`
+- **missing_requirements_folder**: Layer/Task 'middleware-retry' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/middleware-retry`
+- **missing_requirements_folder**: Layer/Task 'hash-node' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/hash-node`
+- **missing_requirements_folder**: Layer/Task 'signature-v4' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/signature-v4`
+- **missing_requirements_folder**: Layer/Task 'util-uri-escape' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-uri-escape`
+- **missing_requirements_folder**: Layer/Task 'md5-js' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/md5-js`
+- **missing_requirements_folder**: Layer/Task 'eventstream-serde-node' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/eventstream-serde-node`
+- **missing_requirements_folder**: Layer/Task 'middleware-content-length' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/middleware-content-length`
+- **missing_requirements_folder**: Layer/Task 'config-resolver' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/config-resolver`
+- **missing_requirements_folder**: Layer/Task 'eventstream-codec' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/eventstream-codec`
+- **missing_requirements_folder**: Layer/Task 'middleware-stack' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/middleware-stack`
+- **missing_requirements_folder**: Layer/Task 'middleware-endpoint' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/middleware-endpoint`
+- **missing_requirements_folder**: Layer/Task 'querystring-builder' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/querystring-builder`
+- **missing_requirements_folder**: Layer/Task 'url-parser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/url-parser`
+- **missing_requirements_folder**: Layer/Task 'core' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/core`
+- **missing_requirements_folder**: Layer/Task 'invalid-dependency' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/invalid-dependency`
+- **missing_requirements_folder**: Layer/Task 'eventstream-serde-config-resolver' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/eventstream-serde-config-resolver`
+- **missing_requirements_folder**: Layer/Task 'shared-ini-file-loader' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/shared-ini-file-loader`
+- **missing_requirements_folder**: Layer/Task 'chunked-blob-reader-native' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/chunked-blob-reader-native`
+- **missing_requirements_folder**: Layer/Task 'property-provider' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/property-provider`
+- **missing_requirements_folder**: Layer/Task 'util-config-provider' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-config-provider`
+- **missing_requirements_folder**: Layer/Task 'util-utf8' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-utf8`
+- **missing_requirements_folder**: Layer/Task 'abort-controller' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/abort-controller`
+- **missing_requirements_folder**: Layer/Task 'chunked-blob-reader' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/chunked-blob-reader`
+- **missing_requirements_folder**: Layer/Task 'util-base64' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-base64`
+- **missing_requirements_folder**: Layer/Task 'credential-provider-imds' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/credential-provider-imds`
+- **missing_requirements_folder**: Layer/Task 'util-body-length-browser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-body-length-browser`
+- **missing_requirements_folder**: Layer/Task 'eventstream-serde-universal' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/eventstream-serde-universal`
+- **missing_requirements_folder**: Layer/Task 'service-error-classification' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/service-error-classification`
+- **missing_requirements_folder**: Layer/Task 'node-config-provider' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/node-config-provider`
+- **missing_requirements_folder**: Layer/Task 'util-defaults-mode-browser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-defaults-mode-browser`
+- **missing_requirements_folder**: Layer/Task 'util-buffer-from' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-buffer-from`
+- **missing_requirements_folder**: Layer/Task 'middleware-serde' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/middleware-serde`
+- **missing_requirements_folder**: Layer/Task 'eventstream-serde-browser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/eventstream-serde-browser`
+- **missing_requirements_folder**: Layer/Task 'types' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/types`
+- **missing_requirements_folder**: Layer/Task 'hash-blob-browser' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/hash-blob-browser`
+- **missing_requirements_folder**: Layer/Task 'util-hex-encoding' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-hex-encoding`
+- **missing_requirements_folder**: Layer/Task 'util-retry' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@smithy/util-retry`
+- **missing_next_level_structure**: Feature/Milestone 'array-union' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/array-union`
+- **missing_next_level_structure**: Feature/Milestone 'asap' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/asap`
+- **missing_next_level_structure**: Feature/Milestone 'v8-compile-cache-lib' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/v8-compile-cache-lib`
+- **missing_next_level_structure**: Feature/Milestone 'update-browserslist-db' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/update-browserslist-db`
+- **missing_next_level_structure**: Feature/Milestone 'buffer-from' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/buffer-from`
+- **missing_next_level_structure**: Feature/Milestone 'bser' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/bser`
+- **missing_next_level_structure**: Feature/Milestone 'clone' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/clone`
+- **missing_next_level_structure**: Feature/Milestone 'lodash.merge' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/lodash.merge`
+- **missing_next_level_structure**: Feature/Milestone 'ieee754' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ieee754`
+- **missing_next_level_structure**: Feature/Milestone 'node-gyp-build-optional-packages' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/node-gyp-build-optional-packages`
+- **missing_next_level_structure**: Feature/Milestone 'wrappy' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/wrappy`
+- **missing_requirements_folder**: Layer/Task 'reg-exp' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/es5-ext/reg-exp`
+- **missing_requirements_folder**: Layer/Task 'iterable' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/es5-ext/iterable`
+- **missing_requirements_folder**: Layer/Task 'object' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/es5-ext/object`
+- **missing_next_level_structure**: Feature/Milestone 'util-deprecate' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/util-deprecate`
+- **missing_next_level_structure**: Feature/Milestone 'ansi-styles' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/ansi-styles`
+- **missing_next_level_structure**: Feature/Milestone 'dir-glob' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/dir-glob`
+- **missing_next_level_structure**: Feature/Milestone 'color-string' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/color-string`
+- **missing_next_level_structure**: Feature/Milestone 'yn' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/yn`
+- **missing_next_level_structure**: Feature/Milestone 'wrap-ansi' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/wrap-ansi`
+- **missing_requirements_folder**: Layer/Task 'storage-common' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@azure/storage-common`
+- **missing_requirements_folder**: Layer/Task 'core-lro' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@azure/core-lro`
+- **missing_requirements_folder**: Layer/Task 'core-client' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/@azure/core-client`
+- **missing_next_level_structure**: Feature/Milestone 'pg-int8' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/pg-int8`
+- **missing_next_level_structure**: Feature/Milestone 'globby' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/globby`
+- **missing_next_level_structure**: Feature/Milestone 'bare-stream' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/bare-stream`
+- **missing_next_level_structure**: Feature/Milestone 'lodash.isarguments' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/lodash.isarguments`
+- **missing_next_level_structure**: Feature/Milestone 'is-path-inside' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/is-path-inside`
+- **missing_next_level_structure**: Feature/Milestone 'callsites' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/callsites`
+- **missing_next_level_structure**: Feature/Milestone 'forwarded' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/forwarded`
+- **missing_next_level_structure**: Feature/Milestone 'postgres-bytea' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/postgres-bytea`
+- **missing_next_level_structure**: Feature/Milestone 'proxy-from-env' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/proxy-from-env`
+- **missing_next_level_structure**: Feature/Milestone 'parse-json' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/parse-json`
+- **missing_next_level_structure**: Feature/Milestone 'napi-build-utils' missing Layer/Task organization
+  - *Recommendation*: Create proper layer/task folders to continue requirements hierarchy
+  - *Path*: `/workspaces/control_tower/cloned_repos/business_ventures/opti_royale/node_modules/napi-build-utils`
+
+## 📁 life_quality
+⚠️ **NEEDS ATTENTION** - 4 structure issues:
+
+### Level 3 (System/Workpackage):
+- **missing_requirements_folder**: System/Workpackage 'workpackages' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store system/workpackage requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/life_quality/home_improvements/workpackages`
+
+### Level 5 (Layer/Task):
+- **missing_requirements_folder**: Layer/Task 'milestones' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/life_quality/home_improvements/workpackages/exterior_landscaping/milestones`
+- **missing_requirements_folder**: Layer/Task 'milestones' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/life_quality/home_improvements/workpackages/kitchen_renovation/milestones`
+- **missing_requirements_folder**: Layer/Task 'milestones' missing requirements/ folder
+  - *Recommendation*: Create requirements/ folder to store layer/task requirements files
+  - *Path*: `/workspaces/control_tower/cloned_repos/life_quality/home_improvements/workpackages/bathroom_upgrade/milestones`
+
+## 📁 online_presence
+⚠️ **NEEDS ATTENTION** - 1 structure issues:
+
+### Level 2 (Project):
+- **no_projects**: No projects found in North Star repository
+  - *Recommendation*: Create project folders to organize work at Level 2
+  - *Path*: `/workspaces/control_tower/cloned_repos/online_presence`
+
+## 📁 professional_excellence
+⚠️ **NEEDS ATTENTION** - 1 structure issues:
+
+### Level 3 (System/Workpackage):
+- **missing_level3_structure**: Project 'Safran SF Optimization' missing Level 3 (Systems/Workpackages) organization
+  - *Recommendation*: Create systems/ or workpackages/ folders to organize Level 3 requirements structure
+  - *Path*: `/workspaces/control_tower/cloned_repos/professional_excellence/Safran SF Optimization`
+
+## 🔧 Recommended Actions
+
+### Priority Issues:
+- **missing_requirements_folder**: 383 instances
+- **missing_next_level_structure**: 185 instances
+- **no_projects**: 3 instances
+- **missing_level3_structure**: 2 instances
+
+### Implementation Plan:
+1. **Create Level 3 Structure**: Organize projects into Systems/Workpackages
+2. **Add Level 4 Organization**: Break systems into Features/Milestones
+3. **Implement Level 5 Details**: Organize features into Layers/Tasks
+4. **Requirements Integration**: Ensure each level can cascade requirements properly
+5. **Validate Structure**: Re-run validation after restructuring

@@ -39,7 +39,7 @@ class ContractProjectManager:
         self.project_name = "ZnNi Line Development Plan"
         self.xml_workspace = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace"
         # UPDATED: Use new folder structure with /current/ subdirectory as per Friday workflow
-        self.current_xml = os.path.join(self.xml_workspace, "current", "ZnNi_Line_Development_Plan-08.xml")
+        self.current_xml = os.path.join(self.xml_workspace, "current", "ZnNi Line Development Plan-08.xml")
         self.source_mpp = r"D:\Downloads\ZnNi Line Development Plan-08.mpp"
         self.ms_project = None
         self.auto_sync_enabled = True
@@ -298,7 +298,8 @@ try {{
         if period in ["current", "both"]:
             current_milestones = self.ms_project.get_milestones(
                 start_date=current_month_start,
-                end_date=current_month_end
+                end_date=current_month_end,
+                include_overdue=True
             )
             results['current_month'] = current_milestones
             
@@ -478,75 +479,6 @@ try {{
             List of change records formatted for presentation
         """
         return self.change_management.get_presentation_changes(phase)
-        """
-        Query milestones for current/next month with reporting
-        
-        Args:
-            period: "current", "next", or "both"
-            
-        Returns:
-            Dictionary with milestone lists
-        """
-        # Track this query for reporting
-        command = f"python3 control_tower.py ms-project --action milestones --period {period}"
-        parameters = {"period": period}
-        query_hash, is_new = self.reporting.track_query("milestones", command, parameters)
-        
-        if not self.load_project():
-            return {}
-            
-        today = datetime.now()
-        
-        # Current month range - ensure we include the last day of the month
-        current_month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        # Get last day of current month more reliably
-        if today.month == 12:
-            current_month_end = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
-        else:
-            current_month_end = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
-        # Set to end of day
-        current_month_end = current_month_end.replace(hour=23, minute=59, second=59)
-        
-        # Next month range - fixed calculation
-        if today.month == 12:
-            next_month_start = today.replace(year=today.year + 1, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-            next_month_end = today.replace(year=today.year + 1, month=1, day=31, hour=23, minute=59, second=59)
-        else:
-            next_month_start = today.replace(month=today.month + 1, day=1, hour=0, minute=0, second=0, microsecond=0)
-            # Get last day of next month
-            if today.month + 1 in [1, 3, 5, 7, 8, 10, 12]:
-                last_day = 31
-            elif today.month + 1 in [4, 6, 9, 11]:
-                last_day = 30
-            else:  # February
-                last_day = 29 if (today.year + (1 if today.month == 12 else 0)) % 4 == 0 else 28
-            next_month_end = today.replace(month=today.month + 1, day=last_day, hour=23, minute=59, second=59)
-        
-        results = {}
-        
-        if period in ["current", "both"]:
-            current_milestones = self.ms_project.get_milestones(
-                start_date=current_month_start,
-                end_date=current_month_end
-            )
-            results['current_month'] = current_milestones
-            
-        if period in ["next", "both"]:
-            next_milestones = self.ms_project.get_milestones(
-                start_date=next_month_start, 
-                end_date=next_month_end
-            )
-            results['next_month'] = next_milestones
-        
-        # Generate and save report
-        report_content = self._format_milestones_report(results, period)
-        report_name = f"milestones_{period}"
-        self.reporting.save_report(report_name, report_content, query_hash)
-        
-        if is_new:
-            print(f"🆕 New query tracked! Check control_tower_commands.md for reusable command.")
-        
-        return results
     
     def _format_milestones_report(self, milestones_data: Dict[str, List], period: str) -> str:
         """Format milestones data for report generation"""

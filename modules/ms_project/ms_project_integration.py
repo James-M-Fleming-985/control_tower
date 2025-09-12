@@ -162,36 +162,57 @@ class MSProjectIntegration:
         return found.text if found is not None else ""
     
     def get_milestones(self, start_date: Optional[datetime] = None, 
-                      end_date: Optional[datetime] = None) -> List[Dict]:
+                      end_date: Optional[datetime] = None, 
+                      include_overdue: bool = False) -> List[Dict]:
         """
-        Get milestones within date range
+        Get milestones within date range, optionally including overdue incomplete milestones
         
         Args:
             start_date: Start of date range
             end_date: End of date range
+            include_overdue: If True, include all past incomplete milestones regardless of date range
             
         Returns:
             List of milestone tasks
         """
         milestones = []
+        today = datetime.now()
         
         for task in self.tasks:
             if task['is_milestone']:
                 task_date = self._parse_ms_date(task['finish'])
+                is_complete = task['percent_complete'] == '100'
                 
-                # Filter by date range if provided
-                if start_date and task_date and task_date < start_date:
-                    continue
-                if end_date and task_date and task_date > end_date:
-                    continue
-                    
-                milestones.append({
-                    'name': task['name'],
-                    'date': task_date,
-                    'status': 'Complete' if task['percent_complete'] == '100' else 'Pending',
-                    'percent_complete': task['percent_complete'],
-                    'resource': task['resource_names']
-                })
+                # Check if milestone should be included
+                include_milestone = False
+                
+                # Include if within date range
+                if start_date and end_date:
+                    if task_date and start_date <= task_date <= end_date:
+                        include_milestone = True
+                elif start_date:
+                    if task_date and task_date >= start_date:
+                        include_milestone = True
+                elif end_date:
+                    if task_date and task_date <= end_date:
+                        include_milestone = True
+                else:
+                    # No date filters, include all
+                    include_milestone = True
+                
+                # If include_overdue is True, also include past incomplete milestones
+                if include_overdue and not is_complete and task_date and task_date < today:
+                    include_milestone = True
+                
+                if include_milestone:
+                    milestones.append({
+                        'name': task['name'],
+                        'date': task_date,
+                        'status': 'Complete' if is_complete else 'Pending',
+                        'percent_complete': task['percent_complete'],
+                        'resource': task['resource_names'],
+                        'is_overdue': task_date and task_date < today and not is_complete
+                    })
         
         return sorted(milestones, key=lambda x: x['date'] or datetime.min)
     

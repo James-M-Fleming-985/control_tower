@@ -11,40 +11,36 @@
   - ~~Status: Complete~~
   - ~~Resource: M-Tech~~
 
-- 🚨 **ZnNi Line Chiller System Optimization Platform Loures Design Approved** (OVERDUE) Awaiting feedback from Matt D. emailed 12/08/25
-  - Due: 11/08/2025
-  - Status: Pending
-  - Resource: Not assigned
+- 🚨 **~~ZnNi Line Chiller System Optimization Platform Loures Design Approved** (OVERDUE) Awaiting feedback from Matt D. emailed 12/08/25~~
+  - ~~Due: 11/08/2025~~
+  - ~~Status: Pending~~
+  - ~~Resource: Not assigned~~
 
-- 🚨 **ZnNi Line Chiller System Optimization Platform & Housing Design Complete** (OVERDUE) See line 14
-  - Due: 11/08/2025
-  - Status: Pending
-  - Resource: Not assigned
+- 🚨 **~~ZnNi Line Chiller System Optimization Platform & Housing Design Complete** (OVERDUE) See line 14~~
+  - ~~Due: 11/08/2025~~
+  - ~~Status: Pending~~
+  - ~~Resource: Not assigned~~
 
-- ⏳ **SF Investment Strategy OEE & OLE Application Testing Complete** (OVERDUE) Matt W on Holiday
-  - Due: 12/08/2025
-  - Status: Pending
-  - Resource: Matt Wetton
+- ⏳ **~~SF Investment Strategy OEE & OLE Application Testing Complete** (OVERDUE) Matt W on Holiday~~
+  - ~~Due: 12/08/2025~~
+  - ~~Status: Pending~~
+  - ~~Resource: Matt Wetton~~
 
-- ⏳ **ZnNi Line Chiller System Optimization Platform Install Complete** (OVERDUE) MTECH awaiting parts, to be installed by 15/08/25
-  - Due: 12/08/2025
-  - Status: Pending
-  - Resource: M-Tech
+- ⏳ **~~ZnNi Line Chiller System Optimization Platform Install Complete** (OVERDUE) MTECH awaiting parts, to be installed by 15/08/25~~
+  - ~~Due: 12/08/2025~~
+  - ~~Status: Pending~~
+  - ~~Resource: M-Tech~~
 
 - ⏳ **~~ZnNi Line Kardex Optimization Kardex Shelf Layout strategy Agreed~~**
   - ~~Due: 13/08/2025~~
   - ~~Status: Pending~~
   - ~~Resource: James Fleming~~
 
-- ⏳ **SF Investment Strategy OEE & OLE Application Development Complete**
-  - Due: 15/08/2025
-  - Status: Pending
-  - Resource: Matt Wetton
+- ⏳ **~~SF Investment Strategy OEE & OLE Application Development Complete~~**
+  - ~~Due: 15/08/2025~~
+  - ~~Status: Pending~~
+  - ~~Resource: Matt Wetton~~
 
-- ⏳ **Surface Finish Table 1 Work Package Complete** Awaiting feedback from Kurt P.
-  - Due: 18/08/2025
-  - Status: Pending
-  - Resource: James Bick
 
 - ⏳ **SF Operational Documentation (inc. Training) Optimization Form/process merging, redundency removed, obsolesence/change filed completed**
   - Due: 18/08/2025

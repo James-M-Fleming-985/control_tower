@@ -139,7 +139,12 @@ class AutoSyncScheduler:
         """Check ms_project_data folder for newer XML files and sync them"""
         try:
             ms_project_data_dir = "/workspaces/control_tower/cloned_repos/contract_projects/ms_project_data"
-            current_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/ZnNi Line Development Plan-08.xml"
+            current_xml = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/current/ZnNi Line Development Plan-08.xml"
+            snapshots_dir = "/workspaces/control_tower/cloned_repos/contract_projects/xml_workspace/snapshots"
+            
+            # Ensure current and snapshots directories exist
+            os.makedirs(os.path.dirname(current_xml), exist_ok=True)
+            os.makedirs(snapshots_dir, exist_ok=True)
             
             if not os.path.exists(ms_project_data_dir):
                 return False
@@ -170,11 +175,13 @@ class AutoSyncScheduler:
             
             # Copy the newer file to XML workspace
             import shutil
-            backup_path = f"{current_xml}.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             
+            # Create Friday snapshot if current XML exists
             if os.path.exists(current_xml):
-                shutil.copy2(current_xml, backup_path)
-                self.logger.info(f"📦 Backup created: {os.path.basename(backup_path)}")
+                friday_date = datetime.now().strftime('%Y%m%d')
+                snapshot_path = os.path.join(snapshots_dir, f"friday_{friday_date}_ZnNi_Line_Development_Plan-08.xml")
+                shutil.copy2(current_xml, snapshot_path)
+                self.logger.info(f"� Friday snapshot created: friday_{friday_date}_ZnNi_Line_Development_Plan-08.xml")
             
             shutil.copy2(newest_file, current_xml)
             self.logger.info(f"✅ XML updated from: {os.path.basename(newest_file)}")

@@ -93,9 +93,9 @@ class SafranPowerPointGenerator:
         # For contract_projects, check multiple possible locations
         if repo_name == "contract_projects":
             possible_paths = [
-                f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/current/ZnNi_Line_Development_Plan-08.xml",
+                f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/current/ZnNi Line Development Plan-08.xml",
                 f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/current/{xml_filename}",
-                f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/ZnNi_Line_Development_Plan-08.xml",
+                f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/ZnNi Line Development Plan-08.xml",
                 f"/workspaces/control_tower/cloned_repos/{repo_name}/xml_workspace/{xml_filename}"
             ]
             self.xml_file_path = None
@@ -3403,6 +3403,31 @@ class SafranPowerPointGenerator:
         else:
             title_shape.text = f"{phase_name} - {milestone_type.replace('_', ' ').title()} Milestones"
         
+        # Add descriptive table header text box above the table
+        table_header_map = {
+            "this_month": "Milestones for this month",
+            "last_month_completed": "Milestones completed last month", 
+            "next_month_planned": "Milestones planned for next month",
+            "upcoming": "Upcoming milestones",
+            "risks": "Risks for Documentation and Training"
+        }
+        
+        table_header_text = table_header_map.get(milestone_type, f"{milestone_type.replace('_', ' ').title()} Milestones")
+        
+        # Create text box for table header
+        header_left = Inches(1)
+        header_top = Inches(1.5)
+        header_width = Inches(8)
+        header_height = Inches(0.4)
+        
+        header_textbox = slide.shapes.add_textbox(header_left, header_top, header_width, header_height)
+        header_frame = header_textbox.text_frame
+        header_frame.text = table_header_text
+        header_paragraph = header_frame.paragraphs[0]
+        header_paragraph.font.size = Pt(14)
+        header_paragraph.font.bold = True
+        header_paragraph.font.color.rgb = RGBColor(0, 45, 95)  # Safran blue
+        
         # Create table with different structure for risks vs milestones
         rows = len(milestones) + 1  # +1 for header
         if milestone_type == "risks":
@@ -3410,9 +3435,9 @@ class SafranPowerPointGenerator:
         else:
             cols = 3  # Milestone Name, Date, Status
         
-        # Add table
+        # Add table (positioned below the descriptive header)
         left = Inches(1)
-        top = Inches(2)
+        top = Inches(2.1)  # Moved down to make room for header text
         width = Inches(8)
         height = Inches(4)
         

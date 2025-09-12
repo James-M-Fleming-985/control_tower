@@ -45,6 +45,15 @@ def main():
                             choices=['help', 'demo', 'organize', 'roadmap'],
                             help='Utility to run')
     
+    # Friday Workflow
+    friday_parser = subparsers.add_parser('friday', help='Friday workflow commands')
+    friday_parser.add_argument('--compare-to-last-week', action='store_true',
+                              help='Compare current XML to last Friday\'s snapshot')
+    friday_parser.add_argument('--compare-only', action='store_true',
+                              help='Only compare XML versions, don\'t generate presentations') 
+    friday_parser.add_argument('--generate-only', action='store_true',
+                              help='Only generate presentations, don\'t sync or compare')
+    
     args = parser.parse_args()
     
     if not args.system:
@@ -58,6 +67,8 @@ def main():
         return run_csv_commands(args)
     elif args.system == 'util':
         return run_utility_commands(args)
+    elif args.system == 'friday':
+        return run_friday_workflow(args)
     
     return 0
 
