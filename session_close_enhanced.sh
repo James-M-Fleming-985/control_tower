@@ -146,9 +146,8 @@ if [ -d "cloned_repos" ]; then
         cd - >/dev/null
     else
         echo "    ⏭️  Not a git repository"
-    fi            cd - >/dev/null
-        fi
-    done
+    fi
+done
 else
     echo "  ℹ️  No cloned repositories found"
 fi
