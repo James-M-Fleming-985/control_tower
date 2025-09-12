@@ -119,35 +119,34 @@ if [ -d "cloned_repos" ]; then
             
             cd "$repo"
             
-            # Check if this is a valid git repository
-            if [ -d ".git" ]; then
-                # Check if requirements folder exists and has files
-                if [ -d "requirements" ] && [ -n "$(find requirements -name '*.md' -type f 2>/dev/null)" ]; then
-                    if [ -n "$(git status --porcelain)" ]; then
-                        echo "    🔄 Syncing requirements updates..."
-                        git add requirements/
-                        if git commit -m "Requirements update: $(date '+%Y-%m-%d %H:%M:%S') - Timeline data sync"; then
-                            echo "    ✅ Requirements committed locally"
-                            echo "    🚀 Pushing to remote repository..."
-                            if git push; then
-                                echo "    ✅ Requirements pushed to remote $repo_name repository"
-                            else
-                                echo "    ⚠️  Push failed for $repo_name - check network or permissions"
-                            fi
-                        else
-                            echo "    ⚠️  Commit failed for $repo_name - manual review needed"
-                        fi
-                    else
-                        echo "    ✅ Requirements up to date"
-                    fi
+    # Check if it's a git repository
+    if [ -d "$repo_path/.git" ] || git -C "$repo_path" status >/dev/null 2>&1; then
+        echo "  📁 Checking $repo_name..."
+        
+        cd "$repo_path" || continue
+        
+        if [ -n "$(git status --porcelain)" ]; then
+            echo "    🔄 Syncing requirements updates..."
+            git add requirements/ 2>/dev/null || git add . 2>/dev/null
+            if git commit -m "Requirements update: $(date '+%Y-%m-%d %H:%M:%S') - Timeline data sync" 2>/dev/null; then
+                echo "    ✅ Changes committed successfully"
+                echo "    🚀 Pushing to remote repository..."
+                if git push origin main 2>/dev/null; then
+                    echo "    ✅ Successfully pushed to $repo_name repository"
                 else
-                    echo "    ⏭️  No requirements folder or files found"
+                    echo "    ⚠️  Push failed - may need authentication or manual review"
                 fi
             else
-                echo "    ⚠️  Not a git repository"
+                echo "    ⚠️  Commit failed - manual review needed"
             fi
-            
-            cd - >/dev/null
+        else
+            echo "    ✅ Requirements up to date"
+        fi
+        
+        cd - >/dev/null
+    else
+        echo "    ⏭️  Not a git repository"
+    fi            cd - >/dev/null
         fi
     done
 else
