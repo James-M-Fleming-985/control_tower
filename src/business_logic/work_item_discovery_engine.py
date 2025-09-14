@@ -99,8 +99,11 @@ class WorkItemDiscoveryEngine:
             # Convert raw requirements to work items with error handling
             work_items = self._convert_raw_requirements_to_work_items(raw_requirements)
             
+            # Assign status to all items based on due dates
+            self._assign_status_to_all_items(work_items)
+            
             self._stats['work_items_discovered'] = len(work_items)
-            self.logger.info(f"Discovered {len(work_items)} work items from {len(repositories)} repositories")
+            self.logger.debug(f"Discovered {len(work_items)} work items from {len(repositories)} repositories")  # Changed to debug
             
             return work_items
             
@@ -108,6 +111,31 @@ class WorkItemDiscoveryEngine:
             self.logger.error(f"Error during work item discovery: {e}")
             self._stats['errors_encountered'] += 1
             return []  # Graceful handling - return empty list instead of crashing
+    
+    def _assign_status_to_all_items(self, items: List[WorkItem]) -> None:
+        """
+        Assign status to all work items based on their due dates.
+        
+        This ensures proper color coding in terminal output regardless of filtering.
+        
+        Args:
+            items: List of work items to assign status to
+        """
+        try:
+            today = date.today()
+            
+            for item in items:
+                if not item.due_date:
+                    item.status = ItemStatus.UPCOMING  # No due date = upcoming
+                elif item.due_date < today:
+                    item.status = ItemStatus.OVERDUE
+                elif item.due_date == today:
+                    item.status = ItemStatus.DUE_TODAY
+                else:
+                    item.status = ItemStatus.UPCOMING
+                    
+        except Exception as e:
+            self.logger.error(f"Error assigning status to work items: {e}")
     
     def _convert_raw_requirements_to_work_items(self, raw_requirements: List[RawRequirement]) -> List[WorkItem]:
         """

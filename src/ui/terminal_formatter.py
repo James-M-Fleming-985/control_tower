@@ -20,8 +20,14 @@ class ColorScheme:
     GREEN = "\033[32m"
     BLUE = "\033[34m"
     WHITE = "\033[37m"
+    PURPLE = "\033[35m"
+    CYAN = "\033[36m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_PURPLE = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
     RESET = "\033[0m"
     BOLD = "\033[1m"
+    DIM = "\033[2m"
 
 
 class TerminalFormatter:
@@ -139,34 +145,43 @@ class TerminalFormatter:
     
     def _build_status_line(self, item: WorkItem) -> str:
         """Build the main status line with emoji and color coding"""
+        req_level = item.requirement_level.value if hasattr(item.requirement_level, 'value') else item.requirement_level
+        
         if item.status == ItemStatus.OVERDUE:
             days_overdue = (date.today() - item.due_date).days if item.due_date else 0
-            req_level = item.requirement_level.value if hasattr(item.requirement_level, 'value') else item.requirement_level
             status_text = f"⏰ OVERDUE: {item.id} ({item.title}) [{req_level}] ({days_overdue} days overdue)"
         elif item.status == ItemStatus.DUE_TODAY:
-            req_level = item.requirement_level.value if hasattr(item.requirement_level, 'value') else item.requirement_level
             status_text = f"🎯 DUE TODAY: {item.id} ({item.title}) [{req_level}]"
+        elif item.status == ItemStatus.UPCOMING:
+            days_until_due = (item.due_date - date.today()).days if item.due_date else 0
+            if days_until_due > 0:
+                status_text = f"📋 UPCOMING: {item.id} ({item.title}) [{req_level}] (due in {days_until_due} days)"
+            else:
+                status_text = f"📋 UPCOMING: {item.id} ({item.title}) [{req_level}]"
+        else:
+            # Fallback for any unknown status
+            status_text = f"📋 {item.id} ({item.title}) [{req_level}]"
         
         return self.apply_color_coding(status_text, item.status)
     
     def _build_hierarchy_line(self, item: WorkItem) -> str:
         """Build the hierarchical context line"""
         hierarchy_display = item.get_hierarchical_display()
-        return f"   {hierarchy_display}"
+        return f"   {self.colors.BRIGHT_GREEN}{hierarchy_display}{self.colors.RESET}"
     
     def _build_work_specification_line(self, item: WorkItem) -> str:
         """Build the work specification line (layer or milestone)"""
         work_spec = item.get_work_specification()
-        return f"   {work_spec}"
+        return f"   {self.colors.PURPLE}{work_spec}{self.colors.RESET}"
     
     def _build_metadata_line(self, item: WorkItem) -> str:
         """Build the metadata line with priority, effort, and due date"""
         priority_value = item.priority.value if hasattr(item.priority, 'value') else item.priority
-        return f"   Priority: {priority_value} | Effort: {item.effort_estimate} | Due: {item.due_date}"
+        return f"   {self.colors.CYAN}Priority: {self.colors.RESET}{priority_value} {self.colors.DIM}|{self.colors.RESET} {self.colors.CYAN}Effort: {self.colors.RESET}{item.effort_estimate} {self.colors.DIM}|{self.colors.RESET} {self.colors.CYAN}Due: {self.colors.RESET}{item.due_date}"
     
     def _build_action_line(self, item: WorkItem) -> str:
         """Build the direct action command line"""
-        return f"   Next: make work TASK={item.id}"
+        return f"   {self.colors.BRIGHT_PURPLE}Next: {self.colors.RESET}{self.colors.BOLD}make work TASK={item.id}{self.colors.RESET}"
     
     def _format_empty_message(self) -> str:
         """Format message for when no work items are found"""

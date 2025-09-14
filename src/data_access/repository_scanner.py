@@ -51,7 +51,11 @@ class RepositoryScanner:
         "features/*.md",
         "milestones/*.md",
         "**/features/*.md",  # Nested features directories
-        "**/milestones/*.md"  # Nested milestones directories
+        "**/milestones/*.md",  # Nested milestones directories
+        "projects/**/features/*.md",  # Project-based feature structure
+        "projects/**/milestones/*.md",  # Project-based milestone structure
+        "**/FEATURE-*.md",  # Specific feature file naming pattern
+        "**/MILESTONE-*.md"  # Specific milestone file naming pattern
     ]
     
     def __init__(self):
@@ -81,7 +85,7 @@ class RepositoryScanner:
             - DA-001: Scans all 6 North Star repositories
             - DA-007: Reports scanning progress and statistics
         """
-        logger.info(f"Starting scan of {len(repo_paths)} repositories")
+        logger.debug(f"Starting scan of {len(repo_paths)} repositories")  # Changed to debug
         all_requirements = []
         self._scan_stats['repositories_scanned'] = 0
         
@@ -97,7 +101,7 @@ class RepositoryScanner:
                 # Continue with other repositories instead of failing completely
                 continue
         
-        logger.info(f"Scan complete. Found {len(all_requirements)} requirements from {self._scan_stats['repositories_scanned']} repositories")
+        logger.debug(f"Scan complete. Found {len(all_requirements)} requirements from {self._scan_stats['repositories_scanned']} repositories")  # Changed to debug
         return all_requirements
     
     def scan_single_repository(self, repo_path: str) -> List[RawRequirement]:
