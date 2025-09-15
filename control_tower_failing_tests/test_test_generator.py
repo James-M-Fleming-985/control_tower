@@ -247,6 +247,12 @@ def test_fr_establish_requirement_to_test_traceability_mapping():
         result = generator.generate_failing_pytest_tests(req)
         assert result is not None, "Should generate failing pytest tests"
         assert len(result) > 0, "Should generate at least one test"
+    elif "establish requirement" in req_description:
+        generator = TestGenerator()
+        test_requirement = {"id": "TEST-001", "title": "Test requirement"}
+        result = generator.establish_requirement_traceability(test_requirement)
+        assert result is not None, "Should establish requirement traceability"
+        assert "mapping" in result, "Should return traceability mapping"
     else:
         # Generic functionality test - this will fail until we implement the missing functionality
         parser = RequirementsParser()
@@ -284,6 +290,11 @@ def test_fr_support_multiple_markdown_format_variations():
         result = generator.generate_failing_pytest_tests(req)
         assert result is not None, "Should generate failing pytest tests"
         assert len(result) > 0, "Should generate at least one test"
+    elif "multiple markdown format variations" in req_description:
+        generator = TestGenerator()
+        result = generator.support_multiple_markdown_format_variations()
+        assert result is not None, "Should support multiple markdown format variations"
+        assert result == True, "Should return True for markdown format support"
     else:
         # Generic functionality test - this will fail until we implement the missing functionality
         parser = RequirementsParser()
@@ -321,6 +332,11 @@ def test_fr_handle_large_requirement_files_1mb_efficiently():
         result = generator.generate_failing_pytest_tests(req)
         assert result is not None, "Should generate failing pytest tests"
         assert len(result) > 0, "Should generate at least one test"
+    elif "handle large requirement files" in req_description:
+        parser = RequirementsParser()
+        result = parser.handle_large_files_efficiently(1048576)  # 1MB in bytes
+        assert result is not None, "Should handle large files efficiently"
+        assert "status" in result, "Should return status information"
     else:
         # Generic functionality test - this will fail until we implement the missing functionality
         parser = RequirementsParser()
@@ -540,6 +556,14 @@ def test_process_large_files_1mb_within_performance_limits_2_seconds():
         result = parser.create_requirement_traceability("TEST-REQ-001")
         assert result is not None, "Should create complete traceability data structure"
         assert hasattr(result, 'requirement_links'), "Should link requirements to tests"
+    elif "process large files" in criterion_description and "performance limits" in criterion_description:
+        parser = RequirementsParser()
+        import time
+        start_time = time.time()
+        result = parser.handle_large_files_efficiently(1048576)  # 1MB in bytes
+        end_time = time.time()
+        assert result is not None, "Should process large files"
+        assert (end_time - start_time) < 2.0, "Should process within 2 second performance limit"
     else:
         # Generic acceptance criterion test - this will fail until we implement the functionality
         parser = RequirementsParser()
