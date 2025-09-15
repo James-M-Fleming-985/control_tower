@@ -104,7 +104,7 @@ def test_fr_generate_failing_pytest_test_files_from_parsed_requirements():
         result = parser.extract_acceptance_criteria(test_markdown)
         assert result is not None, "Should extract acceptance criteria"
         assert len(result) > 0, "Should find acceptance criteria"
-    elif "generate_failing_pytest" in req_description:
+    elif "generate_failing_pytest" in req_description or "generate failing pytest" in req_description:
         generator = TestGenerator()
         from data_access.requirements_models import ParsedRequirement
         req = ParsedRequirement(id="TEST-001", title="Test", acceptance_criteria=[{"id": "AC-001", "description": "Test"}])
@@ -148,6 +148,26 @@ def test_fr_create_test_file_structure_with_proper_imports_and_fixtures():
         result = generator.generate_failing_pytest_tests(req)
         assert result is not None, "Should generate failing pytest tests"
         assert len(result) > 0, "Should generate at least one test"
+    elif "create test file structure" in req_description:
+        generator = TestGenerator()
+        from data_access.requirements_models import ParsedRequirement
+        from data_access.test_generator import GeneratedTest
+        
+        # Create minimal test data that matches the method signature
+        requirement = ParsedRequirement(id="TEST-001", title="Test requirement", acceptance_criteria=[])
+        test = GeneratedTest(
+            test_name="test_example",
+            test_code="def test_example(): pass",
+            test_file_path="test_example.py",
+            requirement_id="TEST-001",
+            acceptance_criterion="Test acceptance criterion",
+            test_type="unit",
+            dependencies=[],
+            fixtures_needed=[]
+        )
+        result = generator.create_test_file_structure([test], requirement)
+        assert result is not None, "Should create test file structure"
+        assert hasattr(result, 'file_path'), "Should return test file object with file_path"
     else:
         # Generic functionality test - this will fail until we implement the missing functionality
         parser = RequirementsParser()
@@ -185,6 +205,11 @@ def test_fr_validate_requirement_completeness_and_testability():
         result = generator.generate_failing_pytest_tests(req)
         assert result is not None, "Should generate failing pytest tests"
         assert len(result) > 0, "Should generate at least one test"
+    elif "validate requirement" in req_description:
+        generator = TestGenerator()
+        test_requirement = {"id": "TEST-001", "title": "Test requirement"}
+        result = generator.validate_requirement_completeness(test_requirement)
+        assert result is not None, "Should validate requirement completeness"
     else:
         # Generic functionality test - this will fail until we implement the missing functionality
         parser = RequirementsParser()
