@@ -7,7 +7,7 @@ Acceptance Criteria: UI-001 through UI-006
 """
 
 import pytest
-from datetime import date
+from datetime import date, timedelta
 from enum import Enum
 from dataclasses import dataclass
 from typing import List
@@ -23,13 +23,14 @@ class TestTerminalFormatter:
     def setup_method(self):
         """Setup test fixtures"""
         self.formatter = TerminalFormatter()
+        today = date.today()
         
         # Sample work items for testing
         self.feature_item = WorkItem(
             id="FEATURE-003-02",
             title="Investment Portfolio Rebalancing",
             description="Implement portfolio rebalancing algorithm",
-            due_date=date(2025, 9, 13),  # Today
+            due_date=today,  # Today
             priority=Priority.HIGH,
             effort_estimate="3 days",
             requirement_level=RequirementLevel.FR,
@@ -46,7 +47,7 @@ class TestTerminalFormatter:
             id="MILESTONE-004",
             title="Project Review Completion",
             description="Complete project documentation review",
-            due_date=date(2025, 9, 11),  # Overdue
+            due_date=today - timedelta(days=2),  # 2 days overdue
             priority=Priority.CRITICAL,
             effort_estimate="1 day",
             requirement_level=RequirementLevel.MR,
@@ -74,12 +75,13 @@ class TestTerminalFormatter:
     def test_format_work_item_due_today(self):
         """RED: Test formatting due today item - UI-001, UI-002"""
         result = self.formatter.format_work_item(self.feature_item)
+        today = date.today()
         
         expected_lines = [
             "🎯 DUE TODAY: FEATURE-003-02 (Investment Portfolio Rebalancing) [FR]",
             "   Feature Name: Investment Portfolio Rebalancing → Investment Strategy → Financial Security → financial_security",
             "   Layer to work on: Data Access Layer",
-            "   Priority: High | Effort: 3 days | Due: 2025-09-13",
+            f"   Priority: High | Effort: 3 days | Due: {today}",
             "   Next: make work TASK=FEATURE-003-02"
         ]
         
@@ -89,12 +91,14 @@ class TestTerminalFormatter:
     def test_format_work_item_overdue(self):
         """RED: Test formatting overdue item - UI-001, UI-002"""
         result = self.formatter.format_work_item(self.milestone_item)
+        today = date.today()
+        overdue_date = today - timedelta(days=2)
         
         expected_lines = [
             "⏰ OVERDUE: MILESTONE-004 (Project Review Completion) [MR] (2 days overdue)",
             "   Milestone Name: Project Review Completion → Professional Development Workpackage → Professional Excellence → professional_excellence",
             "   Milestone to work on: Documentation Review Task",
-            "   Priority: Critical | Effort: 1 day | Due: 2025-09-11",
+            f"   Priority: Critical | Effort: 1 day | Due: {overdue_date}",
             "   Next: make work TASK=MILESTONE-004"
         ]
         

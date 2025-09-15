@@ -8,7 +8,31 @@ raw requirements and extracted metadata.
 from dataclasses import dataclass
 from datetime import date
 from typing import Optional
-from src.business_logic.work_item_model import RequirementLevel, Priority
+
+# For legacy compatibility - import RequirementLevel and Priority 
+try:
+    from src.business_logic.work_item_model import RequirementLevel, Priority
+except ImportError:
+    # Define basic enums if business logic not available
+    from enum import Enum
+    
+    class RequirementLevel(Enum):
+        COMPONENT = 1
+        MODULE = 2
+        SERVICE = 3
+        SYSTEM = 4
+        LAYER = 5
+        FR = 6  # Functional Requirement
+        BR = 7  # Business Requirement
+        AC = 8  # Acceptance Criteria
+        PR = 9  # Performance Requirement
+        QR = 10  # Quality Requirement
+    
+    class Priority(Enum):
+        LOW = 1
+        MEDIUM = 2
+        HIGH = 3
+        CRITICAL = 4
 
 
 @dataclass

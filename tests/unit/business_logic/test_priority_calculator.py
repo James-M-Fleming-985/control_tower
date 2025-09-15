@@ -7,7 +7,7 @@ Acceptance Criteria: BL-007 through BL-010
 """
 
 import pytest
-from datetime import date
+from datetime import date, timedelta
 from typing import List
 
 # These imports will FAIL initially - that's the RED phase
@@ -21,13 +21,14 @@ class TestBasicPriorityCalculator:
     def setup_method(self):
         """Setup test fixtures"""
         self.calculator = BasicPriorityCalculator()
+        today = date.today()
         
         # Sample work items for testing
         self.overdue_item_1 = WorkItem(
             id="OVERDUE-001",
             title="Critical Overdue Task",
             description="Very overdue task",
-            due_date=date(2025, 9, 10),  # 3 days overdue
+            due_date=today - timedelta(days=3),  # 3 days overdue
             priority=Priority.CRITICAL,
             effort_estimate="2 days",
             requirement_level=RequirementLevel.FR,
@@ -44,7 +45,7 @@ class TestBasicPriorityCalculator:
             id="OVERDUE-002",
             title="Another Overdue Task",
             description="Another overdue task",
-            due_date=date(2025, 9, 11),  # 2 days overdue
+            due_date=today - timedelta(days=2),  # 2 days overdue
             priority=Priority.HIGH,
             effort_estimate="1 day",
             requirement_level=RequirementLevel.FR,
@@ -61,7 +62,7 @@ class TestBasicPriorityCalculator:
             id="DUE-TODAY-001",
             title="Due Today Task 1",
             description="Task due today",
-            due_date=date(2025, 9, 13),  # Today
+            due_date=today,  # Today
             priority=Priority.HIGH,
             effort_estimate="3 days",
             requirement_level=RequirementLevel.FR,
@@ -78,7 +79,7 @@ class TestBasicPriorityCalculator:
             id="DUE-TODAY-002",
             title="Due Today Task 2",
             description="Another task due today",
-            due_date=date(2025, 9, 13),  # Today
+            due_date=today,  # Today
             priority=Priority.MEDIUM,
             effort_estimate="1 day",
             requirement_level=RequirementLevel.FR,

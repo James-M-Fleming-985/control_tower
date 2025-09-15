@@ -30,3 +30,6 @@ todos/
 
 # Logs
 *.log
+*.tar.gz
+*.backup
+backups/

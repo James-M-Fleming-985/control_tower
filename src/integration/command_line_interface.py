@@ -181,15 +181,12 @@ class CommandLineInterface:
     
     # Class constants for performance optimization
     DEFAULT_REPOSITORIES = [
-        "cloned_repos/Causal_affect",
-        "cloned_repos/contract_projects", 
-        "cloned_repos/domain_specific-network_dev",
-        "cloned_repos/financial_optimizer",
-        "cloned_repos/financial_security_dev",
-        "cloned_repos/home_improvements",
-        "cloned_repos/LIMS_concept_actual",
-        "cloned_repos/opti_royale",
-        "cloned_repos/relationship_building"
+        "cloned_repos/business_ventures",
+        "cloned_repos/financial_security", 
+        "cloned_repos/investment_strategy",
+        "cloned_repos/life_quality",
+        "cloned_repos/online_presence",
+        "cloned_repos/professional_excellence"
     ]
     
     # Status filter sets for efficient filtering
