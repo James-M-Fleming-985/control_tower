@@ -81,6 +81,10 @@ what-next-lims: ## 🧪 Check LIMS concept repository
 what-next-relationships: ## 👥 Check relationship building repository
 	@$(PYTHON) $(MAIN_SCRIPT) --repository=cloned_repos/relationship_building
 
+.PHONY: what-next-control-tower
+what-next-control-tower: ## 🏗️ Check Control Tower self-management repository
+	@$(PYTHON) $(MAIN_SCRIPT) --repository=cloned_repos/control_tower
+
 # ============================================================================
 # PROFESSIONAL STANDARDS ENFORCEMENT
 # ============================================================================
