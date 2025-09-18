@@ -401,6 +401,15 @@ class StageGateEnforcer:
         # Basic physical verification
         return self.working_directory.exists()
 
+    def check_stage_gate(self, stage: str, evidence: dict) -> dict:
+        """Check stage gate status (UI integration compatibility method)"""
+        # Simple stage gate check for UI integration
+        return {
+            "passed": evidence.get("progress", 0) > 0,
+            "blocking_reason": None if evidence.get("progress", 0) > 0 else "No progress detected",
+            "stage": stage
+        }
+
 
 class TDDComplianceAssessor:
     """REAL TDD compliance assessment with failure prevention"""
