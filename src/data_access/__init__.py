@@ -21,7 +21,8 @@ from .git_operations import (
     GitPerformanceMonitor, GitRepositoryError
 )
 
-from .tdd_phase_repository import TDDPhaseRepository, PhaseValidator
+# Temporarily commented out due to syntax issue: 
+# from .tdd_phase_repository import TDDPhaseRepository, PhaseValidator
 
 from .phase_data_interface import PhaseDataInterface
 
