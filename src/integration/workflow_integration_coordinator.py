@@ -173,9 +173,25 @@ class WorkflowIntegrationCoordinator:
     - Production-ready reliability patterns
     """
     
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize enhanced workflow integration coordinator"""
-        self.config = config or {}
+    def __init__(self, config_or_enforcer: Optional[Union[Dict[str, Any], Any]] = None):
+        """
+        Initialize enhanced workflow integration coordinator
+        
+        Args:
+            config_or_enforcer: Either a config dict or an enforcer object (for flexibility)
+        """
+        # Handle different parameter types for backward compatibility
+        if config_or_enforcer is None:
+            self.config = {}
+            self.enforcer = None
+        elif isinstance(config_or_enforcer, dict):
+            # Config dict provided
+            self.config = config_or_enforcer
+            self.enforcer = None
+        else:
+            # Assume it's an enforcer object
+            self.config = {}
+            self.enforcer = config_or_enforcer
         
         # Core state management with thread safety
         self.integrations = {}
@@ -389,6 +405,71 @@ class WorkflowIntegrationCoordinator:
                 "encryption_enabled": False,
                 "transmission_secure": False,
                 "error": str(e)
+            }
+    
+    def coordinate_phase_transition(self, from_phase, to_phase, evidence=None):
+        """
+        Coordinate phase transition in the integration layer.
+        
+        Args:
+            from_phase: Current phase (string or PhaseType)
+            to_phase: Target phase (string or PhaseType)  
+            evidence: Evidence for the transition (optional)
+            
+        Returns:
+            Dict with coordination result
+        """
+        try:
+            # Convert phase types to strings if needed
+            from_phase_str = from_phase.value if hasattr(from_phase, 'value') else str(from_phase)
+            to_phase_str = to_phase.value if hasattr(to_phase, 'value') else str(to_phase)
+            
+            logger.info(f"Coordinating phase transition: {from_phase_str} -> {to_phase_str}")
+            
+            # Simple validation for valid transitions
+            valid_transitions = {
+                "RED": ["GREEN"],
+                "GREEN": ["REFACTOR"], 
+                "REFACTOR": ["RED"]
+            }
+            
+            is_valid_transition = to_phase_str in valid_transitions.get(from_phase_str, [])
+            
+            # Update metrics
+            self._metrics['operations']['total'] += 1
+            if is_valid_transition:
+                self._metrics['operations']['successful'] += 1
+            else:
+                self._metrics['operations']['failed'] += 1
+            
+            result = {
+                "successful": is_valid_transition,
+                "from_phase": from_phase_str,
+                "to_phase": to_phase_str,
+                "timestamp": time.time(),
+                "evidence_provided": evidence is not None,
+                "coordination_id": f"coord_{int(time.time() * 1000)}",
+                "message": f"Phase transition {'allowed' if is_valid_transition else 'blocked'}"
+            }
+            
+            if evidence:
+                result["evidence_summary"] = {
+                    "evidence_count": len(evidence) if isinstance(evidence, dict) else 1,
+                    "evidence_type": type(evidence).__name__
+                }
+            
+            logger.info(f"Phase transition coordination result: {result['successful']}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Phase transition coordination failed: {e}")
+            self._metrics['operations']['total'] += 1
+            self._metrics['operations']['failed'] += 1
+            return {
+                "successful": False,
+                "error": str(e),
+                "timestamp": time.time(),
+                "message": "Coordination failed due to error"
             }
     
     async def coordinate_workflow_async(self, workflow: Dict[str, Any]) -> Dict[str, Any]:

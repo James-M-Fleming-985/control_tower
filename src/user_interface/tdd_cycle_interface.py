@@ -26,7 +26,14 @@ class TDDCycleInterface:
     progress display and phase transition visualization.
     """
     
-    def __init__(self):
+    def __init__(self, enforcer=None):
+        """
+        Initialize TDD cycle interface.
+        
+        Args:
+            enforcer: Optional TDD cycle enforcer for enhanced functionality
+        """
+        self.enforcer = enforcer
         self.display_enabled = True
         self.progress_history: List[Dict[str, Any]] = []
         self.current_display_state = {
@@ -170,6 +177,104 @@ class TDDCycleInterface:
         except Exception as e:
             logger.error(f"Failed to display test results: {e}")
             return False
+    
+    def display_phase_status(self):
+        """
+        Display current phase status with enforcer integration.
+        
+        Returns:
+            Dict with current phase status information
+        """
+        try:
+            status = {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "display_enabled": self.display_enabled,
+                "current_state": self.current_display_state.copy()
+            }
+            
+            # If enforcer is available, get additional status
+            if self.enforcer:
+                try:
+                    # Get current phase from enforcer if available
+                    if hasattr(self.enforcer, 'get_current_phase'):
+                        current_phase = self.enforcer.get_current_phase()
+                        status["enforcer_phase"] = current_phase.value if hasattr(current_phase, 'value') else str(current_phase)
+                    
+                    # Get current state if available
+                    if hasattr(self.enforcer, 'get_current_state'):
+                        enforcer_state = self.enforcer.get_current_state()
+                        if enforcer_state:
+                            status["enforcer_state"] = {
+                                "phase": enforcer_state.current_phase.value if hasattr(enforcer_state.current_phase, 'value') else str(enforcer_state.current_phase),
+                                "tests_passing": enforcer_state.tests_passing,
+                                "tests_failing": enforcer_state.tests_failing,
+                                "enforcement_active": enforcer_state.enforcement_active
+                            }
+                except Exception as e:
+                    logger.warning(f"Could not get enforcer status: {e}")
+                    status["enforcer_error"] = str(e)
+            
+            # Display status if enabled
+            if self.display_enabled:
+                print(f"Phase Status: {status}")
+            
+            logger.info("Displayed phase status")
+            return status
+            
+        except Exception as e:
+            logger.error(f"Failed to display phase status: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def get_current_phase_display(self):
+        """
+        Get current phase display information.
+        
+        Returns:
+            Dict with current phase display data
+        """
+        try:
+            display_info = {
+                "success": True,
+                "current_state": self.current_display_state.copy(),
+                "display_enabled": self.display_enabled,
+                "history_count": len(self.progress_history),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Add enforcer information if available
+            if self.enforcer:
+                try:
+                    if hasattr(self.enforcer, 'get_current_phase'):
+                        current_phase = self.enforcer.get_current_phase()
+                        display_info["enforcer_phase"] = current_phase.value if hasattr(current_phase, 'value') else str(current_phase)
+                        
+                    if hasattr(self.enforcer, 'get_current_state'):
+                        enforcer_state = self.enforcer.get_current_state()
+                        if enforcer_state:
+                            display_info["phase_details"] = {
+                                "phase": enforcer_state.current_phase.value if hasattr(enforcer_state.current_phase, 'value') else str(enforcer_state.current_phase),
+                                "enforcement_active": enforcer_state.enforcement_active,
+                                "can_transition": enforcer_state.can_transition_phases
+                            }
+                except Exception as e:
+                    logger.warning(f"Could not get enforcer display info: {e}")
+                    display_info["enforcer_error"] = str(e)
+            
+            logger.info("Retrieved current phase display")
+            return display_info
+            
+        except Exception as e:
+            logger.error(f"Failed to get current phase display: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
     
     def show_coverage_report(self, coverage_data: Dict[str, float]) -> bool:
         """
