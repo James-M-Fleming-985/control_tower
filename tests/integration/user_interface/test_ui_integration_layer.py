@@ -26,7 +26,7 @@ class TestUIIntegrationLayer:
     def test_phase_display_with_git_operations(self):
         """Test phase display integration with git operations"""
         # Simulate git checkpoint creation
-        result = self.git_ops.create_phase_checkpoint("RED")
+        result = self.git_ops.create_phase_checkpoint("RED", "Test RED phase checkpoint")
         
         # Display should update to show git operation result
         self.phase_display.show_red_phase()

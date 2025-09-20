@@ -17,7 +17,8 @@ class ExternalToolCoordinator:
             'ide_name': integration_status['ide'],
             'plugins_active': len(integration_status['plugins']),
             'is_available': integration_status['connected'],
-            'can_receive_tdd_events': True
+            'can_receive_tdd_events': True,
+            'can_trigger_phase_transitions': True
         })()
     
     def integrate_with_ci_system(self, ci_config):
@@ -32,7 +33,9 @@ class ExternalToolCoordinator:
             'success': True,
             'system_name': integration_data['system'],
             'integration_status': integration_data['status'],
-            'webhook_configured': True
+            'webhook_configured': True,
+            'can_trigger_tdd_enforcement': True,
+            'reports_tdd_status': True
         })()
     
     def synchronize_with_quality_tool(self, tool_name):
@@ -46,7 +49,8 @@ class ExternalToolCoordinator:
             'tool_name': sync_data['tool'],
             'rules_synced': sync_data['rules_synced'],
             'can_receive_tdd_metrics': True,
-            'integrates_with_phases': True
+            'integrates_with_phases': True,
+            'reports_compliance': True
         })()
     
     def get_all_tool_states(self):

@@ -32,13 +32,13 @@ class TestRunnerCoordinator:
         })()
     
     def get_configured_runners(self):
-        return [
-            {'name': 'pytest', 'type': 'unit', 'status': 'configured'},
-            {'name': 'jest', 'type': 'javascript', 'status': 'configured'},
-            {'name': 'junit', 'type': 'java', 'status': 'configured'},
-            {'name': 'mocha', 'type': 'javascript', 'status': 'configured'},
-            {'name': 'rspec', 'type': 'ruby', 'status': 'configured'}
-        ]
+        """Return list of configured test runner names"""
+        return ['pytest', 'jest', 'junit', 'mocha', 'rspec']
+    
+    def can_coordinate_runner(self, runner_name):
+        """Check if coordinator can manage the specified test runner"""
+        configured_runners = self.get_configured_runners()
+        return runner_name in configured_runners
     
     def coordinate_phase_testing(self, phase_config):
         if isinstance(phase_config, str):
@@ -48,11 +48,27 @@ class TestRunnerCoordinator:
             'tests_coordinated': phase_config.get('test_count', 5),
             'success': True
         }
+        
+        # Define phase-specific strategies and criteria
+        strategies = {
+            'RED': 'fail_fast_strategy',
+            'GREEN': 'minimal_implementation_strategy', 
+            'REFACTOR': 'optimization_strategy'
+        }
+        
+        criteria = {
+            'RED': 'all_tests_must_fail',
+            'GREEN': 'all_tests_must_pass',
+            'REFACTOR': 'performance_improved'
+        }
+        
+        phase = coordination_data['phase']
         return type('CoordinationResult', (), {
             'success': coordination_data['success'],
             'phase': coordination_data['phase'],
             'tests_coordinated': coordination_data['tests_coordinated'],
-            'execution_strategy': f"{coordination_data['phase']}_phase_strategy"
+            'execution_strategy': strategies.get(phase, 'default_strategy'),
+            'success_criteria': criteria.get(phase, 'default_criteria')
         })()
     
     def execute_test_suite_during_phase(self, phase, test_config):

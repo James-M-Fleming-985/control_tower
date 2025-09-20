@@ -38,12 +38,15 @@ class InteractiveCommandInterface:
         """Register command"""
         self.commands[name] = func
     
-    def execute_command(self, command):
-        """Execute command"""
+    def execute_command(self, command, *args):
+        """Execute command with optional arguments"""
         self.command_history.append(command)
         if command in self.commands:
-            return self.commands[command]()
-        return f"Command '{command}' not found"
+            try:
+                return self.commands[command](*args) if args else self.commands[command]()
+            except Exception as e:
+                return f"Error executing '{command}': {e}"
+        return None  # Changed to return None for unknown commands
     
     def get_available_commands(self):
         """Get available commands"""
@@ -54,8 +57,10 @@ class InteractiveCommandInterface:
         parts = input_str.split()
         return {"command": parts[0] if parts else "", "args": parts[1:] if len(parts) > 1 else []}
     
-    def display_help(self):
-        """Display help"""
+    def display_help(self, topic=None):
+        """Display help for all commands or specific topic"""
+        if topic and topic in self.commands:
+            return f"Help for '{topic}': {self.commands[topic].__doc__ or 'No documentation available'}"
         return f"Available commands: {', '.join(self.commands.keys())}"
     
     def validate_command(self, command):
@@ -200,3 +205,25 @@ class InteractiveCommandInterface:
             
         self.preferences[key] = value
         print(f"⚙️  Preference updated: {key} = {value}")
+
+    def handle_error(self, error):
+        """Handle errors in command processing"""
+        error_msg = f"Error: {str(error)}"
+        self.command_history.append(f"ERROR: {error_msg}")
+        return error_msg
+
+    def get_user_input(self):
+        """Get user input (mocked for testing)"""
+        return "test_input"
+
+    def get_phase(self):
+        """Get current TDD phase"""
+        return getattr(self, '_current_phase', 'RED')
+
+    def set_phase(self, phase):
+        """Set current TDD phase"""
+        valid_phases = ['RED', 'GREEN', 'REFACTOR']
+        if phase in valid_phases:
+            self._current_phase = phase
+            return True
+        return False

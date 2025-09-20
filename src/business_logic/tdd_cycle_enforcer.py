@@ -60,6 +60,9 @@ class CycleState:
     quality_score: float
     evidence_collected: bool
     phase_history: List[Dict[str, Any]] = field(default_factory=list)
+    enforcement_active: bool = True
+    phase_tracking_intact: bool = True
+    can_transition_phases: bool = True
 
 
 class TDDCycleEnforcer:

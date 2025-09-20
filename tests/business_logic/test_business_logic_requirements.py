@@ -136,8 +136,7 @@ class TestREDPhaseEnforcementRequirements:
         
         assert result.compliance_score < 0.5
 
-        
-        def test_f1_5_red_phase_validates_minimal_test_implementation(self):
+    def test_f1_5_red_phase_validates_minimal_test_implementation(self):
         """
         REQUIREMENT F1.5: RED phase must validate minimal test implementation
         EXPECTED: Should fail initially - no implementation
@@ -154,8 +153,8 @@ class TestREDPhaseEnforcementRequirements:
         
         assert result.compliance_score >= 0.75
 
-        
-        class TestGREENPhaseEnforcementRequirements:
+
+class TestGREENPhaseEnforcementRequirements:
     """
     F2: GREEN Phase Enforcement Requirements  
     Tests for REAL minimal implementation validation
