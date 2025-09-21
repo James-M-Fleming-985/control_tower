@@ -1,5 +1,5 @@
 """
-FAILING TESTS for TP-002: UI Integration Test Coverage 80% Target
+FAILING TESTS for TP-002: UI Integration Test Coverage 80% Target  
 ======================================
 
 These tests MUST FAIL initially (RED phase).
@@ -31,22 +31,12 @@ class TestTP002:
         import subprocess
         import json
         
-        # Scope coverage to only Integration Layer UI components (4 components)
-        integration_ui_components = [
-            "src/user_interface/command_interface.py",
-            "src/user_interface/enforcement_display.py", 
-            "src/user_interface/phase_display.py",
-            "src/user_interface/progress_tracker.py"
-        ]
-        
+        # This test will fail because UI integration tests don't exist yet
         try:
             result = subprocess.run([
                 "python", "-m", "pytest", 
                 "tests/integration/user_interface/", 
-                "--cov=src/user_interface/command_interface.py",
-                "--cov=src/user_interface/enforcement_display.py", 
-                "--cov=src/user_interface/phase_display.py",
-                "--cov=src/user_interface/progress_tracker.py",
+                "--cov=src/user_interface", 
                 "--cov-report=json"
             ], capture_output=True, text=True)
             

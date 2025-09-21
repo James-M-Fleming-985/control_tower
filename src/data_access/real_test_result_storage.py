@@ -197,12 +197,15 @@ class RealTestResultStorage(ThreadSafeDataAccess):
         # Try database
         return self._retrieve_from_database(storage_id)
     
-    def query_test_results(self) -> List[Dict]:
+    def query_test_results(self, query_params: Dict = None) -> List[Dict]:
         """
-        Query all test results from database
+        Query test results from database
+        
+        Args:
+            query_params: Optional query parameters for filtering
         
         Returns:
-            List of all test results
+            List of test results matching query
         """
         if self._data_lost:
             return []
@@ -213,7 +216,27 @@ class RealTestResultStorage(ThreadSafeDataAccess):
                 conn.row_factory = sqlite3.Row
                 
                 cursor = conn.cursor()
-                cursor.execute('SELECT * FROM test_results ORDER BY timestamp DESC')
+                
+                # Build query based on parameters
+                if query_params:
+                    # Build WHERE clause from query_params
+                    where_conditions = []
+                    values = []
+                    
+                    for key, value in query_params.items():
+                        if key in ['test_id', 'status']:
+                            where_conditions.append(f"{key} = ?")
+                            values.append(value)
+                    
+                    if where_conditions:
+                        where_clause = " WHERE " + " AND ".join(where_conditions)
+                        query = f'SELECT * FROM test_results{where_clause} ORDER BY timestamp DESC'
+                        cursor.execute(query, values)
+                    else:
+                        cursor.execute('SELECT * FROM test_results ORDER BY timestamp DESC')
+                else:
+                    cursor.execute('SELECT * FROM test_results ORDER BY timestamp DESC')
+                
                 rows = cursor.fetchall()
                 
                 results = []

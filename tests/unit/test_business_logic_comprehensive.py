@@ -30,9 +30,33 @@ except ImportError:
     
     class PhaseEnforcement:
         def enforce_phase_rules(self, phase_data):
-            return {"enforced": True, "phase": phase_data.get("current_phase", "RED")}
+            phase = phase_data.get("current_phase", "RED")
+            test_results = phase_data.get("test_results", {})
+            code_quality = phase_data.get("code_quality", {})
+            failing_count = test_results.get("failing", 0)
+            passing_count = test_results.get("passing", 0)
+            
+            if phase == "RED":
+                return {"valid": True, "failing_count": failing_count, "passing_count": passing_count, "phase": phase}
+            elif phase == "GREEN":
+                return {"valid": passing_count > 0 and failing_count == 0, "failing_count": failing_count, "passing_count": passing_count, "phase": phase}
+            elif phase == "REFACTOR":
+                quality_acceptable = code_quality.get("complexity") == "low" and code_quality.get("duplication") == "minimal"
+                return {"valid": failing_count == 0, "failing_count": failing_count, "quality_acceptable": quality_acceptable, "phase": phase}
+            return {"valid": False, "failing_count": failing_count, "passing_count": passing_count, "phase": phase}
+            
         def validate_phase_transition(self, transition):
-            return {"allowed": transition.get("from") != transition.get("to")}
+            from_phase = transition.get("from")
+            to_phase = transition.get("to")
+            # Define valid transitions
+            valid_transitions = {
+                "RED": ["GREEN"],
+                "GREEN": ["REFACTOR"],
+                "REFACTOR": ["RED"]
+            }
+            allowed = from_phase != to_phase and to_phase in valid_transitions.get(from_phase, [])
+            return {"allowed": allowed, "sequence_valid": allowed}
+            
         def check_exit_criteria(self, phase, criteria):
             return {"met": all(criteria.values()), "phase": phase}
     

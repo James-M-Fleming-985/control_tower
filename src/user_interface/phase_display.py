@@ -31,22 +31,22 @@ class TDDPhaseDisplay:
         self._cycles = []
     
     def show_phase(self, phase: str) -> str:
-        """Display current TDD phase with advanced accessibility and color schemes"""
+        """Display current TDD phase - minimal implementation"""
         self.current_phase = phase
-        # WCAG 2.1 AA compliant colors with high contrast
-        accessibility_colors = {
-            "RED": "\033[91m",    # Bright red for better visibility
-            "GREEN": "\033[92m",  # Bright green for accessibility
-            "REFACTOR": "\033[93m" # Bright yellow for contrast
-        }
-        # Add ARIA-like label for screen readers
-        aria_label = f"[PHASE: {phase}]"
-        color_code = accessibility_colors.get(phase, "\033[0m")
-        return f"{aria_label} {color_code}{phase}\033[0m"
+        return f"[PHASE: {phase}] {phase}"
     
-    def get_phase_color(self, phase: str) -> str:
-        """Get ANSI color code for phase"""
+    def show_color_coding(self, phase: str) -> str:
+        """Show color coding - minimal implementation"""
         return self.colors.get(phase, "\033[0m")
+    
+    def show_transition_animation(self, from_phase: str, to_phase: str) -> str:
+        """Show transition animation - minimal implementation"""
+        return f"{from_phase} -> {to_phase}"
+    
+    def show_duration_display(self, phase: str) -> str:
+        """Show duration display - minimal implementation"""
+        duration = time.time() - self.phase_start_time
+        return f"{phase}: {duration:.1f}s"
     
     def animate_transition(self, from_phase: str, to_phase: str) -> None:
         """Animate phase transition with smooth CSS-like timing"""

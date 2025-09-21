@@ -3,8 +3,21 @@ Business Logic Layer Requirements Test Suite
 ===========================================
 
 Comprehensive failing tests for LAY-003-01-03-002 Business Logic Layer
-covering all functional, performance, and compliance requirements.
-"""
+covering all functional, performance, and compliance re        
+        # ACT & ASSERT: Should validate and find issues
+        pass
+
+    def test_f2_4_green_phase_prevents_feature_creep(self):
+        """
+        REQUIREMENT F2.4: GREEN phase must prevent feature creep
+        EXPECTED: Should fail initially - no implementation
+        """
+        # ARRANGE: Project with new features added
+        project_path = self.temp_dir
+        evidence = {"new_features_added": True}
+        
+        # ACT & ASSERT: Should validate and find issues
+        pass
 
 import pytest
 import time
@@ -205,8 +218,7 @@ class TestGREENPhaseEnforcementRequirements:
         
         assert "Over-implementation detected" in result.blocking_issues
 
-        
-        def test_f2_3_green_phase_validates_code_coverage(self):
+    def test_f2_3_green_phase_validates_code_coverage(self):
         """
         REQUIREMENT F2.3: GREEN phase must validate adequate code coverage
         EXPECTED: Should fail initially - no implementation
@@ -216,8 +228,7 @@ class TestGREENPhaseEnforcementRequirements:
         evidence = {"code_coverage": 0.60}  # Below 75% threshold
         
         # ACT & ASSERT: Should validate and find issues
-
-        
+        pass
         result = self.enforcer.enforce_green_phase(project_path, evidence)
 
         

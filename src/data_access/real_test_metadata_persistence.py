@@ -56,6 +56,21 @@ class RealTestMetadataPersistence(ThreadSafeDataAccess):
         # Initialize default schema
         self._initialize_default_schema()
     
+    def store_test_metadata(self, file_name: str, test_metadata: Dict) -> Dict:
+        """
+        REQ-LAY-001-F3-01: Store REAL test metadata with physical evidence
+        
+        Args:
+            file_name: Test file name identifier
+            test_metadata: Test metadata to persist
+            
+        Returns:
+            Dictionary with persistence confirmation
+        """
+        # Add file_name to metadata for tracking
+        test_metadata['associated_file'] = file_name
+        return self.persist_test_metadata(test_metadata)
+    
     def persist_test_metadata(self, test_metadata: Dict) -> Dict:
         """
         REQ-LAY-001-F3-01: Collect REAL test metadata with physical evidence
@@ -257,6 +272,28 @@ class RealTestMetadataPersistence(ThreadSafeDataAccess):
                 'evidence_files': evidence_files,
                 'session_id': session_id
             }
+    
+    def retrieve_test_metadata(self, file_name: str) -> Optional[Dict]:
+        """
+        Retrieve metadata for a specific test file
+        
+        Args:
+            file_name: Test file name to retrieve metadata for
+            
+        Returns:
+            Metadata dictionary or None if not found
+        """
+        # Search for metadata files that match the file name
+        for metadata_file in self.metadata_files_dir.glob('metadata_*.json'):
+            try:
+                with open(metadata_file, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+                    if metadata.get('associated_file') == file_name:
+                        return metadata
+            except (IOError, json.JSONDecodeError):
+                continue
+        
+        return None
     
     def retrieve_metadata_by_session(self, session_id: str) -> Optional[Dict]:
         """

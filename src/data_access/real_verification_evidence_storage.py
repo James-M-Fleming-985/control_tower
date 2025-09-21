@@ -171,17 +171,32 @@ class RealVerificationEvidenceStorage(ThreadSafeDataAccess):
                 'error': str(e)
             }
     
-    def store_verification_evidence(self, evidence: Dict) -> Dict:
+    def collect_evidence(self, evidence_id: str, evidence: Dict) -> Dict:
+        """
+        Collect verification evidence for analysis
+        
+        Args:
+            evidence_id: Evidence identifier
+            evidence: Evidence data to collect
+            
+        Returns:
+            Dictionary with collection confirmation
+        """
+        # Alias to store_verification_evidence for compatibility
+        return self.store_verification_evidence(evidence_id, evidence)
+    
+    def store_verification_evidence(self, evidence_id: str, evidence: Dict) -> Dict:
         """
         Store general verification evidence
         
         Args:
+            evidence_id: Evidence identifier
             evidence: Verification evidence data
             
         Returns:
             Dictionary with storage confirmation
         """
-        evidence_id = self._generate_evidence_id()
+        # Use provided evidence_id instead of generating one
         timestamp = datetime.now().isoformat()
         
         enriched_evidence = {
