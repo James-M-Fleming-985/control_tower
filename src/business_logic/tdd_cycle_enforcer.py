@@ -959,6 +959,56 @@ class TDDCycleEnforcer:
             1.0
         )
     
+    def handle_interruption(self) -> Dict[str, Any]:
+        """Handle cycle interruption and recovery"""
+        try:
+            interruption_time = time.time()
+            current_state = self._get_current_state()
+            
+            # Log interruption
+            interruption_data = {
+                'interruption_time': interruption_time,
+                'current_phase': current_state.get('current_phase', 'UNKNOWN'),
+                'recovery_status': 'INITIATED',
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            # Attempt recovery
+            recovery_successful = self._attempt_recovery(current_state)
+            
+            interruption_data.update({
+                'recovery_successful': recovery_successful,
+                'recovery_time': time.time() - interruption_time
+            })
+            
+            return interruption_data
+            
+        except Exception as e:
+            return {
+                'interruption_time': time.time(),
+                'recovery_status': 'FAILED',
+                'error': str(e),
+                'timestamp': datetime.now().isoformat()
+            }
+    
+    def _get_current_state(self) -> Dict[str, Any]:
+        """Get current cycle state"""
+        return {
+            'current_phase': getattr(self, 'current_phase', PhaseType.RED),
+            'enforcement_count': getattr(self, 'enforcement_count', 0),
+            'last_enforcement': getattr(self, 'last_enforcement_time', None)
+        }
+    
+    def _attempt_recovery(self, state: Dict[str, Any]) -> bool:
+        """Attempt to recover from interruption"""
+        try:
+            # Reset internal state
+            self.enforcement_count = 0
+            self.last_enforcement_time = None
+            return True
+        except:
+            return False
+    
     def _calculate_phase_compliance(self, phase: PhaseType, evidence: Dict[str, Any]) -> float:
         """Calculate compliance score based on phase requirements"""
         score = 0.0
