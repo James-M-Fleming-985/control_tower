@@ -7,8 +7,23 @@
 📁 Evidence Base: /workspaces/control_tower/evidence/
 
 🔧 SOFTWARE DEVELOPMENT PROJECTS:
-Structure: /{project_id}/{system_id}/{feature_id}/{layer_id}/{stage}/
-Example: /workspaces/control_tower/evidence/PROJECT-003/SYSTEM-003-01/FEATURE-003-01-02/LAYER-003-01-02-001/
+Structure: /{project_id}/{system_id}/{feature_id}/{layer_id}/{stage}/🔄 Multi-Level Testing Cascade Management:
+├── Cascade detection for layer/task completion → next-level testing trigger is working
+├── Feature-level cascade (all layers complete → feature testing) is operational
+├── System-level cascade (all features complete → system testing) is functional
+├── Project-level cascade (all systems complete → project testing) is implemented
+├── Cascade status tracking and completion reporting is working for both project types
+├── Cascade failure detection and rollback trigger implementation is operational
+└── Failed cascade recovery validation and artifact quarantine management is functional
+
+🚨 Failure Handling and Recovery:
+├── Failure detection at all levels (layer/feature/system/project) with scope analysis is working
+├── Stable checkpoint creation after GREEN→REFACTOR transitions is operational
+├── Rollback decision logic based on failure scope and impact analysis is implemented
+├── Artifact quarantine system for failed tests, implementations, requirements is functional
+├── Rollback history tracking and recovery validation is working
+├── Recovery timeline generation and failure analysis reporting is operational
+└── Automated rollback target selection and progressive recovery validation is implementedle: /workspaces/control_tower/evidence/PROJECT-003/SYSTEM-003-01/FEATURE-003-01-02/LAYER-003-01-02-001/
 
 📋 STANDARD DELIVERY PROJECTS:
 Structure: /{project_id}/{workpackage_id}/{milestone_id}/{task_id}/{stage}/
@@ -41,7 +56,25 @@ Example: /workspaces/control_tower/evidence/PROJECT-005/WORKPACKAGE-005-02/MILES
 ├── activity_log.txt               # Comprehensive activity tracking
 ├── requirements_matrix.json       # Requirements to tests/tasks mapping
 ├── workflow_config.json           # Project type and workflow configuration
-└── cascade_status.json            # Multi-level testing status tracking
+├── cascade_status.json            # Multi-level testing status tracking
+├── stable_checkpoints/            # Known-good states for rollback
+│   ├── last_stable_layer_state.json
+│   ├── last_stable_feature_state.json
+│   ├── rollback_manifest_v{n}.json
+│   └── checkpoint_validation.json
+├── failure_analysis/              # Failure investigation and recovery
+│   ├── failure_root_cause_analysis.json
+│   ├── failure_timeline.json
+│   ├── affected_artifacts_list.json
+│   └── rollback_plan.json
+├── quarantine/                    # Failed artifacts storage
+│   ├── failed_tests_{timestamp}/
+│   ├── broken_implementations_{timestamp}/
+│   └── invalid_requirements_{timestamp}/
+└── rollback_history/              # Rollback tracking and metrics
+    ├── rollback_log.txt
+    ├── recovery_steps_taken.json
+    └── rollback_success_validation.json
 ```quirement Type**: Data Access Layer  
 **Level### **Enhanced Quality Requirements**
 ```
@@ -156,10 +189,16 @@ Structure Pattern: /{project_id}/{system_id}/{feature_id}/{stage}/
 Example: /workspaces/control_tower/evidence/PROJECT-003/SYSTEM-003-01/FEATURE-003-01-02/
 
 🎯 Stage Directories:
-├── red_stage/          # Failed tests, initial test creation
-├── green_stage/        # Passing tests, implementation code  
-├── refactor_stage/     # Refactored code, quality improvements
-└── activity_log.txt    # Simple activity tracking
+├── red_stage/                # Failed tests, initial test creation
+├── green_stage/              # Passing tests, implementation code  
+├── refactor_stage/           # Refactored code, quality improvements
+├── stable_checkpoints/       # Recovery points after successful cycles
+├── failure_analysis/         # Detailed failure investigation data  
+├── quarantine/              # Isolated artifacts pending review
+├── rollback_history/        # Audit trail of rollback operations
+├── user_decisions/          # Interactive rollback decision logs
+├── threshold_configs/       # Project-specific failure threshold settings
+└── activity_log.txt         # Simple activity tracking
 ```
 
 ### **Comprehensive Artifact Naming Convention**
@@ -259,6 +298,46 @@ Contains: timestamp, stage, artifact_type, description, file_size, requirements_
    ├── Support PROJECT-002 workflow execution system integration for type recognition
    ├── Maintain workflow configuration persistence across project lifecycle
    └── Enable workflow type switching and migration with data preservation
+
+✅ REQ-FUNC-009: Failure Detection and Rollback Management
+   ├── Detect test failures at all levels (layer, feature, system, project) with scope analysis
+   ├── Create stable checkpoints after successful GREEN→REFACTOR transitions
+   ├── Implement rollback decision logic based on failure scope and impact analysis
+   ├── Manage artifact quarantine for failed tests, implementations, and requirements
+   ├── Track rollback history and recovery validation for audit and learning
+   ├── Support partial rollbacks (single layer) vs full rollbacks (feature/system level)
+   ├── Maintain rollback manifest with affected artifacts and recovery steps
+   └── Integrate rollback triggers with cascade testing failure detection
+
+✅ REQ-FUNC-010: Checkpoint and Recovery System
+   ├── Create immutable snapshots of stable states at strategic workflow points
+   ├── Validate checkpoint integrity and completeness before storage
+   ├── Implement smart rollback target selection based on failure analysis
+   ├── Support incremental recovery with progressive validation steps
+   ├── Track recovery success metrics and rollback effectiveness
+   ├── Generate failure analysis reports for continuous improvement
+   ├── Maintain recovery timeline for project management visibility
+   └── Enable recovery validation through automated re-testing of rolled-back state
+
+✅ REQ-FUNC-011: Configurable Failure Thresholds
+   ├── Configure test failure thresholds (e.g., >20% failures trigger rollback, >5 critical failures)
+   ├── Configure requirement violation thresholds (e.g., >15% unmet, >3 high-priority violations)
+   ├── Configure cascade failure thresholds (e.g., >30% dependent features affected)
+   ├── Implement severity-based thresholds (CRITICAL, HIGH, MEDIUM, LOW)
+   ├── Support project-type specific thresholds (SOFTWARE_DEV vs STANDARD_DELIVERY)
+   ├── Load thresholds from configuration files with validation and error handling
+   ├── Report current thresholds and failure counts when rollback decisions are made
+   └── Prevent excessive rollbacks from minor failures (1/100 tests, 1/200 requirements)
+
+✅ REQ-FUNC-012: Interactive User Rollback Notification
+   ├── Display failure analysis summary with counts, thresholds, and impact assessment
+   ├── Present interactive terminal prompts with rollback options in Codespaces
+   ├── Offer rollback choices: "Full Rollback", "Partial Rollback", "Quarantine & Continue", "Cancel"
+   ├── Log user decisions with timestamp and rationale for audit trail
+   ├── Implement timeout handling with conservative default (quarantine) after 5 minutes
+   ├── Ensure Codespaces compatibility using standard terminal input/output
+   ├── Show rollback progress with clear status updates and confirmation steps
+   └── Require user confirmation for destructive operations with clear consequences
 ```
 
 ### **Quality Requirements**
