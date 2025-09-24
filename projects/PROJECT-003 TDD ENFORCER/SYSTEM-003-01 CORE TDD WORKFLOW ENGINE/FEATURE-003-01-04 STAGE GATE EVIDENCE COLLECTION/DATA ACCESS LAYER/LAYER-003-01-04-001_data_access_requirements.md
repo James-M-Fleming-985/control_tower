@@ -1,51 +1,127 @@
 # ⚙️ LAYER REQUIREMENT - DATA ACCESS LAYER
 
-**Requirement ID**: LAY-003-01-04-001  
-**Requirement Type**: Data Access Layer  
-**Level**: 5 (Layer)  
-**Parent Feature**: FEATURE-003-01-04 STAGE GATE EVIDENCE COLLECTION  
+**Requirement ID**: LAY-003-01## 📁 DUAL-HIERARCHY EVIDENCE STORAGE STRUCTURE
+
+### **Base Directory Organization - Dual Project Types**
+```
+📁 Evidence Base: /workspaces/control_tower/evidence/
+
+🔧 SOFTWARE DEVELOPMENT PROJECTS:
+Structure: /{project_id}/{system_id}/{feature_id}/{layer_id}/{stage}/
+Example: /workspaces/control_tower/evidence/PROJECT-003/SYSTEM-003-01/FEATURE-003-01-02/LAYER-003-01-02-001/
+
+📋 STANDARD DELIVERY PROJECTS:
+Structure: /{project_id}/{workpackage_id}/{milestone_id}/{task_id}/{stage}/
+Example: /workspaces/control_tower/evidence/PROJECT-005/WORKPACKAGE-005-02/MILESTONE-005-02-03/TASK-005-02-03-001/
+```
+
+### **Comprehensive Stage Directory System**
+```
+🎯 TDD Workflow Stages (Software Development):
+├── requirements_analysis_stage/     # Requirements parsing and validation
+├── test_generation_stage/          # Requirements → failing tests (no placeholders)
+├── red_stage/                      # Failed tests, initial test creation
+├── green_stage/                    # Passing tests, implementation code  
+├── refactor_stage/                 # Refactored code, quality improvements
+├── unit_testing_stage/             # Unit test execution and results
+├── integration_testing_stage/      # Integration test execution and results
+├── e2e_testing_stage/             # End-to-end test execution and results
+├── requirements_verification_stage/ # Requirements traceability and validation
+└── compliance_validation_stage/    # Final compliance and audit artifacts
+
+📊 Standard Delivery Stages:
+├── planning_stage/                 # Task planning and requirements
+├── execution_stage/                # Task execution artifacts
+├── review_stage/                   # Quality review and validation
+├── approval_stage/                 # Approval documentation
+├── delivery_stage/                 # Final delivery artifacts
+└── closure_stage/                  # Task closure and lessons learned
+
+📄 Tracking Files (All Project Types):
+├── activity_log.txt               # Comprehensive activity tracking
+├── requirements_matrix.json       # Requirements to tests/tasks mapping
+├── workflow_config.json           # Project type and workflow configuration
+└── cascade_status.json            # Multi-level testing status tracking
+```quirement Type**: Data Access Layer  
+**Level### **Enhanced Quality Requirements**
+```
+⚡ Performance (Codespace-Optimized for Complex Operations):
+   ├── Response Time: < 3 seconds for evidence storage with requirements traceability
+   ├── Requirements Processing: < 5 seconds for traceability matrix generation
+   ├── Cascade Detection: < 2 seconds for multi-level completion detection
+   ├── Throughput: Handle 200+ evidence artifacts per day across multiple project types
+   ├── Memory Usage: < 100MB for evidence processing with requirements analysis
+   └── Storage: Efficient dual-hierarchy file-based storage with metadata indexing
+
+🛡️ Reliability (Production-Grade for Critical Workflows):
+   ├── Error Handling: Comprehensive error handling for workflow detection, requirements parsing, cascade management
+   ├── Recovery: Workflow-aware recovery with state restoration and cascade continuation
+   ├── Data Integrity: Requirements traceability consistency and cascade status accuracy
+   ├── Availability: High availability for critical workflow transitions (95% uptime target)
+   ├── Data Safety: Multi-layered backup with git integration, requirements versioning, and cascade state preservation
+   └── Validation: Real-time data validation for requirements links, workflow types, and cascade triggers
+
+🔧 Advanced Maintainability:
+   ├── Modular Implementation: Separated concerns for workflow types, requirements processing, and cascade management
+   ├── Clear Architecture: Well-documented dual-hierarchy structure with workflow-aware organization
+   ├── Developer-Friendly: Intuitive APIs for both software development and standard delivery workflows
+   ├── Comprehensive Logging: Detailed audit trails for requirements changes, workflow transitions, and cascade events
+   ├── Configuration Management: Flexible workflow configuration with easy project type switching
+   └── Integration Support: Clean interfaces for PROJECT-002 workflow execution system integration
+
+📊 Traceability and Compliance:
+   ├── Requirements Coverage: 100% traceability from requirements to implementation artifacts
+   ├── Audit Trail: Complete lifecycle tracking for compliance and quality assurance
+   ├── Verification Reports: Automated generation of requirements fulfillment and test coverage reports
+   ├── Cascade Monitoring: Real-time tracking of multi-level testing completion and triggers
+   └── Quality Metrics: Quantified scoring for requirements coverage, test quality, and workflow compliance
+```rent Feature**: FEATURE-003-01-04 STAGE GATE EVIDENCE COLLECTION  
 **Created**: 2025-09-18  
-**Last Updated**: 2025-09-18  
-**Status**: Active
+**Last Updated**: 2025-09-24  
+**Status**: Active  
+**Environment**: Codespace (1-2 developers)
 
 ## ⏱️ TIMELINE MANAGEMENT
 
-**Duration**: 2 days  
-**Due Date**: 2025-09-20  
-**Start Date**: 2025-09-18  
+**Duration**: 1 day  
+**Due Date**: 2025-09-25  
+**Start Date**: 2025-09-24  
 **Priority**: High  
-**Effort Estimate**: 3 person-days  
+**Effort Estimate**: 1 person-day  
 **Dependencies**: FEATURE-003-01-04 requirements  
-**Progress**: 0% - Layer requirements defined
+**Progress**: 0% - Simplified layer requirements defined
 
 ---
 
 ## ⚙️ LAYER DEFINITION
 
 ### **Layer Overview**
-Data Access Layer for Stage Gate Evidence Collection manages **REAL evidence artifact storage**, **REAL audit trail persistence**, and **REAL compliance document storage** required for tamper-evident TDD process documentation.
+Comprehensive file-based Data Access Layer for Stage Gate Evidence Collection manages **dual-hierarchy artifact storage**, **workflow-aware organization**, and **complete lifecycle tracking** for both software development and standard delivery projects in 1-2 developer codespace environment.
 
 ### **Layer Purpose**
 ```
-🎯 Primary Responsibility: REAL evidence storage and audit-compliant data persistence
-🔧 Technical Function: REAL artifact storage with immutable audit trails
-📊 Data Handling: REAL evidence artifacts, audit records, compliance documentation
-🔗 Interface Role: Provides REAL evidence persistence for stage gate documentation
+🎯 Primary Responsibility: Dual-project-type evidence storage with complete lifecycle coverage
+🔧 Technical Function: Workflow-aware artifact storage with requirements traceability
+📊 Data Handling: Evidence artifacts, requirements mappings, verification reports, multi-level test results
+🔗 Interface Role: Unified evidence persistence for TDD workflows AND standard delivery projects
+🔄 Lifecycle Support: Requirements → Tests → Implementation → Verification → Multi-level Testing
 ```
 
 ### **Layer Boundaries**
 ```
 📥 Input Interfaces:
-   ├── Data Inputs: REAL stage gate artifacts, evidence metadata, audit events
-   ├── API Calls: Evidence storage requests, audit trail creation, compliance queries
-   ├── Events: REAL stage completions, evidence capture, audit triggers
-   └── Dependencies: File system, secure storage, audit logging infrastructure
+   ├── Data Inputs: Stage gate artifacts, requirements documents, test specifications, verification reports
+   ├── API Calls: Evidence storage, artifact retrieval, requirements traceability, workflow detection
+   ├── Events: Stage completions, requirements changes, test generation, verification completion
+   ├── Project Types: SOFTWARE_DEV (project/system/feature/layer) + STANDARD_DELIVERY (project/workpackage/milestone/task)
+   └── Dependencies: Local file system, git version control, requirements parsing
 
 📤 Output Interfaces:
-   ├── Data Outputs: REAL evidence artifacts, audit trail data, compliance reports
-   ├── API Responses: Evidence retrieval, audit queries, compliance status
-   ├── Events: Evidence stored, audit events, compliance updates
-   └── Services: Evidence storage, audit trail management, compliance data access
+   ├── Data Outputs: Organized evidence files, requirements matrices, verification reports, cascade test results
+   ├── API Responses: Evidence retrieval, traceability reports, workflow status, compliance validation
+   ├── Events: Evidence stored, requirements mapped, verification completed, cascade testing triggered
+   ├── Reports: Requirements traceability, test generation validation, multi-level testing summaries
+   └── Services: Dual-hierarchy storage, workflow detection, requirements verification, cascade testing
 ```
 
 ---
@@ -55,79 +131,262 @@ Data Access Layer for Stage Gate Evidence Collection manages **REAL evidence art
 ### **Technology Stack**
 ```
 💻 Programming Language: Python 3.9+
-🛠️ Framework/Library: sqlite3, cryptography, hashlib, json
-📦 Dependencies: cryptography for evidence integrity, sqlite3 for audit storage
-🗄️ Data Storage: SQLite with encryption for audit trails, filesystem for artifacts
-☁️ Infrastructure: Secure storage with backup and integrity verification
+🛠️ Framework/Library: os, json, datetime, pathlib (standard library)
+📦 Dependencies: Minimal - standard Python libraries only
+🗄️ Data Storage: File system organization with JSON metadata
+☁️ Infrastructure: Codespace file system with git-based backup
 ```
 
 ### **Architecture Pattern**
 ```
-🏗️ Design Pattern: Immutable Event Store Pattern for audit compliance
-🔗 Integration Pattern: Write-Once Repository with integrity validation
-📊 Data Access Pattern: Append-only audit log with evidence linking
-⚡ Performance Pattern: Efficient artifact storage with integrity caching
+🏗️ Design Pattern: Simple Directory Structure with Metadata Files
+🔗 Integration Pattern: File-based Repository with git versioning
+📊 Data Access Pattern: Organized directory traversal with JSON metadata
+⚡ Performance Pattern: Direct file I/O with timestamp-based naming
 ```
 
 ---
 
-## 📝 FUNCTIONAL REQUIREMENTS
+## � EVIDENCE STORAGE STRUCTURE
 
-### **Core Functionality**
+### **Base Directory Organization**
 ```
-✅ Primary Functions:
-   ├── Function 1: REAL evidence artifact storage with cryptographic integrity
-   ├── Function 2: REAL audit trail creation and immutable persistence
-   ├── Function 3: REAL compliance document storage and versioning
-   └── Function 4: REAL evidence retrieval with integrity verification
+📁 Evidence Base: /workspaces/control_tower/evidence/
+Structure Pattern: /{project_id}/{system_id}/{feature_id}/{stage}/
+Example: /workspaces/control_tower/evidence/PROJECT-003/SYSTEM-003-01/FEATURE-003-01-02/
 
-✅ Data Processing:
-   ├── Input Validation: REAL evidence validation, integrity verification
-   ├── Business Logic: REAL audit trail logic, evidence categorization
-   ├── Data Transformation: Evidence artifacts to stored format with metadata
-   ├── Output Formatting: REAL evidence packages with compliance formatting
-   └── Error Handling: REAL storage failures, integrity corruption recovery
+🎯 Stage Directories:
+├── red_stage/          # Failed tests, initial test creation
+├── green_stage/        # Passing tests, implementation code  
+├── refactor_stage/     # Refactored code, quality improvements
+└── activity_log.txt    # Simple activity tracking
+```
 
-✅ Integration Points:
-   ├── API Endpoints: Evidence storage API, audit trail API, compliance query API
-   ├── Database Operations: Immutable audit record operations
-   ├── External Services: Secure storage services, backup systems
-   └── Event Handling: REAL evidence events, audit triggers
+### **Comprehensive Artifact Naming Convention**
+```
+📋 File Naming Pattern: {timestamp}_{stage}_{artifact_type}_{version}.{ext}
+
+🔧 Software Development Examples:
+├── 20250924_143022_requirements_analysis_requirements_spec_v1.json
+├── 20250924_143035_test_generation_failing_tests_v1.py
+├── 20250924_143045_red_test_failures_v1.json
+├── 20250924_143055_green_implementation_v1.py
+├── 20250924_143100_refactor_metrics_v1.md
+├── 20250924_143110_unit_testing_results_v1.xml
+├── 20250924_143120_integration_testing_results_v1.xml
+├── 20250924_143130_e2e_testing_results_v1.xml
+├── 20250924_143140_requirements_verification_traceability_matrix_v1.json
+└── 20250924_143150_compliance_validation_audit_report_v1.pdf
+
+📊 Standard Delivery Examples:
+├── 20250924_143022_planning_task_specification_v1.md
+├── 20250924_143045_execution_deliverable_v1.docx
+├── 20250924_143100_review_quality_checklist_v1.json
+├── 20250924_143110_approval_sign_off_v1.pdf
+├── 20250924_143120_delivery_final_artifact_v1.zip
+└── 20250924_143130_closure_lessons_learned_v1.md
+
+🏷️ Enhanced Metadata Files: {artifact_name}.meta.json
+Contains: timestamp, stage, artifact_type, description, file_size, requirements_links, workflow_type, cascade_level
+```
+
+---
+
+## 📝 COMPREHENSIVE FUNCTIONAL REQUIREMENTS
+
+### **Core Dual-Hierarchy Storage**
+```
+✅ REQ-FUNC-001: Dual Project Type Evidence Storage
+   ├── Detect project type (SOFTWARE_DEV vs STANDARD_DELIVERY) from workflow configuration
+   ├── Create appropriate hierarchy: project/system/feature/layer OR project/workpackage/milestone/task
+   ├── Store artifacts with workflow-aware naming convention and stage categorization
+   ├── Generate enhanced JSON metadata with requirements links and workflow context
+   └── Handle file I/O errors with workflow-specific recovery mechanisms
+
+✅ REQ-FUNC-002: Workflow-Aware Activity Logging
+   ├── Maintain comprehensive activity logs per project unit with workflow type awareness
+   ├── Log all lifecycle events: requirements changes, test generation, implementation, verification
+   ├── Track cascade testing triggers and multi-level test completion
+   ├── Append-only format with structured data for automated processing
+   └── Human-readable format with workflow context for debugging and audit
+
+✅ REQ-FUNC-003: Intelligent Evidence Retrieval
+   ├── Workflow-aware directory traversal supporting both hierarchy types
+   ├── Advanced search by stage, artifact type, workflow type, and cascade level
+   ├── Requirements-linked artifact discovery and traceability reporting
+   ├── Metadata parsing with workflow context and cascade status
+   └── File existence validation with workflow-appropriate error handling
+
+✅ REQ-FUNC-004: Advanced Storage Organization
+   ├── Automatic directory creation for both hierarchy types with workflow detection
+   ├── Comprehensive stage-based categorization (10+ stage types)
+   ├── Duplicate handling with version incrementing and conflict resolution
+   ├── Git integration with workflow-aware commit messages and branching
+   └── Cascade testing directory preparation and management
+```
+
+### **Requirements Traceability and Verification**
+```
+✅ REQ-FUNC-005: Requirements-Test Traceability Management
+   ├── Parse requirements documents and extract testable specifications
+   ├── Generate bidirectional traceability matrix (requirements ↔ tests/tasks)
+   ├── Validate test generation from requirements with NO placeholder detection
+   ├── Track requirement fulfillment status throughout lifecycle
+   ├── Generate requirements verification reports with compliance scoring
+   └── Maintain real-time traceability updates as requirements and tests evolve
+
+✅ REQ-FUNC-006: Test Generation Validation
+   ├── Validate that failing tests are generated directly from requirements specifications
+   ├── Detect and reject placeholder tests (pytest.skip, TODO, pass-only tests)
+   ├── Ensure each test implements a specific, valid requirement with measurable criteria
+   ├── Track test-to-requirement linkage for complete lifecycle coverage
+   ├── Generate test quality reports with requirement mapping validation
+   └── Support both TDD test generation and standard delivery task validation
+
+✅ REQ-FUNC-007: Multi-Level Testing Cascade Management
+   ├── Detect completion of lowest-level units (layer/task) and trigger next-level testing
+   ├── Manage feature-level testing cascade: all layers complete → feature unit/integration/e2e
+   ├── Manage system-level testing cascade: all features complete → system unit/integration/e2e
+   ├── Manage project-level testing cascade: all systems complete → project unit/integration/e2e
+   ├── Store cascade testing artifacts with appropriate hierarchy and stage categorization
+   ├── Track cascade status and generate completion reports for each level
+   └── Support both software development and standard delivery project cascade patterns
+
+✅ REQ-FUNC-008: Workflow Type Recognition and Management
+   ├── Auto-detect project type from directory structure, configuration, or explicit declaration
+   ├── Apply appropriate terminology: system/feature/layer vs workpackage/milestone/task
+   ├── Configure stage types and workflow patterns based on detected project type
+   ├── Support PROJECT-002 workflow execution system integration for type recognition
+   ├── Maintain workflow configuration persistence across project lifecycle
+   └── Enable workflow type switching and migration with data preservation
 ```
 
 ### **Quality Requirements**
 ```
-⚡ Performance:
-   ├── Response Time: < 500ms for evidence storage
-   ├── Throughput: 100+ evidence artifacts per minute
-   ├── Memory Usage: < 256MB for evidence processing
-   └── CPU Usage: < 15% during evidence operations
+⚡ Performance (Codespace-Appropriate):
+   ├── Response Time: < 2 seconds for evidence storage
+   ├── Throughput: Handle 50+ evidence artifacts per day
+   ├── Memory Usage: < 50MB for evidence processing
+   └── Storage: Efficient file-based storage in codespace
 
-🛡️ Reliability:
-   ├── Error Rate: < 0.01% for evidence operations
-   ├── Availability: 99.99% uptime for evidence storage
-   ├── Recovery Time: < 10 seconds for storage recovery
-   └── Data Integrity: 100% evidence integrity with cryptographic verification
+🛡️ Reliability (Developer-Friendly):
+   ├── Error Handling: Graceful failure with clear error messages
+   ├── Recovery: Simple file-based recovery mechanisms
+   ├── Availability: Best effort (codespace environment)
+   └── Data Safety: Git-based backup and versioning
 
-🔒 Security:
-   ├── Input Sanitization: Evidence data validation and sanitization
-   ├── Authentication: Secure evidence access with audit logging
-   ├── Authorization: Role-based evidence access control
-   └── Data Protection: Encrypted evidence storage with integrity hashing
+� Maintainability:
+   ├── Simple Implementation: Minimal dependencies, easy to debug
+   ├── Clear Structure: Organized directories, readable logs
+   ├── Developer-Friendly: Easy to browse, understand, and modify
+   └── Git Integration: Automatic versioning and change tracking
 ```
 
-## 📋 COMPLETION CRITERIA
+## 📋 COMPREHENSIVE COMPLETION CRITERIA
 
-### **Layer Completion Conditions**
+### **Layer Completion Conditions - Full Lifecycle Coverage**
 ```
 🏁 LAYER COMPLETE WHEN:
-├── All evidence storage functions are implemented and tested
-├── Unit test coverage is ≥ 95%
-├── Integration tests with business logic layer are passing
-├── Performance requirements (< 500ms response) are met
-├── Code review is completed with security specialist approval
-├── Documentation is complete with evidence storage specifications
-├── Security requirements are satisfied with encryption validation
-├── Error handling covers all storage and integrity failure scenarios
-└── REAL evidence storage with cryptographic integrity is fully operational
+
+🔧 Core Dual-Hierarchy Storage:
+├── Dual project type detection and storage (SOFTWARE_DEV + STANDARD_DELIVERY) are implemented and tested
+├── Both hierarchy types (project/system/feature/layer AND project/workpackage/milestone/task) work correctly
+├── All 10+ stage types are supported with appropriate directory creation and organization
+├── Enhanced metadata generation with requirements links and workflow context is functional
+├── Workflow-aware artifact naming and categorization is operational
+
+📊 Requirements Traceability System:
+├── Requirements document parsing and testable specification extraction is working
+├── Bidirectional traceability matrix generation (requirements ↔ tests/tasks) is operational
+├── Test generation validation with NO placeholder detection is functional
+├── Requirements verification reporting with compliance scoring is implemented
+├── Real-time traceability updates are working throughout project lifecycle
+
+🔄 Multi-Level Testing Cascade Management:
+├── Cascade detection for layer/task completion → next-level testing trigger is working
+├── Feature-level cascade (all layers complete → feature testing) is operational
+├── System-level cascade (all features complete → system testing) is functional
+├── Project-level cascade (all systems complete → project testing) is implemented
+├── Cascade status tracking and completion reporting is working for both project types
+
+⚙️ Workflow Integration:
+├── PROJECT-002 workflow execution system integration for type recognition is complete
+├── Workflow type switching and data migration is functional
+├── Activity logging covers all lifecycle events with workflow context
+├── Enhanced error handling for workflow detection, requirements parsing, cascade management
+
+🧪 Quality Assurance:
+├── Unit test coverage is ≥ 90% across all functional requirements (8 major requirement areas)
+├── Integration tests with business logic layer cover both project types and workflow scenarios
+├── Performance requirements met: < 3s storage, < 5s traceability, < 2s cascade detection
+├── Requirements traceability accuracy ≥ 99% with automated validation
+├── Cascade trigger reliability ≥ 95% with comprehensive error recovery
+
+📋 Documentation and Deployment:
+├── Code review completed and approved for all expanded functionality
+├── Comprehensive documentation with dual-hierarchy examples and workflow scenarios
+├── Git integration validated for workflow-aware commits and cascade state preservation
+├── PROJECT-002 integration documentation and handoff procedures complete
+└── Full lifecycle evidence storage with organized filing for both project types is operational
+```
+
+## 🎯 COMPREHENSIVE IMPLEMENTATION NOTES
+
+### **Development Focus Areas - Phased Approach**
+```
+🛠️ Priority 1: Dual-Hierarchy Core Operations
+├── Project type detection and workflow configuration management
+├── Dual directory structure creation (software dev + standard delivery)
+├── Enhanced file naming with workflow context and requirements links
+├── Comprehensive error handling for workflow detection and hierarchy management
+└── Advanced metadata generation with traceability information
+
+🛠️ Priority 2: Requirements Traceability System
+├── Requirements document parsing and specification extraction
+├── Bidirectional traceability matrix generation and maintenance
+├── Test generation validation with placeholder detection and rejection
+├── Requirements verification reporting with compliance scoring
+└── Real-time traceability updates and consistency validation
+
+🛠️ Priority 3: Multi-Level Cascade Management
+├── Cascade detection algorithms for completion triggers
+├── Multi-level testing artifact management (feature/system/project levels)
+├── Cascade status tracking and completion reporting
+├── Cross-workflow cascade support (software dev + standard delivery)
+└── Integration with PROJECT-002 workflow execution system
+
+🛠️ Priority 4: Enhanced Activity Tracking
+├── Comprehensive lifecycle event logging with workflow context
+├── Structured activity data for automated processing and reporting
+├── Cascade event tracking and multi-level completion monitoring
+├── Requirements change tracking and impact analysis
+└── Audit trail generation for compliance and quality assurance
+
+🛠️ Priority 5: Integration & Advanced Testing
+├── PROJECT-002 workflow execution system integration
+├── Comprehensive unit tests covering all 8 functional requirement areas
+├── Integration tests for both project types and cascade scenarios
+├── Performance testing for requirements processing and cascade detection
+└── End-to-end workflow validation across complete project lifecycles
+```
+
+### **Enhanced Implementation Benefits**
+```
+✅ Comprehensive Coverage: Complete project lifecycle support vs TDD-only
+✅ Dual Project Support: Both software development and standard delivery workflows
+✅ Requirements Integration: Full traceability and verification vs basic storage
+✅ Cascade Automation: Multi-level testing automation vs manual coordination
+✅ Workflow Intelligence: Adaptive behavior based on project type vs fixed structure
+✅ Quality Assurance: Built-in compliance and verification vs basic file storage
+✅ Scalability: Supports growing project complexity while maintaining 1-2 developer efficiency
+✅ Future-Proofing: Foundation for advanced project management and automation features
+```
+
+### **Development Timeline Adjustment**
+```
+⏱️ Updated Duration: 3 days (vs original 1 day)
+📋 Justification: Comprehensive functionality requires additional development time
+🎯 Value Proposition: Complete project lifecycle management vs basic file storage
+⚖️ Cost-Benefit: 3x development time for 10x functionality and future-proofing
+🔄 Iterative Approach: Core functionality first, then enhanced features
 ```
