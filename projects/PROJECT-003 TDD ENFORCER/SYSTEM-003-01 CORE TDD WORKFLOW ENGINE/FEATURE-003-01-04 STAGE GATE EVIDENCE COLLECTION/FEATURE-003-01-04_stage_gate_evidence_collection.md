@@ -93,6 +93,72 @@
    ├── Acceptance Criteria: Links evidence to specific requirements, features, and deliverables
    ├── Priority: High
    └── Dependencies: Requirements mapping, evidence indexing, traceability matrix
+
+🔧 REQ-FUNC-006: Test Generation Validation
+   ├── Description: Validate test generation and execution against TDD requirements
+   ├── Acceptance Criteria: Verify test completeness, execution results, coverage metrics
+   ├── Priority: High
+   └── Dependencies: Test execution framework, coverage analysis tools
+
+🔧 REQ-FUNC-007: Multi-Level Testing Cascade Management
+   ├── Description: Manage testing cascade across multiple hierarchical levels
+   ├── Acceptance Criteria: Coordinate tests across projects, systems, features, layers
+   ├── Priority: High
+   └── Dependencies: Hierarchical project structure, test orchestration
+
+🔧 REQ-FUNC-008: Workflow Type Recognition
+   ├── Description: Automatically detect and adapt to different workflow types
+   ├── Acceptance Criteria: Recognize workflow patterns, adapt evidence collection accordingly
+   ├── Priority: Medium
+   └── Dependencies: Workflow analysis, pattern recognition
+
+🔧 REQ-FUNC-009: Failure Detection and Rollback Management
+   ├── Description: Detect workflow failures and manage rollback to stable checkpoints
+   ├── Acceptance Criteria: Automatic failure detection, stable checkpoint creation, rollback execution
+   ├── Priority: Critical
+   └── Dependencies: Checkpoint system, failure monitoring, rollback mechanisms
+
+🔧 REQ-FUNC-010: Checkpoint and Recovery System
+   ├── Description: Create and manage stable checkpoints for recovery operations
+   ├── Acceptance Criteria: Automated checkpoint creation, recovery point validation, restore capabilities
+   ├── Priority: Critical
+   └── Dependencies: State management, data persistence, recovery procedures
+
+🔧 REQ-FUNC-011: Configurable Failure Thresholds
+   ├── Description: Configure failure detection thresholds and rollback triggers
+   ├── Acceptance Criteria: Customizable thresholds, automatic trigger activation, threshold monitoring
+   ├── Priority: High
+   └── Dependencies: Configuration management, monitoring system, threshold logic
+
+🔧 REQ-FUNC-012: Interactive User Rollback Notification
+   ├── Description: Notify users of rollback decisions and allow interactive confirmation
+   ├── Acceptance Criteria: Real-time notifications, user decision interface, confirmation handling
+   ├── Priority: High
+   └── Dependencies: Notification system, user interface, decision workflow
+
+🔧 REQ-FUNC-013: Mobile API Integration
+   ├── Description: Provide mobile API for workflow control and monitoring
+   ├── Acceptance Criteria: REST API endpoints, mobile-optimized responses, workflow control
+   ├── Priority: Medium
+   └── Dependencies: API framework, mobile compatibility, authentication
+
+🔧 REQ-FUNC-014: Mobile Push Notification System
+   ├── Description: Send push notifications to mobile devices for workflow events
+   ├── Acceptance Criteria: Push notification delivery, event-based triggers, delivery confirmation
+   ├── Priority: Medium
+   └── Dependencies: Push notification service, mobile app integration, event system
+
+🔧 REQ-FUNC-015: Mobile Decision Interface
+   ├── Description: Provide mobile interface for workflow decisions and approvals
+   ├── Acceptance Criteria: Mobile-friendly decision UI, approval workflow, decision logging
+   ├── Priority: Medium
+   └── Dependencies: Mobile UI framework, decision workflow, approval system
+
+🔧 REQ-FUNC-016: Mobile Rollback Execution and Monitoring
+   ├── Description: Execute and monitor rollback operations from mobile interface
+   ├── Acceptance Criteria: Mobile rollback controls, real-time monitoring, execution feedback
+   ├── Priority: Medium
+   └── Dependencies: Mobile interface, rollback system, monitoring capabilities
 ```
 
 ### **Non-Functional Requirements**
@@ -176,6 +242,27 @@
    ├── ✅ Zero-impact evidence collection during development
    ├── ✅ Standardized interfaces for evidence access and reporting
    └── ✅ Robust error handling with evidence recovery capabilities
+
+🎯 Rollback Management:
+   ├── ✅ Automatic failure detection with configurable thresholds
+   ├── ✅ Stable checkpoint creation and management
+   ├── ✅ Interactive user rollback notification and confirmation
+   ├── ✅ Rollback execution with recovery monitoring
+   └── ✅ Rollback audit trail and status tracking
+
+🎯 Mobile API Integration:
+   ├── ✅ REST API endpoints for workflow control and monitoring
+   ├── ✅ Mobile push notification system for workflow events
+   ├── ✅ Mobile decision interface for approvals and confirmations
+   ├── ✅ Mobile rollback execution and monitoring capabilities
+   └── ✅ Mobile-optimized API responses and authentication
+
+🎯 Enhanced Testing and Validation:
+   ├── ✅ Test generation validation against TDD requirements
+   ├── ✅ Multi-level testing cascade management
+   ├── ✅ Workflow type recognition and adaptation
+   ├── ✅ Comprehensive evidence validation with integrity checking
+   └── ✅ Advanced storage organization with intelligent retrieval
 ```
 
 ### **Performance Benchmarks**
@@ -248,6 +335,18 @@
    ├── Retrieval Speed: <3 seconds for any historical evidence
    ├── Integrity Verification: 100% tamper detection success
    └── Process Improvement: 95% reduction in manual documentation effort
+
+📈 Rollback and Recovery Metrics:
+   ├── Failure Detection Accuracy: >95% automatic failure detection
+   ├── Rollback Success Rate: >98% successful rollback operations
+   ├── Recovery Time: <2 minutes from failure to stable state
+   └── Checkpoint Reliability: 100% checkpoint creation success
+
+📈 Mobile API Metrics:
+   ├── API Response Time: <3 seconds for mobile API calls
+   ├── Push Notification Delivery: >95% successful delivery rate
+   ├── Mobile Decision Response: <10 seconds average decision time
+   └── Mobile API Availability: >99% uptime for mobile services
 ```
 
 ### **Qualitative Indicators**
@@ -263,6 +362,18 @@
    ├── High: Clear visibility into collected evidence and documentation status
    ├── High: Reliable evidence availability for review and validation
    └── High: Zero manual effort required for compliance documentation
+
+🎯 Rollback and Recovery Quality:
+   ├── High: Reliable failure detection with minimal false positives
+   ├── High: Fast, predictable rollback operations with clear status feedback
+   ├── High: Comprehensive rollback audit trail for process improvement
+   └── High: User-friendly rollback decision interface with clear options
+
+🎯 Mobile Integration Quality:
+   ├── High: Responsive mobile API with intuitive workflow control
+   ├── High: Timely push notifications with relevant workflow information
+   ├── High: User-friendly mobile decision interface with clear context
+   └── High: Reliable mobile rollback execution with real-time feedback
 ```
 
 ---
@@ -285,12 +396,16 @@
    ├── All Features: Evidence from all TDD workflow stages and validations
    ├── Data: Test results, code changes, validation outputs, timing metrics
    ├── Resources: Secure storage, encryption libraries, indexing system
+   ├── Mobile: Push notification service, mobile app integration
+   ├── Rollback: Checkpoint system, failure monitoring, recovery procedures
    └── External: Digital signature tools, compression utilities
 
 🔗 Output Dependencies:
    ├── Compliance: Audit-ready evidence packages and reports
    ├── Management: Process metrics and improvement insights
    ├── Quality: Traceability matrix and validation evidence
+   ├── Mobile: Mobile notifications, workflow control responses
+   ├── Rollback: Rollback execution results, recovery status updates
    └── Archive: Long-term evidence retention and historical analysis
 ```
 
