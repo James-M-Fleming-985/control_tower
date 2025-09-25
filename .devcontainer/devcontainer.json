@@ -1,0 +1,120 @@
+{
+    "name": "Control Tower - Multi-Repo Management Hub",
+    "image": "mcr.microsoft.com/devcontainers/python:3.12-bullseye",
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {
+            "ppa": true,
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {
+            "installDirectlyFromGitHubRelease": true,
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts",
+            "nodeGypDependencies": true
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "enableNonRootDocker": "true"
+        }
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.flake8",
+                "ms-python.pylint",
+                "ms-toolsai.jupyter",
+                "GitHub.vscode-pull-request-github",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-vscode.vscode-json",
+                "redhat.vscode-yaml",
+                "ms-vscode.markdown-it-katex",
+                "DavidAnson.vscode-markdownlint",
+                "ms-vscode.test-adapter-converter",
+                "ms-python.pytest",
+                "ms-vscode.vscode-github-issue-notebooks",
+                "GitHub.vscode-github-actions",
+                "eamodio.gitlens"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.testing.pytestEnabled": true,
+                "python.testing.unittestEnabled": false,
+                "python.testing.pytestArgs": ["."],
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "git.autofetch": true,
+                "git.enableSmartCommit": true,
+                "terminal.integrated.shell.linux": "/bin/bash",
+                "workbench.colorTheme": "GitHub Dark",
+                "files.autoSave": "afterDelay",
+                "files.autoSaveDelay": 1000,
+                "markdown.preview.fontSize": 14
+            }
+        }
+    },
+
+    "postCreateCommand": "pip install -e . && pip install pytest pytest-cov pytest-mock pytest-html pathlib dataclasses && gh auth status || echo 'Run: gh auth login --web to authenticate with GitHub'",
+    
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+
+    "remoteEnv": {
+        "CONTROL_TOWER_MODE": "true",
+        "MULTI_REPO_WORKSPACE": "/workspaces/control_tower",
+        "PYTHONPATH": "/workspaces/control_tower/src:/workspaces/control_tower",
+        "GIT_EDITOR": "code --wait"
+    },
+
+    "forwardPorts": [
+        8080,
+        3000,
+        5000,
+        8000
+    ],
+
+    "portsAttributes": {
+        "8080": {
+            "label": "TDD Mobile API",
+            "onAutoForward": "notify"
+        },
+        "3000": {
+            "label": "Web UI",
+            "onAutoForward": "silent"
+        },
+        "5000": {
+            "label": "Flask Dev Server",
+            "onAutoForward": "silent"
+        },
+        "8000": {
+            "label": "Python HTTP Server",
+            "onAutoForward": "silent"
+        }
+    },
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/control_tower,type=bind",
+    "workspaceFolder": "/workspaces/control_tower",
+
+    "initializeCommand": "echo 'Initializing Control Tower Multi-Repo Management Hub...'",
+    
+    "updateContentCommand": [
+        "pip", "install", "--upgrade", 
+        "pytest", "pytest-cov", "pytest-mock", "pytest-html", 
+        "black", "flake8", "pylint",
+        "requests", "pyyaml", "click"
+    ],
+
+    "containerEnv": {
+        "WORKSPACE_TYPE": "control_tower",
+        "REPO_MANAGEMENT_MODE": "centralized",
+        "TDD_ENFORCER_ENABLED": "true"
+    }
+}
