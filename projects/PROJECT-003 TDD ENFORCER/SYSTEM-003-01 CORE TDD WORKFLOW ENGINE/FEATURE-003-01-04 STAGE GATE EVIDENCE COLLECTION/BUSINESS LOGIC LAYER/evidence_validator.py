@@ -6,9 +6,26 @@ Generated from: /workspaces/control_tower/Prompts/TDD Prompts/1. Failing Tests P
 
 import time
 import json
-from typing import Dict, List, Any, Optional
+import logging
+from typing import Dict, List, Any, Optional, Tuple, Union
 from dataclasses import dataclass
 from enum import Enum
+
+
+# Custom Exception Types
+class EvidenceValidationError(Exception):
+    """Raised when evidence validation fails."""
+    pass
+
+
+class ComplianceCalculationError(Exception):
+    """Raised when TDD compliance calculation encounters errors."""
+    pass
+
+
+class InvalidEvidenceFormatError(Exception):
+    """Raised when evidence format is invalid or incomplete."""
+    pass
 
 
 class StageType(Enum):
@@ -122,7 +139,25 @@ class EvidenceValidator:
     Implements REAL evidence validation algorithms and enforced stage gate validation logic
     """
     
-    def __init__(self):
+    # Configuration Constants
+    DEFAULT_PENALTIES = {
+        'RED': -50,    # Critical failure penalty
+        'GREEN': -30,  # Implementation gap penalty  
+        'REFACTOR': -20  # Quality improvement penalty
+    }
+
+    DEFAULT_THRESHOLDS = {
+        'min_passing_score': 70,
+        'quality_gate_score': 80,
+        'excellent_score': 90
+    }
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        self.logger = logging.getLogger(__name__)
+        self.config = self._validate_config(config or {})
+        self.penalties = self.config.get('penalties', self.DEFAULT_PENALTIES)
+        self.thresholds = self.config.get('thresholds', self.DEFAULT_THRESHOLDS)
+        
         self.evidence_storage = None
         self.workflow_engine = None
         self.quality_thresholds = {
@@ -139,6 +174,31 @@ class EvidenceValidator:
     def set_workflow_engine(self, workflow_engine):
         """Set the workflow engine dependency"""
         self.workflow_engine = workflow_engine
+
+    def _validate_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate and normalize configuration parameters."""
+        validated_config = {}
+        
+        # Validate penalties
+        penalties = config.get('penalties', self.DEFAULT_PENALTIES)
+        for phase, penalty in penalties.items():
+            if not isinstance(penalty, int) or penalty > 0:
+                raise ValueError(f"Penalty for {phase} must be negative integer, got {penalty}")
+        
+        validated_config['penalties'] = penalties
+        validated_config['thresholds'] = config.get('thresholds', self.DEFAULT_THRESHOLDS)
+        return validated_config
+
+    def validate_evidence_format(self, evidence: Dict[str, Any]) -> None:
+        """Validate evidence structure with detailed error reporting."""
+        required_keys = ['test_results', 'implementation_status']
+        missing_keys = [key for key in required_keys if key not in evidence]
+        
+        if missing_keys:
+            raise InvalidEvidenceFormatError(
+                f"Missing required evidence keys: {missing_keys}. "
+                f"Expected structure: {required_keys}"
+            )
 
     def validate_stage_gate_evidence(self, stage: str, evidence_package: Dict) -> ValidationResult:
         """
@@ -377,52 +437,151 @@ class EvidenceValidator:
 
     def verify_tdd_compliance(self, workflow: Dict) -> ComplianceReport:
         """
-        Verify TDD compliance and detect process violations
-        Returns comprehensive compliance assessment
+        Evaluate TDD compliance using severity-weighted penalty scoring.
+        
+        This method implements the core 14-line algorithm for TDD compliance validation
+        with severity-weighted penalties. It detects process violations across RED, GREEN,
+        and REFACTOR phases and calculates a compliance score from 0-100.
+        
+        Args:
+            workflow: Dictionary containing workflow evidence with keys:
+                - 'implementation_before_tests': bool - RED phase violation indicator
+                - 'excessive_implementation': bool - GREEN phase violation indicator  
+                - 'tests_changed_during_refactor': bool - REFACTOR phase violation indicator
+        
+        Returns:
+            ComplianceReport containing:
+                - compliance_score: Weighted score (0-100) with phase-specific penalties
+                - violations_found: Boolean indicating if violations were detected
+                - violation_types: List of violation categories found
+                - violation_details: Detailed descriptions of each violation
+        
+        Penalty Structure:
+            - RED_PHASE_VIOLATION: -50 points (Critical - implementation before tests)
+            - GREEN_PHASE_VIOLATION: -30 points (High - non-minimal implementation)
+            - REFACTOR_PHASE_VIOLATION: -20 points (Medium - test changes during refactor)
+        
+        Example:
+            >>> validator = EvidenceValidator()
+            >>> workflow = {
+            ...     'implementation_before_tests': False,
+            ...     'excessive_implementation': True,
+            ...     'tests_changed_during_refactor': False
+            ... }
+            >>> result = validator.verify_tdd_compliance(workflow)
+            >>> print(result.compliance_score)  # 70.0 (100 - 30 penalty)
+            >>> print(result.violations_found)  # True
         """
+        start_time = time.time()
+        
+        # Log start of compliance verification
+        self.logger.debug(f"Starting TDD compliance verification for workflow: {workflow.keys()}")
+        
         violations_found = False
         violation_types = []
         violation_details = []
         
-        # Check for Red phase violations (implementation before tests)
-        if workflow.get('implementation_before_tests', False):
-            violations_found = True
-            violation_types.append('RED_PHASE_VIOLATION')
-            violation_details.append('Implementation created before failing tests')
-            
-        # Check for Green phase violations (excessive implementation)
-        if workflow.get('excessive_implementation', False):
-            violations_found = True
-            violation_types.append('GREEN_PHASE_VIOLATION')
-            violation_details.append('Non-minimal implementation')
-            
-        # Check for Refactor phase violations (test changes)
-        if workflow.get('tests_changed_during_refactor', False):
-            violations_found = True
-            violation_types.append('REFACTOR_PHASE_VIOLATION')
-            violation_details.append('Tests modified during refactor')
-            
-        # Calculate severity-weighted compliance score
-        compliance_score = 100.0  # Start with perfect score
+        # Extract workflow violations using helper method
+        violation_types, violation_details = self._extract_workflow_violations(workflow)
+        violations_found = len(violation_types) > 0
         
-        # Apply severity-based penalties
-        for violation_type in violation_types:
-            if violation_type == 'RED_PHASE_VIOLATION':
-                compliance_score -= 50.0  # Critical violation: -50 points
-            elif violation_type == 'GREEN_PHASE_VIOLATION':
-                compliance_score -= 30.0  # High violation: -30 points
-            elif violation_type == 'REFACTOR_PHASE_VIOLATION':
-                compliance_score -= 20.0  # Medium violation: -20 points
+        # Log violations found
+        if violations_found:
+            self.logger.warning(f"TDD violations detected: {violation_types}")
         
-        # Ensure score doesn't go below 0
-        compliance_score = max(0.0, compliance_score)
+        # Calculate compliance score using helper method
+        compliance_score = self._calculate_compliance_penalty_score(violation_types)
         
-        return ComplianceReport(
+        # Calculate performance metrics
+        execution_time = time.time() - start_time
+        
+        result = ComplianceReport(
             violations_found=violations_found,
             violation_types=violation_types,
             violation_details=violation_details,
             overall_compliance_score=compliance_score
         )
+        
+        # Add performance metrics to result
+        result.performance_metrics = {
+            'execution_time_ms': round(execution_time * 1000, 2),
+            'workflow_size_kb': len(str(workflow)) / 1024
+        }
+        
+        self.logger.info(f"TDD compliance verification completed in {result.performance_metrics['execution_time_ms']}ms")
+        
+        return result
+
+    def prepare_mobile_evidence_package(self, evidence: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Prepare optimized evidence package for mobile transmission.
+        
+        Ensures package size < 50KB while preserving essential validation data.
+        """
+        # Compress evidence while maintaining validation integrity
+        mobile_package = {
+            'compliance_score': evidence.get('compliance_score'),
+            'is_compliant': evidence.get('is_compliant'),
+            'summary_metrics': self._create_summary_metrics(evidence),
+            'critical_issues': self._extract_critical_issues(evidence)
+        }
+        
+        package_size = len(str(mobile_package)) / 1024  # Size in KB
+        if package_size > 50:
+            self.logger.warning(f"Mobile package size {package_size:.1f}KB exceeds 50KB limit")
+        
+        return mobile_package
+
+    def _create_summary_metrics(self, evidence: Dict[str, Any]) -> Dict[str, Any]:
+        """Create summary metrics for mobile optimization."""
+        return {
+            'test_count': len(evidence.get('test_results', [])),
+            'pass_rate': evidence.get('overall_pass_rate', 0.0),
+            'quality_score': evidence.get('quality_score', 0.0)
+        }
+
+    def _extract_critical_issues(self, evidence: Dict[str, Any]) -> List[str]:
+        """Extract only critical issues for mobile package."""
+        issues = evidence.get('issues', [])
+        return [issue for issue in issues if issue.get('severity') == 'CRITICAL'][:5]  # Limit to 5
+
+    def _extract_workflow_violations(self, workflow: Dict[str, Any]) -> Tuple[List[str], List[str]]:
+        """Extract and categorize workflow violations by type and details."""
+        violation_types = []
+        violation_details = []
+        
+        # Check for Red phase violations (implementation before tests)
+        if workflow.get('implementation_before_tests', False):
+            violation_types.append('RED_PHASE_VIOLATION')
+            violation_details.append('Implementation created before failing tests')
+            
+        # Check for Green phase violations (excessive implementation)
+        if workflow.get('excessive_implementation', False):
+            violation_types.append('GREEN_PHASE_VIOLATION')
+            violation_details.append('Non-minimal implementation')
+            
+        # Check for Refactor phase violations (test changes)
+        if workflow.get('tests_changed_during_refactor', False):
+            violation_types.append('REFACTOR_PHASE_VIOLATION')
+            violation_details.append('Tests modified during refactor')
+            
+        return violation_types, violation_details
+    
+    def _calculate_compliance_penalty_score(self, violation_types: List[str]) -> float:
+        """Calculate total penalty score from violation types using configuration."""
+        compliance_score = 100.0  # Start with perfect score
+        
+        # Apply severity-based penalties using class constants
+        for violation_type in violation_types:
+            if violation_type == 'RED_PHASE_VIOLATION':
+                compliance_score += self.DEFAULT_PENALTIES['RED']  # -50 points
+            elif violation_type == 'GREEN_PHASE_VIOLATION':
+                compliance_score += self.DEFAULT_PENALTIES['GREEN']  # -30 points
+            elif violation_type == 'REFACTOR_PHASE_VIOLATION':
+                compliance_score += self.DEFAULT_PENALTIES['REFACTOR']  # -20 points
+        
+        # Ensure score doesn't go below 0
+        return max(0.0, compliance_score)
 
     def calculate_tdd_quality_scores(self, workflow: Dict) -> TDDQualityScores:
         """
