@@ -1,17 +1,3 @@
-# 🧪 FAILING TESTS PROMPT - Simple Integration Layer
-
-## 📋 TESTING CONTEXT
-
-**Target Implementation**: `SimpleIntegrationHandler` Integration Layer Class  
-**Layer**: FEATURE-003-01-04 Integration Layer  
-**TDD Phase**: RED - Create Failing Tests  
-**Project Scope**: Small team (1-2 developers), practical implementation  
-
-## 🎯 SIMPLE CORE FAILING TESTS
-
-### **Basic File Integration Tests**
-
-```python
 import pytest
 import json
 from pathlib import Path
@@ -76,11 +62,7 @@ def test_generate_simple_report():
     # Cleanup
     Path('red_evidence.json').unlink()
     Path('green_evidence.json').unlink()
-```
 
-### **Simple Notification Tests**
-
-```python
 def test_send_email_notification():
     # Should fail: No implementation exists yet
     handler = SimpleIntegrationHandler()
@@ -110,11 +92,7 @@ def test_log_to_console():
     
     assert 'INFO' in output
     assert 'Evidence collection completed' in output
-```
 
-### **Configuration Management Tests**
-
-```python
 def test_load_simple_config():
     # Should fail: No implementation exists yet
     handler = SimpleIntegrationHandler()
@@ -152,36 +130,8 @@ def test_validate_config():
     
     assert handler.validate_config(valid_config) is True
     assert handler.validate_config(invalid_config) is False
-```
 
-## 🎯 SIMPLE TEST EXECUTION EXPECTATIONS
-
-### **All Tests Should Fail Initially**
-
-- Each test should fail because `SimpleIntegrationHandler` doesn't exist yet
-- Tests focus on practical, everyday functionality you'll actually use
-- No complex enterprise patterns or over-engineering
-
-### **Implementation Guidance**
-
-- Create a simple `SimpleIntegrationHandler` class
-- Use basic file I/O for evidence storage
-- Simple email notifications (maybe just print to console initially)
-- Basic JSON configuration file
-- Focus on getting it working, not enterprise-grade architecture
-
-### **Success Criteria**
-
-- All tests pass with minimal, practical implementation
-- Evidence gets saved to local files you can actually examine
-- Simple reports you can read and understand
-- Basic notifications that actually help you
-- Configuration that's easy to modify
-
-## 📋 SIMPLE TEST UTILITIES
-
-```python
-# Just the basics you actually need
+# Test utilities
 def create_test_evidence(stage='test_stage', test_count=5):
     return {
         'stage': stage,
@@ -197,24 +147,3 @@ def create_test_config():
         'email_enabled': False,
         'console_logging': True
     }
-```
-
-## ✅ COMPLETION CRITERIA
-
-**You're done when:**
-
-- Evidence gets saved to files you can open and read
-- You can generate a simple report showing what happened
-- Basic notifications work (even if just console output)
-- Configuration is easy to change
-- All tests pass with simple, maintainable code
-
-**No need for:**
-
-- Complex authentication systems
-- Enterprise monitoring
-- Advanced error recovery
-- Performance optimization beyond basic needs
-- Complicated async processing
-
-This is about making TDD evidence collection actually useful for your small team, not impressing enterprise architects!
