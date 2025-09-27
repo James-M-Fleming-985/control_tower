@@ -858,3 +858,92 @@ class EvidenceStorage:
             "rollback_id": rollback_id,
             "status_checked_at": datetime.now().isoformat()
         }
+
+    def search_evidence_by_criteria(self, 
+                                   project_pattern: str = '*',
+                                   stage_pattern: str = '*',
+                                   artifact_type_pattern: str = '*') -> List[Dict[str, Any]]:
+        """
+        Search evidence using pattern-based criteria.
+        Maps to existing method: retrieve_evidence with filtering
+        
+        Args:
+            project_pattern: Pattern for project matching (e.g., 'PROJECT-003*')
+            stage_pattern: Pattern for stage matching (e.g., 'TEST_*')
+            artifact_type_pattern: Pattern for artifact type matching
+            
+        Returns:
+            List of matching evidence records
+        """
+        import fnmatch
+        
+        try:
+            results = []
+            
+            # Iterate through base path to find matching projects
+            for project_path in self.base_path.iterdir():
+                if not project_path.is_dir():
+                    continue
+                    
+                project_name = project_path.name
+                if not fnmatch.fnmatch(project_name, project_pattern):
+                    continue
+                
+                # Search through project hierarchy
+                try:
+                    for level2_path in project_path.iterdir():
+                        if not level2_path.is_dir():
+                            continue
+                        for level3_path in level2_path.iterdir():
+                            if not level3_path.is_dir():
+                                continue
+                            for level4_path in level3_path.iterdir():
+                                if not level4_path.is_dir():
+                                    continue
+                                
+                                # Search stages within level4
+                                for stage_path in level4_path.iterdir():
+                                    if not stage_path.is_dir():
+                                        continue
+                                    
+                                    stage_name = stage_path.name
+                                    if not fnmatch.fnmatch(stage_name, stage_pattern):
+                                        continue
+                                    
+                                    # Search evidence files in stage
+                                    for evidence_file in stage_path.glob("evidence_*.json"):
+                                        try:
+                                            with open(evidence_file, 'r', encoding='utf-8') as f:
+                                                evidence_data = json.load(f)
+                                            
+                                            # Check artifact type pattern
+                                            artifact_type = evidence_data.get('artifact_type', '')
+                                            if not fnmatch.fnmatch(artifact_type, artifact_type_pattern):
+                                                continue
+                                            
+                                            # Add search metadata
+                                            search_result = {
+                                                'evidence_data': evidence_data,
+                                                'file_path': str(evidence_file),
+                                                'project_hierarchy': f"{project_name}/{level2_path.name}/{level3_path.name}/{level4_path.name}",
+                                                'stage': stage_name,
+                                                'matched_patterns': {
+                                                    'project': project_pattern,
+                                                    'stage': stage_pattern,
+                                                    'artifact_type': artifact_type_pattern
+                                                }
+                                            }
+                                            results.append(search_result)
+                                            
+                                        except (json.JSONDecodeError, IOError):
+                                            # Skip corrupted files
+                                            continue
+                                            
+                except (OSError, PermissionError):
+                    # Skip inaccessible directories
+                    continue
+            
+            return results
+            
+        except Exception as e:
+            raise StorageError(f"Failed to search evidence by criteria: {e}")

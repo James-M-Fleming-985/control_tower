@@ -400,6 +400,43 @@ class EvidenceDisplayInterface:
             dashboard_lines.append(f"  {req_name}: {current}% - {status}")
         
         return "\n".join(dashboard_lines)
+
+    def display_audit_compliance_dashboard(self, compliance_data: Dict[str, Any]) -> str:
+        """Display compliance dashboard with proper score formatting"""
+        
+        if compliance_data and compliance_data.get('overall_compliance_score') is not None:
+            score = compliance_data['overall_compliance_score']
+            
+            # Ensure proper formatting
+            if isinstance(score, (int, float)):
+                formatted_score = f"{score}%" if score > 0 else "0%"
+            else:
+                formatted_score = "0%"  # Fallback
+                
+            dashboard = f"Overall Compliance: {formatted_score}\n"
+            
+            # Add stage compliance if available
+            stage_compliance = compliance_data.get('stage_gates_status', {})
+            if stage_compliance:
+                dashboard += "Stage Compliance:\n"
+                for stage, status in stage_compliance.items():
+                    stage_score = status.get('score', 0) if isinstance(status, dict) else 0
+                    dashboard += f"  {stage}: {stage_score}%\n"
+            
+            # Add requirement compliance if available
+            req_passed = compliance_data.get('requirements_passed', 0)
+            req_total = compliance_data.get('requirements_total', 0)
+            if req_total > 0:
+                req_score = (req_passed / req_total * 100)
+                dashboard += f"Requirement Compliance: {req_score:.1f}%\n"
+            else:
+                dashboard += "Requirement Compliance:\n"
+                
+        else:
+            # Fallback when no compliance data available
+            dashboard = "Overall Compliance: 0%\nStage Compliance:\nRequirement Compliance:"
+            
+        return dashboard
     
     def render_compliance_violations(self, violation_data: Dict[str, Any]) -> str:
         """Render compliance violations with remediation"""
@@ -832,6 +869,7 @@ class EvidenceDisplayInterface:
         # Apply mobile optimizations
         optimizations = mobile_settings.get('mobile_optimizations', {})
         mobile_content['display_config'] = {
+            'screen_width': screen_width,  # ADD THIS LINE - iOS/Android standard
             'compact_display': optimizations.get('compact_display', True),
             'reduced_animations': optimizations.get('reduced_animations', True),
             'touch_friendly': optimizations.get('touch_friendly_targets', True),
@@ -851,12 +889,13 @@ class EvidenceDisplayInterface:
         
         if device_type == 'mobile':
             css_rules.extend([
-                "/* Mobile Layout */",
+                "/* Mobile Layout - iOS Accessibility Compliant */",
                 "@media (max-width: 320px) {",
-                "  .compliance-dashboard { font-size: 12px; padding: 8px; }",
-                "  .status-line { margin-bottom: 4px; }",
+                "  .compliance-dashboard { font-size: 16px; padding: 8px; }",  # CHANGED FROM 12px - iOS zoom prevention
+                "  .status-line { margin-bottom: 4px; font-size: 16px; }",  # Consistent sizing
                 "  .chart-container { height: 200px; }",
-                "  .touch-target { min-height: 44px; min-width: 44px; }",
+                "  .touch-target { min-height: 44px; min-width: 44px; font-size: 16px; }",  # Touch target readability
+                "  .compliance-grid { grid-template-columns: 1fr; display: grid; gap: 8px; }",  # Single column mobile
                 "}"
             ])
         elif device_type == 'tablet':
