@@ -86,17 +86,18 @@
 ## 📋 REQUIREMENTS
 
 ### **Application Overview**
-The Automated Development Workflow Execution system provides single-command execution of complete feature development workflows with mandatory TDD enforcement through PROJECT-003 integration. This system transforms `make work-on 'feature-name'` into a fully automated development pipeline that rips through all layers of a feature following TDD methodology, maintaining compliance at every step, and completing entire features without manual intervention. The system works across any repository and can complete typical features in under 15 minutes total execution time.
+The Automated Development Workflow Execution system provides intelligent single-command execution of complete feature development workflows with adaptive complexity management and mandatory TDD enforcement through PROJECT-003 integration. This system transforms `make work-on 'feature-name'` into a fully automated development pipeline that intelligently detects feature complexity (simple single-iteration vs complex multi-iteration), adapts TDD workflow accordingly, rips through all layers following appropriate TDD methodology, maintains compliance at every step, and completes features efficiently. The system works across any repository, completing simple features in 15-60 minutes and complex multi-iteration features in 2-8 hours with full performance target validation.
 
 ### **Success Criteria**
 ```
-✅ Application Functionality: Single command (`make work-on 'feature-name'`) completes entire features across all repositories
-✅ Performance Requirements: <15 minutes total for typical 4-layer feature, <3.5 minutes per layer
-✅ Quality Standards: 100% TDD compliance through PROJECT-003 integration, zero manual validation bypassing
-✅ User Acceptance: 95% developer satisfaction with fully automated feature development
-✅ Deployment Success: Production-ready automation that rips through layers maintaining quality
-✅ Repository Agnostic: Works identically in any strategic repository with approved requirements
-✅ TDD Integration: Seamless PROJECT-003 TDD enforcement without workflow interruption
+✅ Application Functionality: Single command (`make work-on 'feature-name'`) completes entire features across all repositories with intelligent complexity detection
+✅ Performance Requirements: <60 minutes for simple features, <8 hours for complex multi-iteration features, <200ms for performance-critical components
+✅ Quality Standards: 100% TDD compliance through PROJECT-003 integration, zero manual validation bypassing, adaptive workflow based on complexity
+✅ User Acceptance: 95% developer satisfaction with intelligently automated feature development
+✅ Deployment Success: Production-ready automation that adapts workflow complexity maintaining quality
+✅ Repository Agnostic: Works identically in any strategic repository with approved requirements and complexity detection
+✅ TDD Integration: Seamless PROJECT-003 TDD enforcement with single and multi-iteration workflow support
+✅ Complexity Management: Automatic detection and appropriate handling of simple (1 iteration) vs complex (4-16 iterations) features
 ```
 
 ### **Business Value**
@@ -120,23 +121,23 @@ The Automated Development Workflow Execution system provides single-command exec
 
 ### **System Requirements (Level 3)**
 ```
-⚙️ SYSTEM-002-01: Feature Discovery & Requirements Validation System
-   ├── Purpose: Discover features across repositories and validate approved requirements exist
-   ├── Features Required: Cross-repository feature discovery, requirements validation, layer identification
-   ├── Integration Points: All strategic repositories, requirements documents, PROJECT-001 discovery engine
-   └── Success Criteria: Any feature with approved requirements can be automatically developed
+⚙️ SYSTEM-002-01: Git Management & Safety System
+   ├── Purpose: Provide comprehensive git safety, branching strategies, and repository management for all workflow complexity levels
+   ├── Features Required: Git safety checkpoints, branch management, rollback capabilities, multi-iteration state persistence
+   ├── Integration Points: All strategic repositories, git repositories, PROJECT-003 TDD enforcer checkpoints
+   └── Success Criteria: Zero git conflicts, safe rollback for any complexity level, persistent state across iterations
 
-⚙️ SYSTEM-002-02: Automated Layer Development Orchestration System
-   ├── Purpose: Orchestrate complete layer development through PROJECT-003 TDD enforcement
-   ├── Features Required: Layer sequencing, PROJECT-003 integration, progress tracking, failure handling
-   ├── Integration Points: PROJECT-003 TDD Enforcer, git repositories, testing frameworks
-   └── Success Criteria: Layers complete in <3.5 minutes each with full TDD compliance
+⚙️ SYSTEM-002-02: TDD Workflow & Complexity Management System
+   ├── Purpose: Intelligent TDD workflow orchestration with automatic complexity detection and adaptive processing
+   ├── Features Required: Feature complexity detection, single/multi-iteration TDD orchestration, PROJECT-003 integration, performance target management
+   ├── Integration Points: PROJECT-003 TDD Enforcer, requirements analysis, performance monitoring, iteration state management
+   └── Success Criteria: Automatic complexity detection, appropriate TDD workflow for each feature type, <200ms performance targets met
 
-⚙️ SYSTEM-002-03: Feature Completion & Integration System
-   ├── Purpose: Validate feature completion and handle integration across all layers
-   ├── Features Required: Integration testing, feature validation, deployment preparation, metrics collection
-   ├── Integration Points: Testing frameworks, deployment systems, monitoring tools
-   └── Success Criteria: Complete features ready for production in <15 minutes total
+⚙️ SYSTEM-002-03: Real-time Validation & Feedback System
+   ├── Purpose: Provide real-time progress monitoring, validation feedback, and intelligent time estimation across all complexity levels
+   ├── Features Required: Real-time progress tracking, complexity-aware time estimation, validation feedback, failure recovery
+   ├── Integration Points: TDD workflow system, git management, performance monitoring, user interface
+   └── Success Criteria: Accurate progress reporting, intelligent time estimates, real-time validation feedback for all feature types
 ```
 
 ### **Technology Stack**
