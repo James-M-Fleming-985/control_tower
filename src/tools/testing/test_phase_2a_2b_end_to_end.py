@@ -14,6 +14,7 @@ import sys
 import os
 
 # Add src to path for imports
+# Import (using root src - not PROJECT-003 specific)
 sys.path.append('/workspaces/control_tower/src')
 
 from data_access.requirements_parser import RequirementsParser

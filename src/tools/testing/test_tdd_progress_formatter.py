@@ -15,6 +15,7 @@ from datetime import datetime
 from contextlib import redirect_stdout
 
 # Add src to path for imports
+# Import (using root src - not PROJECT-003 specific)
 sys.path.append('/workspaces/control_tower/src')
 
 from ui.tdd_progress_formatter import (

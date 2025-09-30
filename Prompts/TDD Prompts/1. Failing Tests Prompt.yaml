@@ -1,0 +1,834 @@
+---
+# Failing Tests Prompt - Contextual Testing Pyramid Validation Engine
+
+metadata:
+  prompt_type: "failing_tests"
+  feature_id: "FEATURE-003-02-01"
+  feature_name: "Contextual Testing Pyramid Validation Engine"
+  tdd_phase: "RED"
+  created_date: "2025-09-30"
+  updated_date: "2025-09-30"
+
+testing_context:
+  target_implementation: "FEATURE-003-02-01 Contextual Testing Pyramid Validation Engine"
+  source_document: "FEATURE-003-02-01_testing_pyramid_validation_engine.md"
+  source_date: "2025-09-30"
+  tdd_phase: "RED"
+  phase_description: "Create Failing Tests for Complete Contextual Validation System"
+  project_scope:
+    - "Contextual pyramid validation"
+    - "Cross-component integration" 
+    - "Mobile execution"
+    - "Progressive certification"
+  priority: "Complete contextual TDD validation implementing Stages 8-10 with PROJECT-002 workflow integration"
+  success_criteria:
+    - "Context-aware testing validation"
+    - "Cross-component integration"
+    - "Mobile support"
+    - "Intelligent progression"
+
+stage_8_tests:
+  name: "CONTEXTUAL TESTING PYRAMID VALIDATION FAILING TESTS"
+  description: "Context-aware testing strategy validation, cross-component integration, and intelligent validation scope determination based on current development position"
+  
+  test_discovery_engine:
+    class_name: "TestContextualTestDiscoveryEngine"
+    description: "Test Contextual Test Discovery - Context-aware test categorization"
+    tests:
+      - name: "test_contextual_test_discovery_engine_exists"
+        description: "Should have ContextualTestDiscoveryEngine for context-aware test discovery"
+        expected_failure: "ContextualTestDiscoveryEngine class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import ContextualTestDiscoveryEngine"
+        
+      - name: "test_discover_tests_with_context"
+        description: "Should discover and categorize tests based on current development context"
+        expected_failure: "discover_contextual_tests method missing"
+        context_requirements:
+          current_layer: "business_logic"
+          current_feature: "pyramid_validation"
+          current_system: "extended_validation_engine"
+          completed_components: ["data_access_layer", "mobile_api"]
+          integration_requirements: ["cross_layer_validation", "mobile_integration"]
+        assertions:
+          - "discovery_result['tests_discovered'] > 0"
+          - "'unit_tests' in discovery_result"
+          - "'integration_tests' in discovery_result"
+          - "'e2e_tests' in discovery_result"
+          - "'cross_component_tests' in discovery_result"
+          - "discovery_result['context_applied'] is True"
+          
+      - name: "test_categorize_tests_by_pyramid_level"
+        description: "Should categorize tests by pyramid level with contextual awareness"
+        expected_failure: "categorize_by_pyramid_level method missing"
+        test_files:
+          - "test_pyramid_unit.py"
+          - "test_cross_layer_integration.py"
+          - "test_mobile_workflow_e2e.py"
+          - "test_component_integration.py"
+        assertions:
+          - "categorization['unit_tests'] >= 1"
+          - "categorization['integration_tests'] >= 1"
+          - "categorization['e2e_tests'] >= 1"
+          - "categorization['categorization_accuracy'] > 95.0"
+          - "categorization['context_influence'] is True"
+
+  pyramid_distribution_analyzer:
+    class_name: "TestContextualPyramidDistributionAnalyzer"
+    description: "Test Contextual Pyramid Analysis - Context-aware distribution validation"
+    tests:
+      - name: "test_contextual_distribution_analyzer_exists"
+        description: "Should have ContextualDistributionAnalyzer for context-aware pyramid analysis"
+        expected_failure: "ContextualDistributionAnalyzer class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import ContextualDistributionAnalyzer"
+        
+      - name: "test_analyze_contextual_pyramid_distribution"
+        description: "Should analyze pyramid distribution with contextual requirements"
+        expected_failure: "analyze_contextual_distribution method missing"
+        test_distribution:
+          unit_tests: 70
+          integration_tests: 20
+          e2e_tests: 10
+          cross_component_tests: 15
+        context:
+          current_layer: "business_logic"
+          development_stage: "integration_phase"
+          completed_components: 3
+          integration_requirements: ["cross_layer", "mobile_api", "workflow_engine"]
+        assertions:
+          - "analysis['pyramid_compliance'] is not None"
+          - "'contextual_recommendations' in analysis"
+          - "'integration_test_requirements' in analysis"
+          - "analysis['context_appropriate'] is True"
+          - "analysis['cross_component_coverage'] >= 80.0"
+          
+      - name: "test_validate_against_contextual_requirements"
+        description: "Should validate pyramid against contextual development requirements"
+        expected_failure: "validate_contextual_requirements method missing"
+        current_distribution:
+          unit_percentage: 65
+          integration_percentage: 25
+          e2e_percentage: 10
+        contextual_requirements:
+          layer: "business_logic"
+          min_unit_percentage: 60
+          required_integration_tests: ["cross_layer", "component_integration"]
+          mobile_integration_required: true
+          cross_component_validation: true
+        assertions:
+          - "validation['requirements_met'] is not None"
+          - "validation['compliance_score'] >= 0"
+          - "'missing_requirements' in validation"
+          - "'contextual_gaps' in validation"
+
+  cross_component_integration:
+    class_name: "TestCrossComponentIntegrationEngine"
+    description: "Test Cross-Component Integration - Context-aware component interaction validation"
+    tests:
+      - name: "test_cross_component_integration_engine_exists"
+        description: "Should have CrossComponentIntegrationEngine for component interaction testing"
+        expected_failure: "CrossComponentIntegrationEngine class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import CrossComponentIntegrationEngine"
+        
+      - name: "test_discover_component_integration_requirements"
+        description: "Should discover integration requirements between current and completed components"
+        expected_failure: "discover_integration_requirements method missing"
+        current_component:
+          name: "business_logic_layer"
+          interfaces: ["IPyramidValidator", "IComplianceChecker"]
+          dependencies: ["data_access_layer", "mobile_api"]
+        completed_components:
+          - name: "data_access_layer"
+            provided_interfaces: ["ITestRepository", "IComponentStatus"]
+            status: "completed"
+          - name: "mobile_api"
+            provided_interfaces: ["IMobileAuth", "IRemoteExecution"]
+            status: "completed"
+        assertions:
+          - "requirements['integration_points'] >= 2"
+          - "'required_tests' in requirements"
+          - "'interface_compatibility' in requirements"
+          - "requirements['cross_component_tests_needed'] > 0"
+          
+      - name: "test_execute_cross_component_integration_tests"
+        description: "Should execute integration tests between current and completed components"
+        expected_failure: "execute_integration_tests method missing"
+        integration_config:
+          current_component: "business_logic_layer"
+          target_components: ["data_access_layer", "mobile_api"]
+          test_scenarios:
+            - "data_flow_validation"
+            - "interface_compatibility"
+            - "error_handling_integration"
+            - "mobile_command_processing"
+        assertions:
+          - "test_results['tests_executed'] > 0"
+          - "test_results['integration_success_rate'] >= 0"
+          - "'component_compatibility' in test_results"
+          - "'integration_issues' in test_results"
+          - "test_results['cross_component_validation'] is True"
+          
+      - name: "test_validate_interface_compatibility"
+        description: "Should validate interface compatibility between components"
+        expected_failure: "validate_interface_compatibility method missing"
+        interface_mapping:
+          business_logic_layer:
+            requires: ["ITestRepository", "IMobileAuth"]
+            provides: ["IPyramidValidator", "IComplianceChecker"]
+          data_access_layer:
+            provides: ["ITestRepository", "IComponentStatus"]
+          mobile_api:
+            provides: ["IMobileAuth", "IRemoteExecution"]
+        assertions:
+          - "compatibility['compatible'] is not None"
+          - "'missing_interfaces' in compatibility"
+          - "'interface_conflicts' in compatibility"
+          - "compatibility['compatibility_score'] >= 0"
+
+  multi_level_test_execution:
+    class_name: "TestContextualMultiLevelTestExecutor"
+    description: "Test Contextual Multi-Level Test Execution - Context-aware pyramid test execution"
+    tests:
+      - name: "test_contextual_test_executor_exists"
+        description: "Should have ContextualMultiLevelTestExecutor for context-aware test execution"
+        expected_failure: "ContextualMultiLevelTestExecutor class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import ContextualMultiLevelTestExecutor"
+        
+      - name: "test_execute_contextual_unit_tests"
+        description: "Should execute unit tests with contextual awareness and performance tracking"
+        expected_failure: "execute_contextual_unit_tests method missing"
+        execution_context:
+          layer: "business_logic"
+          feature: "pyramid_validation"
+          test_scope: "unit"
+          performance_targets:
+            max_duration: 120  # 2 minutes
+          coverage_requirements:
+            min_coverage: 90.0
+        unit_tests:
+          - "test_pyramid_analyzer.py"
+          - "test_context_validator.py"
+          - "test_distribution_calculator.py"
+        assertions:
+          - "execution_result['tests_executed'] > 0"
+          - "execution_result['execution_time'] <= 120"
+          - "execution_result['success_rate'] >= 0"
+          - "execution_result['coverage_achieved'] >= 0"
+          - "execution_result['context_applied'] is True"
+          
+      - name: "test_execute_contextual_integration_tests"
+        description: "Should execute integration tests with cross-component awareness"
+        expected_failure: "execute_contextual_integration_tests method missing"
+        execution_context:
+          layer: "business_logic"
+          completed_components: ["data_access_layer", "mobile_api"]
+          integration_scope: "cross_component"
+          performance_targets:
+            max_duration: 300  # 5 minutes
+          integration_requirements: ["data_flow", "interface_compatibility", "mobile_integration"]
+        integration_tests:
+          - "test_cross_layer_integration.py"
+          - "test_mobile_api_integration.py"
+          - "test_component_workflow_integration.py"
+        assertions:
+          - "execution_result['integration_tests_executed'] > 0"
+          - "execution_result['execution_time'] <= 300"
+          - "execution_result['cross_component_success_rate'] >= 0"
+          - "execution_result['integration_coverage'] >= 0"
+          - "'component_compatibility' in execution_result"
+          
+      - name: "test_execute_contextual_e2e_tests"
+        description: "Should execute E2E tests with workflow context and mobile support"
+        expected_failure: "execute_contextual_e2e_tests method missing"
+        execution_context:
+          system: "extended_validation_engine"
+          workflow_integration: "PROJECT-002"
+          mobile_support_required: true
+          performance_targets:
+            max_duration: 600  # 10 minutes
+          e2e_scenarios: ["complete_validation_workflow", "mobile_remote_execution", "cross_component_integration"]
+        e2e_tests:
+          - "test_complete_pyramid_validation_workflow.py"
+          - "test_mobile_validation_execution.py"
+          - "test_project_002_integration_workflow.py"
+        assertions:
+          - "execution_result['e2e_tests_executed'] > 0"
+          - "execution_result['execution_time'] <= 600"
+          - "execution_result['workflow_integration_success'] >= 0"
+          - "execution_result['mobile_execution_success'] >= 0"
+          - "'end_to_end_coverage' in execution_result"
+
+  coverage_analysis:
+    class_name: "TestContextualCoverageAnalysisEngine"
+    description: "Test Contextual Coverage Analysis - Context-aware coverage measurement and validation"
+    tests:
+      - name: "test_contextual_coverage_analyzer_exists"
+        description: "Should have ContextualCoverageAnalysisEngine for context-aware coverage analysis"
+        expected_failure: "ContextualCoverageAnalysisEngine class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import ContextualCoverageAnalysisEngine"
+        
+      - name: "test_analyze_contextual_test_coverage"
+        description: "Should analyze test coverage with awareness of current development context"
+        expected_failure: "analyze_contextual_coverage method missing"
+        coverage_data:
+          unit_coverage: 92.5
+          integration_coverage: 87.0
+          e2e_coverage: 78.5
+          cross_component_coverage: 85.0
+        context:
+          current_layer: "business_logic"
+          development_stage: "integration_phase"
+          completed_components: ["data_access_layer", "mobile_api"]
+          coverage_requirements:
+            unit_min: 90.0
+            integration_min: 80.0
+            e2e_min: 70.0
+            cross_component_min: 80.0
+        assertions:
+          - "analysis['overall_coverage'] >= 0"
+          - "analysis['context_compliance'] is not None"
+          - "'coverage_gaps' in analysis"
+          - "'contextual_recommendations' in analysis"
+          - "analysis['meets_requirements'] is not None"
+          
+      - name: "test_identify_contextual_coverage_gaps"
+        description: "Should identify coverage gaps specific to current development context"
+        expected_failure: "identify_coverage_gaps method missing"
+        current_coverage:
+          components:
+            pyramid_validator: 95.0
+            context_analyzer: 85.0
+            integration_engine: 70.0  # Below threshold
+          cross_component_interfaces:
+            data_access_integration: 90.0
+            mobile_api_integration: 65.0  # Below threshold
+        context_requirements:
+          component_coverage_threshold: 80.0
+          integration_coverage_threshold: 75.0
+          critical_components: ["pyramid_validator", "integration_engine"]
+          required_integrations: ["data_access_integration", "mobile_api_integration"]
+        assertions:
+          - "'component_gaps' in gaps"
+          - "'integration_gaps' in gaps"
+          - "gaps['total_gaps_found'] >= 0"
+          - "'remediation_priority' in gaps"
+
+mobile_remote_execution:
+  name: "MOBILE REMOTE EXECUTION SUPPORT FAILING TESTS"
+  description: "Context-aware mobile validation execution"
+  
+  mobile_execution_engine:
+    class_name: "TestMobileRemoteExecutionEngine"
+    description: "Test Mobile Remote Execution - Context-aware mobile validation execution"
+    tests:
+      - name: "test_mobile_remote_execution_engine_exists"
+        description: "Should have MobileRemoteExecutionEngine for mobile-initiated validation"
+        expected_failure: "MobileRemoteExecutionEngine class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import MobileRemoteExecutionEngine"
+        
+      - name: "test_accept_mobile_validation_commands"
+        description: "Should accept and validate mobile-initiated contextual validation commands"
+        expected_failure: "accept_mobile_command method missing"
+        mobile_command:
+          command_type: "contextual_pyramid_validation"
+          authentication_token: "mobile_auth_token_12345"
+          context_parameters:
+            layer: "business_logic"
+            feature: "pyramid_validation"
+            validation_scope: "full_pyramid"
+          execution_preferences:
+            real_time_updates: true
+            notification_level: "detailed"
+        assertions:
+          - "command_result['command_accepted'] is True"
+          - "command_result['authentication_verified'] is True"
+          - "command_result['execution_id'] is not None"
+          - "'context_resolved' in command_result"
+          - "command_result['mobile_session_active'] is True"
+          
+      - name: "test_execute_remote_contextual_validation"
+        description: "Should execute contextual pyramid validation remotely with real-time status"
+        expected_failure: "execute_remote_validation method missing"
+        execution_config:
+          execution_id: "mobile_exec_12345"
+          validation_type: "contextual_pyramid"
+          context:
+            layer: "business_logic"
+            completed_components: ["data_access_layer"]
+            mobile_optimization: true
+          real_time_updates: true
+          mobile_session: "mobile_session_abc123"
+        assertions:
+          - "execution_result['execution_started'] is True"
+          - "execution_result['real_time_updates_enabled'] is True"
+          - "execution_result['mobile_notifications_active'] is True"
+          - "'validation_progress' in execution_result"
+          - "execution_result['context_applied'] is True"
+          
+      - name: "test_provide_mobile_real_time_status_updates"
+        description: "Should provide real-time status updates to mobile devices during validation"
+        expected_failure: "send_mobile_status_update method missing"
+        mobile_session:
+          session_id: "mobile_session_abc123"
+          device_info:
+            type: "mobile"
+            platform: "ios"
+          update_preferences:
+            frequency: "real_time"
+            detail_level: "comprehensive"
+        validation_status:
+          execution_id: "mobile_exec_12345"
+          current_stage: "unit_test_execution"
+          progress_percentage: 45.0
+          tests_executed: 25
+          tests_remaining: 30
+          current_context: "business_logic_layer"
+        assertions:
+          - "update_result['update_sent'] is True"
+          - "update_result['mobile_delivery_confirmed'] is True"
+          - "update_result['notification_format'] == 'mobile_optimized'"
+          - "'update_timestamp' in update_result"
+
+  mobile_contextual_integration:
+    class_name: "TestMobileContextualIntegration"
+    description: "Test Mobile Contextual Integration - Mobile-specific contextual validation features"
+    tests:
+      - name: "test_mobile_contextual_validator_exists"
+        description: "Should have MobileContextualValidator for mobile-optimized validation"
+        expected_failure: "MobileContextualValidator class doesn't exist yet"
+        import_path: "from contextual_pyramid_validator import MobileContextualValidator"
+        
+      - name: "test_optimize_validation_for_mobile_execution"
+        description: "Should optimize contextual validation for mobile network and performance constraints"
+        expected_failure: "optimize_for_mobile method missing"
+        validation_config:
+          pyramid_scope: "full"
+          context:
+            layer: "business_logic"
+            feature: "pyramid_validation"
+          mobile_constraints:
+            network_type: "4G"
+            battery_level: 65
+            data_usage_limit: "50MB"
+          performance_optimization: true
+        assertions:
+          - "optimization['optimized_scope'] is not None"
+          - "optimization['estimated_data_usage'] <= 50"  # MB
+          - "optimization['estimated_execution_time'] <= 600"  # 10 minutes for mobile
+          - "optimization['battery_efficient'] is True"
+          - "'mobile_specific_adjustments' in optimization"
+          
+      - name: "test_generate_mobile_contextual_report"
+        description: "Should generate mobile-optimized contextual validation reports"
+        expected_failure: "generate_mobile_report method missing"
+        validation_results:
+          pyramid_compliance: true
+          context_validation:
+            layer: "business_logic"
+            cross_component_success: 95.0
+            integration_coverage: 87.5
+          execution_metrics:
+            total_time: 245  # seconds
+            tests_executed: 75
+            success_rate: 96.0
+        mobile_preferences:
+          format: "mobile_optimized"
+          summary_level: "executive"
+          include_graphics: false  # Data usage optimization
+          push_notification_summary: true
+        assertions:
+          - "mobile_report['mobile_optimized'] is True"
+          - "mobile_report['size_kb'] <= 50"  # Mobile data optimization
+          - "'executive_summary' in mobile_report"
+          - "'push_notification_content' in mobile_report"
+
+integration_tests:
+  name: "INTEGRATION TESTS (SIMPLIFIED)"
+  description: "Basic Integration Tests - Simple cross-component functionality"
+  
+  basic_integration:
+    class_name: "TestBasicIntegration"
+    tests:
+      - name: "test_pyramid_validation_integration"
+        description: "Should integrate test storage with pyramid validation"
+        expected_failure: "integration doesn't exist yet"
+        imports:
+          - "from data_access.test_repository import TestRepository"
+          - "from business_logic.pyramid_validator import PyramidValidator"
+        assertions:
+          - "'is_valid' in validation_result"
+          - "'recommendations' in validation_result"
+          
+      - name: "test_status_integration"
+        description: "Should integrate component status with position tracking"
+        expected_failure: "integration method missing"
+        imports:
+          - "from data_access.component_status_repository import ComponentStatusRepository"
+          - "from data_access.position_repository import PositionRepository"
+        assertions:
+          - "current_status is not None"
+          
+      - name: "test_mobile_integration"
+        description: "Should integrate mobile config with test display"
+        expected_failure: "mobile formatting integration missing"
+        imports:
+          - "from data_access.test_repository import TestRepository"
+          - "from data_access.mobile_config import MobileConfig"
+        assertions:
+          - "mobile_display['optimized_for_mobile'] is True"
+          - "len(mobile_display['tests']) <= 10"
+
+project_002_integration:
+  name: "PROJECT-002 WORKFLOW INTEGRATION TESTS"
+  description: "PROJECT-002 Workflow Enforcer Integration - Simplified for Small Teams"
+  
+  workflow_integration:
+    class_name: "TestProject002Integration"
+    tests:
+      - name: "test_workflow_repository_exists"
+        description: "Should have WorkflowRepository for PROJECT-002 integration"
+        expected_failure: "repository class doesn't exist yet"
+        import_path: "from data_access.workflow_repository import WorkflowRepository"
+        
+      - name: "test_store_workflow_progression_data"
+        description: "Should store workflow progression data for PROJECT-002"
+        expected_failure: "store_workflow_data method missing"
+        workflow_data:
+          current_layer: "data_access"
+          current_feature: "pyramid_validation"
+          completion_status: "in_progress"
+          progression_triggers:
+            pyramid_valid: true
+            tests_passing: true
+            ready_for_next_layer: false
+          next_steps: ["complete_integration_tests", "validate_mobile_support"]
+        assertions:
+          - "result['success'] is True"
+          
+      - name: "test_get_progression_status"
+        description: "Should retrieve current progression status for PROJECT-002"
+        expected_failure: "get_progression_status method missing"
+        assertions:
+          - "status is not None"
+          - "'current_layer' in status"
+          - "'completion_status' in status"
+          - "'progression_triggers' in status"
+          
+      - name: "test_check_progression_readiness"
+        description: "Should check if ready to progress to next layer/feature"
+        expected_failure: "check_progression_readiness method missing"
+        readiness_criteria:
+          pyramid_distribution_valid: true
+          component_tests_passing: true
+          mobile_compatibility_verified: true
+        assertions:
+          - "'ready_to_progress' in readiness"
+          - "'blocking_issues' in readiness"
+          - "'next_layer_recommendations' in readiness"
+          
+      - name: "test_trigger_workflow_progression"
+        description: "Should trigger progression to next workflow stage"
+        expected_failure: "trigger_progression method missing"
+        progression_command:
+          action: "progress_to_next_layer"
+          current_completion:
+            layer: "data_access"
+            feature: "pyramid_validation"
+            status: "completed"
+          next_target:
+            layer: "business_logic"
+            feature: "pyramid_validation"
+            estimated_duration: "3 days"
+        assertions:
+          - "result['progression_triggered'] is True"
+          - "'next_layer' in result"
+          - "'workflow_updated' in result"
+          
+      - name: "test_workflow_history_tracking"
+        description: "Should track workflow progression history"
+        expected_failure: "get_workflow_history method missing"
+        assertions:
+          - "isinstance(history, list)"
+          - "all('timestamp' in event for event in history)"
+          - "all('action' in event for event in history)"
+
+simple_persistence:
+  name: "SIMPLE PERSISTENCE TESTS"
+  description: "File-Based Storage Tests (Simple Start) - Good for small teams"
+  
+  file_storage:
+    class_name: "TestSimplePersistence"
+    tests:
+      - name: "test_file_storage_initialization"
+        description: "Should initialize file-based storage"
+        expected_failure: "FileStorage class doesn't exist yet"
+        import_path: "from data_access.file_storage import FileStorage"
+        assertions:
+          - "storage.data_directory is not None"
+          
+      - name: "test_save_test_data_to_file"
+        description: "Should save test data to JSON file"
+        expected_failure: "save_data method missing"
+        test_data:
+          test_name: "example_test"
+          result: "passed"
+        assertions:
+          - "result['success'] is True"
+          
+      - name: "test_load_test_data_from_file"
+        description: "Should load test data from JSON file"
+        expected_failure: "load_data method missing"
+        assertions:
+          - "isinstance(data, list)"
+          
+      - name: "test_backup_data"
+        description: "Should create backup of all data"
+        expected_failure: "create_backup method missing"
+        assertions:
+          - "backup_result['success'] is True"
+          - "'backup_path' in backup_result"
+
+basic_performance:
+  name: "BASIC PERFORMANCE TESTS"
+  description: "Simple Performance Validation (No Micro-benchmarking) - Ensure things work, don't obsess over milliseconds"
+  
+  performance_validation:
+    class_name: "TestBasicPerformance"
+    tests:
+      - name: "test_test_storage_handles_reasonable_load"
+        description: "Should handle storing multiple tests without breaking"
+        expected_failure: "store_test method missing"
+        test_count: 100
+        assertions:
+          - "result['success'] is True"
+          
+      - name: "test_pyramid_calculation_with_many_tests"
+        description: "Should calculate pyramid distribution with reasonable dataset"
+        expected_failure: "get_pyramid_distribution method missing"
+        assertions:
+          - "0 <= distribution['unit_percentage'] <= 100"
+          - "0 <= distribution['integration_percentage'] <= 100"
+          - "0 <= distribution['e2e_percentage'] <= 100"
+          
+      - name: "test_mobile_data_formatting_reasonable_speed"
+        description: "Should format mobile data without hanging"
+        expected_failure: "format_for_mobile method missing"
+        dataset_size: 500
+        assertions:
+          - "len(formatted) <= 10"
+          - "isinstance(formatted, list)"
+
+implementation_priority:
+  name: "IMPLEMENTATION PRIORITY GUIDE (SMALL TEAM)"
+  description: "Small team implementation order (2-4 weeks total)"
+  
+  timeline:
+    week_1:
+      name: "MVP CORE"
+      tasks:
+        - "TestRepository (basic store/retrieve)"
+        - "FileStorage (simple JSON files)"
+        - "Basic pyramid distribution calculation"
+        
+    week_2:
+      name: "STATUS TRACKING"
+      tasks:
+        - "ComponentStatusRepository (basic status tracking)"
+        - "PositionRepository (simple position tracking)"
+        - "Basic integration between repositories"
+        
+    week_3:
+      name: "MOBILE SUPPORT (IF NEEDED)"
+      tasks:
+        - "MobileConfig (responsive display)"
+        - "Mobile data formatting"
+        - "Basic mobile optimization"
+        
+    week_4:
+      name: "WORKFLOW INTEGRATION & POLISH"
+      tasks:
+        - "WorkflowRepository (PROJECT-002 integration)"
+        - "Cross-component integration"
+        - "Basic performance validation"
+        - "Simple backup/restore"
+  
+  focus_areas:
+    - "Getting it working first"
+    - "Simple, maintainable code"
+    - "Essential features only"
+    - "PROJECT-002 workflow integration for progression tracking"
+    - "Room for future growth"
+    
+  avoid_areas:
+    - "Micro-benchmarking (<100ms requirements)"
+    - "Complex enterprise integrations beyond PROJECT-002"
+    - "Over-abstracted architecture"
+    - "Premature optimization"
+
+success_criteria:
+  name: "SUCCESS CRITERIA (SMALL TEAM)"
+  
+  week_1_success:
+    - "Can store and retrieve test results"
+    - "Can calculate basic pyramid distribution (70/20/10 target)"
+    - "Data persists between sessions"
+    
+  week_2_success:
+    - "Can track component completion status"
+    - "Can track current development position"
+    - "Basic cross-repository functionality works"
+    
+  week_3_success:
+    name: "Optional"
+    criteria:
+      - "Mobile-friendly display configuration"
+      - "Responsive data formatting"
+      - "Basic mobile optimization"
+      
+  week_4_success:
+    - "All repositories work together"
+    - "PROJECT-002 workflow integration tracks progression"
+    - "Workflow progression triggers work correctly"
+    - "Reasonable performance (no hanging)"
+    - "Simple backup/restore capability"
+    
+  overall_success:
+    - "Test pyramid validation works"
+    - "Team knows where they are in development"
+    - "Component status is tracked"
+    - "PROJECT-002 workflow integration enables automatic progression"
+    - "Data doesn't disappear"
+    - "System works on mobile devices"
+    - "Code is maintainable and extensible"
+
+growth_path:
+  name: "GROWTH PATH"
+  description: "When you outgrow this simple system"
+  
+  future_enhancements:
+    - name: "Add Database"
+      description: "Replace FileStorage with SQLite/PostgreSQL"
+    - name: "Add Authentication"
+      description: "When you need user management"
+    - name: "Add Real-time Updates"
+      description: "When team coordination requires it"
+    - name: "Add Performance Optimization"
+      description: "When you have actual bottlenecks"
+    - name: "Add Enterprise Integration"
+      description: "When external systems are needed"
+      
+  philosophy: "Start simple, grow as needed!"
+
+legacy_tests:
+  name: "LEGACY TESTS: COMPONENT IMPORT PATH RESOLUTION (RESOLVED)"
+  description: "Component Import Path Resolution Tests (NOW WORKING) - All 5 components now successfully discovered and importable (100% success rate). Updated from 40% availability to 100% with correct path configuration."
+  
+  evidence_collection_imports:
+    class_name: "TestEvidenceCollectionImports"
+    description: "Test import path resolution for evidence collection components (ALL RESOLVED)"
+    tests:
+      - name: "test_stage_gate_validator_import_success"
+        description: "Should successfully import StageGateValidator from business logic"
+        import_path: "from src.business_logic.stage_gate_validator import StageGateValidator"
+        status: "RESOLVED"
+        
+      - name: "test_audit_trail_manager_import_success"
+        description: "Should successfully import AuditTrailManager from verification algorithms"
+        import_path: "from src.business_logic.verification_algorithms import AuditTrailManager"
+        status: "RESOLVED"
+        
+      - name: "test_evidence_storage_import_success"
+        description: "Should successfully import EvidenceStorage from root"
+        import_path: "from evidence_storage import EvidenceStorage"
+        status: "RESOLVED"
+        
+      - name: "test_simple_integration_handler_import_success"
+        description: "Should successfully import SimpleIntegrationHandler from root"
+        import_path: "from simple_integration_handler import SimpleIntegrationHandler"
+        status: "RESOLVED"
+        
+      - name: "test_compliance_reporter_missing_module"
+        description: "Should still fail to import ComplianceReporter (needs implementation)"
+        expected_failure: "No module named 'compliance_reporter'"
+        import_path: "from compliance_reporter import ComplianceReporter"
+        status: "EXPECTED_FAILURE"
+
+method_implementation_requirements:
+  name: "METHOD IMPLEMENTATION REQUIREMENTS"
+  
+  simple_integration_handler:
+    method: "execute_workflow"
+    estimated_time: "15-30 minutes to implement"
+    description: "Execute complete evidence collection workflow. Maps to existing methods: generate_simple_report, save_evidence_locally"
+    parameters:
+      workflow_config:
+        phase: "str (e.g., 'ROBUST_TESTING')"
+        feature: "str (e.g., 'FEATURE-003-01-04')"
+        evidence_count: "int (Number of evidence points)"
+    returns: "Dict with status, components_processed, message"
+    
+  audit_trail_manager:
+    method: "generate_audit_trail"
+    estimated_time: "10-20 minutes to implement"
+    description: "Generate audit trail entries for evidence collection tracking. Maps to existing method: analyze_verification_patterns"
+    parameters:
+      trail_id: "str (Unique identifier for audit trail)"
+    returns: "List of audit entries with action, timestamp, details"
+    
+  evidence_storage:
+    method: "search_evidence_by_criteria"
+    estimated_time: "20-45 minutes to implement"
+    description: "Search evidence using pattern-based criteria. Maps to existing method: retrieve_evidence with filtering"
+    parameters:
+      project_pattern: "str (Pattern for project matching, e.g., 'PROJECT-003*')"
+      stage_pattern: "str (Pattern for stage matching, e.g., 'TEST_*')"
+      artifact_type_pattern: "str (Pattern for artifact type matching)"
+    returns: "List of matching evidence records"
+
+completion_criteria:
+  name: "COMPLETION CRITERIA"
+  description: "You're Done When:"
+  
+  foundation_complete:
+    - "All evidence collection components import successfully"
+    - "Component availability reports 100% (5/5 components)"
+    - "ComplianceReporter generates comprehensive reports"
+    - "Robust testing framework shows accurate system status"
+    
+  mobile_integration_complete:
+    - "Mobile display configuration includes screen_width and touch settings"
+    - "Mobile CSS uses 16px font size for iOS compliance"
+    - "Mobile data pagination limits large datasets to 10 items"
+    - "Responsive CSS generates single-column grid layouts"
+    
+  cross_layer_integration_complete:
+    - "Compliance scores display actual percentages (not 0%)"
+    - "Performance monitoring tracks operations across layers"
+    - "Three-layer data flow works consistently"
+    
+  tdd_workflow_complete:
+    - "RED stage validation accepts proper failing tests"
+    - "Mobile workflow returns proper object types"
+    - "Complete TDD cycle validation works end-to-end"
+    
+  production_ready:
+    - "Overall test success rate 95%+ (40/42 tests minimum)"
+    - "FEATURE-003-01-04 evidence collection pipeline fully operational"
+    - "System accurately assessed as production-ready"
+    - "All documented issues from remediation plan resolved"
+
+achievement_summary:
+  name: "WHAT THIS ACHIEVES"
+  
+  achievements:
+    - name: "Corrects False Negatives"
+      description: "System is 80% mature, not 40% as incorrectly reported"
+    - name: "Enables Mobile Deployment"
+      description: "Complete mobile integration with iOS compliance"
+    - name: "Fixes Cross-Layer Issues"
+      description: "Compliance scores and performance monitoring work"
+    - name: "Validates TDD Process"
+      description: "Complete RED→GREEN→REFACTOR cycle validation"
+    - name: "Production Readiness"
+      description: "FEATURE-003-01-04 ready for deployment"
+      
+  final_note: "This comprehensive test suite transforms the evidence collection system from falsely assessed '40% complete' to accurately validated 'production ready' status!"

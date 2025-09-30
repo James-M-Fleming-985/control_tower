@@ -1,0 +1,34 @@
+---
+title: "SYSTEM LEVEL TESTING PROMPT"
+version: "1.0"
+type: "TDD System Testing Prompt"
+created: "2024-12-28"
+status: "PLACEHOLDER - Content To Be Developed"
+
+meta:
+  purpose: "System-level testing guidance for comprehensive TDD validation across multiple components and integration points"
+  scope: "Full system validation including cross-component interactions and end-to-end workflows"
+  note: "This file was empty in the original Markdown version. Content should be developed based on system testing requirements."
+
+placeholder_structure:
+  system_testing_phases:
+    - "Component Integration Testing"
+    - "Cross-System Validation"
+    - "End-to-End Workflow Testing"
+    - "Performance and Load Testing"
+    - "Security and Compliance Testing"
+  
+  testing_levels:
+    - "Individual System Testing"
+    - "Multi-System Integration"
+    - "Full Stack Validation"
+    - "Production Environment Simulation"
+  
+  deliverables:
+    - "System Test Plans"
+    - "Integration Test Suites"
+    - "Performance Benchmarks"
+    - "Compliance Validation Reports"
+
+development_status: "REQUIRES_CONTENT_DEVELOPMENT"
+next_steps: "Define comprehensive system testing methodology for TDD workflows"

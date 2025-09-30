@@ -1,0 +1,55 @@
+# Repository File Organization Protection
+# =====================================
+# 
+# This file defines rules and failsafes to prevent accidental 
+# file saves to the repository root directory.
+
+# Git hooks and IDE settings should reference these rules
+
+# CRITICAL PROTECTION RULES:
+# 1. No new .py files in repo root
+# 2. No new .md files in repo root (except README updates)  
+# 3. All PROJECT-003 files must go in projects/PROJECT-003 TDD ENFORCER/
+# 4. All test files must go in tests/ or project-specific test directories
+# 5. All documentation must go in docs/ or project-specific docs/
+
+# ALLOWED ROOT FILES (existing only):
+# - .gitignore, README.md, pyproject.toml, Makefile
+# - Configuration files (.env, etc.)
+# - License files
+
+# SUGGESTED LOCATIONS BY FILE TYPE:
+
+# Python Files (.py):
+# - Tests: tests/ or projects/PROJECT-003 TDD ENFORCER/tests/
+# - Source: src/ or projects/PROJECT-003 TDD ENFORCER/src/  
+# - Scripts: scripts/
+# - Tools: tools/
+
+# Documentation (.md):
+# - General: docs/
+# - PROJECT-003: projects/PROJECT-003 TDD ENFORCER/docs/
+# - Requirements: requirements/
+
+# Configuration (.json, .ini, .yaml):
+# - config/
+
+# Data (.csv, .db, .sqlite):  
+# - data/
+
+# Reports (.html, .txt):
+# - reports/ or htmlcov/
+
+# Archives (.tar.gz, .zip, .backup):
+# - backups/
+
+# Scripts (.sh, .bash):
+# - scripts/
+
+# ENFORCEMENT TOOLS:
+# 1. scripts/repo_file_guard.py - Python checker
+# 2. scripts/root_protection.sh - Bash helper
+# 3. .gitignore rules for temporary files
+# 4. IDE workspace settings (when available)
+
+echo "Repository protection rules loaded. Use scripts/repo_file_guard.py to check file placement."
