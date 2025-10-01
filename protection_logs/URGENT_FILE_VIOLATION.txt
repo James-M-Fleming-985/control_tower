@@ -1,0 +1,7 @@
+URGENT: File Placement Violation Detected
+=========================================
+Time: 2025-10-01 15:47:56
+File: /workspaces/control_tower/protection_logs/URGENT_FILE_VIOLATION.txt
+Issue: ⚠️  Attempting to save 'URGENT_FILE_VIOLATION.txt' to repository root! Consider: reports/
+Required location: reports/
+Fix command: mkdir -p reports/ && mv /workspaces/control_tower/protection_logs/URGENT_FILE_VIOLATION.txt reports/

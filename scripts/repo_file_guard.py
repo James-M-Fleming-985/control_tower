@@ -87,7 +87,9 @@ class RepoFileGuard:
         project_indicators = [
             "project-003", "project_003", "tdd_enforcer", "tdd-enforcer",
             "mobile_command", "context_engine", "audit_trail", 
-            "tdd_cycle", "phase_enforcement", "stage_gate"
+            "tdd_cycle", "phase_enforcement", "stage_gate",
+            "contextual_pyramid", "contextual_validation", "business_logic_grade",
+            "compliance_reporter", "evidence_validator", "layer_requirements"
         ]
         
         # Check filename
@@ -99,10 +101,17 @@ class RepoFileGuard:
             content_indicators = [
                 "project-003", "tdd enforcer", "mobile_command_history_repository",
                 "context_engine_repository", "tdd_cycle_enforcer", 
-                "system-003-", "feature-003-", "layer-003-"
+                "system-003-", "feature-003-", "layer-003-",
+                "contextual testing pyramid", "business logic layer",
+                "req-bus-", "req-perf-", "req-qual-", "req-int-bus-"
             ]
             if any(indicator in content_lower for indicator in content_indicators):
                 return True
+        
+        # Check if file is being created in current working directory context
+        cwd_path = str(self.current_dir).lower()
+        if "project-003" in cwd_path or "tdd enforcer" in cwd_path:
+            return True
                 
         return False
     
