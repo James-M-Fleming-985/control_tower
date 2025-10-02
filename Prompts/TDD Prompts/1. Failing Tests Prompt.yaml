@@ -1,360 +1,560 @@
 ---
-# Failing Tests Prompt - Business Logic Layer Contextual Pyramid Validation
+# Failing Tests Prompt - User Interface Layer Contextual Pyramid Validation
 
 metadata:
   prompt_type: "failing_tests"
   feature_id: "FEATURE-003-02-01"
-  layer_id: "LAYER-003-02-01-002"
+  layer_id: "LAYER-003-02-01-003"
   feature_name: "Contextual Testing Pyramid Validation Engine"
-  layer_name: "Business Logic Layer"
+  layer_name: "User Interface Layer"
   tdd_phase: "RED"
-  created_date: "2025-10-01"
-  updated_date: "2025-10-01"
+  created_date: "2025-10-02"
+  updated_date: "2025-10-02"
 
 testing_context:
-  target_implementation: "LAYER-003-02-01-002 Business Logic Layer"
-  source_document: "LAYER-003-02-01-002_business_logic_requirements.md"
-  source_date: "2025-10-01"
+  target_implementation: "LAYER-003-02-01-003 User Interface Layer"
+  source_document: "LAYER-003-02-01-003_user_interface_requirements.md"
+  source_date: "2025-09-29"
   tdd_phase: "RED"
-  phase_description: "Create 24 Failing Tests for Business Logic Layer Requirements"
-  test_scope: "BUSINESS_LOGIC_LAYER_ONLY"
-  test_file_pattern: "test_contextual_pyramid_validator.py"
+  phase_description: "Create 24 Failing Tests for User Interface Layer Requirements"
+  test_scope: "USER_INTERFACE_LAYER_ONLY"
+  test_file_pattern: "test_contextual_pyramid_ui.py"
   project_scope:
-    - "REQ-BUS-001 through REQ-BUS-008: Functional Requirements"
-    - "REQ-PERF-BUS-001 through REQ-PERF-BUS-002: Performance Requirements"
-    - "REQ-QUAL-BUS-001 through REQ-QUAL-BUS-002: Quality Requirements"
-    - "REQ-INT-BUS-001 through REQ-INT-BUS-004: Integration Requirements"
-  priority: "24 focused failing tests aligned to business logic requirements"
+    - "REQ-UI-001 through REQ-UI-008: Functional Requirements"
+    - "REQ-PERF-UI-001 through REQ-PERF-UI-002: Performance Requirements"
+    - "REQ-UX-UI-001 through REQ-UX-UI-002: Usability Requirements"
+    - "REQ-MOB-UI-001 through REQ-MOB-UI-002: Mobile Framework Integration"
+    - "REQ-RT-UI-001 through REQ-RT-UI-002: Real-Time Data Integration"
+    - "REQ-MOB-OPT-001 through REQ-MOB-OPT-002: Mobile Optimization"
+    - "REQ-MOB-SEC-001: Mobile Security"
+  priority: "24 focused failing tests aligned to user interface requirements"
   success_criteria:
     - "Exactly 24 failing tests created"
-    - "Direct mapping to 16 business logic requirements"
+    - "Direct mapping to 16 UI requirements"
     - "No repository-wide test execution"
-    - "Business Logic Layer scope only"
+    - "User Interface Layer scope only"
 
-business_logic_layer_tests:
-  name: "BUSINESS LOGIC LAYER FAILING TESTS (24 TESTS TOTAL)"
-  description: "Focused failing tests for LAYER-003-02-01-002 Business Logic Layer requirements"
-  test_file: "test_contextual_pyramid_validator.py"
+user_interface_layer_tests:
+  name: "USER INTERFACE LAYER FAILING TESTS (24 TESTS TOTAL)"
+  description: "Focused failing tests for LAYER-003-02-01-003 User Interface Layer requirements"
+  test_file: "test_contextual_pyramid_ui.py"
   execution_scope: "LAYER_ONLY"
-  
+
   functional_requirements_tests:
-    name: "FUNCTIONAL REQUIREMENTS (REQ-BUS-001 through REQ-BUS-008)"
+    name: "FUNCTIONAL REQUIREMENTS (REQ-UI-001 through REQ-UI-008)"
     description: "16 tests for 8 functional requirements (2 tests each)"
-    
-    req_bus_001_tests:
-      requirement_id: "REQ-BUS-001"
-      requirement_name: "Contextual Pyramid Distribution Analysis"
-      class_name: "TestContextualPyramidDistributionAnalysis"
-      tests:
-        - name: "test_contextual_pyramid_analyzer_exists"
-          description: "Should have ContextualPyramidAnalyzer class for context-aware distribution analysis"
-          expected_failure: "ContextualPyramidAnalyzer class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import ContextualPyramidAnalyzer"
-          
-        - name: "test_analyze_pyramid_distribution_with_context"
-          description: "Should analyze testing pyramid distribution based on current layer/feature/system context"
-          expected_failure: "analyze_contextual_distribution method missing"
-          context_inputs:
-            current_layer: "business_logic"
-            current_feature: "pyramid_validation"
-            completed_components: ["data_access_layer"]
-          assertions:
-            - "analysis_result['distribution_valid'] is not None"
-            - "analysis_result['context_applied'] is True"
-            - "analysis_result['accuracy'] >= 0.95"
-    
-    req_bus_002_tests:
-      requirement_id: "REQ-BUS-002"
-      requirement_name: "Context-Aware Test Validation Logic"
-      class_name: "TestContextAwareValidationLogic"
-      tests:
-        - name: "test_context_aware_validator_exists"
-          description: "Should have ContextAwareValidator class for context-sensitive validation"
-          expected_failure: "ContextAwareValidator class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import ContextAwareValidator"
-          
-        - name: "test_validate_tests_with_context_requirements"
-          description: "Should validate tests based on current layer/feature/system requirements"
-          expected_failure: "validate_with_context method missing"
-          context_inputs:
-            contextual_requirements: ["cross_layer_validation", "mobile_integration"]
-            completed_components: ["data_access_layer", "mobile_api"]
-          assertions:
-            - "validation_result['context_considered'] is True"
-            - "validation_result['requirements_met'] is not None"
 
-    req_bus_003_tests:
-      requirement_id: "REQ-BUS-003"
-      requirement_name: "Cross-Component Integration Orchestration"
-      class_name: "TestCrossComponentIntegrationOrchestration"
+    req_ui_001_tests:
+      requirement_id: "REQ-UI-001"
+      requirement_name: "Mobile Authentication Interface"
+      class_name: "TestMobileAuthenticationInterface"
       tests:
-        - name: "test_integration_orchestrator_exists"
-          description: "Should have IntegrationOrchestrator class for cross-component orchestration"
-          expected_failure: "IntegrationOrchestrator class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import IntegrationOrchestrator"
-          
-        - name: "test_orchestrate_cross_component_integration"
-          description: "Should orchestrate testing between current and completed components"
-          expected_failure: "orchestrate_integration method missing"
-          integration_inputs:
-            current_component: "business_logic_layer"
-            completed_components: ["data_access_layer", "mobile_api"]
-          assertions:
-            - "orchestration_result['integration_scheduled'] is True"
-            - "orchestration_result['compatibility_detected'] >= 0.98"
+        - name: "test_mobile_auth_interface_component_exists"
+          description: "Should have MobileAuthInterface component for secure mobile login"
+          expected_failure: "MobileAuthInterface component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import MobileAuthInterface"
 
-    req_bus_004_tests:
-      requirement_id: "REQ-BUS-004"
-      requirement_name: "Component Dependency Analysis"
-      class_name: "TestComponentDependencyAnalysis"
-      tests:
-        - name: "test_dependency_analyzer_exists"
-          description: "Should have DependencyAnalyzer class for component dependency analysis"
-          expected_failure: "DependencyAnalyzer class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import DependencyAnalyzer"
-          
-        - name: "test_analyze_component_dependencies"
-          description: "Should analyze dependencies between current and completed components"
-          expected_failure: "analyze_dependencies method missing"
-          dependency_inputs:
-            current_interfaces: ["IPyramidValidator", "IComplianceChecker"]
-            completed_interfaces: ["ITestRepository", "IMobileAuth"]
+        - name: "test_mobile_auth_interface_renders_within_target_time"
+          description: "Should render mobile authentication interface within 2 seconds with required security features"
+          expected_failure: "render method missing or performance not validated"
+          render_requirements:
+            max_load_time: 2.0 # seconds
+            features:
+              [
+                "login_form",
+                "device_registration",
+                "biometric_auth",
+                "session_management",
+              ]
           assertions:
-            - "dependency_result['compatibility_matrix'] is not None"
-            - "dependency_result['all_dependencies_identified'] is True"
+            - "interface_result['load_time'] < 2.0"
+            - "interface_result['security_features_present'] == 4"
+            - "interface_result['usability_score'] >= 0.99"
 
-    req_bus_005_tests:
-      requirement_id: "REQ-BUS-005" 
-      requirement_name: "Mobile Command Interpretation"
-      class_name: "TestMobileCommandInterpretation"
+    req_ui_002_tests:
+      requirement_id: "REQ-UI-002"
+      requirement_name: "Mobile Command Interface"
+      class_name: "TestMobileCommandInterface"
       tests:
-        - name: "test_mobile_command_interpreter_exists"
-          description: "Should have MobileCommandInterpreter class for mobile command processing"
-          expected_failure: "MobileCommandInterpreter class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import MobileCommandInterpreter"
-          
-        - name: "test_interpret_mobile_validation_commands"
-          description: "Should process and validate mobile-initiated contextual validation commands"
-          expected_failure: "interpret_command method missing"
-          mobile_command:
-            authentication_token: "mobile_auth_12345"
-            command_type: "contextual_validation"
-            context_params: {"layer": "business_logic"}
-          assertions:
-            - "interpretation_result['command_valid'] is True"
-            - "interpretation_result['response_time'] < 2.0"
+        - name: "test_mobile_command_interface_component_exists"
+          description: "Should have MobileCommandInterface component for initiating contextual validation commands"
+          expected_failure: "MobileCommandInterface component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import MobileCommandInterface"
 
-    req_bus_006_tests:
-      requirement_id: "REQ-BUS-006"
-      requirement_name: "Remote Execution Orchestration"
-      class_name: "TestRemoteExecutionOrchestration"
-      tests:
-        - name: "test_remote_execution_orchestrator_exists"
-          description: "Should have RemoteExecutionOrchestrator class for remote execution management"
-          expected_failure: "RemoteExecutionOrchestrator class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import RemoteExecutionOrchestrator"
-          
-        - name: "test_orchestrate_contextual_validation_execution"
-          description: "Should orchestrate contextual validation execution from mobile commands"
-          expected_failure: "orchestrate_execution method missing"
-          execution_params:
-            mobile_session: "session_abc123"
-            contextual_parameters: {"layer": "business_logic", "feature": "pyramid_validation"}
+        - name: "test_mobile_command_execution_acknowledgment"
+          description: "Should acknowledge mobile command execution within 2 seconds with real-time status"
+          expected_failure: "execute_command method missing or acknowledgment validation not implemented"
+          command_requirements:
+            acknowledgment_time: 2.0 # seconds
+            features:
+              [
+                "command_selection",
+                "parameter_input",
+                "execution_controls",
+                "status_monitoring",
+              ]
+            mobile_optimization:
+              [
+                "touch_controls",
+                "offline_capability",
+                "push_notifications",
+                "gesture_support",
+              ]
           assertions:
-            - "execution_result['orchestration_started'] is True"
-            - "execution_result['status_update_latency'] < 5.0"
+            - "command_result['acknowledgment_time'] < 2.0"
+            - "command_result['real_time_status'] is True"
+            - "command_result['mobile_optimized'] is True"
 
-    req_bus_007_tests:
-      requirement_id: "REQ-BUS-007"
-      requirement_name: "Contextual Progression Analysis"
-      class_name: "TestContextualProgressionAnalysis"
+    req_ui_003_tests:
+      requirement_id: "REQ-UI-003"
+      requirement_name: "Layer/Feature/System Position Display"
+      class_name: "TestPositionDisplay"
       tests:
-        - name: "test_progression_analyzer_exists"
-          description: "Should have ProgressionAnalyzer class for contextual progression assessment"
-          expected_failure: "ProgressionAnalyzer class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import ProgressionAnalyzer"
-          
-        - name: "test_analyze_progression_readiness"
-          description: "Should assess readiness for progression to next layer/feature/system"
-          expected_failure: "analyze_readiness method missing"
-          progression_inputs:
-            contextual_validation_results: {"pyramid_valid": True}
-            cross_component_status: {"integration_complete": True}
-          assertions:
-            - "readiness_result['progression_ready'] is not None"
-            - "readiness_result['context_aware'] is True"
+        - name: "test_position_display_component_exists"
+          description: "Should have PositionDisplay component for layer/feature/system hierarchy visualization"
+          expected_failure: "PositionDisplay component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import PositionDisplay"
 
-    req_bus_008_tests:
-      requirement_id: "REQ-BUS-008"
-      requirement_name: "Intelligent Workflow Continuation"
-      class_name: "TestIntelligentWorkflowContinuation"
-      tests:
-        - name: "test_workflow_continuation_engine_exists"
-          description: "Should have WorkflowContinuationEngine class for intelligent workflow management"
-          expected_failure: "WorkflowContinuationEngine class doesn't exist yet"
-          import_path: "from src.business_logic.contextual_pyramid_validator import WorkflowContinuationEngine"
-          
-        - name: "test_determine_next_workflow_steps"
-          description: "Should determine and trigger next workflow steps based on contextual completion"
-          expected_failure: "determine_next_steps method missing"
-          workflow_inputs:
-            progression_assessment: {"ready_for_next": True}
-            project_002_integration: {"workflow_state": "active"}
+        - name: "test_position_display_updates_on_context_changes"
+          description: "Should update position visualization within 500ms of context changes"
+          expected_failure: "update_position method missing or latency validation not implemented"
+          display_requirements:
+            update_latency: 0.5 # seconds
+            components:
+              [
+                "position_indicators",
+                "hierarchy_visualization",
+                "progression_breadcrumbs",
+                "completion_status",
+              ]
+            features:
+              [
+                "interactive_tree",
+                "progress_bars",
+                "completion_indicators",
+                "next_step_highlights",
+              ]
           assertions:
-            - "continuation_result['next_steps_determined'] is True"
-            - "continuation_result['accuracy'] >= 0.95"
+            - "display_result['update_latency'] < 0.5"
+            - "display_result['context_aware'] is True"
+            - "display_result['visual_components_present'] >= 4"
+
+    req_ui_004_tests:
+      requirement_id: "REQ-UI-004"
+      requirement_name: "Contextual Pyramid Visualization"
+      class_name: "TestContextualPyramidVisualization"
+      tests:
+        - name: "test_contextual_pyramid_viz_component_exists"
+          description: "Should have ContextualPyramidViz component for context-aware pyramid visualization"
+          expected_failure: "ContextualPyramidViz component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import ContextualPyramidViz"
+
+        - name: "test_contextual_pyramid_renders_context_specific_data"
+          description: "Should render context-specific pyramid data within 1 second with adaptive features"
+          expected_failure: "render_contextual method missing or performance validation not implemented"
+          visualization_requirements:
+            render_time: 1.0 # seconds
+            components:
+              [
+                "adaptive_pyramid_charts",
+                "context_indicators",
+                "position_specific_recommendations",
+              ]
+            features:
+              [
+                "drill_down_capabilities",
+                "contextual_filtering",
+                "progression_navigation",
+              ]
+          assertions:
+            - "viz_result['render_time'] < 1.0"
+            - "viz_result['context_specific'] is True"
+            - "viz_result['adaptive_features_active'] is True"
+
+    req_ui_005_tests:
+      requirement_id: "REQ-UI-005"
+      requirement_name: "Component Integration Dashboard"
+      class_name: "TestComponentIntegrationDashboard"
+      tests:
+        - name: "test_integration_dashboard_component_exists"
+          description: "Should have IntegrationDashboard component for cross-component integration status"
+          expected_failure: "IntegrationDashboard component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import IntegrationDashboard"
+
+        - name: "test_integration_dashboard_updates_on_status_changes"
+          description: "Should update integration dashboard within 1 second of component status changes"
+          expected_failure: "update_dashboard method missing or latency validation not implemented"
+          dashboard_requirements:
+            update_latency: 1.0 # seconds
+            components:
+              [
+                "status_grid",
+                "integration_matrices",
+                "compatibility_indicators",
+                "dependency_maps",
+              ]
+            visualization:
+              ["relationship_diagrams", "progress_bars", "traffic_lights"]
+          assertions:
+            - "dashboard_result['update_latency'] < 1.0"
+            - "dashboard_result['real_time_updates'] is True"
+            - "dashboard_result['component_count'] >= 4"
+
+    req_ui_006_tests:
+      requirement_id: "REQ-UI-006"
+      requirement_name: "Cross-Component Testing Visualization"
+      class_name: "TestCrossComponentTestingVisualization"
+      tests:
+        - name: "test_testing_visualization_component_exists"
+          description: "Should have TestingVisualization component for cross-component integration testing progress"
+          expected_failure: "TestingVisualization component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import TestingVisualization"
+
+        - name: "test_testing_visualization_updates_realtime_with_execution"
+          description: "Should update testing visualization in real-time with test execution"
+          expected_failure: "real_time_update method missing or synchronization not implemented"
+          visualization_requirements:
+            real_time_sync: True
+            components:
+              [
+                "integration_test_matrices",
+                "component_interaction_diagrams",
+                "test_result_summaries",
+              ]
+            features:
+              [
+                "interactive_component_maps",
+                "test_execution_flow",
+                "result_heat_maps",
+              ]
+            filtering: ["component_specific", "test_type", "status_based"]
+          assertions:
+            - "viz_result['real_time_sync'] is True"
+            - "viz_result['test_execution_synchronized'] is True"
+            - "viz_result['filtering_available'] >= 3"
+
+    req_ui_007_tests:
+      requirement_id: "REQ-UI-007"
+      requirement_name: "Progression Tracking Display"
+      class_name: "TestProgressionTrackingDisplay"
+      tests:
+        - name: "test_progression_tracking_component_exists"
+          description: "Should have ProgressionTracking component for layer/feature/system progression visualization"
+          expected_failure: "ProgressionTracking component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import ProgressionTracking"
+
+        - name: "test_progression_tracking_displays_accurate_status"
+          description: "Should display accurate progression status with <500ms update latency"
+          expected_failure: "track_progression method missing or latency validation not implemented"
+          tracking_requirements:
+            update_latency: 0.5 # seconds
+            components:
+              [
+                "progression_timeline",
+                "milestone_indicators",
+                "completion_notifications",
+                "next_step_guidance",
+              ]
+            visualization:
+              [
+                "interactive_timeline",
+                "progress_percentages",
+                "phase_transitions",
+                "workflow_indicators",
+              ]
+          assertions:
+            - "tracking_result['update_latency'] < 0.5"
+            - "tracking_result['status_accurate'] is True"
+            - "tracking_result['notification_system_active'] is True"
+
+    req_ui_008_tests:
+      requirement_id: "REQ-UI-008"
+      requirement_name: "Completion Notifications Interface"
+      class_name: "TestCompletionNotificationsInterface"
+      tests:
+        - name: "test_completion_notifications_component_exists"
+          description: "Should have CompletionNotifications component for progression event notifications"
+          expected_failure: "CompletionNotifications component doesn't exist yet"
+          import_path: "from src.ui.components.contextual_pyramid_ui import CompletionNotifications"
+
+        - name: "test_completion_notifications_delivered_within_target_time"
+          description: "Should deliver completion notifications within 2 seconds of progression events"
+          expected_failure: "deliver_notification method missing or latency validation not implemented"
+          notification_requirements:
+            delivery_time: 2.0 # seconds
+            components:
+              [
+                "push_notifications",
+                "completion_alerts",
+                "progression_confirmations",
+                "next_step_prompts",
+              ]
+            mobile_integration:
+              ["mobile_push", "offline_queuing", "priority_handling"]
+            personalization:
+              ["user_preferences", "priority_filtering", "delivery_timing"]
+          assertions:
+            - "notification_result['delivery_time'] < 2.0"
+            - "notification_result['mobile_integrated'] is True"
+            - "notification_result['personalized'] is True"
 
   performance_requirements_tests:
-    name: "PERFORMANCE REQUIREMENTS (REQ-PERF-BUS-001 through REQ-PERF-BUS-002)"
-    description: "2 tests for 2 performance requirements (1 test each)"
-    
-    req_perf_bus_001_test:
-      requirement_id: "REQ-PERF-BUS-001"
-      requirement_name: "Contextual Algorithm Performance"
-      class_name: "TestContextualAlgorithmPerformance"
+    name: "PERFORMANCE REQUIREMENTS (REQ-PERF-UI-001 through REQ-PERF-UI-002)"
+    description: "4 tests for 2 performance requirements (2 tests each)"
+
+    req_perf_ui_001_tests:
+      requirement_id: "REQ-PERF-UI-001"
+      requirement_name: "Mobile Interface Responsiveness"
+      class_name: "TestMobileInterfaceResponsiveness"
       tests:
-        - name: "test_contextual_algorithms_meet_performance_targets"
-          description: "Should execute contextual validation algorithms within performance targets"
+        - name: "test_mobile_interface_initial_load_performance"
+          description: "Should load mobile interface within 2 seconds with responsive navigation <1 second"
           expected_failure: "Performance validation not implemented yet"
           performance_targets:
-            contextual_pyramid_analysis: 3.0  # seconds
-            cross_component_integration: 2.0  # seconds
+            initial_load: 2.0 # seconds
+            subsequent_navigation: 1.0 # seconds
+            ui_state_updates: 0.5 # seconds
           assertions:
-            - "performance_result['pyramid_analysis_time'] < 3.0"
-            - "performance_result['integration_time'] < 2.0"
+            - "performance_result['initial_load_time'] < 2.0"
+            - "performance_result['navigation_time'] < 1.0"
+            - "performance_result['ui_update_time'] < 0.5"
 
-    req_perf_bus_002_test:
-      requirement_id: "REQ-PERF-BUS-002"
-      requirement_name: "Mobile Command Processing Speed"
-      class_name: "TestMobileCommandProcessingSpeed"
+        - name: "test_mobile_performance_across_device_capabilities"
+          description: "Should maintain responsive performance across different mobile device capabilities"
+          expected_failure: "Cross-device performance validation not implemented yet"
+          device_requirements:
+            test_devices:
+              ["low_end_mobile", "mid_range_tablet", "high_end_phone"]
+            network_conditions: ["3G", "4G", "WiFi", "offline"]
+          assertions:
+            - "performance_result['all_devices_within_targets'] is True"
+            - "performance_result['network_resilient'] is True"
+
+    req_perf_ui_002_tests:
+      requirement_id: "REQ-PERF-UI-002"
+      requirement_name: "Real-Time Visualization Performance"
+      class_name: "TestRealTimeVisualizationPerformance"
       tests:
-        - name: "test_mobile_commands_meet_performance_targets"
-          description: "Should process mobile commands within mobile UX performance targets"
-          expected_failure: "Mobile performance validation not implemented yet"
+        - name: "test_visualization_rendering_performance"
+          description: "Should render visualizations within 1 second with real-time updates <500ms"
+          expected_failure: "Visualization performance validation not implemented yet"
           performance_targets:
-            command_processing: 2.0  # seconds
-            execution_orchestration: 5.0  # seconds
+            visualization_rendering: 1.0 # seconds
+            real_time_updates: 0.5 # seconds
+            user_interactions: 0.1 # seconds
           assertions:
-            - "performance_result['command_processing_time'] < 2.0"
-            - "performance_result['orchestration_time'] < 5.0"
+            - "performance_result['rendering_time'] < 1.0"
+            - "performance_result['update_latency'] < 0.5"
+            - "performance_result['interaction_time'] < 0.1"
 
-  quality_requirements_tests:
-    name: "QUALITY REQUIREMENTS (REQ-QUAL-BUS-001 through REQ-QUAL-BUS-002)"
-    description: "2 tests for 2 quality requirements (1 test each)"
-    
-    req_qual_bus_001_test:
-      requirement_id: "REQ-QUAL-BUS-001"
-      requirement_name: "Contextual Logic Accuracy"
-      class_name: "TestContextualLogicAccuracy"
-      tests:
-        - name: "test_contextual_validation_accuracy_meets_targets"
-          description: "Should operate contextual validation and progression logic with high accuracy"
-          expected_failure: "Quality validation not implemented yet"
-          accuracy_targets:
-            contextual_validation_accuracy: 0.95
-            cross_component_integration_accuracy: 0.98
+        - name: "test_high_frequency_update_performance"
+          description: "Should handle high-frequency updates without performance degradation"
+          expected_failure: "High-frequency update performance validation not implemented yet"
+          update_requirements:
+            update_frequency: 10 # updates per second
+            concurrent_visualizations: 4
+            no_degradation: True
           assertions:
-            - "accuracy_result['contextual_validation'] >= 0.95"
-            - "accuracy_result['cross_component_integration'] >= 0.98"
+            - "performance_result['handles_high_frequency'] is True"
+            - "performance_result['no_degradation'] is True"
+            - "performance_result['concurrent_viz_stable'] is True"
 
-    req_qual_bus_002_test:
-      requirement_id: "REQ-QUAL-BUS-002"
-      requirement_name: "Mobile Command Reliability"
-      class_name: "TestMobileCommandReliability"
+  usability_requirements_tests:
+    name: "USABILITY REQUIREMENTS (REQ-UX-UI-001 through REQ-UX-UI-002)"
+    description: "2 tests for 2 usability requirements (1 test each)"
+
+    req_ux_ui_001_test:
+      requirement_id: "REQ-UX-UI-001"
+      requirement_name: "Mobile User Experience"
+      class_name: "TestMobileUserExperience"
       tests:
-        - name: "test_mobile_command_reliability_meets_targets"
-          description: "Should operate mobile command processing reliably across network conditions"
-          expected_failure: "Mobile reliability validation not implemented yet"
-          reliability_targets:
-            command_processing_success: 0.99
-            execution_orchestration_success: 0.95
+        - name: "test_mobile_ux_meets_quality_targets"
+          description: "Should achieve 95%+ mobile user satisfaction with <5% error rate and <3s task completion"
+          expected_failure: "UX quality validation not implemented yet"
+          ux_targets:
+            user_satisfaction: 0.95
+            user_error_rate: 0.05
+            task_completion_time: 3.0 # seconds
+            features:
+              [
+                "gesture_support",
+                "offline_capability",
+                "responsive_design",
+                "intuitive_navigation",
+              ]
           assertions:
-            - "reliability_result['command_processing_success'] >= 0.99"
-            - "reliability_result['orchestration_success'] >= 0.95"
+            - "ux_result['user_satisfaction'] >= 0.95"
+            - "ux_result['error_rate'] < 0.05"
+            - "ux_result['task_completion_time'] < 3.0"
+            - "ux_result['mobile_optimized_features'] >= 4"
+
+    req_ux_ui_002_test:
+      requirement_id: "REQ-UX-UI-002"
+      requirement_name: "Contextual Interface Clarity"
+      class_name: "TestContextualInterfaceClarity"
+      tests:
+        - name: "test_contextual_interface_clarity_meets_targets"
+          description: "Should achieve context position understanding within 5 seconds with >95% navigation success"
+          expected_failure: "Contextual clarity validation not implemented yet"
+          clarity_targets:
+            context_understanding_time: 5.0 # seconds
+            navigation_success_rate: 0.95
+            clarity_features:
+              [
+                "context_indicators",
+                "progression_status",
+                "component_relationships",
+                "integration_results",
+              ]
+            navigation_features:
+              [
+                "contextual_breadcrumbs",
+                "progressive_disclosure",
+                "intelligent_defaults",
+                "quick_access",
+              ]
+          assertions:
+            - "clarity_result['understanding_time'] < 5.0"
+            - "clarity_result['navigation_success'] >= 0.95"
+            - "clarity_result['clarity_features_present'] >= 4"
+            - "clarity_result['navigation_features_present'] >= 4"
 
   integration_requirements_tests:
-    name: "INTEGRATION REQUIREMENTS (REQ-INT-BUS-001 through REQ-INT-BUS-004)"
+    name: "INTEGRATION REQUIREMENTS (Mobile Framework + Real-Time Data Integration)"
     description: "4 tests for 4 integration requirements (1 test each)"
-    
-    req_int_bus_001_test:
-      requirement_id: "REQ-INT-BUS-001"
-      requirement_name: "Context Position Integration"
-      class_name: "TestContextPositionIntegration"
-      tests:
-        - name: "test_context_engine_integration_meets_requirements"
-          description: "Should integrate with Context Engine for layer/feature/system position tracking"
-          expected_failure: "Context Engine integration not implemented yet"
-          integration_requirements:
-            update_latency: 1.0  # seconds
-            real_time_awareness: true
-          assertions:
-            - "integration_result['context_position_tracked'] is True"
-            - "integration_result['update_latency'] < 1.0"
 
-    req_int_bus_002_test:
-      requirement_id: "REQ-INT-BUS-002"
-      requirement_name: "Component Registry Integration"
-      class_name: "TestComponentRegistryIntegration"
+    req_mob_ui_001_test:
+      requirement_id: "REQ-MOB-UI-001"
+      requirement_name: "Mobile UI Framework Integration"
+      class_name: "TestMobileUIFrameworkIntegration"
       tests:
-        - name: "test_component_registry_integration_meets_requirements"
-          description: "Should integrate with Component Registry for completed component status"
-          expected_failure: "Component Registry integration not implemented yet"
-          integration_requirements:
-            real_time_updates: true
-            accurate_status_tracking: true
+        - name: "test_mobile_framework_integration_meets_requirements"
+          description: "Should integrate deeply with mobile UI framework for native-like experience with full feature parity"
+          expected_failure: "Mobile framework integration not implemented yet"
+          framework_requirements:
+            framework_type: ["react_native", "flutter", "pwa_mobile"]
+            features:
+              [
+                "native_gestures",
+                "device_integration",
+                "offline_support",
+                "push_notifications",
+              ]
+            native_experience: True
+            feature_parity: True
           assertions:
-            - "integration_result['component_status_accurate'] is True"
-            - "integration_result['real_time_updates'] is True"
+            - "integration_result['framework_integrated'] is True"
+            - "integration_result['native_features_available'] >= 4"
+            - "integration_result['native_like_experience'] is True"
+            - "integration_result['feature_parity_achieved'] is True"
 
-    req_int_bus_003_test:
-      requirement_id: "REQ-INT-BUS-003"
-      requirement_name: "Mobile API Integration"
-      class_name: "TestMobileApiIntegration"
+    req_mob_ui_002_test:
+      requirement_id: "REQ-MOB-UI-002"
+      requirement_name: "Mobile Authentication UI Integration"
+      class_name: "TestMobileAuthenticationUIIntegration"
       tests:
-        - name: "test_mobile_api_integration_meets_requirements"
-          description: "Should integrate with Mobile API framework for command processing"
-          expected_failure: "Mobile API integration not implemented yet"
-          integration_requirements:
-            secure_command_processing: true
-            response_time: 2.0  # seconds
+        - name: "test_mobile_auth_ui_integration_meets_security_targets"
+          description: "Should integrate seamlessly with mobile authentication system within 2 seconds at 99.9% security compliance"
+          expected_failure: "Mobile authentication UI integration not implemented yet"
+          auth_requirements:
+            completion_time: 2.0 # seconds
+            security_compliance: 0.999
+            integration_features:
+              [
+                "biometric_auth",
+                "device_verification",
+                "session_management",
+                "secure_storage",
+              ]
+            security_features:
+              [
+                "mobile_protocols",
+                "encrypted_credentials",
+                "secure_communication",
+              ]
           assertions:
-            - "integration_result['secure_processing'] is True"
-            - "integration_result['response_time'] < 2.0"
+            - "auth_result['completion_time'] < 2.0"
+            - "auth_result['security_compliance'] >= 0.999"
+            - "auth_result['integration_features_present'] >= 4"
+            - "auth_result['security_features_present'] >= 3"
 
-    req_int_bus_004_test:
-      requirement_id: "REQ-INT-BUS-004"
-      requirement_name: "PROJECT-002 Workflow Integration"
-      class_name: "TestProject002WorkflowIntegration"
+    req_rt_ui_001_test:
+      requirement_id: "REQ-RT-UI-001"
+      requirement_name: "Context Engine UI Integration"
+      class_name: "TestContextEngineUIIntegration"
       tests:
-        - name: "test_project_002_workflow_integration_meets_requirements"
-          description: "Should integrate with PROJECT-002 Workflow Enforcer for automatic progression"
-          expected_failure: "PROJECT-002 Workflow integration not implemented yet"
-          integration_requirements:
-            seamless_continuation: true
-            intelligent_progression: true
+        - name: "test_context_engine_ui_integration_real_time_updates"
+          description: "Should integrate with Context Engine for live position updates within 500ms without data conflicts"
+          expected_failure: "Context Engine UI integration not implemented yet"
+          context_integration_requirements:
+            update_latency: 0.5 # seconds
+            integration_features:
+              [
+                "websocket_connections",
+                "real_time_event_streaming",
+                "position_change_notifications",
+              ]
+            update_types:
+              [
+                "live_position_tracking",
+                "progression_events",
+                "context_changes",
+                "workflow_transitions",
+              ]
+            no_data_conflicts: True
           assertions:
-            - "integration_result['seamless_workflow_continuation'] is True"
-            - "integration_result['intelligent_progression_decisions'] is True"
+            - "context_result['update_latency'] < 0.5"
+            - "context_result['real_time_streaming'] is True"
+            - "context_result['update_types_supported'] >= 4"
+            - "context_result['no_data_conflicts'] is True"
+
+    req_rt_ui_002_test:
+      requirement_id: "REQ-RT-UI-002"
+      requirement_name: "Component Registry UI Integration"
+      class_name: "TestComponentRegistryUIIntegration"
+      tests:
+        - name: "test_component_registry_ui_integration_status_updates"
+          description: "Should integrate with Component Registry for live status updates within 1 second of changes"
+          expected_failure: "Component Registry UI integration not implemented yet"
+          registry_integration_requirements:
+            update_latency: 1.0 # seconds
+            integration_features:
+              [
+                "component_status_streams",
+                "integration_event_notifications",
+                "compatibility_updates",
+              ]
+            visualization_features:
+              [
+                "live_component_status",
+                "integration_progress",
+                "compatibility_indicators",
+              ]
+          assertions:
+            - "registry_result['update_latency'] < 1.0"
+            - "registry_result['status_streaming'] is True"
+            - "registry_result['integration_features_present'] >= 3"
+            - "registry_result['visualization_features_present'] >= 3"
 
 test_execution_configuration:
   name: "TEST EXECUTION CONFIGURATION"
-  description: "Ensures only Business Logic Layer tests are executed, not repository-wide"
-  
+  description: "Ensures only User Interface Layer tests are executed, not repository-wide"
+
   test_scope_control:
-    target_test_file: "test_contextual_pyramid_validator.py"
-    test_directory: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/BUSINESS LOGIC LAYER"
-    execution_command: "python -m pytest {test_directory}/test_contextual_pyramid_validator.py -v"
+    target_test_file: "test_contextual_pyramid_ui.py"
+    test_directory: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER"
+    execution_command: "python -m pytest {test_directory}/test_contextual_pyramid_ui.py -v"
     scope_validation: "LAYER_ONLY - No repository-wide execution"
     expected_test_count: 24
     prevention_measures:
       - "Use specific file path, not directory recursion"
       - "Avoid pytest discovery in parent directories"
       - "Explicit test file targeting only"
-    
+
   test_isolation:
     description: "Prevents execution of 700+ repository tests"
     constraints:
-      - "Only test_contextual_pyramid_validator.py should be executed"
+      - "Only test_contextual_pyramid_ui.py should be executed"
       - "No pytest discovery beyond target file"
       - "No recursive directory testing"
     validation:
@@ -364,43 +564,85 @@ test_execution_configuration:
 
 implementation_requirements:
   name: "IMPLEMENTATION REQUIREMENTS"
-  description: "Required classes and methods for GREEN phase"
-  
-  required_classes:
-    - "ContextualPyramidAnalyzer"
-    - "ContextAwareValidator" 
-    - "IntegrationOrchestrator"
-    - "DependencyAnalyzer"
-    - "MobileCommandInterpreter"
-    - "RemoteExecutionOrchestrator"
-    - "ProgressionAnalyzer"
-    - "WorkflowContinuationEngine"
-  
-  implementation_file: "/workspaces/control_tower/src/business_logic/contextual_pyramid_validator.py"
-  
+  description: "Required UI components and methods for GREEN phase"
+
+  required_components:
+    - "MobileAuthInterface"
+    - "MobileCommandInterface"
+    - "PositionDisplay"
+    - "ContextualPyramidViz"
+    - "IntegrationDashboard"
+    - "TestingVisualization"
+    - "ProgressionTracking"
+    - "CompletionNotifications"
+
+  implementation_file: "/workspaces/control_tower/src/ui/components/contextual_pyramid_ui.py"
+
   test_file_creation:
-    target_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/BUSINESS LOGIC LAYER/test_contextual_pyramid_validator.py"
+    target_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_contextual_pyramid_ui.py"
     test_count: 24
-    structure: "8 test classes with 24 total test methods"
-    
+    structure: "12 test classes with 24 total test methods"
+
+  component_structure:
+    mobile_components:
+      - "MobileAuthInterface: Secure mobile login with biometric auth, device verification, session management"
+      - "MobileCommandInterface: Context-aware command execution with real-time status, touch controls, offline capability"
+
+    visualization_components:
+      - "PositionDisplay: Layer/feature/system hierarchy visualization with interactive tree, progress bars, completion indicators"
+      - "ContextualPyramidViz: Context-aware pyramid charts with adaptive features, drill-down, contextual filtering"
+      - "IntegrationDashboard: Component integration status with matrices, compatibility indicators, dependency maps"
+      - "TestingVisualization: Cross-component testing progress with interactive maps, execution flow, result heat maps"
+
+    progression_components:
+      - "ProgressionTracking: Timeline visualization with milestone indicators, completion notifications, next step guidance"
+      - "CompletionNotifications: Push notifications with mobile integration, personalization, priority filtering"
+
+    performance_requirements:
+      - "Mobile interface initial load: <2 seconds"
+      - "Mobile navigation: <1 second"
+      - "UI state updates: <500ms"
+      - "Visualization rendering: <1 second"
+      - "Real-time updates: <500ms"
+      - "User interactions: <100ms"
+
+    integration_requirements:
+      - "Mobile UI framework integration: React Native/Flutter/PWA with native gestures, offline support, push notifications"
+      - "Mobile authentication: Biometric auth, device verification, <2s completion, 99.9% security compliance"
+      - "Context Engine: Real-time position tracking via WebSocket, <500ms update latency, no data conflicts"
+      - "Component Registry: Live status updates via event streaming, <1s update latency, compatibility indicators"
+
+    usability_requirements:
+      - "Mobile UX: 95%+ user satisfaction, <5% error rate, <3s task completion"
+      - "Contextual clarity: Context understanding <5s, 95%+ navigation success"
+      - "Mobile optimization: Responsive design, offline capability, cross-device compatibility"
+      - "Accessibility: Touch optimization, gesture support, progressive disclosure, intelligent defaults"
+
 completion_criteria:
   name: "RED PHASE COMPLETION"
   description: "24/24 failing tests created and properly scoped"
-  
+
   success_criteria:
-    - "Exactly 24 failing tests created in test_contextual_pyramid_validator.py"
-    - "All tests properly fail with expected import/method errors"
+    - "Exactly 24 failing tests created in test_contextual_pyramid_ui.py"
+    - "All tests properly fail with expected import/component errors"
     - "No repository-wide test execution (prevent 700+ test runs)"
-    - "All 16 business logic requirements covered by tests"
+    - "All 16 UI requirements covered by tests"
     - "Test execution limited to single file only"
-    
+
   ready_for_green_phase:
     - "All 24 tests failing as expected"
     - "Test scope properly contained"
-    - "Implementation file structure defined" 
-    - "Performance and quality targets specified in tests"
+    - "Implementation file structure defined"
+    - "Performance and usability targets specified in tests"
+    - "Mobile optimization requirements validated in tests"
+    - "Integration requirements verified in tests"
 
 ---
-
-# END OF BUSINESS LOGIC LAYER FAILING TESTS PROMPT
-# Total Tests: 24 (aligned to 16 business logic requirements)
+# END OF USER INTERFACE LAYER FAILING TESTS PROMPT
+# Total Tests: 24 (aligned to 16 UI requirements)
+# Mobile Requirements: Authentication, Command Interface, Framework Integration
+# Visualization Requirements: Position Display, Contextual Pyramid, Integration Dashboard, Testing Visualization
+# Progression Requirements: Tracking Display, Completion Notifications
+# Performance: Mobile responsiveness, Real-time visualization performance
+# Usability: Mobile UX, Contextual interface clarity
+# Integration: Mobile framework, Mobile auth, Context Engine, Component Registry
