@@ -1,0 +1,1 @@
+# Tests __init__.py for proper Python module structure

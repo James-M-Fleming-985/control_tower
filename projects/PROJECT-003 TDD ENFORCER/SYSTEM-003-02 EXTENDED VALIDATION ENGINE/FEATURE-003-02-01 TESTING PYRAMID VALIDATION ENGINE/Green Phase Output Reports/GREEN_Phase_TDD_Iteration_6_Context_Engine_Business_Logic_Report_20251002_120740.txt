@@ -1,0 +1,44 @@
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_process_context_changes_fails_initially FAILED [ 33%]
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_validate_context_consistency_fails_initially FAILED [ 66%]
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_merge_context_states_fails_initially FAILED [100%]
+ERROR: Coverage failure: total of 8 is less than fail-under=95
+
+
+=================================== FAILURES ===================================
+_ TestContextEngineBusinessLogic.test_process_context_changes_fails_initially __
+tests/test_context_engine_business_logic.py:41: in test_process_context_changes_fails_initially
+    with pytest.raises(NotImplementedError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'NotImplementedError'>
+_ TestContextEngineBusinessLogic.test_validate_context_consistency_fails_initially _
+tests/test_context_engine_business_logic.py:49: in test_validate_context_consistency_fails_initially
+    with pytest.raises(NotImplementedError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'NotImplementedError'>
+___ TestContextEngineBusinessLogic.test_merge_context_states_fails_initially ___
+tests/test_context_engine_business_logic.py:62: in test_merge_context_states_fails_initially
+    with pytest.raises(NotImplementedError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'NotImplementedError'>
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                 Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------------
+src/__init__.py                                          0      0   100%
+src/business_logic/__init__.py                           0      0   100%
+src/business_logic/context_engine_service.py            26      1    96%   71
+src/business_logic/contextual_pyramid_validator.py     220    220     0%   34-783
+src/business_logic/mobile_session_manager.py            59     59     0%   8-208
+----------------------------------------------------------------------------------
+TOTAL                                                  305    280     8%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 8.20%
+=========================== short test summary info ============================
+FAILED tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_process_context_changes_fails_initially - Failed: DID NOT RAISE <class 'NotImplementedError'>
+FAILED tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_validate_context_consistency_fails_initially - Failed: DID NOT RAISE <class 'NotImplementedError'>
+FAILED tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_merge_context_states_fails_initially - Failed: DID NOT RAISE <class 'NotImplementedError'>
+============================== 3 failed in 0.27s ===============================

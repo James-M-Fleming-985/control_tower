@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 3 items
+
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_process_context_changes_fails_initially PASSED [ 33%]
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_validate_context_consistency_fails_initially PASSED [ 66%]
+tests/test_context_engine_business_logic.py::TestContextEngineBusinessLogic::test_merge_context_states_fails_initially PASSED [100%]
+ERROR: Coverage failure: total of 8 is less than fail-under=95
+
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                 Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------------
+src/__init__.py                                          0      0   100%
+src/business_logic/__init__.py                           0      0   100%
+src/business_logic/context_engine_service.py            26      1    96%   71
+src/business_logic/contextual_pyramid_validator.py     220    220     0%   34-783
+src/business_logic/mobile_session_manager.py            59     59     0%   8-208
+----------------------------------------------------------------------------------
+TOTAL                                                  305    280     8%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 8.20%
+============================== 3 passed in 0.20s ===============================
