@@ -6,1083 +6,65 @@ metadata:
   layer_id: "LAYER-003-02-01-003"
   layer_name: "User Interface Layer"
   feature_id: "FEATURE-003-02-01"
-  feature_name: "Contextual Pyramid Visualization UI + Mobile Interface"
+  feature_name: "Context Visualization Interface"
   tdd_phase: "REFACTOR"
-  created_date: "2025-10-02"
-  updated_date: "2025-10-02"
-  green_phase_completion_date: "2025-10-02T20:36:33Z"
-  implementation_status: "Based on actual GREEN phase results (26/26 tests passing)"
+  created_date: "2025-10-03"
+  updated_date: "2025-10-03"
+  green_phase_completion_date: "2025-10-03T11:44:47Z"
+  implementation_status: "Based on actual GREEN phase results - TDD Iteration 14 (3/3 tests passing)"
 
 green_phase_completion:
   status: "COMPLETE SUCCESS"
   test_results:
-    passing_tests: 26
-    total_tests: 26
+    passing_tests: 3
+    total_tests: 3
     pass_rate: 100
 
   execution_summary:
-    timestamp: "2025-10-02T20:36:33Z"
-    duration: "0.08 seconds"
-    primary_achievement: "Perfect RED → GREEN Transition with Mobile UI Optimization (0/26 → 26/26)"
-    system_status: "PRODUCTION READY"
-    layer_status: "User Interface Layer complete - Contextual Pyramid Visualization UI + Mobile Interface operational"
+    timestamp: "2025-10-03T11:44:47Z"
+    duration: "0.04 seconds"
+    primary_achievement: "Perfect RED → GREEN Transition for Context Visualization Interface (0/3 → 3/3)"
+    system_status: "GREEN PHASE COMPLETE - READY FOR REFACTOR"
+    layer_status: "User Interface Layer - Context Visualization Interface stub implementation complete"
+    coverage: "100% code coverage on context_visualization_interface.py module"
 
   critical_tests_status:
-    description: "26 Critical Tests That Must Pass During REFACTOR (16 Functional + 4 Performance + 2 Usability + 4 Integration)"
+    description: "3 Critical Tests That Must Pass During REFACTOR - TDD Iteration 14"
+
     functional_requirements_tests:
       test_1:
-        name: "test_mobile_auth_interface_component_exists"
-        description: "MobileAuthInterface component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-001"
+        name: "test_render_context_hierarchy_fails_initially"
+        description: "Context hierarchy rendering with tree visualization"
+        status: "PASSING (raises NotImplementedError as expected)"
+        requirement: "REQ-VIZ-001 - Context Hierarchy Rendering"
+        refactor_target: "Replace NotImplementedError with actual tree visualization logic"
 
       test_2:
-        name: "test_mobile_auth_interface_renders_within_target_time"
-        description: "Mobile authentication interface rendering <2s with security features"
-        status: "PASSING"
-        requirement: "REQ-UI-001"
+        name: "test_display_context_sync_status_fails_initially"
+        description: "Context sync status display with version tracking"
+        status: "PASSING (raises NotImplementedError as expected)"
+        requirement: "REQ-VIZ-002 - Context Sync Status Display"
+        refactor_target: "Replace NotImplementedError with actual sync status display logic"
 
       test_3:
-        name: "test_mobile_command_interface_component_exists"
-        description: "MobileCommandInterface component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-002"
-
-      test_4:
-        name: "test_mobile_command_execution_acknowledgment"
-        description: "Mobile command execution acknowledgment <2s with real-time status"
-        status: "PASSING"
-        requirement: "REQ-UI-002"
-
-      test_5:
-        name: "test_position_display_component_exists"
-        description: "PositionDisplay component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-003"
-
-      test_6:
-        name: "test_position_display_updates_on_context_changes"
-        description: "Position display updates <500ms on context changes"
-        status: "PASSING"
-        requirement: "REQ-UI-003"
-
-      test_7:
-        name: "test_contextual_pyramid_viz_component_exists"
-        description: "ContextualPyramidViz component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-004"
-
-      test_8:
-        name: "test_contextual_pyramid_renders_context_specific_data"
-        description: "Contextual pyramid rendering <1s with adaptive features"
-        status: "PASSING"
-        requirement: "REQ-UI-004"
-
-      test_9:
-        name: "test_integration_dashboard_component_exists"
-        description: "IntegrationDashboard component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-005"
-
-      test_10:
-        name: "test_integration_dashboard_updates_on_status_changes"
-        description: "Integration dashboard updates <1s on status changes"
-        status: "PASSING"
-        requirement: "REQ-UI-005"
-
-      test_11:
-        name: "test_testing_visualization_component_exists"
-        description: "TestingVisualization component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-006"
-
-      test_12:
-        name: "test_testing_visualization_updates_realtime_with_execution"
-        description: "Testing visualization real-time synchronization with test execution"
-        status: "PASSING"
-        requirement: "REQ-UI-006"
-
-      test_13:
-        name: "test_progression_tracking_component_exists"
-        description: "ProgressionTracking component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-007"
-
-      test_14:
-        name: "test_progression_tracking_displays_accurate_status"
-        description: "Progression tracking <500ms with accurate status display"
-        status: "PASSING"
-        requirement: "REQ-UI-007"
-
-      test_15:
-        name: "test_completion_notifications_component_exists"
-        description: "CompletionNotifications component existence validation"
-        status: "PASSING"
-        requirement: "REQ-UI-008"
-
-      test_16:
-        name: "test_completion_notifications_delivered_within_target_time"
-        description: "Completion notifications delivered <2s with mobile integration"
-        status: "PASSING"
-        requirement: "REQ-UI-008"
-
-    performance_requirements_tests:
-      test_17:
-        name: "test_mobile_interface_initial_load_performance"
-        description: "Mobile interface load <2s, navigation <1s, updates <500ms"
-        status: "PASSING"
-        requirement: "REQ-UI-009"
-
-      test_18:
-        name: "test_mobile_performance_across_device_capabilities"
-        description: "Performance maintenance across devices and network conditions"
-        status: "PASSING"
-        requirement: "REQ-UI-009"
-
-      test_19:
-        name: "test_visualization_rendering_performance"
-        description: "Visualization rendering <1s, updates <500ms, interactions <100ms"
-        status: "PASSING"
-        requirement: "REQ-UI-010"
-
-      test_20:
-        name: "test_high_frequency_update_performance"
-        description: "High-frequency updates (>10/s) without performance degradation"
-        status: "PASSING"
-        requirement: "REQ-UI-010"
-
-    usability_requirements_tests:
-      test_21:
-        name: "test_mobile_ux_meets_quality_targets"
-        description: "Mobile UX >95% satisfaction, <5% error rate, <3s task completion"
-        status: "PASSING"
-        requirement: "REQ-UI-011"
-
-      test_22:
-        name: "test_contextual_interface_clarity_meets_targets"
-        description: "Contextual interface <5s understanding, >95% navigation success"
-        status: "PASSING"
-        requirement: "REQ-UI-012"
-
-    integration_requirements_tests:
-      test_23:
-        name: "test_mobile_framework_integration_meets_requirements"
-        description: "Mobile UI framework integration (React Native/Flutter/PWA)"
-        status: "PASSING"
-        requirement: "REQ-UI-013"
-
-      test_24:
-        name: "test_mobile_auth_ui_integration_meets_security_targets"
-        description: "Mobile authentication UI <2s completion, >99.9% security compliance"
-        status: "PASSING"
-        requirement: "REQ-UI-014"
-
-      test_25:
-        name: "test_context_engine_ui_integration_real_time_updates"
-        description: "Context Engine UI integration WebSocket updates <500ms"
-        status: "PASSING"
-        requirement: "REQ-UI-015"
-
-      test_26:
-        name: "test_component_registry_ui_integration_status_updates"
-        description: "Component Registry UI status streaming <1s"
-        status: "PASSING"
-        requirement: "REQ-UI-016"
-        description: "Mobile command reliability >99% across multiple executions"
-        status: "PASSING"
-        requirement: "REQ-QUAL-002"
-
-    integration_requirements_tests:
-      test_21:
-        name: "test_context_engine_integration_meets_requirements"
-        description: "Context Engine integration with <1s update latency"
-        status: "PASSING"
-        requirement: "REQ-INT-BUS-001"
-
-      test_22:
-        name: "test_component_registry_integration_meets_requirements"
-        description: "Component Registry integration with real-time updates"
-        status: "PASSING"
-        requirement: "REQ-INT-BUS-002"
-
-      test_23:
-        name: "test_mobile_api_integration_meets_requirements"
-        description: "Mobile API integration with secure processing and <2s response"
-        status: "PASSING"
-        requirement: "REQ-INT-BUS-003"
-
-      test_24:
-        name: "test_project_002_workflow_integration_meets_requirements"
-        description: "PROJECT-002 workflow integration with seamless continuation"
-        status: "PASSING"
-        requirement: "REQ-INT-BUS-004"
-
-  components_implemented:
-    mobile_auth_interface:
-      status: "COMPLETE"
-      description: "Mobile authentication interface with <2s rendering, biometric auth, and >99% security"
-      tests_covered: 5
-      requirements:
-        ["REQ-UI-001", "REQ-UI-009", "REQ-UI-011", "REQ-UI-013", "REQ-UI-014"]
-
-    mobile_command_interface:
-      status: "COMPLETE"
-      description: "Mobile command interface with <2s acknowledgment and real-time status"
-      tests_covered: 3
-      requirements: ["REQ-UI-002", "REQ-UI-011"]
-
-    position_display:
-      status: "COMPLETE"
-      description: "Layer/feature/system position display with <500ms updates and context awareness"
-      tests_covered: 4
-      requirements: ["REQ-UI-003", "REQ-UI-012", "REQ-UI-015"]
-
-    contextual_pyramid_viz:
-      status: "COMPLETE"
-      description: "Contextual pyramid visualization with <1s rendering and high-frequency support"
-      tests_covered: 4
-      requirements: ["REQ-UI-004", "REQ-UI-010"]
-
-    integration_dashboard:
-      status: "COMPLETE"
-      description: "Component integration dashboard with <1s updates and real-time streaming"
-      tests_covered: 3
-      requirements: ["REQ-UI-005", "REQ-UI-016"]
-
-    testing_visualization:
-      status: "COMPLETE"
-      description: "Cross-component testing visualization with real-time test execution sync"
-      tests_covered: 2
-      requirements: ["REQ-UI-006"]
-
-    progression_tracking:
-      status: "COMPLETE"
-      description: "Progression tracking display with <500ms updates and notification system"
-      tests_covered: 2
-      requirements: ["REQ-UI-007"]
-
-    completion_notifications:
-      status: "COMPLETE"
-      description: "Completion notifications interface with <2s delivery and mobile integration"
-      tests_covered: 2
-      requirements: ["REQ-UI-008"]
-
-refactor_objectives:
-  primary_goal: "Enhance UI component quality and user experience while maintaining 100% test pass rate (26/26)"
-  focus_areas:
-    - "Mobile UI responsiveness optimization"
-    - "Real-time visualization performance"
-    - "Context Engine WebSocket integration"
-    - "Component Registry streaming enhancement"
-    - "Error handling and user feedback"
-    - "Accessibility and mobile UX"
-    - "Code organization and component reusability"
-    - "Documentation and interface clarity"
-
-  constraints:
-    - "All 26 tests must continue passing"
-    - "Performance requirements must remain met (<2s mobile load, <1s rendering, <500ms updates, <100ms interactions)"
-    - "Usability requirements must remain met (>95% satisfaction, <5% error rate, <3s task completion)"
-    - "No breaking changes to component interfaces"
-    - "Maintain mobile framework compatibility (React Native/Flutter/PWA)"
-    - "Preserve Context Engine and Component Registry integration"
-
-refactor_priorities:
-  mobile_ui_performance_optimization:
-    priority: "HIGH"
-    description: "Optimize mobile UI components while maintaining performance requirements"
-
-    mobile_interface_optimization:
-      current_status:
-        - "All components currently meet performance targets"
-        - "MobileAuthInterface: 1.5s load (target <2s)"
-        - "MobileCommandInterface: 1.5s acknowledgment (target <2s)"
-        - "PositionDisplay: 0.4s updates (target <500ms)"
-        - "ContextualPyramidViz: 0.9s rendering (target <1s)"
-        - "IntegrationDashboard: 0.9s updates (target <1s)"
-
-      improvements:
-        component_rendering_optimization:
-          description: "Optimize UI component rendering performance"
-          implementation:
-            - "Virtual scrolling for large component lists"
-            - "Progressive rendering for complex visualizations"
-            - "Debounced updates for high-frequency events"
-          expected_benefit: "20-30% faster rendering for complex UIs"
-
-        state_management_optimization:
-          description: "Optimize component state management"
-          implementation:
-            - "Efficient state diffing and updates"
-            - "Memoization for expensive computations"
-            - "Selective re-rendering of changed components"
-          expected_benefit: "Reduced re-render cycles and smoother UX"
-
-        mobile_load_optimization:
-          description: "Optimize mobile interface initial load"
-          implementation:
-            - "Code splitting for mobile components"
-            - "Lazy loading of non-critical UI features"
-            - "Progressive Web App caching strategies"
-          expected_benefit: "30-40% faster mobile initial load"
-
-    real_time_visualization_optimization:
-      current_status:
-        - "Visualization performance meets targets (<1s rendering, <500ms updates, <100ms interactions)"
-        - "High-frequency updates (>10/s) supported without degradation"
-        - "Concurrent visualizations stable"
-
-      improvements:
-        websocket_optimization:
-          description: "Optimize WebSocket integration for real-time updates"
-          implementation:
-            - "Efficient WebSocket message batching"
-            - "Delta updates instead of full state transmission"
-            - "Smart reconnection with state recovery"
-          expected_benefit: "50-60% reduction in network traffic"
-
-        visualization_caching:
-          description: "Cache visualization data for faster rendering"
-          implementation:
-            - "LRU cache for pyramid visualization data (max 20 items)"
-            - "Cache component status for dashboard (5-minute TTL)"
-            - "Pre-compute common visualization states"
-          expected_benefit: "40-50% faster repeated visualization rendering"
-
-        interaction_responsiveness:
-          description: "Enhance UI interaction responsiveness"
-          implementation:
-            - "Optimistic UI updates for immediate feedback"
-            - "Request debouncing for rapid user interactions"
-            - "Smart loading states with skeleton screens"
-          expected_benefit: "Perceived performance improvement and smoother UX"
-
-  ui_component_organization:
-    priority: "MEDIUM"
-    description: "Improve UI component structure and maintainability"
-
-    base_component_abstraction:
-      description: "Extract common UI component patterns"
-      implementation:
-        base_ui_component:
-          class_name: "BaseUIComponent"
-          purpose: "Common functionality for all UI components"
-          methods:
-            - "_validate_config_parameters()"
-            - "_measure_performance()"
-            - "_generate_component_id()"
-            - "_log_render_metrics()"
-            - "_handle_error_state()"
-
-        ui_component_interface:
-          class_name: "IUIComponent"
-          purpose: "Define standard UI component contract"
-          methods:
-            - "render(params: Dict) -> Dict"
-            - "get_performance_metrics() -> Dict"
-            - "get_accessibility_info() -> Dict"
-            - "handle_interaction(event: Dict) -> Dict"
-
-      benefits:
-        - "Reduced code duplication across 8 UI components"
-        - "Consistent performance measurement"
-        - "Standardized error handling patterns"
-        - "Easier testing and component extension"
-
-    ui_configuration:
-      description: "Centralize UI configuration settings"
-      implementation:
-        config_class:
-          class_name: "UIComponentConfig"
-          settings:
-            performance_thresholds:
-              mobile_initial_load_max_time: 2.0
-              mobile_navigation_max_time: 1.0
-              ui_update_max_time: 0.5
-              visualization_rendering_max_time: 1.0
-              visualization_update_max_time: 0.5
-              interaction_max_time: 0.1
-
-            usability_requirements:
-              mobile_ux_min_satisfaction: 0.95
-              mobile_ux_max_error_rate: 0.05
-              mobile_ux_max_task_time: 3.0
-              contextual_ui_max_understanding_time: 5.0
-              contextual_ui_min_navigation_success: 0.95
-
-            caching_settings:
-              pyramid_viz_cache_size: 20
-              component_status_cache_ttl: 300
-              precompute_common_states: true
-
-            mobile_optimization:
-              code_splitting_enabled: true
-              lazy_loading_enabled: true
-              pwa_caching_enabled: true
-              max_bundle_size_kb: 500
-
-            integration_settings:
-              websocket_enabled: true
-              context_engine_update_max_latency: 0.5
-              registry_status_max_latency: 1.0
-              delta_updates_enabled: true
-
-      benefits:
-        - "Single source of UI performance configuration"
-        - "Easy tuning of performance thresholds"
-        - "Environment-specific UI settings"
-        - "Runtime optimization adjustments"
-
-  ui_error_handling:
-    priority: "HIGH"
-    description: "Robust error handling and user feedback for UI components"
-
-    exception_hierarchy:
-      description: "Create structured exception hierarchy for UI errors"
-      exceptions:
-        UIComponentException:
-          description: "Base exception for all UI component errors"
-
-        MobileRenderingException:
-          parent: "UIComponentException"
-          description: "Errors in mobile UI rendering operations"
-
-        VisualizationException:
-          parent: "UIComponentException"
-          description: "Visualization rendering and update errors"
-
-        IntegrationConnectionException:
-          parent: "UIComponentException"
-          description: "WebSocket and API integration connection failures"
-
-        PerformanceThresholdException:
-          parent: "UIComponentException"
-          description: "UI performance requirement violations"
-
-        AccessibilityException:
-          parent: "UIComponentException"
-          description: "Accessibility and usability requirement violations"
-
-    retry_mechanisms:
-      description: "Implement retry logic for transient UI failures"
-      strategies:
-        websocket_connection:
-          max_retries: 5
-          backoff_strategy: "exponential"
-          retry_conditions:
-            [
-              "connection timeout",
-              "network error",
-              "server unavailable",
-            ]
-
-        component_rendering:
-          max_retries: 3
-          backoff_strategy: "linear"
-          retry_conditions:
-            ["render timeout", "data fetch failure", "resource load error"]
-
-        mobile_api_calls:
-          max_retries: 4
-          backoff_strategy: "exponential"
-          retry_conditions:
-            ["network timeout", "authentication delay", "rate limit"]
-
-        context_engine_updates:
-          max_retries: 3
-          backoff_strategy: "exponential"
-          retry_conditions:
-            [
-              "update timeout",
-              "sync failure",
-              "data conflict",
-            ]
-
-        registry_status_updates:
-          max_retries: 3
-          backoff_strategy: "linear"
-          retry_conditions:
-            ["streaming interruption", "status fetch failure", "update lag"]
-
-    graceful_degradation:
-      description: "Maintain UI functionality during partial failures"
-      strategies:
-        websocket_failure:
-          fallback: "Polling-based updates with 2s interval"
-          performance_impact: "Slightly increased latency but updates still functional"
-
-        visualization_rendering_failure:
-          fallback: "Text-based status display"
-          user_impact: "Reduced visual appeal but information still accessible"
-
-        mobile_framework_failure:
-          fallback: "Progressive Web App fallback"
-          functionality_impact: "Some native features unavailable but core UI functional"
-
-        context_engine_connection_failure:
-          fallback: "Cached context data with manual refresh option"
-          user_impact: "Potentially stale data but UI remains operational"
-
-        component_registry_failure:
-          fallback: "Static component status display"
-          user_impact: "No real-time updates but status visible"
-
-        authentication_ui_failure:
-          fallback: "Standalone contextual validation without PROJECT-002 sync"
-          functionality_impact: "No workflow integration but core validation features functional"
-
-  documentation_enhancement:
-    priority: "MEDIUM"
-    description: "Comprehensive documentation for maintainability"
-
-    api_documentation:
-      description: "Complete API documentation for all public methods"
-      requirements:
-        - "Method purpose and usage examples"
-        - "Parameter descriptions and types"
-        - "Return value specifications"
-        - "Exception conditions and handling"
-        - "Performance characteristics"
-
-    architecture_documentation:
-      description: "Document system architecture and design decisions"
-      contents:
-          fallback: "Basic authentication without biometric/device features"
-          user_impact: "Reduced security features but login still functional"
-
-  user_feedback_enhancement:
-    priority: "MEDIUM"
-    description: "Improve user feedback and error messaging"
-
-    loading_states:
-      description: "Comprehensive loading state management"
-      improvements:
-        - "Skeleton screens for initial component load"
-        - "Progressive loading indicators for data fetch"
-        - "Optimistic UI updates with rollback on failure"
-        - "Contextual loading messages based on operation"
-
-    error_messaging:
-      description: "User-friendly error messages and recovery guidance"
-      improvements:
-        - "Clear error descriptions in user language"
-        - "Actionable recovery steps for common errors"
-        - "Contextual help links for complex issues"
-        - "Error severity indicators (info/warning/error/critical)"
-
-    success_feedback:
-      description: "Positive feedback for successful operations"
-      improvements:
-        - "Toast notifications for quick actions"
-        - "Modal confirmations for critical operations"
-        - "Progress indicators for multi-step processes"
-        - "Completion animations for visual satisfaction"
-
-  accessibility_enhancement:
-    priority: "MEDIUM"
-    description: "Improve accessibility and inclusive design"
-
-    screen_reader_support:
-      description: "ARIA labels and screen reader optimization"
-      improvements:
-        - "Semantic HTML structure"
-        - "ARIA labels for interactive elements"
-        - "Keyboard navigation support"
-        - "Focus management for modal dialogs"
-
-    mobile_accessibility:
-      description: "Touch-optimized mobile accessibility"
-      improvements:
-        - "Minimum 44x44px touch targets"
-        - "Swipe gestures for common actions"
-        - "Voice control integration"
-        - "High contrast mode support"
-
-  documentation_improvement:
-    priority: "MEDIUM"
-    description: "Comprehensive documentation for UI components"
-
-    api_documentation:
-      description: "Clear component API documentation"
-      sections:
-        - "Component props and configuration"
-        - "Event handlers and callbacks"
-        - "Performance characteristics"
-        - "Integration requirements"
-        - "Mobile framework specifics"
-
-    usage_examples:
-      description: "Practical usage examples and patterns"
-      examples:
-        - "Basic component initialization"
-        - "WebSocket integration setup"
-        - "Mobile authentication flow"
-        - "Visualization customization"
-        - "Error handling patterns"
-
-    architecture_documentation:
-      description: "High-level architecture documentation"
-      sections:
-        - "Component interaction diagrams"
-        - "State management patterns"
-        - "WebSocket message flow"
-        - "Mobile framework integration"
-        - "Context Engine connection"
-
-    maintenance_guides:
-      description: "Operational guides for UI maintenance"
-      guides:
-        - "Performance monitoring and optimization"
-        - "Troubleshooting rendering issues"
-        - "WebSocket debugging"
-        - "Mobile device testing"
-        - "Accessibility audits"
-
-  security_hardening:
-    priority: "MEDIUM"
-    description: "UI security improvements for production use"
-
-    input_sanitization:
-      description: "Sanitize all user inputs"
-      improvements:
-        - "XSS prevention for text inputs"
-        - "Command injection prevention"
-        - "Path traversal protection"
-        - "Script injection blocking"
-
-    authentication_security:
-      description: "Enhanced authentication UI security"
-      improvements:
-        - "Secure token storage (HttpOnly cookies)"
-        - "Session timeout management"
-        - "Multi-factor authentication UI"
-        - "Biometric authentication integration"
-
-    data_transmission:
-      description: "Secure data transmission"
-      improvements:
-        - "WebSocket over TLS (WSS)"
-        - "API calls over HTTPS only"
-        - "Certificate pinning for mobile"
-        - "End-to-end encryption for sensitive data"
-
-refactor_implementation_plan:
-  phase_1_performance:
-    duration: "1-2 days"
-    focus: "UI performance optimization based on current metrics"
-    tasks:
-      - task: "Implement virtual scrolling for large component lists"
-        estimated_hours: 4
-        priority: "HIGH"
-        context: "Optimize rendering for dashboards with 50+ components"
-
-      - task: "Add WebSocket message batching and delta updates"
-        estimated_hours: 3
-        priority: "HIGH"
-        context: "Reduce network traffic by 50-60%"
-
-      - task: "Implement visualization data caching (LRU, max 20 items)"
-        estimated_hours: 2
-        priority: "HIGH"
-        context: "Speed up repeated visualization rendering by 40-50%"
-
-    success_criteria:
-      - "All 26 tests continue passing"
-      - "Mobile load time remains <2s"
-      - "Visualization rendering remains <1s with optimizations"
-
-  phase_2_organization:
-    duration: "1 day"
-    focus: "UI component code organization improvement"
-    tasks:
-      - task: "Extract BaseUIComponent pattern from 8 components"
-        estimated_hours: 3
-        priority: "HIGH"
-        context: "Create common interface for all UI components"
-
-      - task: "Centralize UI configuration in UIComponentConfig"
-        estimated_hours: 2
-        priority: "MEDIUM"
-        context: "Single source for performance thresholds and settings"
-
-      - task: "Standardize error handling across components"
-        estimated_hours: 2
-        priority: "MEDIUM"
-        context: "Consistent error states and user feedback"
-
-    success_criteria:
-      - "Code duplication reduced by 30%+ across 8 components"
-      - "Consistent component interface patterns"
-      - "Unified configuration management"
-
-  phase_3_robustness:
-    duration: "1 day"
-    focus: "Enhanced error handling and mobile optimization"
-    tasks:
-      - task: "Implement UI exception hierarchy"
-        estimated_hours: 2
-        priority: "HIGH"
-        context: "Structured exceptions for rendering, WebSocket, and integration errors"
-
-      - task: "Add WebSocket retry mechanisms with exponential backoff"
-        estimated_hours: 3
-        priority: "HIGH"
-        context: "Enhance connection resilience for Context Engine and Component Registry"
-
-      - task: "Implement accessibility features (ARIA labels, keyboard navigation)"
-        estimated_hours: 2
-        priority: "MEDIUM"
-        context: "Ensure WCAG 2.1 AA compliance for all UI components"
-
-    success_criteria:
-      - "Robust error handling for WebSocket and rendering failures"
-      - "Retry logic handles network interruptions"
-      - "Complete accessibility compliance"
-
-testing_strategy:
-  continuous_validation:
-    description: "Ensure no regression during refactoring"
-    approach:
-      - "Run full test suite after each change"
-      - "Performance benchmarking before/after"
-      - "Mobile device testing (iOS/Android)"
-      - "WebSocket connection stability testing"
-      - "Accessibility audit with automated tools"
-
-  additional_tests:
-    description: "Add tests for new functionality"
-    new_tests:
-      - "WebSocket reconnection and recovery tests"
-      - "Virtual scrolling performance tests"
-      - "Error state and user feedback tests"
-      - "Mobile framework integration tests"
-      - "Accessibility compliance tests"
-
-  regression_prevention:
-    description: "Prevent quality degradation"
-    measures:
-      - "Automated test execution on every change"
-      - "Code coverage monitoring (maintain >80%)"
-      - "Performance regression detection"
-      - "UI component compatibility validation"
-      - "Cross-browser and cross-device testing"
-
-quality_gates:
-  performance_gate:
-    description: "UI performance improvements validated"
-    criteria:
-      - "Mobile initial load <2s maintained"
-      - "Visualization rendering <1s maintained"
-      - "WebSocket updates <500ms maintained"
-      - "UI interactions <100ms maintained"
-      - "Network traffic reduced by 50%+"
-
-  maintainability_gate:
-    description: "Component quality improvements validated"
-    criteria:
-      - "Code duplication reduced by 30%+"
-      - "Component complexity <10 per method"
-      - "All public interfaces documented"
-      - "Consistent error handling patterns"
-      - "Accessibility standards met"
-
-  robustness_gate:
-    description: "Error handling improvements validated"
-    criteria:
-      - "Graceful handling of all network failures"
-      - "Retry logic prevents transient failures"
-      - "Fallback UI states functional"
-      - "User feedback for all error scenarios"
-
-deployment_considerations:
-  backward_compatibility:
-    description: "Ensure existing integrations continue working"
-    requirements:
-      - "All component interfaces unchanged"
-      - "WebSocket message formats supported"
-      - "Mobile framework compatibility maintained"
-      - "Gradual rollout capability"
-
-  migration_strategy:
-    description: "Safe migration from GREEN to REFACTORED version"
-    steps:
-      - "Deploy refactored components alongside existing"
-      - "A/B test new components with subset of users"
-      - "Switch traffic to refactored version"
-      - "Monitor performance and user feedback"
-      - "Remove old components after validation"
-
-  rollback_plan:
-    description: "Quick rollback if issues discovered"
-    procedure:
-      - "Switch traffic back to previous components"
-      - "Restore component state if needed"
-      - "Identify and fix refactoring issues"
-      - "Re-attempt migration with fixes"
-
-success_metrics:
-  quantitative_metrics:
-    performance_requirements_maintained:
-      mobile_initial_load_time: "<= 2.0 seconds (currently 1.5s, maintain or improve)"
-      mobile_navigation_time: "<= 1.0 seconds (currently 0.8s, maintain or improve)"
-      ui_update_time: "<= 0.5 seconds (currently 0.4s, maintain or improve)"
-      visualization_rendering_time: "<= 1.0 seconds (currently 0.9s, maintain or improve)"
-      visualization_update_latency: "<= 0.5 seconds (currently 0.4s, maintain or improve)"
-      interaction_time: "<= 0.1 seconds (currently 0.08s, maintain or improve)"
-
-    usability_requirements_maintained:
-      mobile_ux_satisfaction: ">= 95% (currently 96%, maintain or improve)"
-      mobile_ux_error_rate: "<= 5% (currently 4%, maintain or improve)"
-      task_completion_time: "<= 3.0 seconds (currently 2.5s, maintain or improve)"
-      contextual_ui_understanding_time: "<= 5.0 seconds (currently 4.5s, maintain or improve)"
-      contextual_ui_navigation_success: ">= 95% (currently 96%, maintain or improve)"
-
-    code_quality_improvements:
-      code_duplication_reduction: ">= 30% (across 8 UI components)"
-      documentation_coverage: ">= 95% (all public interfaces)"
-      error_handling_coverage: "100% (all UI scenarios)"
-      accessibility_compliance: "100% (WCAG 2.1 AA)"
-
-    robustness_enhancements:
-      websocket_reconnection_success_rate: ">= 95%"
-      retry_mechanism_effectiveness: ">= 90%"
-      graceful_degradation_scenarios: "100%"
-      network_resilience: ">= 99%"
-
-  qualitative_metrics:
-    maintainability:
-      - "Components are easier to understand and modify"
-      - "New developers can quickly understand UI architecture"
-      - "Common patterns are consistently applied"
-
-    reliability:
-      - "UI handles errors gracefully with user feedback"
-      - "Performance is consistent across devices"
-      - "WebSocket connections are stable and resilient"
-
-    developer_experience:
-      - "Component APIs are intuitive and well-documented"
-      - "Error messages are helpful and actionable"
-      - "Configuration is simple and flexible"
-
-    user_experience:
-      - "UI is responsive and smooth on mobile devices"
-      - "Visual feedback is clear and timely"
-      - "Accessibility features work seamlessly"
-
-green_phase_implementation_analysis:
-  actual_implementations:
-    contextual_pyramid_ui:
-      file: "/workspaces/control_tower/src/ui/components/contextual_pyramid_ui.py"
-      components_implemented: 8
-      lines_of_code: 210
-      key_components:
-        - name: "MobileAuthInterface"
-          performance: "1.5s load (target <2s)"
-          security: ">99.9% compliance"
-          refactor_opportunities:
-            ["Code splitting", "Biometric auth enhancement", "Session management optimization"]
-
-        - name: "MobileCommandInterface"
-          performance: "1.5s acknowledgment (target <2s)"
-          ux: "96% satisfaction (target >95%)"
-          refactor_opportunities:
-            ["Optimistic updates", "Enhanced error feedback", "Command batching"]
-
-        - name: "PositionDisplay"
-          performance: "0.4s updates (target <500ms)"
-          context_awareness: "Real-time WebSocket integration"
-          refactor_opportunities:
-            ["Delta updates", "Visual clarity enhancement", "Navigation optimization"]
-
-        - name: "ContextualPyramidViz"
-          performance: "0.9s rendering (target <1s)"
-          high_frequency: ">10 updates/s supported"
-          refactor_opportunities:
-            ["Visualization caching", "Progressive rendering", "Interaction optimization"]
-
-        - name: "IntegrationDashboard"
-          performance: "0.9s updates (target <1s)"
-          streaming: "Real-time Component Registry integration"
-          refactor_opportunities:
-            ["Virtual scrolling", "Status aggregation", "Component filtering"]
-
-        - name: "TestingVisualization"
-          synchronization: "Real-time test execution sync"
-          refactor_opportunities:
-            ["Test result caching", "Filtering enhancement", "Visual hierarchy"]
-
-        - name: "ProgressionTracking"
-          performance: "0.4s updates (target <500ms)"
-          accuracy: "Status display accuracy"
-          refactor_opportunities:
-            ["Notification system enhancement", "Progress animation", "State persistence"]
-
-        - name: "CompletionNotifications"
-          performance: "1.8s delivery (target <2s)"
-          integration: "Mobile push notification support"
-          refactor_opportunities:
-            ["Personalization engine", "Multi-channel delivery", "Priority queuing"]
-
-    mobile_framework_integration:
-      frameworks_supported: ["React Native", "Flutter", "PWA"]
-      native_features: 4
-      platform_optimization:
-        ["Platform-specific code splitting", "Native bridge optimization", "Feature detection enhancement"]
-
-  performance_achievements:
-    exceeded_targets:
-      - "Mobile initial load: 1.5s vs <2s target (25% improvement margin)"
-      - "Mobile navigation: 0.8s vs <1s target (20% improvement margin)"
-      - "UI updates: 0.4s vs <500ms target (20% improvement margin)"
-      - "Visualization rendering: 0.9s vs <1s target (10% improvement margin)"
-      - "Interactions: 0.08s vs <100ms target (20% improvement margin)"
-
-  quality_achievements:
-    exceeded_standards:
-      - "Mobile UX satisfaction: 96% vs >95% target"
-      - "Mobile error rate: 4% vs <5% target"
-      - "Task completion time: 2.5s vs <3s target"
-      - "Understanding time: 4.5s vs <5s target"
-      - "Navigation success: 96% vs >95% target"
-
-  refactoring_focus_areas:
-    priority_1_performance:
-      - "Implement WebSocket message batching for 50-60% network reduction"
-      - "Add visualization data caching for 40-50% rendering improvement"
-      - "Optimize mobile load with code splitting for 30-40% faster startup"
-
-    priority_2_maintainability:
-      - "Extract common UI patterns across 8 components into BaseUIComponent"
-      - "Centralize configuration management in UIComponentConfig"
-      - "Create unified error handling and user feedback system"
-
-    priority_3_robustness:
-      - "Enhance WebSocket resilience with retry and reconnection logic"
-      - "Add comprehensive exception hierarchy for UI failures"
-      - "Implement accessibility features for WCAG 2.1 AA compliance"
-
-refactor_execution_guidelines:
-  step_by_step_approach:
-    - "Run full test suite before any changes (verify 26/26 passing)"
-    - "Make one improvement at a time"
-    - "Run tests after each change"
-    - "Commit working code frequently"
-    - "Document changes as you go"
-
-  refactoring_workflow:
-    phase_1_preparation:
-      - "Review GREEN phase implementation in contextual_pyramid_ui.py"
-      - "Identify code duplication patterns across 8 components"
-      - "Plan component extraction strategy"
-      - "Create refactoring branch"
-
-    phase_2_extraction:
-      - "Extract BaseUIComponent with common methods"
-      - "Create IUIComponent interface"
-      - "Refactor each component to inherit from base"
-      - "Verify tests pass after each component refactor"
-
-    phase_3_optimization:
-      - "Implement WebSocket message batching"
-      - "Add visualization data caching (LRU)"
-      - "Optimize mobile code splitting"
-      - "Verify performance improvements"
-
-    phase_4_robustness:
-      - "Add exception hierarchy"
-      - "Implement retry mechanisms"
-      - "Add graceful degradation"
-      - "Test error scenarios"
-
-    phase_5_documentation:
-      - "Update component API docs"
-      - "Add usage examples"
-      - "Document architecture decisions"
-      - "Create maintenance guides"
-
-  testing_checklist:
-    before_refactoring:
-      - "✅ All 26 tests passing"
-      - "✅ Performance benchmarks recorded"
-      - "✅ No pending changes"
-
-    during_refactoring:
-      - "✅ Tests pass after each change"
-      - "✅ No performance regressions"
-      - "✅ Code coverage maintained"
-
-    after_refactoring:
-      - "✅ All 26 tests still passing"
-      - "✅ Performance maintained or improved"
-      - "✅ Documentation updated"
-      - "✅ Code review completed"
-
-refactor_completion_criteria:
-  technical_completion:
-    - "All 26 tests passing (16 functional + 4 performance + 2 usability + 4 integration)"
-    - "Code duplication reduced by 30%+"
-    - "Performance requirements maintained (mobile <2s, visualization <1s, updates <500ms)"
-    - "Error handling comprehensive and tested"
-    - "Documentation complete and accurate"
-
-  business_completion:
-    - "User Interface Layer production-ready with mobile optimization"
-    - "Team can maintain and extend 8 UI components easily"
-    - "WebSocket integration robust with real-time updates"
-    - "Mobile framework integration seamless (React Native/Flutter/PWA)"
-    - "Context Engine and Component Registry integration stable"
-    - "Accessibility compliance achieved (WCAG 2.1 AA)"
-
-  validation_completion:
-    - "Full regression testing passed (26/26 tests)"
-    - "Performance benchmarks maintained or improved"
-    - "Usability metrics maintained (>95% satisfaction, <5% error rate)"
-    - "Error handling and recovery scenarios tested"
-    - "WebSocket resilience validated across network conditions"
-    - "Mobile device compatibility verified (iOS/Android)"
-    - "Accessibility audit passed"
-
-next_steps:
-  immediate_next:
-    - name: "User Interface Layer REFACTOR Execution"
-      description: "Execute refactoring plan with continuous testing"
-      timeline: "Current phase"
-
-    - name: "Integration Layer Planning"
-      description: "Plan Integration Layer TDD cycle"
-      timeline: "After UI REFACTOR completion"
-
-  medium_term:
-    - name: "Mobile App Deployment"
-      description: "Deploy mobile interfaces to app stores"
-      timeline: "Month 2"
-
-    - name: "Advanced Visualization Features"
-      description: "3D pyramid visualization, interactive dashboards"
-      timeline: "Month 3-4"
-
-  long_term:
-    - name: "Multi-Platform Expansion"
-      description: "Desktop apps, browser extensions"
-      timeline: "Month 6+"
-
-    - name: "Advanced Analytics Dashboard"
-      description: "Real-time analytics and reporting"
-      timeline: "Month 6+"
+        name: "test_show_context_change_timeline_fails_initially"
+        description: "Context change timeline with event history"
+        status: "PASSING (raises NotImplementedError as expected)"
+        requirement: "REQ-VIZ-003 - Context Change Timeline"
+        refactor_target: "Replace NotImplementedError with actual timeline visualization logic"
 
 ---
-# TDD ITERATION 13: MOBILE UI COMPONENTS REFACTOR
+# TDD ITERATION 14: CONTEXT VISUALIZATION INTERFACE REFACTOR
 
-iteration_13_refactor:
+iteration_14_refactor:
   metadata:
-    iteration_number: 13
-    focus: "Mobile UI Components - REFACTOR Phase"
+    iteration_number: 14
+    focus: "Context Visualization Interface - REFACTOR Phase"
     phase: "REFACTOR"
-    green_phase_report: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/Green Phase Output Reports/13_Mobile_UI_Components_Green_Phase_20251002_215716.md"
-    implementation_file: "/workspaces/control_tower/src/ui/components/mobile_ui_components.py"
-    test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_mobile_ui_components_iteration_13.py"
-    created_date: "2025-10-02"
+    green_phase_report: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/Green Phase Output Reports/14_Context_Visualization_Interface_Green_Phase_20251003_114447.md"
+    implementation_file: "/workspaces/control_tower/src/ui/components/context_visualization_interface.py"
+    test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_context_visualization_interface_iteration_14.py"
+    created_date: "2025-10-03"
 
   green_phase_status:
     tests_passed: 3
@@ -1090,282 +72,829 @@ iteration_13_refactor:
     pass_rate: "100%"
     status: "All tests passing - Ready for REFACTOR"
     current_implementation: "Minimal stub raising NotImplementedError"
+    code_coverage: "100% on context_visualization_interface.py module"
+    execution_time: "3.24 seconds"
+    platform: "Linux - Python 3.12.11, pytest-8.4.2"
+
+  green_phase_implementation_details:
+    stub_methods:
+      - name: "render_context_hierarchy"
+        stub_behavior: "Raises NotImplementedError with descriptive message"
+        expected_fields: "user_id, context_tree (project, system, feature, layers)"
+
+      - name: "display_context_sync_status"
+        stub_behavior: "Raises NotImplementedError with descriptive message"
+        expected_fields: "local_version, remote_version, sync_conflicts, last_sync_time, sync_health"
+
+      - name: "show_context_change_timeline"
+        stub_behavior: "Raises NotImplementedError with descriptive message"
+        expected_fields: "changes (list of events), time_range filter"
+
+    module_structure:
+      imports: "from typing import Dict, Any, Optional"
+      class_name: "ContextVisualizationInterface"
+      constructor: "__init__(self, config: Optional[Dict[str, Any]] = None)"
+      instance_variable: "self.config = config or {}"
 
   refactor_objectives:
-    primary_goal: "Transform stub implementation into fully functional mobile UI components"
-    
+    primary_goal: "Transform stub implementation into fully functional context visualization interface"
+
     specific_enhancements:
-      - "Implement actual command history view rendering with timeline display"
-      - "Implement Context Engine status display with real-time sync indicators"
-      - "Implement security indicators with visual authentication and compliance displays"
-      - "Add mobile-responsive layouts and touch-optimized interactions"
-      - "Implement data validation and error handling"
-      - "Add performance optimization for mobile devices"
-      - "Integrate with existing UI component architecture (BaseUIComponent pattern)"
+      - "Implement actual context hierarchy tree visualization with interactive navigation"
+      - "Implement context sync status display with real-time version tracking and conflict detection"
+      - "Implement context change timeline with chronological events and time-range filtering"
+      - "Add data validation and robust error handling for all methods"
+      - "Implement visual indicators (tree nodes, health icons, timeline markers)"
+      - "Add performance optimization for large hierarchy trees and timelines"
+      - "Enable user-friendly timestamp formatting and relative time display"
 
   critical_components_refactor:
-    mobile_ui_components:
+    context_visualization_interface:
       current_state:
         description: "Minimal stub implementation raising NotImplementedError"
         methods:
-          - "render_command_history_view() - raises NotImplementedError"
-          - "display_context_engine_status() - raises NotImplementedError"
-          - "show_security_indicators() - raises NotImplementedError"
-        
-      refactor_requirements:
-        render_command_history_view:
-          enhancement_priority: "HIGH"
-          current_behavior: "Raises NotImplementedError"
-          target_behavior: "Render mobile command history view with timeline format"
-          
-          implementation_details:
-            input_validation:
-              - "Validate view_config contains required fields: user_id, display_format, filter_criteria, page_size"
-              - "Validate display_format is supported (timeline, list, grid)"
-              - "Validate page_size is positive integer"
-              - "Validate filter_criteria is valid dictionary"
-            
-            core_functionality:
-              - "Fetch command history data (mock or integrate with command history repository)"
-              - "Apply filter_criteria to command list"
-              - "Sort commands chronologically for timeline display"
-              - "Implement pagination based on page_size"
-              - "Format commands for mobile display (truncate long text, responsive cards)"
-            
-            return_structure:
-              view_rendered: "bool - True when successfully rendered"
-              display_format: "str - Echo the format used"
-              total_commands: "int - Total commands matching filter"
-              displayed_commands: "int - Commands on current page"
-              filter_applied: "Dict[str, Any] - Filter criteria applied"
-              user_id: "str - User identifier"
-              timeline_data: "List[Dict] - Formatted command timeline entries (optional)"
-            
-            mobile_optimization:
-              - "Use responsive grid/flex layouts"
-              - "Touch-friendly tap targets (min 44x44 pixels)"
-              - "Swipe gestures for navigation"
-              - "Lazy loading for large command lists"
-              - "Offline caching of recent commands"
+          - "render_context_hierarchy() - raises NotImplementedError"
+          - "display_context_sync_status() - raises NotImplementedError"
+          - "show_context_change_timeline() - raises NotImplementedError"
 
-        display_context_engine_status:
+      refactor_requirements:
+        render_context_hierarchy:
           enhancement_priority: "HIGH"
           current_behavior: "Raises NotImplementedError"
-          target_behavior: "Display Context Engine sync status with visual indicators"
-          
+          target_behavior: "Render context hierarchy with tree visualization of project/system/feature/layer structure"
+
           implementation_details:
             input_validation:
-              - "Validate status_data contains: sync_status, last_sync, pending_changes, context_health"
-              - "Validate sync_status is valid state (synced, syncing, error)"
-              - "Validate last_sync is valid ISO timestamp"
-              - "Validate pending_changes is non-negative integer"
-              - "Validate context_health is valid state (healthy, degraded, critical)"
-            
+              - "Validate hierarchy_data is a dictionary"
+              - "Validate 'user_id' field exists and is non-empty string"
+              - "Validate 'context_tree' field exists and is a dictionary"
+              - "Validate context_tree contains: project, system, feature, layers"
+              - "Validate 'layers' is a list with at least one element"
+              - "Raise ValueError with descriptive message for invalid inputs"
+
             core_functionality:
-              - "Parse and format sync_status with visual indicators (icons, colors)"
-              - "Convert ISO timestamp to user-friendly relative time ('2 minutes ago')"
-              - "Display pending changes count with visual emphasis if > 0"
-              - "Show context health with color coding (green=healthy, yellow=degraded, red=critical)"
-              - "Add sync progress indicator for 'syncing' state"
-            
+              - "Parse hierarchy_data to extract user_id and context_tree components"
+              - "Build tree structure: project → system → feature → layers"
+              - "Calculate node_count: 1 (project) + 1 (system) + 1 (feature) + len(layers)"
+              - "Calculate depth_levels: 4 (project, system, feature, layers)"
+              - "Generate interactive_nodes list with navigable node IDs"
+              - "Support visualization_type: 'tree' (primary), with 'graph' and 'nested' as options"
+              - "Format tree structure with indentation and branch characters (├── └──)"
+
+            return_structure:
+              hierarchy_rendered: "bool - True when successfully rendered"
+              user_id: "str - User identifier from input"
+              tree_structure: "Dict[str, Any] - Hierarchical tree representation"
+              node_count: "int - Total nodes (project + system + feature + layers count)"
+              depth_levels: "int - Maximum depth (always 4 for this structure)"
+              interactive_nodes: "List[str] - Node IDs that support navigation/interaction"
+              visualization_type: "str - Type of visualization (default: 'tree')"
+
+            visualization_features:
+              - "ASCII tree rendering with box-drawing characters"
+              - "Color coding by depth level (project=blue, system=green, feature=yellow, layers=cyan)"
+              - "Interactive node markers (● for clickable, ○ for informational)"
+              - "Expandable/collapsible sections for large hierarchies"
+              - "Breadcrumb trail showing current position in tree"
+
+        display_context_sync_status:
+          enhancement_priority: "HIGH"
+          current_behavior: "Raises NotImplementedError"
+          target_behavior: "Display context sync status with version tracking, conflict detection, and health indicators"
+
+          implementation_details:
+            input_validation:
+              - "Validate sync_status is a dictionary"
+              - "Validate 'local_version' exists and is non-negative integer"
+              - "Validate 'remote_version' exists and is non-negative integer"
+              - "Validate 'sync_conflicts' exists and is a list"
+              - "Validate 'last_sync_time' exists and is valid ISO 8601 timestamp"
+              - "Validate 'sync_health' is one of: 'healthy', 'degraded', 'critical'"
+              - "Raise ValueError for invalid inputs with specific field errors"
+
+            core_functionality:
+              - "Compare local_version and remote_version to determine sync_state"
+              - "Calculate sync_state: 'synced' if versions match, 'out_of_sync' if differ, 'conflict' if sync_conflicts present"
+              - "Count conflict_count from sync_conflicts list length"
+              - "Parse last_sync_time ISO timestamp and convert to user-friendly format"
+              - "Generate last_sync_display as relative time (e.g., '2 hours ago', 'just now')"
+              - "Create health_indicator with visual cues: '🟢 Healthy', '🟡 Degraded', '🔴 Critical'"
+              - "Determine sync_actions based on version comparison: ['pull', 'push', 'resolve_conflicts']"
+
             return_structure:
               status_displayed: "bool - True when successfully displayed"
-              sync_status: "str - Sync status with visual indicator"
-              last_sync_time: "str - Formatted timestamp"
-              pending_changes_count: "int - Number of pending changes"
-              health_indicator: "str - Health status with color/icon"
-              visual_elements: "List[str] - UI elements rendered ['sync_badge', 'timestamp', 'changes_counter', 'health_icon']"
-            
-            real_time_updates:
-              - "WebSocket connection for live sync status"
-              - "Auto-refresh every 30 seconds if WebSocket unavailable"
-              - "Visual pulse/animation during sync"
-              - "Toast notifications for sync completion/errors"
+              sync_state: "str - Computed sync state (synced/out_of_sync/conflict)"
+              version_info: "Dict[str, int] - {'local': N, 'remote': M}"
+              conflict_count: "int - Number of synchronization conflicts"
+              last_sync_display: "str - User-friendly timestamp ('2 minutes ago')"
+              health_indicator: "str - Health with visual emoji (🟢/🟡/🔴)"
+              sync_actions: "List[str] - Available sync actions"
 
-        show_security_indicators:
+            visual_indicators:
+              sync_state_colors:
+                - "synced: green (✓ Synced)"
+                - "out_of_sync: yellow (⚠ Out of Sync)"
+                - "conflict: red (✗ Conflict)"
+              version_display:
+                - "Show version comparison: 'Local: v5 ↔ Remote: v7'"
+                - "Highlight version drift with color coding"
+              conflict_display:
+                - "Show conflict count with warning badge if > 0"
+                - "List conflict types if available"
+
+            helper_methods:
+              _format_relative_time:
+                purpose: "Convert ISO 8601 timestamp to relative time string"
+                input: "timestamp: str (ISO 8601 format)"
+                output: "str - 'X days ago', 'X hours ago', 'X minutes ago', 'Just now'"
+                implementation_notes:
+                  - "Parse ISO timestamp using datetime.fromisoformat()"
+                  - "Calculate timedelta from current UTC time"
+                  - "Format based on delta magnitude (days, hours, minutes)"
+                  - "Handle invalid timestamps gracefully with fallback"
+
+        show_context_change_timeline:
           enhancement_priority: "HIGH"
           current_behavior: "Raises NotImplementedError"
-          target_behavior: "Display security authentication and compliance indicators"
-          
+          target_behavior: "Show context change timeline with chronological events and time-range filtering"
+
           implementation_details:
             input_validation:
-              - "Validate security_status contains: authentication_level, session_status, security_alerts, compliance_status"
-              - "Validate authentication_level is valid (high, medium, low)"
-              - "Validate session_status is valid (active, inactive, expired)"
-              - "Validate security_alerts is list"
-              - "Validate compliance_status is valid (compliant, non-compliant, pending)"
-            
-            core_functionality:
-              - "Display authentication level with visual hierarchy (shield icons, colors)"
-              - "Show session status with countdown timer if expiring soon"
-              - "Display security alerts count with urgency indicators"
-              - "Show compliance status with regulatory badges"
-              - "Calculate overall security score (0.0-1.0) based on all factors"
-            
-            return_structure:
-              indicators_shown: "bool - True when successfully shown"
-              authentication_display: "str - Auth level with visual (e.g., '🛡️ High Security')"
-              session_indicator: "str - Session status with timer"
-              alerts_count: "int - Number of active security alerts"
-              compliance_indicator: "str - Compliance status with badge"
-              security_score: "float - Overall security score 0.0-1.0"
-              alert_details: "List[Dict] - Security alert details (optional)"
-            
-            security_features:
-              - "Auto-lock on session expiration"
-              - "Biometric re-authentication prompt for sensitive actions"
-              - "Visual indicators for SSL/TLS status"
-              - "Privacy mode toggle for sensitive data"
+              - "Validate timeline_data is a dictionary"
+              - "Validate 'changes' field exists and is a list"
+              - "Validate 'time_range' field exists and is one of: 'last_hour', 'last_day', 'last_week', 'all'"
+              - "For each change event, validate: timestamp (ISO 8601), type (string), details (dict)"
+              - "Raise ValueError for invalid structure or unsupported time_range"
 
-  architecture_integration:
-    base_component_pattern:
-      description: "Integrate with existing BaseUIComponent architecture"
-      steps:
-        - "Import BaseUIComponent from contextual_pyramid_ui.py"
-        - "Make MobileUIComponents inherit from BaseUIComponent"
-        - "Use UIComponentConfig for configuration management"
-        - "Leverage shared caching mechanism (LRU cache max 20 items)"
-        - "Use shared performance measurement methods"
-    
-    shared_utilities:
-      - "Use render_performance_test() for performance tracking"
-      - "Implement error_boundary() decorator for error handling"
-      - "Use responsive_layout() helper for mobile layouts"
-      - "Leverage cache_result() decorator for expensive operations"
+            core_functionality:
+              - "Parse timeline_data to extract changes list and time_range filter"
+              - "Sort changes chronologically (most recent first) based on timestamp"
+              - "Apply time_range filter to changes based on current time"
+              - "Filter logic: last_hour (past 60 min), last_day (past 24h), last_week (past 7d), all (no filter)"
+              - "Calculate total_changes (before filtering) and displayed_changes (after filtering)"
+              - "Extract unique event_types from all changes"
+              - "Format timeline_events with parsed timestamps, type icons, and detail summaries"
+              - "Provide filter_options list: ['last_hour', 'last_day', 'last_week', 'all']"
+
+            return_structure:
+              timeline_displayed: "bool - True when successfully displayed"
+              total_changes: "int - Total changes before filtering"
+              displayed_changes: "int - Changes displayed after time_range filter"
+              time_range: "str - Active time range filter"
+              event_types: "List[str] - Unique event types in timeline"
+              timeline_events: "List[Dict[str, Any]] - Formatted events for display"
+              filter_options: "List[str] - Available time range filters"
+
+            timeline_event_format:
+              structure:
+                timestamp: "str - Formatted timestamp (ISO + relative)"
+                type: "str - Event type with icon"
+                type_icon: "str - Visual indicator (🔄 layer_switch, ✅ test_result, etc.)"
+                details: "Dict[str, Any] - Event-specific details"
+                details_summary: "str - One-line human-readable summary"
+                time_ago: "str - Relative time ('5 minutes ago')"
+
+            event_type_icons:
+              - "layer_switch: 🔄"
+              - "test_result: ✅ (pass) or ❌ (fail)"
+              - "commit: 💾"
+              - "deploy: 🚀"
+              - "merge: 🔀"
+              - "rollback: ⏪"
+              - "error: ⚠️"
+              - "default: 📝"
+
+            helper_methods:
+              _filter_changes_by_time_range:
+                purpose: "Filter timeline changes based on time range"
+                input: "changes: List[Dict], time_range: str"
+                output: "List[Dict] - Filtered changes within time range"
+                implementation_notes:
+                  - "Parse current time and calculate cutoff based on time_range"
+                  - "Filter changes where timestamp >= cutoff_time"
+                  - "Return all changes if time_range == 'all'"
+                  - "Handle parsing errors gracefully"
+
+              _get_event_icon:
+                purpose: "Map event type to visual icon"
+                input: "event_type: str"
+                output: "str - Emoji icon for event type"
+                implementation_notes:
+                  - "Use dict mapping for event_type to icon"
+                  - "Return default icon (📝) for unknown types"
+                  - "Support extensibility for new event types"
+
+  implementation_examples:
+    render_context_hierarchy_example: |
+      # Example implementation showing key patterns
+      def render_context_hierarchy(self, hierarchy_data: Dict[str, Any]) -> Dict[str, Any]:
+          # Validate input
+          if not isinstance(hierarchy_data, dict):
+              raise ValueError("hierarchy_data must be a dictionary")
+          
+          # Extract and validate required fields
+          user_id = hierarchy_data.get('user_id')
+          if not user_id:
+              raise ValueError("hierarchy_data must contain non-empty 'user_id'")
+          
+          context_tree = hierarchy_data.get('context_tree', {})
+          layers = context_tree.get('layers', [])
+          
+          if not isinstance(layers, list) or len(layers) == 0:
+              raise ValueError("context_tree.layers must be a non-empty list")
+          
+          # Build tree structure
+          node_count = 1 + 1 + 1 + len(layers)  # project + system + feature + layers
+          depth_levels = 4
+          
+          # Generate interactive nodes
+          interactive_nodes = [
+              f"project_{context_tree.get('project', 'Unknown')}",
+              f"system_{context_tree.get('system', 'Unknown')}",
+              f"feature_{context_tree.get('feature', 'Unknown')}"
+          ] + [f"layer_{layer}" for layer in layers]
+          
+          # Return complete structure
+          return {
+              'hierarchy_rendered': True,
+              'user_id': user_id,
+              'tree_structure': self._build_tree_dict(context_tree),
+              'node_count': node_count,
+              'depth_levels': depth_levels,
+              'interactive_nodes': interactive_nodes,
+              'visualization_type': 'tree'
+          }
+
+    display_context_sync_status_example: |
+      # Example implementation showing sync logic
+      def display_context_sync_status(self, sync_status: Dict[str, Any]) -> Dict[str, Any]:
+          # Validate required fields
+          required_fields = ['local_version', 'remote_version', 'sync_conflicts', 
+                           'last_sync_time', 'sync_health']
+          for field in required_fields:
+              if field not in sync_status:
+                  raise ValueError(f"sync_status must contain '{field}'")
+          
+          # Extract values
+          local_ver = sync_status['local_version']
+          remote_ver = sync_status['remote_version']
+          conflicts = sync_status['sync_conflicts']
+          
+          # Determine sync state
+          if len(conflicts) > 0:
+              sync_state = 'conflict'
+          elif local_ver == remote_ver:
+              sync_state = 'synced'
+          else:
+              sync_state = 'out_of_sync'
+          
+          # Format timestamp
+          last_sync_display = self._format_relative_time(sync_status['last_sync_time'])
+          
+          # Create health indicator with emoji
+          health_emoji = {
+              'healthy': '🟢 Healthy',
+              'degraded': '🟡 Degraded',
+              'critical': '🔴 Critical'
+          }
+          health_indicator = health_emoji.get(sync_status['sync_health'], '⚪ Unknown')
+          
+          # Determine available actions
+          sync_actions = []
+          if sync_state == 'conflict':
+              sync_actions.append('resolve_conflicts')
+          if local_ver < remote_ver:
+              sync_actions.append('pull')
+          if local_ver > remote_ver:
+              sync_actions.append('push')
+          
+          return {
+              'status_displayed': True,
+              'sync_state': sync_state,
+              'version_info': {'local': local_ver, 'remote': remote_ver},
+              'conflict_count': len(conflicts),
+              'last_sync_display': last_sync_display,
+              'health_indicator': health_indicator,
+              'sync_actions': sync_actions
+          }
+
+    show_context_change_timeline_example: |
+      # Example implementation showing timeline filtering
+      def show_context_change_timeline(self, timeline_data: Dict[str, Any]) -> Dict[str, Any]:
+          # Validate input
+          if 'changes' not in timeline_data or 'time_range' not in timeline_data:
+              raise ValueError("timeline_data must contain 'changes' and 'time_range'")
+          
+          changes = timeline_data['changes']
+          time_range = timeline_data['time_range']
+          
+          # Validate time_range
+          valid_ranges = ['last_hour', 'last_day', 'last_week', 'all']
+          if time_range not in valid_ranges:
+              raise ValueError(f"time_range must be one of {valid_ranges}")
+          
+          # Apply time filtering
+          filtered_changes = self._filter_changes_by_time_range(changes, time_range)
+          
+          # Extract unique event types
+          event_types = list(set(change['type'] for change in changes if 'type' in change))
+          
+          # Format timeline events with icons
+          timeline_events = []
+          for change in filtered_changes:
+              event_icon = self._get_event_icon(change.get('type', 'unknown'))
+              timeline_events.append({
+                  **change,
+                  'icon': event_icon,
+                  'formatted_time': self._format_relative_time(change.get('timestamp', ''))
+              })
+          
+          return {
+              'timeline_displayed': True,
+              'total_changes': len(changes),
+              'displayed_changes': len(filtered_changes),
+              'time_range': time_range,
+              'event_types': event_types,
+              'timeline_events': timeline_events,
+              'filter_options': valid_ranges
+          }
 
   performance_targets:
-    command_history_rendering:
-      - "Initial render: <500ms"
-      - "Pagination navigation: <200ms"
-      - "Filter application: <300ms"
-      - "Smooth 60fps scrolling"
-    
-    context_status_display:
-      - "Status update latency: <100ms"
-      - "WebSocket reconnection: <1s"
-      - "Real-time indicator refresh: <50ms"
-    
-    security_indicators:
-      - "Indicator rendering: <200ms"
-      - "Security score calculation: <100ms"
-      - "Alert notification: <150ms"
+    hierarchy_rendering:
+      - "Small hierarchies (<10 nodes): <50ms"
+      - "Medium hierarchies (10-50 nodes): <200ms"
+      - "Large hierarchies (50-200 nodes): <500ms"
+      - "Memory efficient - no deep copies of large trees"
 
-  code_quality_improvements:
-    type_safety:
-      - "Add comprehensive type hints for all parameters and returns"
-      - "Use TypedDict for structured data contracts"
-      - "Validate types at runtime for external inputs"
-    
-    error_handling:
-      - "Graceful degradation for missing data"
-      - "User-friendly error messages"
-      - "Retry logic for network failures"
-      - "Fallback displays for offline mode"
-    
-    documentation:
-      - "Comprehensive docstrings with examples"
-      - "Document mobile-specific considerations"
-      - "Include performance benchmarks"
-      - "Add troubleshooting guide"
-    
-    testing:
-      - "Ensure all 3 tests still pass after refactor"
-      - "Update tests to verify actual functionality (not just NotImplementedError)"
-      - "Add edge case tests for validation"
-      - "Add performance benchmark tests"
+    sync_status_display:
+      - "Status computation: <10ms"
+      - "Timestamp formatting: <5ms"
+      - "Total display generation: <50ms"
 
-  mobile_ux_enhancements:
-    responsive_design:
-      - "Mobile-first CSS with progressive enhancement"
-      - "Breakpoints: <640px mobile, 640-1024px tablet, >1024px desktop"
-      - "Flexible layouts using CSS Grid/Flexbox"
-      - "Adaptive font sizes and spacing"
-    
-    touch_interactions:
-      - "Touch-friendly buttons (min 44x44px)"
-      - "Swipe gestures for navigation"
-      - "Pull-to-refresh for data updates"
-      - "Long-press for contextual actions"
-    
-    accessibility:
-      - "ARIA labels for screen readers"
-      - "High contrast mode support"
-      - "Keyboard navigation support"
-      - "Focus indicators for interactive elements"
-    
-    offline_support:
-      - "Service worker for offline caching"
-      - "Local storage for command history"
-      - "Offline indicator in UI"
-      - "Sync queue for offline actions"
+    timeline_visualization:
+      - "Timeline filtering (100 events): <100ms"
+      - "Timeline filtering (1000 events): <500ms"
+      - "Event formatting per event: <1ms"
+      - "Support up to 10,000 events without degradation"
 
   validation_steps:
     pre_refactor:
       - "✅ All 3 tests passing with NotImplementedError pattern"
       - "✅ Module structure correct"
       - "✅ Import paths working"
-    
+      - "✅ GREEN phase report documented"
+
     during_refactor:
-      - "Implement one method at a time"
-      - "Run tests after each method implementation"
+      - "Implement render_context_hierarchy() first - verify tests pass"
+      - "Implement display_context_sync_status() second - verify tests pass"
+      - "Implement show_context_change_timeline() third - verify tests pass"
+      - "Run full test suite after each method implementation"
       - "Verify no regression in passing tests"
-      - "Check performance benchmarks"
-    
+      - "Check performance benchmarks meet targets"
+
     post_refactor:
-      - "All 3 tests still passing with actual implementation"
-      - "Update tests to verify real functionality (remove NotImplementedError assertions)"
-      - "Performance targets met"
-      - "Documentation complete"
+      - "All 3 tests passing with actual implementations"
+      - "Update test assertions to verify returned data structure (not NotImplementedError)"
+      - "Performance targets met for all methods"
+      - "Documentation complete with examples"
       - "Code review ready"
+      - "Integration testing with Context Engine"
 
   success_criteria:
     functional:
       - "All 3 methods fully implemented (no NotImplementedError)"
       - "All tests passing with actual implementations"
-      - "Input validation working correctly"
-      - "Return structures match specifications"
-    
+      - "Input validation working correctly with clear error messages"
+      - "Return structures match exact specifications"
+      - "Visual indicators rendering correctly"
+      - "Time filtering working accurately"
+
     performance:
-      - "Command history renders <500ms"
-      - "Context status updates <100ms"
-      - "Security indicators render <200ms"
-    
+      - "Hierarchy rendering <500ms for <200 nodes"
+      - "Sync status display <50ms"
+      - "Timeline filtering <500ms for <1000 events"
+      - "No memory leaks or unbounded growth"
+
     quality:
       - "100% type hint coverage"
-      - "Comprehensive error handling"
-      - "Complete documentation"
-      - "Mobile-optimized UX"
-    
+      - "Comprehensive error handling with graceful degradation"
+      - "Complete documentation with usage examples"
+      - "Code follows PEP 8 style guidelines"
+      - "No lint warnings or errors"
+
     integration:
-      - "Integrates with BaseUIComponent architecture"
-      - "Uses shared caching and performance utilities"
-      - "Follows existing UI patterns"
+      - "Compatible with existing UI architecture"
+      - "Works with PYTHONPATH configuration"
+      - "Ready for integration with Context Engine"
       - "Ready for production deployment"
 
 ---
-
 philosophy:
   refactoring_principles:
-    - "Make it better, don't break it"
-    - "Optimize for user experience over complexity"
-    - "Document why, not just what"
+    - "Make it work, make it right, make it fast - in that order"
+    - "Simplicity over cleverness - code should be self-explanatory"
+    - "Fail fast with clear errors - help users debug integration issues"
+    - "Performance matters - but correctness comes first"
+    - "Document the why, not just the what"
     - "Test everything, assume nothing"
 
-  team_considerations:
-    - "Keep components simple enough for the whole team"
-    - "Provide clear upgrade path for UI framework"
-    - "Maintain development velocity"
-    - "Focus on long-term sustainability"
+  small_team_considerations:
+    - "Keep implementations simple enough for team maintenance"
+    - "Provide clear examples and documentation"
+    - "Focus on essential features first"
+    - "Avoid over-engineering - YAGNI (You Aren't Gonna Need It)"
+    - "Maintain development velocity with incremental improvements"
 
   quality_focus:
-    - "Performance improvements that users feel"
-    - "Error handling that guides users"
-    - "Documentation that enables independence"
-    - "Code that welcomes future UI enhancements"
+    - "Robust error handling that guides users to solutions"
+    - "Performance that scales with data growth"
+    - "Documentation that enables self-service integration"
+    - "Code that welcomes future visualization enhancements"
+    - "Type safety that catches errors at development time"
 
   user_experience_focus:
-    - "Mobile-first responsive design"
-    - "Accessibility for all users"
-    - "Clear visual feedback for all actions"
-    - "Smooth animations and transitions"
+    - "Visual clarity - information at a glance"
+    - "Consistent visual language across all visualizations"
+    - "Responsive feedback - users know what's happening"
+    - "Accessibility - works for all users"
+    - "Intuitive interactions - no steep learning curve"
 
+execution_notes:
+  environment_setup:
+    pythonpath: "/workspaces/control_tower/src/ui/components"
+    test_command: 'PYTHONPATH="/workspaces/control_tower/src/ui/components:$PYTHONPATH" python -m pytest'
+
+  refactor_workflow:
+    step_1: "Read GREEN phase report thoroughly"
+    step_2: "Understand current test expectations"
+    step_3: "Implement one method at a time"
+    step_4: "Test after each method implementation"
+    step_5: "Verify all tests still pass"
+    step_6: "Add documentation and type hints"
+    step_7: "Performance benchmark verification"
+    step_8: "Final code review and cleanup"
+
+  testing_strategy:
+    unit_tests: "Verify each method works in isolation"
+    integration_tests: "Test interaction with Context Engine"
+    performance_tests: "Benchmark against performance targets"
+    edge_case_tests: "Handle invalid inputs gracefully"
+
+---
+# TDD ITERATION 15: SECURITY DASHBOARD INTERFACE REFACTOR
+
+iteration_15_refactor:
+  metadata:
+    iteration_number: 15
+    focus: "Security Dashboard Interface - REFACTOR Phase"
+    phase: "REFACTOR"
+    green_phase_report: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/Green Phase Output Reports/15_Security_Dashboard_Interface_Green_Phase_20251003_115845.md"
+    implementation_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/security_dashboard_interface.py"
+    test_file_red: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_security_dashboard_interface.py"
+    test_file_green: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_security_dashboard_interface_green.py"
+    created_date: "2025-10-03"
+
+  green_phase_status:
+    tests_passed: 3
+    total_tests: 3
+    pass_rate: "100%"
+    status: "All tests passing - Ready for REFACTOR"
+    current_implementation: "Full GREEN phase implementation with basic validation"
+    code_metrics:
+      lines_of_code: 265
+      validation_points: 15
+      error_handling: 15
+      type_hints_coverage: "100%"
+
+  refactor_objectives:
+    primary_goal: "Enhance GREEN phase implementation with advanced features, optimizations, and improved user experience"
+
+    specific_enhancements:
+      - "Implement actual time-based filtering for audit trail (currently accepts all events)"
+      - "Add visual security indicators (icons, colors, badges) for security overview"
+      - "Implement historical security score tracking and trending"
+      - "Add advanced search and filtering capabilities for audit events"
+      - "Implement alert deduplication and grouping"
+      - "Add caching for frequently accessed security data"
+      - "Enhance error messages with actionable context"
+      - "Add logging for security monitoring and debugging"
+      - "Implement export functionality (CSV, JSON, PDF)"
+      - "Add event correlation and anomaly detection"
+
+  critical_components_refactor:
+    security_dashboard_interface:
+      current_state:
+        description: "GREEN phase implementation with basic functionality and validation"
+        methods:
+          - "render_security_overview() - Basic security score calculation"
+          - "display_audit_trail() - Basic event display (no time filtering)"
+          - "show_security_alerts() - Basic alert prioritization"
+
+      refactor_requirements:
+        render_security_overview:
+          enhancement_priority: "HIGH"
+          current_behavior: "Calculates security score, determines system security level, formats display data"
+          target_behavior: "Enhanced security visualization with historical tracking, recommendations, and visual indicators"
+
+          refactor_enhancements:
+            visual_indicators:
+              - "Add emoji/icon indicators for security levels (🟢 High, 🟡 Medium, 🔴 Low)"
+              - "Color-coded security score display (green >0.8, yellow 0.5-0.8, red <0.5)"
+              - "Visual badges for authentication level and encryption status"
+              - "Alert count badges with severity colors"
+
+            security_score_enhancements:
+              - "Add security score history tracking (last 7 days)"
+              - "Calculate security score trend (improving/stable/degrading)"
+              - "Provide security score breakdown by component"
+              - "Add security posture recommendations based on score"
+
+            advanced_features:
+              - "Multi-factor authentication score weighting"
+              - "Session expiration warnings (< 1 hour remaining)"
+              - "Compliance violation detection and reporting"
+              - "Security policy enforcement checking"
+
+            performance_optimizations:
+              - "Cache security score calculations (TTL: 60 seconds)"
+              - "Lazy load display_data formatting"
+              - "Optimize authentication level lookups"
+
+          implementation_details:
+            helper_methods_to_add:
+              _get_security_icon:
+                purpose: "Map security level to visual icon"
+                input: "security_level: str (high/medium/low)"
+                output: "str - Emoji icon (🟢/🟡/🔴)"
+
+              _calculate_score_trend:
+                purpose: "Determine security score trend from history"
+                input: "current_score: float, history: List[float]"
+                output: "str - Trend indicator (improving/stable/degrading)"
+
+              _generate_security_recommendations:
+                purpose: "Generate actionable security recommendations"
+                input: "security_overview: Dict[str, Any], security_score: float"
+                output: "List[str] - Prioritized recommendations"
+
+              _check_session_expiration:
+                purpose: "Check if session is expiring soon"
+                input: "expires_at: str (ISO 8601)"
+                output: "Dict[str, Any] - Expiration warning data"
+
+            enhanced_return_structure:
+              - "Add 'security_icon': str - Visual indicator"
+              - "Add 'score_trend': str - Trend indicator"
+              - "Add 'score_breakdown': Dict - Component scores"
+              - "Add 'recommendations': List[str] - Security recommendations"
+              - "Add 'session_warning': Optional[Dict] - Expiration warning if applicable"
+
+        display_audit_trail:
+          enhancement_priority: "CRITICAL"
+          current_behavior: "Displays all events regardless of time_range parameter"
+          target_behavior: "Implement actual time-based filtering, advanced search, export, and anomaly detection"
+
+          refactor_enhancements:
+            time_filtering_implementation:
+              - "Implement datetime-based filtering for time_range values"
+              - "last_hour: events within past 60 minutes from current time"
+              - "last_24_hours: events within past 24 hours"
+              - "last_week: events within past 7 days"
+              - "last_month: events within past 30 days"
+              - "all: no filtering (current behavior)"
+
+            advanced_filtering:
+              - "Add event_type filter (authentication, command_execution, data_access)"
+              - "Add status filter (success, failure, pending)"
+              - "Add user_id filter for multi-user environments"
+              - "Add text search across event details"
+              - "Support filter combinations (AND logic)"
+
+            event_enrichment:
+              - "Add relative timestamps ('2 hours ago', 'just now')"
+              - "Add event severity/risk levels"
+              - "Add event icons by type (🔐 auth, ⚙️ command, 📁 data)"
+              - "Add event duration tracking (for long-running events)"
+
+            anomaly_detection:
+              - "Detect unusual event patterns (frequency spikes)"
+              - "Flag suspicious event sequences"
+              - "Highlight failed authentication attempts"
+              - "Identify access pattern anomalies"
+
+            export_functionality:
+              - "Export to CSV with headers"
+              - "Export to JSON with metadata"
+              - "Export to PDF with formatting"
+              - "Support date range for exports"
+
+            performance_optimizations:
+              - "Implement event pagination (avoid loading all events)"
+              - "Add event caching with TTL"
+              - "Optimize time filtering with indexed lookups"
+              - "Lazy load event details on demand"
+
+          implementation_details:
+            helper_methods_to_add:
+              _filter_by_time_range:
+                purpose: "Filter events based on time range"
+                input: "events: List[Dict], time_range: str, current_time: datetime"
+                output: "List[Dict] - Filtered events"
+                implementation_notes:
+                  - "Parse ISO 8601 timestamps from events"
+                  - "Calculate cutoff time based on time_range"
+                  - "Return events where timestamp >= cutoff_time"
+
+              _apply_advanced_filters:
+                purpose: "Apply multiple filters to events"
+                input: "events: List[Dict], filters: Dict[str, Any]"
+                output: "List[Dict] - Filtered events"
+                filter_options:
+                  - "event_type: str or List[str]"
+                  - "status: str or List[str]"
+                  - "search_text: str"
+
+              _enrich_event:
+                purpose: "Add computed fields to event"
+                input: "event: Dict[str, Any]"
+                output: "Dict[str, Any] - Enriched event"
+                enrichments:
+                  - "relative_time: str"
+                  - "event_icon: str"
+                  - "risk_level: str"
+
+              _detect_anomalies:
+                purpose: "Detect anomalous events in trail"
+                input: "events: List[Dict], user_id: str"
+                output: "List[Dict] - Anomalous events flagged"
+
+              _export_to_format:
+                purpose: "Export events to specified format"
+                input: "events: List[Dict], format: str (csv/json/pdf)"
+                output: "str - Exported data or file path"
+
+            enhanced_return_structure:
+              - "Add 'enriched_events': List[Dict] - Events with relative time and icons"
+              - "Add 'anomalies': List[Dict] - Detected anomalous events"
+              - "Add 'available_filters': Dict - Filterable fields and values"
+              - "Add 'export_options': List[str] - Available export formats"
+
+        show_security_alerts:
+          enhancement_priority: "HIGH"
+          current_behavior: "Basic alert prioritization and trend calculation"
+          target_behavior: "Enhanced alert management with deduplication, grouping, lifecycle tracking, and actionable insights"
+
+          refactor_enhancements:
+            alert_deduplication:
+              - "Identify duplicate alerts by type and details"
+              - "Merge duplicate alerts with occurrence count"
+              - "Track first seen and last seen timestamps"
+
+            alert_grouping:
+              - "Group alerts by type (permission_escalation, unauthorized_access, etc.)"
+              - "Group alerts by severity (high/medium/low)"
+              - "Group alerts by affected resource"
+              - "Support hierarchical grouping (severity → type)"
+
+            alert_lifecycle:
+              - "Track alert states (new, acknowledged, investigating, resolved)"
+              - "Add alert assignment (assign to security team member)"
+              - "Track resolution time and SLA compliance"
+              - "Add alert escalation rules"
+
+            visual_enhancements:
+              - "Add severity icons (🔴 High, 🟡 Medium, 🟢 Low)"
+              - "Add alert type icons (🚨 security, ⚠️ policy, 📊 compliance)"
+              - "Add timeline visualization of alert occurrences"
+              - "Add alert heatmap by time/severity"
+
+            actionable_insights:
+              - "Generate context-specific recommended actions"
+              - "Provide remediation steps for common alert types"
+              - "Link to relevant documentation or runbooks"
+              - "Suggest preventive measures"
+
+            performance_optimizations:
+              - "Cache alert summaries (TTL: 30 seconds)"
+              - "Paginate large alert lists"
+              - "Optimize severity sorting with indexed data"
+
+          implementation_details:
+            helper_methods_to_add:
+              _deduplicate_alerts:
+                purpose: "Remove duplicate alerts and track occurrences"
+                input: "alerts: List[Dict]"
+                output: "List[Dict] - Deduplicated alerts with occurrence count"
+
+              _group_alerts:
+                purpose: "Group alerts by specified criteria"
+                input: "alerts: List[Dict], group_by: str (severity/type/resource)"
+                output: "Dict[str, List[Dict]] - Grouped alerts"
+
+              _get_alert_icon:
+                purpose: "Get visual icon for alert"
+                input: "alert_type: str, severity: str"
+                output: "str - Emoji icon"
+
+              _generate_remediation_steps:
+                purpose: "Generate remediation steps for alert type"
+                input: "alert_type: str, alert_details: Dict"
+                output: "List[str] - Step-by-step remediation"
+
+              _calculate_alert_velocity:
+                purpose: "Calculate rate of new alerts over time"
+                input: "active_alerts: List[Dict], time_window: int"
+                output: "Dict[str, Any] - Velocity metrics"
+
+            enhanced_return_structure:
+              - "Add 'deduplicated_alerts': List[Dict] - Alerts with occurrence counts"
+              - "Add 'grouped_by_severity': Dict - Alerts grouped by severity"
+              - "Add 'grouped_by_type': Dict - Alerts grouped by type"
+              - "Add 'remediation_steps': Dict[str, List[str]] - Steps per alert type"
+              - "Add 'alert_velocity': Dict - Rate of new alerts"
+              - "Add 'sla_compliance': Dict - SLA metrics for alert resolution"
+
+  performance_targets:
+    render_security_overview:
+      - "Security score calculation: <10ms"
+      - "With caching: <2ms for repeated calls"
+      - "Historical trend calculation: <20ms"
+      - "Total rendering: <50ms"
+
+    display_audit_trail:
+      - "Time filtering (100 events): <50ms"
+      - "Time filtering (1000 events): <200ms"
+      - "Advanced filtering: <100ms per filter"
+      - "Anomaly detection (1000 events): <500ms"
+      - "Export to CSV/JSON: <1s for 10000 events"
+
+    show_security_alerts:
+      - "Alert deduplication (100 alerts): <50ms"
+      - "Alert grouping: <30ms"
+      - "Severity sorting: <10ms"
+      - "Total processing: <100ms"
+
+  validation_steps:
+    pre_refactor:
+      - "✅ All 3 GREEN tests passing"
+      - "✅ Basic validation implemented"
+      - "✅ Type hints complete"
+      - "✅ GREEN phase report documented"
+
+    during_refactor:
+      - "Enhance render_security_overview() first - verify tests pass"
+      - "Implement time filtering for display_audit_trail() - critical fix"
+      - "Enhance show_security_alerts() third - verify tests pass"
+      - "Run full test suite after each enhancement"
+      - "Add new tests for advanced features"
+      - "Benchmark performance against targets"
+
+    post_refactor:
+      - "All existing tests still passing"
+      - "New REFACTOR tests passing for enhanced features"
+      - "Performance targets met"
+      - "Documentation updated with examples"
+      - "Integration testing with security backend"
+      - "User acceptance testing for visualization improvements"
+
+  success_criteria:
+    functional:
+      - "Time-based filtering working correctly for all time ranges"
+      - "Visual indicators rendering properly"
+      - "Historical tracking and trending operational"
+      - "Alert deduplication and grouping functional"
+      - "Export functionality working for all formats"
+      - "Anomaly detection identifying suspicious patterns"
+
+    performance:
+      - "Security overview rendering <50ms"
+      - "Audit trail filtering <200ms for 1000 events"
+      - "Alert processing <100ms"
+      - "All caching mechanisms working"
+
+    quality:
+      - "100% type hint coverage maintained"
+      - "Enhanced error handling with actionable messages"
+      - "Comprehensive documentation with usage examples"
+      - "No lint warnings or errors"
+      - "Code review approved"
+
+    user_experience:
+      - "Visual clarity - information at a glance"
+      - "Intuitive filtering and search"
+      - "Responsive performance even with large datasets"
+      - "Actionable recommendations and insights"
+
+---
+# END OF REFACTOR PHASE MINIMAL ENHANCEMENT PROMPT
+# TDD Iterations 14-15: Context Visualization & Security Dashboard
+# Iteration 14: Context Visualization Interface - Full tree visualization with sync status
+# Iteration 15: Security Dashboard Interface - Enhanced security monitoring and audit trail
+# Target: Transform basic implementations into production-ready components
+# Components: ContextVisualizationInterface, SecurityDashboardInterface
+# Implementation Files:
+#   - /workspaces/control_tower/src/ui/components/context_visualization_interface.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/security_dashboard_interface.py
+# GREEN Phase Reports:
+#   - 14_Context_Visualization_Interface_Green_Phase_20251003_114447.md
+#   - 15_Security_Dashboard_Interface_Green_Phase_20251003_115845.md
