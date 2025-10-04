@@ -1,103 +1,1156 @@
 ---
-# GREEN Phase Minimal Implementation Prompt - User Interface Layer
+# GREEN Phase Minimal Implementation Prompt - Integration Layer
 
 metadata:
   prompt_type: "green_phase_implementation"
   feature_id: "FEATURE-003-02-01"
-  layer_id: "LAYER-003-02-01-003"
+  layer_id: "LAYER-003-02-01-004"
   feature_name: "Contextual Testing Pyramid Validation Engine"
-  layer_name: "User Interface Layer"
+  layer_name: "Integration Layer"
   system: "SYSTEM-003-02 Extended Validation Engine"
   project: "PROJECT-003 TDD Enforcer"
   tdd_phase: "GREEN"
-  created_date: "2025-10-02"
-  updated_date: "2025-10-02"
+  created_date: "2025-10-04"
+  updated_date: "2025-10-04"
 
 objective:
-  description: "Implement the minimal required UI components to pass all 24 failing tests from the User Interface Layer RED phase execution"
-  focus: "Creating 8 UI components to enable contextual pyramid visualization, mobile remote monitoring, and cross-component status displays"
+  description: "Implement the minimal required Integration Layer components to pass all 24 failing tests from the Integration Layer RED phase execution"
+  focus: "Creating 8 integration modules for Context Engine API, mobile authentication, workflow coordination, and real-time progress integration"
 
 small_team_appropriateness:
   team_size: "Designed for 2-8 developers"
-  complexity_level: "Medium complexity - manageable for small teams with UI/UX experience"
-  infrastructure_requirements: "Minimal - responsive web components, no complex mobile app build required"
-  time_investment: "2-3 weeks part-time implementation"
-  enterprise_alternatives: "This is NOT enterprise-level UI framework - intentionally simplified"
+  complexity_level: "Medium-High complexity - manageable for small teams with API integration experience"
+  infrastructure_requirements: "Moderate - REST APIs, WebSocket connections, JWT authentication"
+  time_investment: "1-2 weeks part-time implementation"
+  enterprise_alternatives: "This is NOT enterprise-level integration platform - intentionally simplified"
 
   small_team_benefits:
-    - "No complex mobile app build infrastructure required"
-    - "Progressive Web App approach instead of native mobile development"
-    - "Simple WebSocket connections instead of enterprise message queues"
-    - "Responsive design using standard CSS/HTML instead of complex UI frameworks"
-    - "Focuses on contextual visualization, not enterprise dashboards"
+    - "No complex enterprise service bus required"
+    - "Simple REST API and WebSocket patterns instead of message queues"
+    - "JWT-based authentication instead of OAuth2/SAML enterprise solutions"
+    - "Direct API calls instead of microservices orchestration"
+    - "Focuses on essential integrations, not comprehensive enterprise integration"
 
 execution_context:
-  target: "Pass All 24 Failing User Interface Layer Tests"
-  source_test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_contextual_pyramid_ui.py"
+  target: "Pass All 24 Failing Integration Layer Tests"
+  source_test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer.py"
 
   current_status:
     failing_tests: 24
     total_tests: 24
     pass_rate: 0 # Perfect RED phase
     missing_components: 8
-    target_components: "8 UI components for contextual visualization and mobile monitoring"
-    requirements_alignment: "24 tests → 16 UI requirements (perfect 3:2 ratio)"
+    target_components: "8 integration modules for external system integration"
+    requirements_alignment: "24 tests → 18 integration requirements (comprehensive coverage)"
 
-  goal: "100% test pass rate with contextual UI visualization and mobile monitoring"
+  goal: "100% test pass rate with Context Engine, mobile, and workflow integration"
   priority_focus:
-    - "Mobile Authentication Interface (REQ-UI-001)"
-    - "Mobile Command Interface (REQ-UI-002)"
-    - "Layer/Feature/System Position Display (REQ-UI-003)"
-    - "Contextual Pyramid Visualization (REQ-UI-004)"
-    - "Component Integration Dashboard (REQ-UI-005)"
-    - "Cross-Component Testing Visualization (REQ-UI-006)"
-    - "Progression Tracking Display (REQ-UI-007)"
-    - "Completion Notifications Interface (REQ-UI-008)"
+    - "Context Engine API Integration (REQ-INT-001)"
+    - "Contextual Workflow Integration (REQ-INT-002)"
+    - "Mobile Authentication Integration (REQ-INT-003)"
+    - "Mobile Command Processing Endpoints (REQ-INT-004)"
+    - "Cross-Component Integration Testing (REQ-INT-005)"
+    - "Component Compatibility Validation (REQ-INT-006)"
+    - "Remote Execution Orchestration (REQ-INT-007)"
+    - "Real-Time Progress Integration (REQ-INT-008)"
 
-  existing_business_logic:
-    status: "ALREADY IMPLEMENTED"
-    location: "/workspaces/control_tower/src/business_logic/contextual_pyramid_validator.py"
-    description: "Business logic layer provides contextual validation algorithms"
-    note: "New UI components must integrate with existing business logic layer"
+  ui_layer_impact:
+    status: "CRITICAL DEPENDENCY"
+    location: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/ui/"
+    description: "UI Layer is BLOCKED by Integration Layer - 69% of UI requirements depend on these integrations"
+    note: "Completing Integration Layer will unblock 11 of 16 UI requirements and improve UI production readiness from 15/100 to 60-70/100"
 
 critical_components:
-  mobile_auth_interface:
-    priority: "PHASE 1: MOBILE INTERFACE COMPONENTS"
-    file_path: "/workspaces/control_tower/src/ui/components/contextual_pyramid_ui.py"
-    status: "MISSING"
-    requirement: "Required for REQ-UI-001: Mobile Authentication Interface"
-    impact: "Enables secure mobile login with <2s load time and 99% usability"
+  context_engine_integration:
+    priority: "PHASE 1: CONTEXT ENGINE INTEGRATION"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/context_engine_integration.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-001: Context Engine API Integration"
+    impact: "Enables real-time position tracking with <200ms query response and 99.9% uptime"
     failing_tests:
-      - "test_mobile_auth_interface_component_exists"
-      - "test_mobile_auth_interface_renders_within_target_time"
-      - "test_mobile_interface_initial_load_performance"
-      - "test_mobile_performance_across_device_capabilities"
-      - "test_mobile_framework_integration_meets_requirements"
-      - "test_mobile_auth_ui_integration_meets_security_targets"
+      - "test_context_engine_connection_fails_initially"
+      - "test_position_query_fails_initially"
+      - "test_context_query_response_time_fails_initially"
+      - "test_context_synchronization_performance_fails_initially"
+      - "test_context_engine_reliability_fails_initially"
 
     minimal_implementation:
-      description: "Mobile authentication interface with biometric auth and device verification"
-      class_name: "MobileAuthInterface"
-      purpose: "Secure mobile login interface with <2s load time and 99%+ usability"
+      description: "Context Engine API integration for real-time position tracking and event streaming"
+      class_name: "ContextEngineIntegration"
+      purpose: "Connect to Context Engine API for <200ms position queries and 99.9% reliability"
 
       constructor:
         parameters:
-          config:
-            type: "Optional[Dict[str, Any]]"
-            default: None
-            description: "Configuration for mobile auth interface"
+          api_endpoint:
+            type: "Optional[str]"
+            default: "http://localhost:8080/context"
+            description: "Context Engine API endpoint URL"
+          timeout:
+            type: "Optional[float]"
+            default: 5.0
+            description: "API connection timeout in seconds"
         initialization:
-          - "Initialize mobile authentication UI components"
-          - "Set up biometric authentication handlers"
-          - "Configure device registration and session management"
-          - "Set performance targets: <2s load, 99%+ usability"
+          - "Initialize HTTP session for Context Engine API"
+          - "Set up connection pooling for performance"
+          - "Configure retry logic for 99.9% reliability"
+          - "Set performance targets: <200ms queries, <500ms sync"
 
       required_methods:
-        render:
-          description: "Render mobile authentication interface within performance targets"
+        establish_context_connection:
+          description: "Establish connection to Context Engine API with validation"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "connected: bool" # Must be True
+              - "api_version: str" # e.g., "1.0.0"
+              - "health_status: str" # Must be "healthy"
+          implementation_notes:
+            - "Make GET request to /context/health endpoint"
+            - "Validate API is reachable and healthy"
+            - "Return connection status with API version"
+            - "Raise ConnectionError if API unavailable"
+          example_implementation: |
+            import requests
+            
+            def establish_context_connection(self):
+                try:
+                    response = requests.get(
+                        f"{self.api_endpoint}/health",
+                        timeout=self.timeout
+                    )
+                    response.raise_for_status()
+                    data = response.json()
+                    return {
+                        "connected": True,
+                        "api_version": data.get("version", "1.0.0"),
+                        "health_status": data.get("status", "healthy")
+                    }
+                except requests.RequestException as e:
+                    raise ConnectionError(f"Failed to connect to Context Engine: {e}")
+
+        query_current_position:
+          description: "Query current layer/feature/system position from Context Engine"
           parameters:
-            max_load_time:
-              type: "float"
+            session_id:
+              type: "str"
+              description: "Session identifier for position tracking"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "layer: str" # Current layer position
+              - "feature: str" # Current feature position
+              - "system: str" # Current system position
+              - "timestamp: str" # ISO 8601 timestamp
+          implementation_notes:
+            - "Make GET request to /context/position/{session_id}"
+            - "Parse and return current hierarchical position"
+            - "Include timestamp for position accuracy"
+            - "Must complete in <200ms for performance requirement"
+          example_implementation: |
+            def query_current_position(self, session_id: str):
+                response = requests.get(
+                    f"{self.api_endpoint}/position/{session_id}",
+                    timeout=0.2  # 200ms timeout
+                )
+                response.raise_for_status()
+                return response.json()
+
+        validate_query_performance:
+          description: "Validate Context Engine query performance meets <200ms target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "average_response_time: float" # Must be < 0.2s
+              - "meets_target: bool" # Must be True
+              - "sample_size: int" # Number of queries tested
+          implementation_notes:
+            - "Execute 10 sample position queries"
+            - "Measure response time for each query"
+            - "Calculate average response time"
+            - "Validate average < 200ms requirement"
+          example_implementation: |
+            import time
+            
+            def validate_query_performance(self):
+                response_times = []
+                for i in range(10):
+                    start = time.time()
+                    self.query_current_position(f"test-session-{i}")
+                    elapsed = time.time() - start
+                    response_times.append(elapsed)
+                
+                avg_time = sum(response_times) / len(response_times)
+                return {
+                    "average_response_time": avg_time,
+                    "meets_target": avg_time < 0.2,
+                    "sample_size": len(response_times)
+                }
+
+        validate_sync_performance:
+          description: "Validate context synchronization performance meets <500ms target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "sync_time: float" # Must be < 0.5s
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Trigger context state update via POST"
+            - "Measure time until synchronization confirmed"
+            - "Validate sync completes in <500ms"
+            - "Use WebSocket or polling for sync confirmation"
+          example_implementation: |
+            def validate_sync_performance(self):
+                start = time.time()
+                # POST context update
+                requests.post(
+                    f"{self.api_endpoint}/sync",
+                    json={"action": "update_position"},
+                    timeout=0.5
+                )
+                sync_time = time.time() - start
+                return {
+                    "sync_time": sync_time,
+                    "meets_target": sync_time < 0.5
+                }
+
+        monitor_reliability:
+          description: "Monitor Context Engine reliability for 99.9% uptime target"
+          parameters:
+            duration_seconds:
+              type: "int"
+              default: 60
+              description: "Monitoring duration in seconds"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "uptime_percentage: float" # Must be >= 99.9
+              - "successful_requests: int"
+              - "failed_requests: int"
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Make health check requests at 1-second intervals"
+            - "Track successful vs failed requests"
+            - "Calculate uptime percentage"
+            - "Validate >= 99.9% reliability"
+          example_implementation: |
+            def monitor_reliability(self, duration_seconds: int = 60):
+                successful = 0
+                failed = 0
+                for _ in range(duration_seconds):
+                    try:
+                        result = self.establish_context_connection()
+                        if result["connected"]:
+                            successful += 1
+                        else:
+                            failed += 1
+                    except:
+                        failed += 1
+                    time.sleep(1)
+                
+                total = successful + failed
+                uptime_pct = (successful / total * 100) if total > 0 else 0
+                return {
+                    "uptime_percentage": uptime_pct,
+                    "successful_requests": successful,
+                    "failed_requests": failed,
+                    "meets_target": uptime_pct >= 99.9
+                }
+
+  workflow_integration:
+    priority: "PHASE 1: WORKFLOW INTEGRATION"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/workflow_integration.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-002: Contextual Workflow Integration"
+    impact: "Enables intelligent workflow progression with <1s decision time"
+    failing_tests:
+      - "test_workflow_progression_decision_fails_initially"
+      - "test_automatic_trigger_coordination_fails_initially"
+
+    minimal_implementation:
+      class_name: "WorkflowIntegration"
+      purpose: "Contextual workflow coordination with intelligent progression decisions"
+
+      required_methods:
+        determine_next_progression:
+          description: "Determine next workflow progression based on current context"
+          parameters:
+            current_position:
+              type: "Dict[str, str]"
+              description: "Current layer/feature/system position"
+            completion_status:
+              type: "Dict[str, Any]"
+              description: "Completion status of current position"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "next_layer: str" # Next layer to progress to
+              - "next_feature: str" # Next feature to execute
+              - "rationale: str" # Reason for progression decision
+              - "decision_time: float" # Must be < 1.0s
+          implementation_notes:
+            - "Analyze current position in testing pyramid"
+            - "Evaluate completion criteria (all tests passing, coverage targets met)"
+            - "Determine next logical progression step"
+            - "Return decision within 1 second"
+            - "Consider dependencies and prerequisites"
+          example_implementation: |
+            import time
+            
+            def determine_next_progression(self, current_position, completion_status):
+                start = time.time()
+                
+                # Workflow progression logic
+                layer = current_position.get("layer")
+                feature = current_position.get("feature")
+                
+                # Check if current layer is complete
+                if completion_status.get("tests_passing", 0) < 100:
+                    next_step = {
+                        "next_layer": layer,
+                        "next_feature": feature,
+                        "rationale": "Current layer incomplete - continue testing"
+                    }
+                else:
+                    # Progress to next layer in pyramid
+                    next_step = {
+                        "next_layer": self._get_next_layer(layer),
+                        "next_feature": self._get_next_feature(layer, feature),
+                        "rationale": "Current layer complete - progress to next"
+                    }
+                
+                decision_time = time.time() - start
+                next_step["decision_time"] = decision_time
+                return next_step
+
+        coordinate_automatic_triggers:
+          description: "Coordinate automatic workflow triggers based on completion events"
+          parameters:
+            event_type:
+              type: "str"
+              description: "Type of completion event (layer_complete, feature_complete, etc.)"
+            event_data:
+              type: "Dict[str, Any]"
+              description: "Event data and context"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "triggers_activated: List[str]" # List of triggered actions
+              - "coordination_successful: bool" # Must be True
+              - "next_actions: List[str]" # Recommended next actions
+          implementation_notes:
+            - "Listen for completion events (test suite complete, layer validated, etc.)"
+            - "Activate appropriate triggers (next test execution, coverage reports, etc.)"
+            - "Coordinate multiple concurrent workflows"
+            - "Return activated triggers and next recommended actions"
+          example_implementation: |
+            def coordinate_automatic_triggers(self, event_type, event_data):
+                triggers_activated = []
+                next_actions = []
+                
+                if event_type == "layer_complete":
+                    triggers_activated.append("generate_coverage_report")
+                    triggers_activated.append("validate_requirements")
+                    next_actions.append("progress_to_next_layer")
+                    next_actions.append("update_dashboard")
+                elif event_type == "feature_complete":
+                    triggers_activated.append("run_integration_tests")
+                    next_actions.append("validate_feature_requirements")
+                
+                return {
+                    "triggers_activated": triggers_activated,
+                    "coordination_successful": True,
+                    "next_actions": next_actions
+                }
+
+  mobile_auth_integration:
+    priority: "PHASE 2: MOBILE AUTHENTICATION"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration.py"
+    status: "PARTIAL STUB EXISTS - NEEDS COMPLETION"
+    requirement: "Required for REQ-INT-003: Mobile Authentication Integration"
+    impact: "Enables secure mobile access with <1s authentication and 99.9% security compliance"
+    failing_tests:
+      - "test_mobile_authentication_endpoint_fails_initially"
+      - "test_device_registration_fails_initially"
+      - "test_mobile_authentication_performance_fails_initially"
+      - "test_mobile_api_reliability_fails_initially"
+
+    minimal_implementation:
+      class_name: "MobileAuthIntegration"
+      purpose: "Mobile authentication with JWT validation, device registration, and biometric support"
+
+      required_methods:
+        authenticate_mobile_user:
+          description: "Authenticate mobile user with credentials and return JWT token"
+          parameters:
+            username:
+              type: "str"
+              description: "Mobile user username"
+            password:
+              type: "str"
+              description: "Mobile user password"
+            device_id:
+              type: "str"
+              description: "Unique device identifier"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "authenticated: bool" # Must be True for valid credentials
+              - "jwt_token: str" # JWT token for session
+              - "session_id: str" # Session identifier
+              - "expires_at: str" # Token expiration timestamp
+          implementation_notes:
+            - "Validate credentials against user database"
+            - "Generate JWT token with device_id claim"
+            - "Create session with expiration time"
+            - "Return token and session details"
+            - "Must complete in <1 second"
+          example_implementation: |
+            import jwt
+            import datetime
+            
+            def authenticate_mobile_user(self, username, password, device_id):
+                # Validate credentials (simplified)
+                if not self._validate_credentials(username, password):
+                    return {
+                        "authenticated": False,
+                        "jwt_token": "",
+                        "session_id": "",
+                        "expires_at": ""
+                    }
+                
+                # Generate JWT token
+                payload = {
+                    "username": username,
+                    "device_id": device_id,
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+                }
+                token = jwt.encode(payload, "SECRET_KEY", algorithm="HS256")
+                
+                return {
+                    "authenticated": True,
+                    "jwt_token": token,
+                    "session_id": f"session_{device_id}_{int(time.time())}",
+                    "expires_at": payload["exp"].isoformat()
+                }
+
+        register_mobile_device:
+          description: "Register new mobile device for authentication"
+          parameters:
+            device_id:
+              type: "str"
+              description: "Unique device identifier"
+            device_info:
+              type: "Dict[str, Any]"
+              description: "Device information (model, OS, version)"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "registered: bool" # Must be True
+              - "device_token: str" # Device registration token
+              - "registration_timestamp: str" # ISO 8601 timestamp
+          implementation_notes:
+            - "Store device information in registry"
+            - "Generate unique device token"
+            - "Record registration timestamp"
+            - "Enable device-specific security policies"
+          example_implementation: |
+            def register_mobile_device(self, device_id, device_info):
+                # Store in device registry
+                device_token = f"dev_token_{device_id}_{int(time.time())}"
+                timestamp = datetime.datetime.utcnow().isoformat()
+                
+                # Persist device registration (simplified)
+                self._device_registry[device_id] = {
+                    "token": device_token,
+                    "info": device_info,
+                    "registered_at": timestamp
+                }
+                
+                return {
+                    "registered": True,
+                    "device_token": device_token,
+                    "registration_timestamp": timestamp
+                }
+
+        validate_auth_performance:
+          description: "Validate mobile authentication performance meets <1s target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "average_auth_time: float" # Must be < 1.0s
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Execute 10 sample authentication requests"
+            - "Measure time from request to JWT token generation"
+            - "Calculate average authentication time"
+            - "Validate < 1 second requirement"
+          example_implementation: |
+            def validate_auth_performance(self):
+                auth_times = []
+                for i in range(10):
+                    start = time.time()
+                    self.authenticate_mobile_user(
+                        f"test_user_{i}",
+                        "test_password",
+                        f"device_{i}"
+                    )
+                    elapsed = time.time() - start
+                    auth_times.append(elapsed)
+                
+                avg_time = sum(auth_times) / len(auth_times)
+                return {
+                    "average_auth_time": avg_time,
+                    "meets_target": avg_time < 1.0
+                }
+
+        monitor_mobile_reliability:
+          description: "Monitor mobile API reliability for 99.5% availability target"
+          parameters:
+            duration_seconds:
+              type: "int"
+              default: 60
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "availability_percentage: float" # Must be >= 99.5
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Make authentication requests at intervals"
+            - "Track successful vs failed requests"
+            - "Calculate availability percentage"
+            - "Validate >= 99.5% availability"
+          example_implementation: |
+            def monitor_mobile_reliability(self, duration_seconds=60):
+                successful = 0
+                failed = 0
+                for i in range(duration_seconds):
+                    try:
+                        result = self.authenticate_mobile_user(
+                            "test_user",
+                            "test_pass",
+                            f"device_{i}"
+                        )
+                        if result["authenticated"]:
+                            successful += 1
+                        else:
+                            failed += 1
+                    except:
+                        failed += 1
+                    time.sleep(1)
+                
+                total = successful + failed
+                availability = (successful / total * 100) if total > 0 else 0
+                return {
+                    "availability_percentage": availability,
+                    "meets_target": availability >= 99.5
+                }
+
+  mobile_command_integration:
+    priority: "PHASE 2: MOBILE COMMAND PROCESSING"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_command_integration.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-004: Mobile Command Processing Endpoints"
+    impact: "Enables mobile command execution with <2s acknowledgment"
+    failing_tests:
+      - "test_mobile_command_execution_fails_initially"
+      - "test_real_time_command_status_fails_initially"
+      - "test_mobile_command_processing_performance_fails_initially"
+
+    minimal_implementation:
+      class_name: "MobileCommandIntegration"
+      purpose: "Mobile command execution with real-time status and <2s acknowledgment"
+
+      required_methods:
+        execute_mobile_command:
+          description: "Execute validation command from mobile device"
+          parameters:
+            jwt_token:
+              type: "str"
+              description: "Mobile authentication JWT token"
+            command_type:
+              type: "str"
+              description: "Type of command (run_tests, validate_layer, etc.)"
+            command_params:
+              type: "Dict[str, Any]"
+              description: "Command parameters and context"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "command_id: str" # Unique command execution ID
+              - "status: str" # Must be "acknowledged" or "executing"
+              - "acknowledgment_time: float" # Must be < 2.0s
+              - "estimated_completion: float" # Estimated seconds to completion
+          implementation_notes:
+            - "Validate JWT token and extract user/device info"
+            - "Queue command for asynchronous execution"
+            - "Return acknowledgment within 2 seconds"
+            - "Assign unique command ID for status tracking"
+          example_implementation: |
+            def execute_mobile_command(self, jwt_token, command_type, command_params):
+                start = time.time()
+                
+                # Validate JWT token
+                try:
+                    payload = jwt.decode(jwt_token, "SECRET_KEY", algorithms=["HS256"])
+                except jwt.InvalidTokenError:
+                    raise ValueError("Invalid JWT token")
+                
+                # Generate command ID and queue
+                command_id = f"cmd_{int(time.time() * 1000)}"
+                self._command_queue[command_id] = {
+                    "type": command_type,
+                    "params": command_params,
+                    "status": "acknowledged",
+                    "user": payload["username"]
+                }
+                
+                ack_time = time.time() - start
+                return {
+                    "command_id": command_id,
+                    "status": "acknowledged",
+                    "acknowledgment_time": ack_time,
+                    "estimated_completion": 10.0  # Estimate based on command type
+                }
+
+        get_command_status:
+          description: "Get real-time status of executing command"
+          parameters:
+            command_id:
+              type: "str"
+              description: "Command execution ID"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "command_id: str"
+              - "status: str" # acknowledged, executing, completed, failed
+              - "progress_percentage: float" # 0.0 to 100.0
+              - "result: Optional[Dict]" # Command result if completed
+          implementation_notes:
+            - "Look up command status in execution tracker"
+            - "Return current execution state and progress"
+            - "Include result data if command completed"
+            - "Support real-time polling or WebSocket streaming"
+          example_implementation: |
+            def get_command_status(self, command_id):
+                if command_id not in self._command_queue:
+                    raise ValueError(f"Command {command_id} not found")
+                
+                command = self._command_queue[command_id]
+                return {
+                    "command_id": command_id,
+                    "status": command["status"],
+                    "progress_percentage": command.get("progress", 0.0),
+                    "result": command.get("result")
+                }
+
+        validate_command_performance:
+          description: "Validate command acknowledgment meets <2s target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "average_ack_time: float" # Must be < 2.0s
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Execute 10 sample commands"
+            - "Measure acknowledgment time for each"
+            - "Calculate average acknowledgment time"
+            - "Validate < 2 second requirement"
+          example_implementation: |
+            def validate_command_performance(self):
+                ack_times = []
+                for i in range(10):
+                    token = self._generate_test_token()
+                    result = self.execute_mobile_command(
+                        token,
+                        "run_tests",
+                        {"layer": "unit"}
+                    )
+                    ack_times.append(result["acknowledgment_time"])
+                
+                avg_time = sum(ack_times) / len(ack_times)
+                return {
+                    "average_ack_time": avg_time,
+                    "meets_target": avg_time < 2.0
+                }
+
+  cross_component_integration:
+    priority: "PHASE 3: CROSS-COMPONENT INTEGRATION"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/cross_component_integration.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-005: Cross-Component Integration Testing"
+    impact: "Enables component integration validation with <5min test suite execution"
+    failing_tests:
+      - "test_component_integration_execution_fails_initially"
+      - "test_interface_contract_validation_fails_initially"
+      - "test_integration_test_suite_execution_time_fails_initially"
+
+    minimal_implementation:
+      class_name: "CrossComponentIntegration"
+      purpose: "Cross-component integration testing with contract validation"
+
+      required_methods:
+        execute_integration_tests:
+          description: "Execute integration tests across components"
+          parameters:
+            component_a:
+              type: "str"
+              description: "First component identifier"
+            component_b:
+              type: "str"
+              description: "Second component identifier"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "tests_executed: int" # Number of integration tests run
+              - "tests_passed: int" # Number of tests passed
+              - "tests_failed: int" # Number of tests failed
+              - "execution_time: float" # Total execution time
+          implementation_notes:
+            - "Discover integration tests between components"
+            - "Execute tests using pytest or unittest framework"
+            - "Collect and return test results"
+            - "Track execution time for performance validation"
+          example_implementation: |
+            import subprocess
+            
+            def execute_integration_tests(self, component_a, component_b):
+                # Build test filter pattern
+                test_pattern = f"test_integration_{component_a}_{component_b}"
+                
+                start = time.time()
+                result = subprocess.run(
+                    ["pytest", "-k", test_pattern, "-v", "--tb=short"],
+                    capture_output=True,
+                    text=True
+                )
+                execution_time = time.time() - start
+                
+                # Parse pytest output for results
+                output = result.stdout
+                passed = output.count(" PASSED")
+                failed = output.count(" FAILED")
+                total = passed + failed
+                
+                return {
+                    "tests_executed": total,
+                    "tests_passed": passed,
+                    "tests_failed": failed,
+                    "execution_time": execution_time
+                }
+
+        validate_interface_contract:
+          description: "Validate interface contract between components"
+          parameters:
+            interface_name:
+              type: "str"
+              description: "Interface name to validate"
+            expected_methods:
+              type: "List[str]"
+              description: "Expected method signatures"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "contract_valid: bool" # Must be True
+              - "missing_methods: List[str]" # Should be empty
+              - "extra_methods: List[str]" # Unexpected methods
+          implementation_notes:
+            - "Inspect component interface using reflection"
+            - "Compare actual methods against expected contract"
+            - "Identify missing or unexpected methods"
+            - "Validate method signatures match contract"
+          example_implementation: |
+            import inspect
+            
+            def validate_interface_contract(self, interface_name, expected_methods):
+                # Import and inspect interface
+                module_path, class_name = interface_name.rsplit(".", 1)
+                module = __import__(module_path, fromlist=[class_name])
+                interface_class = getattr(module, class_name)
+                
+                # Get actual methods
+                actual_methods = set([
+                    name for name, _ in inspect.getmembers(
+                        interface_class,
+                        predicate=inspect.ismethod
+                    )
+                ])
+                
+                expected_set = set(expected_methods)
+                missing = list(expected_set - actual_methods)
+                extra = list(actual_methods - expected_set)
+                
+                return {
+                    "contract_valid": len(missing) == 0,
+                    "missing_methods": missing,
+                    "extra_methods": extra
+                }
+
+        validate_suite_execution_performance:
+          description: "Validate integration test suite execution meets <5min target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "total_execution_time: float" # Must be < 300s (5 minutes)
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Execute full integration test suite"
+            - "Measure total execution time"
+            - "Validate completion within 5 minutes"
+          example_implementation: |
+            def validate_suite_execution_performance(self):
+                start = time.time()
+                
+                # Run full integration test suite
+                result = subprocess.run(
+                    ["pytest", "tests/integration/", "-v"],
+                    capture_output=True
+                )
+                
+                total_time = time.time() - start
+                return {
+                    "total_execution_time": total_time,
+                    "meets_target": total_time < 300.0  # 5 minutes
+                }
+
+  component_compatibility:
+    priority: "PHASE 3: COMPONENT COMPATIBILITY"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/component_compatibility.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-006: Component Compatibility Validation"
+    impact: "Enables compatibility analysis with <30s validation and 98%+ accuracy"
+    failing_tests:
+      - "test_compatibility_analysis_fails_initially"
+      - "test_conflict_detection_fails_initially"
+      - "test_compatibility_validation_performance_fails_initially"
+
+    minimal_implementation:
+      class_name: "ComponentCompatibility"
+      purpose: "Component compatibility validation and conflict detection"
+
+      required_methods:
+        analyze_compatibility:
+          description: "Analyze compatibility between component versions"
+          parameters:
+            component_a_version:
+              type: "str"
+              description: "Component A version (e.g., '1.2.3')"
+            component_b_version:
+              type: "str"
+              description: "Component B version"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "compatible: bool"
+              - "compatibility_score: float" # 0.0 to 1.0, must be >= 0.98
+              - "issues: List[str]" # Compatibility issues if any
+          implementation_notes:
+            - "Parse semantic version numbers"
+            - "Check version compatibility matrix"
+            - "Identify API breaking changes"
+            - "Calculate compatibility score (98%+ for compatible)"
+          example_implementation: |
+            from packaging import version
+            
+            def analyze_compatibility(self, component_a_version, component_b_version):
+                ver_a = version.parse(component_a_version)
+                ver_b = version.parse(component_b_version)
+                
+                # Simple compatibility logic (major version must match)
+                compatible = ver_a.major == ver_b.major
+                
+                # Calculate compatibility score
+                if compatible:
+                    # Minor version differences reduce score slightly
+                    minor_diff = abs(ver_a.minor - ver_b.minor)
+                    score = 1.0 - (minor_diff * 0.01)  # 1% penalty per minor version
+                else:
+                    score = 0.0
+                
+                issues = []
+                if not compatible:
+                    issues.append(f"Major version mismatch: {ver_a.major} vs {ver_b.major}")
+                
+                return {
+                    "compatible": compatible and score >= 0.98,
+                    "compatibility_score": max(score, 0.0),
+                    "issues": issues
+                }
+
+        detect_conflicts:
+          description: "Detect integration conflicts between components"
+          parameters:
+            components:
+              type: "List[Dict[str, Any]]"
+              description: "List of component specifications"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "conflicts_detected: bool"
+              - "conflict_details: List[Dict]" # List of conflict descriptions
+              - "resolution_suggestions: List[str]" # Suggested resolutions
+          implementation_notes:
+            - "Check for duplicate resource definitions"
+            - "Identify conflicting dependencies"
+            - "Detect incompatible configuration requirements"
+            - "Provide conflict resolution suggestions"
+          example_implementation: |
+            def detect_conflicts(self, components):
+                conflicts = []
+                suggestions = []
+                
+                # Check for port conflicts
+                ports = {}
+                for comp in components:
+                    port = comp.get("port")
+                    if port:
+                        if port in ports:
+                            conflicts.append({
+                                "type": "port_conflict",
+                                "components": [ports[port], comp["name"]],
+                                "port": port
+                            })
+                            suggestions.append(f"Change port for {comp['name']}")
+                        else:
+                            ports[port] = comp["name"]
+                
+                # Check for dependency conflicts
+                deps = {}
+                for comp in components:
+                    for dep_name, dep_ver in comp.get("dependencies", {}).items():
+                        if dep_name in deps and deps[dep_name] != dep_ver:
+                            conflicts.append({
+                                "type": "dependency_conflict",
+                                "dependency": dep_name,
+                                "versions": [deps[dep_name], dep_ver]
+                            })
+                            suggestions.append(f"Align {dep_name} version across components")
+                        else:
+                            deps[dep_name] = dep_ver
+                
+                return {
+                    "conflicts_detected": len(conflicts) > 0,
+                    "conflict_details": conflicts,
+                    "resolution_suggestions": suggestions
+                }
+
+        validate_compatibility_performance:
+          description: "Validate compatibility analysis meets <30s target"
+          parameters: {}
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "analysis_time: float" # Must be < 30s
+              - "meets_target: bool" # Must be True
+          implementation_notes:
+            - "Execute compatibility analysis for 10 component pairs"
+            - "Measure total analysis time"
+            - "Validate completion within 30 seconds"
+          example_implementation: |
+            def validate_compatibility_performance(self):
+                start = time.time()
+                
+                # Analyze 10 component pairs
+                for i in range(10):
+                    self.analyze_compatibility(f"1.{i}.0", f"1.{i+1}.0")
+                
+                analysis_time = time.time() - start
+                return {
+                    "analysis_time": analysis_time,
+                    "meets_target": analysis_time < 30.0
+                }
+
+  remote_execution:
+    priority: "PHASE 4: REMOTE EXECUTION"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/remote_execution.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-007: Remote Execution Orchestration"
+    impact: "Enables remote test execution orchestration with <5s planning time"
+    failing_tests:
+      - "test_remote_execution_planning_fails_initially"
+      - "test_execution_monitoring_fails_initially"
+
+    minimal_implementation:
+      class_name: "RemoteExecutionOrchestrator"
+      purpose: "Remote test execution orchestration and monitoring"
+
+      required_methods:
+        plan_remote_execution:
+          description: "Plan remote test execution across distributed environments"
+          parameters:
+            test_suite:
+              type: "str"
+              description: "Test suite to execute remotely"
+            target_environments:
+              type: "List[str]"
+              description: "Target execution environments"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "execution_plan: Dict" # Execution plan details
+              - "estimated_duration: float" # Estimated execution time
+              - "planning_time: float" # Must be < 5.0s
+          implementation_notes:
+            - "Analyze test suite and target environments"
+            - "Create distributed execution plan"
+            - "Estimate total execution duration"
+            - "Complete planning within 5 seconds"
+          example_implementation: |
+            def plan_remote_execution(self, test_suite, target_environments):
+                start = time.time()
+                
+                # Simple execution planning
+                tests_per_env = self._distribute_tests(test_suite, target_environments)
+                
+                execution_plan = {
+                    "test_suite": test_suite,
+                    "environments": target_environments,
+                    "distribution": tests_per_env,
+                    "parallel_execution": True
+                }
+                
+                # Estimate duration (simplified)
+                estimated_duration = len(tests_per_env) * 2.0  # 2s per test
+                planning_time = time.time() - start
+                
+                return {
+                    "execution_plan": execution_plan,
+                    "estimated_duration": estimated_duration,
+                    "planning_time": planning_time
+                }
+
+        monitor_execution:
+          description: "Monitor remote test execution progress"
+          parameters:
+            execution_id:
+              type: "str"
+              description: "Remote execution identifier"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "status: str" # queued, running, completed, failed
+              - "progress_percentage: float" # 0.0 to 100.0
+              - "results: Optional[Dict]" # Execution results if completed
+          implementation_notes:
+            - "Query remote execution status"
+            - "Aggregate progress from distributed executors"
+            - "Return consolidated status and results"
+          example_implementation: |
+            def monitor_execution(self, execution_id):
+                if execution_id not in self._executions:
+                    raise ValueError(f"Execution {execution_id} not found")
+                
+                execution = self._executions[execution_id]
+                return {
+                    "status": execution["status"],
+                    "progress_percentage": execution.get("progress", 0.0),
+                    "results": execution.get("results")
+                }
+
+  realtime_progress:
+    priority: "PHASE 4: REAL-TIME PROGRESS"
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/realtime_progress.py"
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+    requirement: "Required for REQ-INT-008: Real-Time Progress Integration"
+    impact: "Enables real-time progress updates with <1s delivery via WebSocket"
+    failing_tests:
+      - "test_websocket_progress_updates_fails_initially"
+      - "test_progress_notification_delivery_fails_initially"
+
+    minimal_implementation:
+      class_name: "RealTimeProgressIntegration"
+      purpose: "Real-time progress updates via WebSocket with <1s delivery"
+
+      required_methods:
+        establish_websocket_connection:
+          description: "Establish WebSocket connection for real-time updates"
+          parameters:
+            client_id:
+              type: "str"
+              description: "Client identifier for connection"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "connected: bool" # Must be True
+              - "websocket_url: str" # WebSocket connection URL
+              - "connection_id: str" # Unique connection identifier
+          implementation_notes:
+            - "Create WebSocket server endpoint"
+            - "Accept client connection with handshake"
+            - "Assign unique connection ID"
+            - "Return connection details"
+          example_implementation: |
+            import websockets
+            import asyncio
+            
+            def establish_websocket_connection(self, client_id):
+                # Simplified WebSocket connection
+                ws_url = f"ws://localhost:8765/progress/{client_id}"
+                connection_id = f"conn_{client_id}_{int(time.time())}"
+                
+                # Store connection in registry
+                self._connections[connection_id] = {
+                    "client_id": client_id,
+                    "url": ws_url,
+                    "connected_at": time.time()
+                }
+                
+                return {
+                    "connected": True,
+                    "websocket_url": ws_url,
+                    "connection_id": connection_id
+                }
+
+        deliver_progress_notification:
+          description: "Deliver progress notification via WebSocket within <1s"
+          parameters:
+            connection_id:
+              type: "str"
+              description: "WebSocket connection identifier"
+            notification_data:
+              type: "Dict[str, Any]"
+              description: "Progress notification payload"
+          returns:
+            type: "Dict[str, Any]"
+            fields:
+              - "delivered: bool" # Must be True
+              - "delivery_time: float" # Must be < 1.0s
+              - "acknowledgment: str" # Client acknowledgment
+          implementation_notes:
+            - "Send notification through WebSocket connection"
+            - "Wait for client acknowledgment"
+            - "Measure delivery time from send to ack"
+            - "Ensure delivery within 1 second"
+          example_implementation: |
+            async def deliver_progress_notification(self, connection_id, notification_data):
+                start = time.time()
+                
+                if connection_id not in self._connections:
+                    raise ValueError(f"Connection {connection_id} not found")
+                
+                # Send notification through WebSocket
+                # (Simplified - actual implementation would use websockets library)
+                message = json.dumps({
+                    "type": "progress_update",
+                    "data": notification_data,
+                    "timestamp": time.time()
+                })
+                
+                # Simulate WebSocket send and ack
+                await asyncio.sleep(0.1)  # Simulated network latency
+                
+                delivery_time = time.time() - start
+                return {
+                    "delivered": True,
+                    "delivery_time": delivery_time,
+                    "acknowledgment": "ACK"
+                }
+
               default: 2.0
               description: "Maximum load time in seconds"
           returns:
@@ -3067,36 +4120,150 @@ iteration_16:
             }
 
     validation_steps:
-      - "Replace NotImplementedError in render_performance_overview with minimal implementation"
-      - "Replace NotImplementedError in display_performance_trends with minimal implementation"
-      - "Replace NotImplementedError in show_performance_alerts with minimal implementation"
-      - "Replace NotImplementedError in render_real_time_metrics with minimal implementation"
-      - "Add comprehensive input validation for all methods"
-      - "Run pytest to verify all 4 tests pass with actual implementations"
-      - "Validate that tests pass because proper return dictionaries are provided"
+      - "Implement context_engine_integration.py with all 5 methods"
+      - "Implement workflow_integration.py with all 2 methods"
+      - "Complete mobile_auth_integration.py with all 6 methods"
+      - "Implement mobile_command_integration.py with all 3 methods"
+      - "Implement cross_component_integration.py with all 3 methods"
+      - "Implement component_compatibility.py with all 3 methods"
+      - "Implement remote_execution.py with all 2 methods"
+      - "Implement realtime_progress.py with all 2 methods"
+      - "Run pytest to verify all 24 tests pass with actual implementations"
+      - "Validate performance targets met (<200ms, <1s, <2s, <5min, <30s)"
 
     success_criteria:
-      - "All 4 tests pass with actual implementations (no NotImplementedError)"
-      - "Module imports successfully from test file"
-      - "Class instantiates without errors"
+      - "All 24 tests pass with actual implementations (no NotImplementedError)"
+      - "All modules import successfully from test file"
+      - "All classes instantiate without errors"
       - "All methods return properly structured dictionaries"
-      - "Input validation raises ValueError for invalid inputs"
-      - "Performance calculations accurate (score, trends, thresholds)"
-      - "Ready for REFACTOR phase (enhanced features and optimizations)"
+      - "Performance targets validated (query <200ms, auth <1s, command <2s, suite <5min, compat <30s)"
+      - "Reliability targets met (Context Engine 99.9%, Mobile API 99.5%)"
+      - "Ready for REFACTOR phase (optimization and enhancement)"
 
 ---
-# END OF GREEN PHASE MINIMAL IMPLEMENTATION PROMPT
-# Target: Pass All 24 Failing User Interface Layer Tests + TDD Iterations 13-16 (3 + 3 + 3 + 4 tests)
-# Components: 8 UI components + MobileUIComponents + ContextVisualizationInterface + SecurityDashboardInterface + PerformanceMonitoringDashboard
-# Test Files:
-#   - Main UI: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_contextual_pyramid_ui.py
-#   - Iteration 13: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_mobile_ui_components_iteration_13.py
-#   - Iteration 14: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/USER INTERFACE LAYER/test_context_visualization_interface_iteration_14.py
-#   - Iteration 15: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_security_dashboard_interface.py
-#   - Iteration 16: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_performance_monitoring_dashboard.py
+# IMPLEMENTATION STRATEGY
+
+implementation_strategy:
+  execution_order:
+    phase_1_context_workflow:
+      priority: "CRITICAL - Foundation for all context-aware features"
+      components:
+        - context_engine_integration
+        - workflow_integration
+      estimated_time: "2-3 hours"
+      dependencies: "None - can start immediately"
+
+    phase_2_mobile_integration:
+      priority: "HIGH - Unblocks 69% of UI requirements"
+      components:
+        - mobile_auth_integration
+        - mobile_command_integration
+      estimated_time: "2-3 hours"
+      dependencies: "None - independent of Phase 1"
+
+    phase_3_cross_component:
+      priority: "MEDIUM - Quality validation"
+      components:
+        - cross_component_integration
+        - component_compatibility
+      estimated_time: "1-2 hours"
+      dependencies: "Benefits from Phase 1 & 2 being complete"
+
+    phase_4_advanced_features:
+      priority: "MEDIUM - Advanced capabilities"
+      components:
+        - remote_execution
+        - realtime_progress
+      estimated_time: "1-2 hours"
+      dependencies: "Requires Phase 2 mobile infrastructure"
+
+  common_patterns:
+    error_handling:
+      - "Use try/except blocks for external API calls"
+      - "Raise ConnectionError for API connection failures"
+      - "Raise ValueError for invalid input parameters"
+      - "Log errors for debugging and monitoring"
+
+    performance_measurement:
+      - "Use time.time() for timing measurements"
+      - "Calculate average from multiple samples (n=10)"
+      - "Compare against target thresholds"
+      - "Return timing data in result dictionaries"
+
+    api_communication:
+      - "Use requests library for HTTP/REST APIs"
+      - "Set appropriate timeouts (200ms, 1s, 2s)"
+      - "Handle response.raise_for_status() for error detection"
+      - "Parse JSON responses with response.json()"
+
+    authentication:
+      - "Use PyJWT library for JWT token generation/validation"
+      - "Include device_id, username in token claims"
+      - "Set expiration time (24 hours default)"
+      - "Validate tokens before processing requests"
+
+    websocket_integration:
+      - "Use websockets library for real-time connections"
+      - "Implement async/await pattern for non-blocking I/O"
+      - "Track connections in registry dictionary"
+      - "Measure delivery time for performance validation"
+
+  dependency_installation:
+    required_packages:
+      - "requests - HTTP client for REST APIs"
+      - "PyJWT - JWT token generation/validation"
+      - "websockets - WebSocket server/client"
+      - "packaging - Version comparison utilities"
+    
+    install_command: |
+      pip install requests PyJWT websockets packaging
+
+  testing_workflow:
+    step_1_individual_components:
+      - "Test each module independently as implemented"
+      - "Run pytest tests/integration/test_integration_layer.py::TestContextEngineIntegration"
+      - "Fix any failures before moving to next component"
+
+    step_2_performance_validation:
+      - "Run performance-specific tests"
+      - "Run pytest tests/integration/test_integration_layer.py -k performance"
+      - "Verify all timing targets met"
+
+    step_3_reliability_validation:
+      - "Run reliability-specific tests"
+      - "Run pytest tests/integration/test_integration_layer.py -k reliability"
+      - "Verify 99.9% uptime and 99.5% availability"
+
+    step_4_full_suite:
+      - "Run complete Integration Layer test suite"
+      - "Run pytest tests/integration/test_integration_layer.py -v"
+      - "Verify 24/24 tests passing"
+
+  post_implementation_validation:
+    requirements_verification:
+      - "Verify all 18 requirements covered (8 functional + 3 performance + 2 reliability + 5 integration)"
+      - "Run layer_requirements_verification.py for Integration Layer"
+      - "Generate requirements traceability report"
+
+    ui_layer_impact_assessment:
+      - "Re-run UI Layer requirements verification"
+      - "Compare UI production readiness before/after Integration Layer"
+      - "Expected improvement: 15/100 → 60-70/100"
+      - "Document 11 of 16 UI requirements unblocked"
+
+---
+# END OF GREEN PHASE MINIMAL IMPLEMENTATION PROMPT - INTEGRATION LAYER
+# Target: Pass All 24 Failing Integration Layer Tests
+# Components: 8 integration modules for Context Engine, Mobile, Workflow, and Real-Time integration
+# Test File: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer.py
 # Implementation Files:
-#   - Main UI: /workspaces/control_tower/src/ui/components/contextual_pyramid_ui.py
-#   - Iteration 13: /workspaces/control_tower/src/ui/components/mobile_ui_components.py
-#   - Iteration 14: /workspaces/control_tower/src/ui/components/context_visualization_interface.py
-#   - Iteration 15: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/security_dashboard_interface.py
-#   - Iteration 16: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/performance_monitoring_dashboard.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/context_engine_integration.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/workflow_integration.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_command_integration.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/cross_component_integration.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/component_compatibility.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/remote_execution.py
+#   - /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/realtime_progress.py
+# UI Impact: Unblocks 11 of 16 UI requirements (69%), improves production readiness from 15/100 to 60-70/100
+# Estimated Time: 6-8 hours total across all 8 components
