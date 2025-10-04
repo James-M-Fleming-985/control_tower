@@ -8,49 +8,81 @@ Status: GREEN (Minimal working implementation)
 import time
 from typing import Dict, Any
 
+# Workflow progression constants
+LAYER_PROGRESSION_MAP = {
+    "data_access": "business_logic",
+    "business_logic": "integration",
+    "integration": "ui",
+    "ui": "complete"
+}
+
+DECISION_TIME_TARGET = 1.0  # seconds
+
 
 class WorkflowIntegration:
     """Workflow integration for intelligent progression decisions."""
     
     def __init__(self):
-        """Initialize workflow integration"""
-        self._layer_progression = {
-            "data_access": "business_logic",
-            "business_logic": "integration",
-            "integration": "ui",
-            "ui": "complete"
-        }
+        """Initialize workflow integration with progression map"""
+        self._layer_progression = LAYER_PROGRESSION_MAP
     
     def determine_next_progression(
         self,
         completion_event: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Determine next workflow progression based on completion event"""
+        """Determine next workflow progression based on completion event
+        
+        Args:
+            completion_event: Dict containing component_id, completion_type,
+                            and progression_context
+                            
+        Returns:
+            Dict with next_layer, next_component, decision_time, rationale
+        """
         start = time.time()
         
-        # Extract component and context from event
+        # Extract event details
         component_id = completion_event.get("component_id", "")
         completion_type = completion_event.get("completion_type", "")
-        progression_context = completion_event.get("progression_context", "")
+        progression_context = completion_event.get(
+            "progression_context", ""
+        )
         
-        # Determine next progression based on completion type
+        # Determine next step based on completion type
+        next_step = self._calculate_next_step(
+            component_id, completion_type
+        )
+        
+        # Add timing and context
+        decision_time = time.time() - start
+        next_step["decision_time"] = decision_time
+        next_step["progression_context"] = progression_context
+        return next_step
+    
+    def _calculate_next_step(
+        self, component_id: str, completion_type: str
+    ) -> Dict[str, Any]:
+        """Calculate the next workflow step
+        
+        Args:
+            component_id: Identifier of the completed component
+            completion_type: Type of completion event
+            
+        Returns:
+            Dict with next_layer, next_component, and rationale
+        """
         if completion_type == "layer_complete":
-            next_step = {
+            return {
                 "next_layer": "integration",
                 "next_component": component_id,
                 "rationale": "Layer complete - progress to next layer"
             }
         else:
-            next_step = {
+            return {
                 "next_layer": "current",
                 "next_component": component_id,
                 "rationale": "Continue in current layer"
             }
-        
-        decision_time = time.time() - start
-        next_step["decision_time"] = decision_time
-        next_step["progression_context"] = progression_context
-        return next_step
     
     def coordinate_automatic_triggers(
         self,

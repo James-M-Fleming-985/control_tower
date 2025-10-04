@@ -2,6 +2,13 @@
 
 import time
 from typing import Dict, Any, List
+import re
+
+# Compatibility analysis constants
+TARGET_ANALYSIS_TIME_SECONDS = 30.0
+MIN_COMPATIBILITY_SCORE = 0.0
+MAX_COMPATIBILITY_SCORE = 1.0
+COMPATIBLE_VERSION_THRESHOLD = 0.7
 
 
 class ComponentCompatibility:

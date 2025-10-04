@@ -10,6 +10,11 @@ device registration, session management, and security protocols.
 
 from typing import Dict, Any, Tuple
 
+# Authentication constants
+DEFAULT_TOKEN_EXPIRY_SECONDS = 86400  # 24 hours
+TARGET_AUTH_PERFORMANCE_MS = 1000  # 1 second
+TARGET_UPTIME_PERCENTAGE = 99.5
+
 
 class MobileAuthIntegration:
     """

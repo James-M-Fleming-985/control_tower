@@ -1,0 +1,75 @@
+"""
+Context Engine API Integration Tests - TDD Iteration 9
+RED Phase: Failing tests for Context Engine external API integration
+Layer: Integration Layer
+Requirement: REQ-DATA-007 Context Engine Integration
+"""
+
+import pytest
+import sys
+import os
+
+# Add src to path
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(__file__), '..', '..', 'src', 'integration'
+    )
+)
+
+from context_engine_api_integration_iteration_9 import (
+    ContextEngineAPIIntegration
+)
+
+
+class TestContextEngineAPIIntegration:
+    """RED Phase: Tests expecting NotImplementedError"""
+    
+    def test_sync_with_external_context_engine_fails_initially(self):
+        """
+        RED: External Context Engine sync should fail before implementation
+        """
+        api_integration = ContextEngineAPIIntegration()
+        sync_request = {
+            "user_id": "user_123",
+            "context_data": {
+                "current_feature": "validation_engine",
+                "active_tests": ["test_001", "test_002"],
+                "performance_metrics": {}
+            },
+            "sync_strategy": "bidirectional"
+        }
+        
+        # This should FAIL initially - NotImplementedError expected
+        with pytest.raises(NotImplementedError):
+            api_integration.sync_with_external_context_engine(sync_request)
+    
+    def test_handle_context_conflicts_fails_initially(self):
+        """
+        RED: Context conflict handling should fail before implementation
+        """
+        api_integration = ContextEngineAPIIntegration()
+        conflict_scenario = {
+            "conflict_type": "concurrent_modification",
+            "local_version": 5,
+            "remote_version": 6,
+            "conflict_resolution_strategy": "merge"
+        }
+        
+        # This should FAIL initially - NotImplementedError expected
+        with pytest.raises(NotImplementedError):
+            api_integration.handle_context_conflicts(conflict_scenario)
+    
+    def test_validate_context_consistency_across_systems_fails_initially(
+        self
+    ):
+        """
+        RED: Cross-system context validation should fail before implementation
+        """
+        api_integration = ContextEngineAPIIntegration()
+        
+        # This should FAIL initially - NotImplementedError expected
+        with pytest.raises(NotImplementedError):
+            api_integration.validate_context_consistency_across_systems(
+                "user_123"
+            )
