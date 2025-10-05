@@ -340,14 +340,16 @@ class SecurityDashboardInterface:
         if time_range == 'all':
             return events
         
-        # Parse current time or use now
+        # Parse current time or use now (ensure timezone-aware)
         if current_time:
             try:
                 now = datetime.fromisoformat(current_time.replace('Z', '+00:00'))
             except ValueError:
-                now = datetime.now()
+                from datetime import timezone
+                now = datetime.now(timezone.utc)
         else:
-            now = datetime.now()
+            from datetime import timezone
+            now = datetime.now(timezone.utc)
         
         # Calculate cutoff time
         time_deltas = {
@@ -390,12 +392,13 @@ class SecurityDashboardInterface:
         event_type = event.get('event', '').lower()
         enriched['event_icon'] = event_icons.get(event_type, '📝')
         
-        # Add relative timestamp
+        # Add relative timestamp (ensure timezone-aware)
         try:
             if current_time:
                 now = datetime.fromisoformat(current_time.replace('Z', '+00:00'))
             else:
-                now = datetime.now()
+                from datetime import timezone
+                now = datetime.now(timezone.utc)
             
             event_time = datetime.fromisoformat(event['timestamp'].replace('Z', '+00:00'))
             delta = now - event_time

@@ -1,17 +1,19 @@
 """
-Test Suite for Performance Monitoring Dashboard - TDD Iteration 16 RED Phase
-Tests that methods raise NotImplementedError before implementation.
+Test Suite for Performance Monitoring Dashboard - TDD Iteration 16 REFACTOR Phase
+Tests that methods work correctly with full implementation.
+Updated: 2025-10-05
 """
 
-import pytest
-from performance_monitoring_dashboard import PerformanceMonitoringDashboard
+from src.user_interface.performance_monitoring_dashboard import (
+    PerformanceMonitoringDashboard
+)
 
 
 class TestPerformanceMonitoringDashboard:
-    """Test suite for RED phase - all tests should pass by raising NotImplementedError."""
+    """Test suite for REFACTOR phase - all tests validate working implementations."""
     
-    def test_render_performance_overview_fails_initially(self):
-        """RED: Performance overview rendering should fail before implementation"""
+    def test_render_performance_overview_works_after_implementation(self):
+        """REFACTOR: Performance overview rendering should work with full implementation"""
         dashboard = PerformanceMonitoringDashboard()
         performance_data = {
             "system_performance": {
@@ -27,12 +29,17 @@ class TestPerformanceMonitoringDashboard:
             }
         }
         
-        # This should FAIL initially - NotImplementedError expected
-        with pytest.raises(NotImplementedError):
-            dashboard.render_performance_overview(performance_data)
+        # This should work - full implementation exists
+        result = dashboard.render_performance_overview(performance_data)
+        
+        # Verify return structure
+        assert result["overview_rendered"] is True
+        assert "system_status" in result
+        assert "components_count" in result  # Fixed key name
+        assert "performance_score" in result
     
-    def test_display_performance_trends_fails_initially(self):
-        """RED: Performance trends display should fail before implementation"""
+    def test_display_performance_trends_works_after_implementation(self):
+        """REFACTOR: Performance trends display should work with full implementation"""
         dashboard = PerformanceMonitoringDashboard()
         trends_data = {
             "time_range": "last_24_hours",
@@ -44,12 +51,17 @@ class TestPerformanceMonitoringDashboard:
             "target_line": 200
         }
         
-        # This should FAIL initially - NotImplementedError expected
-        with pytest.raises(NotImplementedError):
-            dashboard.display_performance_trends(trends_data)
+        # This should work - full implementation exists
+        result = dashboard.display_performance_trends(trends_data)
+        
+        # Verify return structure
+        assert result["trends_displayed"] is True
+        assert "time_range" in result
+        assert "data_points" in result  # Fixed key name
+        assert result["data_points"] == 3
     
-    def test_show_performance_alerts_fails_initially(self):
-        """RED: Performance alerts display should fail before implementation"""
+    def test_show_performance_alerts_works_after_implementation(self):
+        """REFACTOR: Performance alerts display should work with full implementation"""
         dashboard = PerformanceMonitoringDashboard()
         alerts_data = {
             "active_alerts": [
@@ -59,12 +71,16 @@ class TestPerformanceMonitoringDashboard:
             "alert_summary": {"critical": 0, "warning": 1, "info": 0}
         }
         
-        # This should FAIL initially - NotImplementedError expected
-        with pytest.raises(NotImplementedError):
-            dashboard.show_performance_alerts(alerts_data)
+        # This should work - full implementation exists
+        result = dashboard.show_performance_alerts(alerts_data)
+        
+        # Verify return structure
+        assert result["alerts_displayed"] is True
+        assert "active_count" in result
+        assert result["active_count"] == 1
     
-    def test_render_real_time_metrics_fails_initially(self):
-        """RED: Real-time metrics rendering should fail before implementation"""
+    def test_render_real_time_metrics_works_after_implementation(self):
+        """REFACTOR: Real-time metrics rendering should work with full implementation"""
         dashboard = PerformanceMonitoringDashboard()
         real_time_config = {
             "refresh_interval_seconds": 5,
@@ -72,10 +88,11 @@ class TestPerformanceMonitoringDashboard:
             "visualization_type": "live_chart"
         }
         
-        # This should FAIL initially - NotImplementedError expected
-        with pytest.raises(NotImplementedError):
-            dashboard.render_real_time_metrics(real_time_config)
-
-
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+        # This should work - full implementation exists
+        result = dashboard.render_real_time_metrics(real_time_config)
+        
+        # Verify return structure
+        assert result["metrics_rendered"] is True
+        assert "refresh_interval_seconds" in result  # Fixed key name
+        assert "visualization_type" in result
+        assert result["refresh_interval_seconds"] == 5
