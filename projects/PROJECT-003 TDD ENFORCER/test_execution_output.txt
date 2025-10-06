@@ -1,0 +1,209 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 18 items
+
+tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_discover_tests_by_pattern_fails_initially FAILED [  5%]
+tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_discover_tests_in_subdirectories_fails_initially FAILED [ 11%]
+tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_list_discovered_tests_fails_initially FAILED [ 16%]
+tests/integration/test_integration_layer_simplified.py::TestCategorization::test_categorize_by_directory_structure_fails_initially FAILED [ 22%]
+tests/integration/test_integration_layer_simplified.py::TestCategorization::test_categorize_by_naming_convention_fallback_fails_initially FAILED [ 27%]
+tests/integration/test_integration_layer_simplified.py::TestCategorization::test_count_tests_by_category_fails_initially FAILED [ 33%]
+tests/integration/test_integration_layer_simplified.py::TestPytestIntegration::test_pytest_test_discovery_fails_initially PASSED [ 38%]
+tests/integration/test_integration_layer_simplified.py::TestPytestIntegration::test_pytest_test_execution_fails_initially PASSED [ 44%]
+tests/integration/test_integration_layer_simplified.py::TestPytestIntegration::test_unittest_fallback_support_fails_initially PASSED [ 50%]
+tests/integration/test_integration_layer_simplified.py::TestPyramidRatioCalculation::test_calculate_pyramid_ratios_fails_initially PASSED [ 55%]
+tests/integration/test_integration_layer_simplified.py::TestPyramidRatioCalculation::test_validate_pyramid_shape_fails_initially PASSED [ 61%]
+tests/integration/test_integration_layer_simplified.py::TestPyramidRatioCalculation::test_identify_inverted_pyramid_fails_initially PASSED [ 66%]
+tests/integration/test_integration_layer_simplified.py::TestResultCollection::test_collect_test_results_fails_initially PASSED [ 72%]
+tests/integration/test_integration_layer_simplified.py::TestResultCollection::test_aggregate_results_by_level_fails_initially PASSED [ 77%]
+tests/integration/test_integration_layer_simplified.py::TestResultCollection::test_calculate_pass_rates_fails_initially PASSED [ 83%]
+tests/integration/test_integration_layer_simplified.py::TestValidationLogic::test_validate_minimum_test_counts_fails_initially PASSED [ 88%]
+tests/integration/test_integration_layer_simplified.py::TestValidationLogic::test_validate_pass_rate_thresholds_fails_initially PASSED [ 94%]
+tests/integration/test_integration_layer_simplified.py::TestValidationLogic::test_determine_overall_compliance_fails_initially PASSED [100%]/home/vscode/.local/lib/python3.12/site-packages/coverage/report_core.py:107: CoverageWarning: Couldn't parse Python file '/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/data_access/tdd_phase_repository_backup.py' (couldnt-parse); see https://coverage.readthedocs.io/en/7.10.7/messages.html#warning-couldnt-parse
+  coverage._warn(msg, slug="couldnt-parse")
+
+ERROR: Coverage failure: total of 2 is less than fail-under=95
+
+
+=================================== FAILURES ===================================
+_________ TestDiscovery.test_discover_tests_by_pattern_fails_initially _________
+tests/integration/test_integration_layer_simplified.py:69: in test_discover_tests_by_pattern_fails_initially
+    discovery.discover_by_pattern(test_directory, patterns)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestDiscovery' object has no attribute 'discover_by_pattern'
+_____ TestDiscovery.test_discover_tests_in_subdirectories_fails_initially ______
+tests/integration/test_integration_layer_simplified.py:79: in test_discover_tests_in_subdirectories_fails_initially
+    discovery.discover_in_subdirectories(base_directory, subdirectories)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestDiscovery' object has no attribute 'discover_in_subdirectories'
+___________ TestDiscovery.test_list_discovered_tests_fails_initially ___________
+tests/integration/test_integration_layer_simplified.py:88: in test_list_discovered_tests_fails_initially
+    test_list = discovery.list_all_tests(test_directory)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestDiscovery' object has no attribute 'list_all_tests'
+__ TestCategorization.test_categorize_by_directory_structure_fails_initially ___
+tests/integration/test_integration_layer_simplified.py:109: in test_categorize_by_directory_structure_fails_initially
+    categories = categorization.categorize_by_directory(test_items)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestCategorization' object has no attribute 'categorize_by_directory'
+_ TestCategorization.test_categorize_by_naming_convention_fallback_fails_initially _
+tests/integration/test_integration_layer_simplified.py:121: in test_categorize_by_naming_convention_fallback_fails_initially
+    categories = categorization.categorize_by_naming(test_items)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestCategorization' object has no attribute 'categorize_by_naming'
+_______ TestCategorization.test_count_tests_by_category_fails_initially ________
+tests/integration/test_integration_layer_simplified.py:134: in test_count_tests_by_category_fails_initially
+    counts = categorization.count_by_category(categorized_tests)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestCategorization' object has no attribute 'count_by_category'
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                                 Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------
+src/__init__.py                                                          0      0   100%
+src/business_logic/__init__.py                                          16     16     0%   13-80
+src/business_logic/authentication.py                                    14     14     0%   6-40
+src/business_logic/availability.py                                      24     24     0%   5-62
+src/business_logic/cluster.py                                           19     19     0%   5-52
+src/business_logic/compliance_validator.py                             192    192     0%   9-478
+src/business_logic/constants.py                                          6      6     0%   9-48
+src/business_logic/continuous_quality.py                                22     22     0%   6-69
+src/business_logic/coverage.py                                           5      5     0%   6-20
+src/business_logic/data_protection.py                                    7      7     0%   6-26
+src/business_logic/disaster_recovery.py                                 12     12     0%   5-41
+src/business_logic/error_classification.py                              52     52     0%   5-142
+src/business_logic/error_recovery.py                                   147    147     0%   5-317
+src/business_logic/external_integration.py                              10     10     0%   6-29
+src/business_logic/integration.py                                       18     18     0%   6-74
+src/business_logic/phase_enforcement.py                                222    222     0%   9-488
+src/business_logic/quality_metrics.py                                    5      5     0%   6-28
+src/business_logic/quality_models.py                                    50     50     0%   5-72
+src/business_logic/recovery.py                                          14     14     0%   5-45
+src/business_logic/red_green_refactor_enforcer.py                      126    126     0%   15-308
+src/business_logic/security.py                                          28     28     0%   5-73
+src/business_logic/security_audit.py                                    11     11     0%   6-35
+src/business_logic/security_manager.py                                 128    128     0%   5-295
+src/business_logic/stage_gate_manager.py                               197    197     0%   9-473
+src/business_logic/stage_gate_models.py                                 23     23     0%   3-33
+src/business_logic/stage_gate_validator.py                             142    142     0%   5-287
+src/business_logic/state_management.py                                  33     33     0%   5-78
+src/business_logic/tdd_compliance_checker.py                           155    155     0%   5-338
+src/business_logic/tdd_cycle_enforcer.py                               390    390     0%   9-1046
+src/business_logic/tdd_models.py                                        59     59     0%   5-93
+src/business_logic/test_effectiveness.py                                 9      9     0%   6-37
+src/business_logic/test_generation_verification_logic.py               446    446     0%   12-985
+src/business_logic/test_quality_scorer.py                              127    127     0%   5-333
+src/business_logic/testability_framework.py                            163    163     0%   5-389
+src/business_logic/verification_algorithms.py                         2768   2768     0%   6-10514
+src/business_logic/verification_cache.py                                75     75     0%   5-144
+src/business_logic/verification_service.py                             159    159     0%   5-394
+src/business_logic/workflow_integration.py                               7      7     0%   5-17
+src/data_access/__init__.py                                              2      2     0%   12-14
+src/data_access/component_status_repository.py                         111    111     0%   5-220
+src/data_access/context_engine_repository.py                           164    164     0%   1-367
+src/data_access/file_storage.py                                         55     55     0%   5-111
+src/data_access/git_checkpoint_models.py                                62     62     0%   9-98
+src/data_access/git_operations.py                                      341    341     0%   9-642
+src/data_access/git_operations_manager.py                              110    110     0%   16-251
+src/data_access/mobile_command_history_repository.py                   773    773     0%   1-1692
+src/data_access/phase_data_interface.py                                 78     78     0%   9-157
+src/data_access/phase_models.py                                        179    179     0%   9-320
+src/data_access/position_repository.py                                  42     42     0%   5-88
+src/data_access/real_test_file_discovery.py                            111    111     0%   13-295
+src/data_access/real_test_metadata_persistence.py                      194    194     0%   13-556
+src/data_access/real_test_result_storage.py                            214    214     0%   13-495
+src/data_access/real_verification_evidence_storage.py                  211    211     0%   13-624
+src/data_access/requirements_driven_data_access.py                     172    172     0%   8-321
+src/data_access/tdd_phase_repository.py                               1793   1793     0%   9-4282
+src/data_access/test_access_controller.py                              121    121     0%   5-240
+src/data_access/test_backup_manager.py                                 140    140     0%   5-218
+src/data_access/test_concurrency_manager.py                             68     68     0%   5-157
+src/data_access/test_coverage_analyzer.py                              206    206     0%   5-566
+src/data_access/test_data_validator.py                                  55     55     0%   5-85
+src/data_access/test_database_schema.py                                 70     70     0%   5-120
+src/data_access/test_generation_data_access.py                         198    198     0%   12-455
+src/data_access/test_generation_repository.py                          181    181     0%   5-423
+src/data_access/test_integration_orchestrator.py                       394    394     0%   5-913
+src/data_access/test_memory_manager.py                                 185    185     0%   5-339
+src/data_access/test_metadata_manager.py                                55     55     0%   5-76
+src/data_access/test_query_optimizer.py                                 41     41     0%   5-126
+src/data_access/test_recovery_manager.py                                91     91     0%   5-176
+src/data_access/test_repository.py                                     120    120     0%   5-264
+src/data_access/test_verification_data_access.py                       171    171     0%   9-361
+src/data_access/utilities.py                                           109    109     0%   12-306
+src/data_access/workflow_repository.py                                  90     90     0%   5-220
+src/integration/__init__.py                                              7      0   100%
+src/integration/component_compatibility.py                              47     47     0%   3-114
+src/integration/context_engine_api_integration_iteration_9.py           96     96     0%   8-301
+src/integration/context_engine_integration.py                           36     36     0%   6-119
+src/integration/cross_component_integration.py                          26     26     0%   10-77
+src/integration/cross_system_security_integration_iteration_10.py       81     81     0%   8-311
+src/integration/external_api_client.py                                 193    157    19%   39-42, 47, 51-68, 72-90, 99, 116-118, 122-150, 159-175, 183-199, 207-215, 223-235, 252-254, 258-291, 300-324, 336-345, 355-368, 384-386, 390-424, 433-456, 464-516, 525, 533-556
+src/integration/external_system_integration_iteration_12.py             51     51     0%   8-207
+src/integration/external_tool_coordinator.py                            40     40     0%   2-126
+src/integration/fault_tolerance_manager.py                              51     51     0%   2-153
+src/integration/git_operations.py                                       67     67     0%   2-144
+src/integration/integration_models.py                                  169     50    70%   59, 85-86, 90, 115-122, 126, 151-159, 166, 192-195, 199-202, 206-209, 213, 238-239, 243, 267, 291-292, 296-298, 302-304, 308, 333-354, 358
+src/integration/mobile_auth_integration.py                              74     74     0%   11-225
+src/integration/mobile_auth_integration_iteration_8.py                 129    129     0%   17-621
+src/integration/mobile_command_integration.py                           32     32     0%   11-94
+src/integration/optimized_workflow_coordinator.py                      326    326     0%   13-726
+src/integration/performance_monitoring_integration_iteration_11.py      61     61     0%   8-228
+src/integration/pyramid_calculator.py                                    7      0   100%
+src/integration/pyramid_validator.py                                    17     17     0%   5-78
+src/integration/pytest_integration.py                                    7      0   100%
+src/integration/realtime_progress.py                                    20     20     0%   3-61
+src/integration/remote_execution.py                                     19     19     0%   10-69
+src/integration/result_collector.py                                      7      0   100%
+src/integration/security_manager.py                                     54     54     0%   2-141
+src/integration/test_categorization.py                                   7      3    57%   27, 42, 57
+src/integration/test_discovery.py                                        7      3    57%   28, 44, 59
+src/integration/test_runner_coordinator.py                              55     55     0%   2-151
+src/integration/validation_logic.py                                      7      0   100%
+src/integration/workflow_api.py                                        163    163     0%   2-363
+src/integration/workflow_integration.py                                 31     31     0%   8-106
+src/integration/workflow_integration_coordinator.py                    496    386    22%   41-62, 72-77, 80-90, 93-101, 104-109, 112-113, 184-224, 229-297, 309-379, 388-403, 422-468, 477-496, 505-525, 539-573, 589-590, 598-641, 650-651, 655, 667-668, 674-713, 722-750, 757-766, 777-798, 806-817, 833-835, 841-883, 890-898, 902-918, 925-931, 935-943, 947, 955-975, 991-993, 1001-1051, 1060-1080, 1087-1098, 1107-1146, 1163, 1167-1176, 1187, 1196, 1208, 1217, 1229, 1237
+src/tdd_enforcer/__init__.py                                             9      9     0%   17-29
+src/tdd_enforcer/current/__init__.py                                     2      2     0%   13-15
+src/tdd_enforcer/current/mobile_command_history/__init__.py              2      2     0%   12-14
+src/user_interface/__init__.py                                           1      1     0%   2
+src/user_interface/command_interface.py                                108    108     0%   6-229
+src/user_interface/completion_notifications_refactored.py               32     32     0%   10-161
+src/user_interface/context_visualization_interface.py                  141    141     0%   9-408
+src/user_interface/enforcement_display.py                              353    353     0%   6-945
+src/user_interface/integration_dashboard_refactored.py                  51     51     0%   9-170
+src/user_interface/mobile_auth_ui.py                                    53     53     0%   10-218
+src/user_interface/mobile_auth_ui_integration.py                        47     47     0%   11-216
+src/user_interface/mobile_authentication_refactored.py                  50     50     0%   12-231
+src/user_interface/mobile_ui_components.py                             110    110     0%   12-347
+src/user_interface/performance_monitoring_dashboard.py                 121    121     0%   11-308
+src/user_interface/phase_display.py                                    150    150     0%   6-301
+src/user_interface/progress_display.py                                 107    107     0%   11-232
+src/user_interface/progress_tracker.py                                 230    230     0%   6-429
+src/user_interface/progression_tracking_refactored.py                   28     28     0%   10-148
+src/user_interface/responsive_web_framework.py                          35     35     0%   9-225
+src/user_interface/security_dashboard_interface.py                      94     94     0%   11-241
+src/user_interface/security_dashboard_interface_refactored.py          265    265     0%   15-653
+src/user_interface/stage_gate_visualization.py                         162    162     0%   11-329
+src/user_interface/tdd_cycle_interface.py                              158    158     0%   16-395
+src/user_interface/tdd_workflow_interface.py                           245    245     0%   12-740
+src/user_interface/testing_visualization_refactored.py                  23     23     0%   10-159
+src/user_interface/verification_display.py                             433    433     0%   25-910
+--------------------------------------------------------------------------------------------------
+TOTAL                                                                18181  17873     2%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 1.69%
+=========================== short test summary info ============================
+FAILED tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_discover_tests_by_pattern_fails_initially - AttributeError: 'TestDiscovery' object has no attribute 'discover_by_pattern'
+FAILED tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_discover_tests_in_subdirectories_fails_initially - AttributeError: 'TestDiscovery' object has no attribute 'discover_in_subdirectories'
+FAILED tests/integration/test_integration_layer_simplified.py::TestDiscovery::test_list_discovered_tests_fails_initially - AttributeError: 'TestDiscovery' object has no attribute 'list_all_tests'
+FAILED tests/integration/test_integration_layer_simplified.py::TestCategorization::test_categorize_by_directory_structure_fails_initially - AttributeError: 'TestCategorization' object has no attribute 'categorize_by_directory'
+FAILED tests/integration/test_integration_layer_simplified.py::TestCategorization::test_categorize_by_naming_convention_fallback_fails_initially - AttributeError: 'TestCategorization' object has no attribute 'categorize_by_naming'
+FAILED tests/integration/test_integration_layer_simplified.py::TestCategorization::test_count_tests_by_category_fails_initially - AttributeError: 'TestCategorization' object has no attribute 'count_by_category'
+========================= 6 failed, 12 passed in 4.26s =========================

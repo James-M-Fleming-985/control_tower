@@ -1,844 +1,1639 @@
----
-# GREEN Phase Minimal Implementation Prompt - Integration Layer
+------
 
-metadata:
-  prompt_type: "green_phase_implementation"
-  feature_id: "FEATURE-003-02-01"
-  layer_id: "LAYER-003-02-01-004"
-  feature_name: "Contextual Testing Pyramid Validation Engine"
-  layer_name: "Integration Layer"
-  system: "SYSTEM-003-02 Extended Validation Engine"
-  project: "PROJECT-003 TDD Enforcer"
-  tdd_phase: "GREEN"
-  created_date: "2025-10-04"
-  updated_date: "2025-10-04"
+# GREEN Phase Minimal Implementation Prompt - Integration Layer SIMPLIFIED# GREEN Phase Minimal Implementation Prompt - Integration Layer SIMPLIFIED
 
-objective:
-  description: "Implement the minimal required Integration Layer components to pass all 24 failing tests from the Integration Layer RED phase execution"
-  focus: "Creating 8 integration modules for Context Engine API, mobile authentication, workflow coordination, and real-time progress integration"
 
-small_team_appropriateness:
-  team_size: "Designed for 2-8 developers"
-  complexity_level: "Medium-High complexity - manageable for small teams with API integration experience"
-  infrastructure_requirements: "Moderate - REST APIs, WebSocket connections, JWT authentication"
-  time_investment: "1-2 weeks part-time implementation"
-  enterprise_alternatives: "This is NOT enterprise-level integration platform - intentionally simplified"
 
-  small_team_benefits:
-    - "No complex enterprise service bus required"
-    - "Simple REST API and WebSocket patterns instead of message queues"
-    - "JWT-based authentication instead of OAuth2/SAML enterprise solutions"
-    - "Direct API calls instead of microservices orchestration"
-    - "Focuses on essential integrations, not comprehensive enterprise integration"
+metadata:metadata:
 
-execution_context:
-  target: "Pass All 24 Failing Integration Layer Tests"
-  source_test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer.py"
+  prompt_type: "green_phase_implementation"  prompt_type: "green_phase_implementation"
+
+  feature_id: "FEATURE-003-02-01"  feature_id: "FEATURE-003-02-01"
+
+  layer_id: "LAYER-003-02-01-004"  layer_id: "LAYER-003-02-01-004"
+
+  feature_name: "Testing Pyramid Validation Engine"  feature_name: "Testing Pyramid Validation Engine"
+
+  layer_name: "Integration Layer - SIMPLIFIED"  layer_name: "Integration Layer - SIMPLIFIED"
+
+  system: "SYSTEM-003-02 Extended Validation Engine"  system: "SYSTEM-003-02 Extended Validation Engine"
+
+  project: "PROJECT-003 TDD Enforcer"  project: "PROJECT-003 TDD Enforcer"
+
+  tdd_phase: "GREEN"  tdd_phase: "GREEN"
+
+  created_date: "2025-10-04"  created_date: "2025-10-04"
+
+  updated_date: "2025-10-06"  updated_date: "2025-10-06"
+
+  simplification_note: "Mobile, WebSocket, and real-time features moved to SYSTEM-003-04 (DEFERRED)"  simplification_note: "Mobile, WebSocket, and real-time features moved to SYSTEM-003-04 (DEFERRED)"
+
+
+
+objective:objective:
+
+  description: "Implement minimal Integration Layer components to pass all 18 failing tests from RED phase"  description: "Implement minimal Integration Layer components to pass all 18 failing tests from RED phase"
+
+  focus: "pytest/unittest integration, test discovery, pyramid categorization, and validation logic"  focus: "pytest/unittest integration, test discovery, pyramid categorization, and validation logic"
+
+  approach: "Terminal-only, no mobile/WebSocket, simple Python test framework integration"  approach: "Terminal-only, no mobile/WebSocket, simple Python test framework integration"
+
+
+
+small_team_appropriateness:small_team_appropriateness:
+
+  team_size: "Designed for 1-3 developers"  team_size: "Designed for 1-3 developers"
+
+  complexity_level: "Low-Medium - standard Python test framework integration"  complexity_level: "Low-Medium - standard Python test framework integration"
+
+  infrastructure_requirements: "None - local pytest/unittest only"  infrastructure_requirements: "None - local pytest/unittest only"
+
+  time_investment: "2-3 days part-time implementation"  time_investment: "2-3 days part-time implementation"
+
+  enterprise_alternatives: "No enterprise alternatives needed - this IS the pragmatic approach"  enterprise_alternatives: "No enterprise alternatives needed - this IS the pragmatic approach"
+
+
+
+  small_team_benefits:  small_team_benefits:
+
+    - "No external API integration required"    - "No external API integration required"
+
+    - "No WebSocket or real-time infrastructure"    - "No WebSocket or real-time infrastructure"
+
+    - "No mobile authentication or JWT"    - "No mobile authentication or JWT"
+
+    - "Standard Python libraries only (pytest, unittest)"    - "Standard Python libraries only (pytest, unittest)"
+
+    - "Simple file system and directory scanning"    - "Simple file system and directory scanning"
+
+    - "Terminal output only - no dashboards"    - "Terminal output only - no dashboards"
+
+    - "Local execution - no remote orchestration"    - "Local execution - no remote orchestration"
+
+
+
+execution_context:execution_context:
+
+  target: "Pass All 18 Failing Integration Layer Tests"  target: "Pass All 18 Failing Integration Layer Tests"
+
+  source_test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer_simplified.py"  source_test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer_simplified.py"
+
+  source_requirements: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/INTEGRATION LAYER/LAYER-003-02-01-004_integration_requirements_SIMPLIFIED.md"  source_requirements: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/INTEGRATION LAYER/LAYER-003-02-01-004_integration_requirements_SIMPLIFIED.md"
+
+  red_phase_summary: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/INTEGRATION LAYER/RED_PHASE_EXECUTION_SUMMARY_20251006_130016.md"
 
   current_status:
-    failing_tests: 24
-    total_tests: 24
-    pass_rate: 0 # Perfect RED phase
-    missing_components: 8
-    target_components: "8 integration modules for external system integration"
-    requirements_alignment: "24 tests → 18 integration requirements (comprehensive coverage)"
 
-  goal: "100% test pass rate with Context Engine, mobile, and workflow integration"
-  priority_focus:
-    - "Context Engine API Integration (REQ-INT-001)"
-    - "Contextual Workflow Integration (REQ-INT-002)"
-    - "Mobile Authentication Integration (REQ-INT-003)"
-    - "Mobile Command Processing Endpoints (REQ-INT-004)"
-    - "Cross-Component Integration Testing (REQ-INT-005)"
-    - "Component Compatibility Validation (REQ-INT-006)"
-    - "Remote Execution Orchestration (REQ-INT-007)"
-    - "Real-Time Progress Integration (REQ-INT-008)"
+  current_status:    failing_tests: 0  # All 18 tests passing (expecting NotImplementedError)
 
-  ui_layer_impact:
-    status: "CRITICAL DEPENDENCY"
-    location: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/ui/"
-    description: "UI Layer is BLOCKED by Integration Layer - 69% of UI requirements depend on these integrations"
-    note: "Completing Integration Layer will unblock 11 of 16 UI requirements and improve UI production readiness from 15/100 to 60-70/100"
+    failing_tests: 0  # All 18 tests passing (expecting NotImplementedError)    total_tests: 18
 
-critical_components:
-  context_engine_integration:
-    priority: "PHASE 1: CONTEXT ENGINE INTEGRATION"
-    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/context_engine_integration.py"
-    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
-    requirement: "Required for REQ-INT-001: Context Engine API Integration"
-    impact: "Enables real-time position tracking with <200ms query response and 99.9% uptime"
-    failing_tests:
-      - "test_context_engine_connection_fails_initially"
-      - "test_position_query_fails_initially"
-      - "test_context_query_response_time_fails_initially"
-      - "test_context_synchronization_performance_fails_initially"
-      - "test_context_engine_reliability_fails_initially"
+    total_tests: 18    red_phase_complete: true
 
-    minimal_implementation:
-      description: "Context Engine API integration for real-time position tracking and event streaming"
-      class_name: "ContextEngineIntegration"
-      purpose: "Connect to Context Engine API for <200ms position queries and 99.9% reliability"
+    red_phase_complete: true    implementation_stubs_created: 6
 
-      constructor:
-        parameters:
-          api_endpoint:
-            type: "Optional[str]"
-            default: "http://localhost:8080/context"
-            description: "Context Engine API endpoint URL"
-          timeout:
-            type: "Optional[float]"
-            default: 5.0
-            description: "API connection timeout in seconds"
-        initialization:
-          - "Initialize HTTP session for Context Engine API"
-          - "Set up connection pooling for performance"
-          - "Configure retry logic for 99.9% reliability"
-          - "Set performance targets: <200ms queries, <500ms sync"
+    implementation_stubs_created: 6    target_components: "6 integration modules for test framework integration"
 
-      required_methods:
-        establish_context_connection:
-          description: "Establish connection to Context Engine API with validation"
-          parameters: {}
-          returns:
+    target_components: "6 integration modules for test framework integration"    requirements_alignment: "18 tests → 6 simplified requirements (complete coverage)"
+
+    requirements_alignment: "18 tests → 6 simplified requirements (complete coverage)"
+
+  goal: "100% test pass rate with real pytest integration and pyramid validation"
+
+  goal: "100% test pass rate with real pytest integration and pyramid validation"  priority_focus:
+
+  priority_focus:    - "pytest/unittest Integration (REQ-INT-001) - 3 tests"
+
+    - "pytest/unittest Integration (REQ-INT-001) - 3 tests"    - "Test Discovery (REQ-INT-002) - 3 tests"
+
+    - "Test Discovery (REQ-INT-002) - 3 tests"    - "Test Categorization by Directory (REQ-INT-003) - 3 tests"
+
+    - "Test Categorization by Directory (REQ-INT-003) - 3 tests"    - "Pyramid Ratio Calculation (REQ-INT-004) - 3 tests"
+
+    - "Pyramid Ratio Calculation (REQ-INT-004) - 3 tests"    - "Test Result Collection (REQ-INT-005) - 3 tests"
+
+    - "Test Result Collection (REQ-INT-005) - 3 tests"    - "Validation Logic (REQ-INT-006) - 3 tests"
+
+    - "Validation Logic (REQ-INT-006) - 3 tests"
+
+  deferred_features:
+
+  deferred_features:    system_id: "SYSTEM-003-04 MOBILE_DASHBOARD_STREAMING"
+
+    system_id: "SYSTEM-003-04 MOBILE_DASHBOARD_STREAMING"    items:
+
+    rationale: "Deferred until 10+ users or distributed team proven necessary"      - "Context Engine real-time integration"
+
+    items:      - "Mobile authentication endpoints"
+
+      - "Context Engine real-time integration"      - "Mobile command processing"
+
+      - "Mobile authentication endpoints"      - "WebSocket real-time streaming"
+
+      - "Mobile command processing"      - "Remote execution orchestration"
+
+      - "WebSocket real-time streaming"      - "Cross-component integration testing (if not needed)"
+
+      - "Remote execution orchestration"      - "Component compatibility validation"
+
+      - "Cross-component integration testing (if not needed)"      - "Push notifications"
+
+      - "Component compatibility validation"      - "Real-time progress updates"
+
+      - "Push notifications"      - "Dashboard visualizations"
+
+      - "Real-time progress updates"
+
+      - "Dashboard visualizations"  ui_layer_impact:
+
+    status: "SIMPLIFIED DEPENDENCY"
+
+  ui_layer_impact:    description: "UI Layer simplified to terminal output only - no mobile/dashboard features"
+
+    status: "SIMPLIFIED DEPENDENCY"    note: "Completing Integration Layer enables terminal-based pyramid validation output"
+
+    description: "UI Layer simplified to terminal output only - no mobile/dashboard features"          parameters: {}
+
+    note: "Completing Integration Layer enables terminal-based pyramid validation output"          returns:
+
             type: "Dict[str, Any]"
-            fields:
-              - "connected: bool" # Must be True
-              - "api_version: str" # e.g., "1.0.0"
+
+# ============================================================================            fields:
+
+# CRITICAL COMPONENTS - 6 SIMPLIFIED MODULES              - "connected: bool" # Must be True
+
+# ============================================================================              - "api_version: str" # e.g., "1.0.0"
+
               - "health_status: str" # Must be "healthy"
-          implementation_notes:
+
+critical_components:          implementation_notes:
+
             - "Make GET request to /context/health endpoint"
-            - "Validate API is reachable and healthy"
-            - "Return connection status with API version"
-            - "Raise ConnectionError if API unavailable"
-          example_implementation: |
-            import requests
-            
-            def establish_context_connection(self):
-                try:
-                    response = requests.get(
-                        f"{self.api_endpoint}/health",
-                        timeout=self.timeout
-                    )
-                    response.raise_for_status()
-                    data = response.json()
+
+  # --------------------------------------------------------------------------            - "Validate API is reachable and healthy"
+
+  # COMPONENT 1: pytest/unittest Integration (REQ-INT-001)            - "Return connection status with API version"
+
+  # --------------------------------------------------------------------------            - "Raise ConnectionError if API unavailable"
+
+  pytest_integration:          example_implementation: |
+
+    priority: "PHASE 1: CORE TEST FRAMEWORK INTEGRATION"            import requests
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/pytest_integration.py"            
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"            def establish_context_connection(self):
+
+    requirement: "REQ-INT-001: pytest/unittest Integration"                try:
+
+    impact: "Enables test discovery and execution via pytest API"                    response = requests.get(
+
+                            f"{self.api_endpoint}/health",
+
+    failing_tests:                        timeout=self.timeout
+
+      - "test_discover_tests_with_pytest"                    )
+
+      - "test_execute_tests_with_pytest"                    response.raise_for_status()
+
+      - "test_discover_tests_with_unittest"                    data = response.json()
+
                     return {
-                        "connected": True,
-                        "api_version": data.get("version", "1.0.0"),
-                        "health_status": data.get("status", "healthy")
-                    }
+
+    minimal_implementation:                        "connected": True,
+
+      description: "Integrate with pytest/unittest for test discovery and execution"                        "api_version": data.get("version", "1.0.0"),
+
+      class_name: "PytestIntegration"                        "health_status": data.get("status", "healthy")
+
+      purpose: "Discover and execute tests using pytest API"                    }
+
                 except requests.RequestException as e:
-                    raise ConnectionError(f"Failed to connect to Context Engine: {e}")
 
-        query_current_position:
-          description: "Query current layer/feature/system position from Context Engine"
-          parameters:
-            session_id:
-              type: "str"
-              description: "Session identifier for position tracking"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "layer: str" # Current layer position
-              - "feature: str" # Current feature position
-              - "system: str" # Current system position
-              - "timestamp: str" # ISO 8601 timestamp
-          implementation_notes:
-            - "Make GET request to /context/position/{session_id}"
-            - "Parse and return current hierarchical position"
-            - "Include timestamp for position accuracy"
-            - "Must complete in <200ms for performance requirement"
-          example_implementation: |
-            def query_current_position(self, session_id: str):
-                response = requests.get(
-                    f"{self.api_endpoint}/position/{session_id}",
-                    timeout=0.2  # 200ms timeout
-                )
-                response.raise_for_status()
-                return response.json()
+      constructor:                    raise ConnectionError(f"Failed to connect to Context Engine: {e}")
 
-        validate_query_performance:
-          description: "Validate Context Engine query performance meets <200ms target"
-          parameters: {}
-          returns:
-            type: "Dict[str, Any]"
+        parameters:
+
+          test_directory:        query_current_position:
+
+            type: "Optional[str]"          description: "Query current layer/feature/system position from Context Engine"
+
+            default: "tests/"          parameters:
+
+            description: "Base directory for test discovery"            session_id:
+
+        initialization:              type: "str"
+
+          - "Store test_directory path"              description: "Session identifier for position tracking"
+
+          - "No external connections needed"          returns:
+
+          - "No authentication required"            type: "Dict[str, Any]"
+
             fields:
-              - "average_response_time: float" # Must be < 0.2s
-              - "meets_target: bool" # Must be True
-              - "sample_size: int" # Number of queries tested
-          implementation_notes:
+
+      required_methods:              - "layer: str" # Current layer position
+
+        discover_tests:              - "feature: str" # Current feature position
+
+          signature: "def discover_tests(self, test_directory: str) -> List[str]"              - "system: str" # Current system position
+
+          description: "Discover tests using pytest API"              - "timestamp: str" # ISO 8601 timestamp
+
+          parameters:          implementation_notes:
+
+            test_directory:            - "Make GET request to /context/position/{session_id}"
+
+              type: "str"            - "Parse and return current hierarchical position"
+
+              description: "Directory to search for tests"            - "Include timestamp for position accuracy"
+
+          returns:            - "Must complete in <200ms for performance requirement"
+
+            type: "List[str]"          example_implementation: |
+
+            description: "List of discovered test file paths"            def query_current_position(self, session_id: str):
+
+          implementation_approach:                response = requests.get(
+
+            - "Use pytest.main(['--collect-only', test_directory]) or pytest collection API"                    f"{self.api_endpoint}/position/{session_id}",
+
+            - "Parse output to extract test file paths"                    timeout=0.2  # 200ms timeout
+
+            - "Return list of absolute paths to test files"                )
+
+          example_implementation: |                response.raise_for_status()
+
+            import pytest                return response.json()
+
+            from pathlib import Path
+
+                    validate_query_performance:
+
+            def discover_tests(self, test_directory: str) -> List[str]:          description: "Validate Context Engine query performance meets <200ms target"
+
+                # Use pytest collection          parameters: {}
+
+                collected = []          returns:
+
+                pytest.main([            type: "Dict[str, Any]"
+
+                    '--collect-only',            fields:
+
+                    test_directory,              - "average_response_time: float" # Must be < 0.2s
+
+                    '-q'              - "meets_target: bool" # Must be True
+
+                ], plugins=[CustomCollector(collected)])              - "sample_size: int" # Number of queries tested
+
+                return collected          implementation_notes:
+
             - "Execute 10 sample position queries"
-            - "Measure response time for each query"
-            - "Calculate average response time"
-            - "Validate average < 200ms requirement"
-          example_implementation: |
-            import time
-            
-            def validate_query_performance(self):
-                response_times = []
-                for i in range(10):
-                    start = time.time()
-                    self.query_current_position(f"test-session-{i}")
-                    elapsed = time.time() - start
-                    response_times.append(elapsed)
-                
-                avg_time = sum(response_times) / len(response_times)
-                return {
-                    "average_response_time": avg_time,
-                    "meets_target": avg_time < 0.2,
-                    "sample_size": len(response_times)
-                }
 
-        validate_sync_performance:
-          description: "Validate context synchronization performance meets <500ms target"
-          parameters: {}
-          returns:
-            type: "Dict[str, Any]"
-            fields:
+        execute_tests:            - "Measure response time for each query"
+
+          signature: "def execute_tests(self, test_items: List[str]) -> Dict[str, Any]"            - "Calculate average response time"
+
+          description: "Execute tests and return results"            - "Validate average < 200ms requirement"
+
+          parameters:          example_implementation: |
+
+            test_items:            import time
+
+              type: "List[str]"            
+
+              description: "List of test items to execute"            def validate_query_performance(self):
+
+          returns:                response_times = []
+
+            type: "Dict[str, Any]"                for i in range(10):
+
+            description: "Test execution results with pass/fail counts"                    start = time.time()
+
+            fields:                    self.query_current_position(f"test-session-{i}")
+
+              - "passed: int"                    elapsed = time.time() - start
+
+              - "failed: int"                    response_times.append(elapsed)
+
+              - "total: int"                
+
+          implementation_approach:                avg_time = sum(response_times) / len(response_times)
+
+            - "Execute pytest.main(test_items) and capture results"                return {
+
+            - "Parse exit code and output"                    "average_response_time": avg_time,
+
+            - "Return structured results dict"                    "meets_target": avg_time < 0.2,
+
+          example_implementation: |                    "sample_size": len(response_times)
+
+            def execute_tests(self, test_items: List[str]) -> Dict[str, Any]:                }
+
+                result = pytest.main(test_items)
+
+                # Parse result code: 0 = all passed, 1 = some failed        validate_sync_performance:
+
+                return {          description: "Validate context synchronization performance meets <500ms target"
+
+                    "passed": result.passed if hasattr(result, 'passed') else 0,          parameters: {}
+
+                    "failed": result.failed if hasattr(result, 'failed') else 0,          returns:
+
+                    "total": len(test_items)            type: "Dict[str, Any]"
+
+                }            fields:
+
               - "sync_time: float" # Must be < 0.5s
-              - "meets_target: bool" # Must be True
-          implementation_notes:
-            - "Trigger context state update via POST"
-            - "Measure time until synchronization confirmed"
-            - "Validate sync completes in <500ms"
-            - "Use WebSocket or polling for sync confirmation"
-          example_implementation: |
-            def validate_sync_performance(self):
-                start = time.time()
-                # POST context update
-                requests.post(
-                    f"{self.api_endpoint}/sync",
-                    json={"action": "update_position"},
-                    timeout=0.5
-                )
-                sync_time = time.time() - start
-                return {
-                    "sync_time": sync_time,
-                    "meets_target": sync_time < 0.5
-                }
 
-        monitor_reliability:
-          description: "Monitor Context Engine reliability for 99.9% uptime target"
-          parameters:
-            duration_seconds:
+        discover_tests_unittest:              - "meets_target: bool" # Must be True
+
+          signature: "def discover_tests_unittest(self, test_directory: str) -> List[str]"          implementation_notes:
+
+          description: "Discover tests using unittest discovery as fallback"            - "Trigger context state update via POST"
+
+          parameters:            - "Measure time until synchronization confirmed"
+
+            test_directory:            - "Validate sync completes in <500ms"
+
+              type: "str"            - "Use WebSocket or polling for sync confirmation"
+
+              description: "Directory to search for tests"          example_implementation: |
+
+          returns:            def validate_sync_performance(self):
+
+            type: "List[str]"                start = time.time()
+
+            description: "List of discovered test file paths"                # POST context update
+
+          implementation_approach:                requests.post(
+
+            - "Use unittest.TestLoader().discover(test_directory)"                    f"{self.api_endpoint}/sync",
+
+            - "Extract test file paths from discovered suite"                    json={"action": "update_position"},
+
+            - "Return list of test file paths"                    timeout=0.5
+
+          example_implementation: |                )
+
+            import unittest                sync_time = time.time() - start
+
+                            return {
+
+            def discover_tests_unittest(self, test_directory: str) -> List[str]:                    "sync_time": sync_time,
+
+                loader = unittest.TestLoader()                    "meets_target": sync_time < 0.5
+
+                suite = loader.discover(test_directory, pattern='test_*.py')                }
+
+                test_files = set()
+
+                for test_group in suite:        monitor_reliability:
+
+                    for test in test_group:          description: "Monitor Context Engine reliability for 99.9% uptime target"
+
+                        test_files.add(test.__module__)          parameters:
+
+                return list(test_files)            duration_seconds:
+
               type: "int"
-              default: 60
-              description: "Monitoring duration in seconds"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "uptime_percentage: float" # Must be >= 99.9
-              - "successful_requests: int"
-              - "failed_requests: int"
-              - "meets_target: bool" # Must be True
-          implementation_notes:
-            - "Make health check requests at 1-second intervals"
-            - "Track successful vs failed requests"
-            - "Calculate uptime percentage"
-            - "Validate >= 99.9% reliability"
+
+  # --------------------------------------------------------------------------              default: 60
+
+  # COMPONENT 2: Test Discovery (REQ-INT-002)              description: "Monitoring duration in seconds"
+
+  # --------------------------------------------------------------------------          returns:
+
+  test_discovery:            type: "Dict[str, Any]"
+
+    priority: "PHASE 1: CORE TEST FRAMEWORK INTEGRATION"            fields:
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/test_discovery.py"              - "uptime_percentage: float" # Must be >= 99.9
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"              - "successful_requests: int"
+
+    requirement: "REQ-INT-002: Test Discovery"              - "failed_requests: int"
+
+    impact: "Enables finding tests by pattern and subdirectory"              - "meets_target: bool" # Must be True
+
+              implementation_notes:
+
+    failing_tests:            - "Make health check requests at 1-second intervals"
+
+      - "test_discover_by_pattern"            - "Track successful vs failed requests"
+
+      - "test_discover_in_subdirectories"            - "Calculate uptime percentage"
+
+      - "test_list_all_tests"            - "Validate >= 99.9% reliability"
+
           example_implementation: |
-            def monitor_reliability(self, duration_seconds: int = 60):
-                successful = 0
-                failed = 0
-                for _ in range(duration_seconds):
+
+    minimal_implementation:            def monitor_reliability(self, duration_seconds: int = 60):
+
+      description: "Discover tests using file patterns and directory scanning"                successful = 0
+
+      class_name: "TestDiscovery"                failed = 0
+
+      purpose: "Find test files using glob patterns (test_*.py, *_test.py)"                for _ in range(duration_seconds):
+
                     try:
-                        result = self.establish_context_connection()
-                        if result["connected"]:
-                            successful += 1
-                        else:
-                            failed += 1
-                    except:
-                        failed += 1
-                    time.sleep(1)
-                
-                total = successful + failed
-                uptime_pct = (successful / total * 100) if total > 0 else 0
-                return {
-                    "uptime_percentage": uptime_pct,
-                    "successful_requests": successful,
-                    "failed_requests": failed,
-                    "meets_target": uptime_pct >= 99.9
-                }
 
-  workflow_integration:
-    priority: "PHASE 1: WORKFLOW INTEGRATION"
-    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/workflow_integration.py"
-    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
-    requirement: "Required for REQ-INT-002: Contextual Workflow Integration"
-    impact: "Enables intelligent workflow progression with <1s decision time"
-    failing_tests:
-      - "test_workflow_progression_decision_fails_initially"
-      - "test_automatic_trigger_coordination_fails_initially"
+      required_methods:                        result = self.establish_context_connection()
 
-    minimal_implementation:
-      class_name: "WorkflowIntegration"
-      purpose: "Contextual workflow coordination with intelligent progression decisions"
+        discover_by_pattern:                        if result["connected"]:
 
-      required_methods:
-        determine_next_progression:
-          description: "Determine next workflow progression based on current context"
+          signature: "def discover_by_pattern(self, test_directory: str, patterns: List[str]) -> List[str]"                            successful += 1
+
+          description: "Discover tests matching specified patterns"                        else:
+
+          parameters:                            failed += 1
+
+            test_directory:                    except:
+
+              type: "str"                        failed += 1
+
+              description: "Base directory to search"                    time.sleep(1)
+
+            patterns:                
+
+              type: "List[str]"                total = successful + failed
+
+              description: "Patterns like ['test_*.py', '*_test.py']"                uptime_pct = (successful / total * 100) if total > 0 else 0
+
+          returns:                return {
+
+            type: "List[str]"                    "uptime_percentage": uptime_pct,
+
+            description: "List of matching test file paths"                    "successful_requests": successful,
+
+          implementation_approach:                    "failed_requests": failed,
+
+            - "Use pathlib.Path(test_directory).glob() for each pattern"                    "meets_target": uptime_pct >= 99.9
+
+            - "Combine results from all patterns"                }
+
+            - "Return sorted unique list of test file paths"
+
+          example_implementation: |  workflow_integration:
+
+            from pathlib import Path    priority: "PHASE 1: WORKFLOW INTEGRATION"
+
+                file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/workflow_integration.py"
+
+            def discover_by_pattern(self, test_directory: str, patterns: List[str]) -> List[str]:    status: "STUB EXISTS - NEEDS IMPLEMENTATION"
+
+                test_files = set()    requirement: "Required for REQ-INT-002: Contextual Workflow Integration"
+
+                base_path = Path(test_directory)    impact: "Enables intelligent workflow progression with <1s decision time"
+
+                for pattern in patterns:    failing_tests:
+
+                    test_files.update(str(p) for p in base_path.rglob(pattern))      - "test_workflow_progression_decision_fails_initially"
+
+                return sorted(test_files)      - "test_automatic_trigger_coordination_fails_initially"
+
+
+
+        discover_in_subdirectories:    minimal_implementation:
+
+          signature: "def discover_in_subdirectories(self, base_directory: str, subdirectories: List[str]) -> Dict[str, List[str]]"      class_name: "WorkflowIntegration"
+
+          description: "Discover tests in specific subdirectories (unit, integration, e2e)"      purpose: "Contextual workflow coordination with intelligent progression decisions"
+
           parameters:
-            current_position:
-              type: "Dict[str, str]"
-              description: "Current layer/feature/system position"
-            completion_status:
-              type: "Dict[str, Any]"
-              description: "Completion status of current position"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "next_layer: str" # Next layer to progress to
-              - "next_feature: str" # Next feature to execute
-              - "rationale: str" # Reason for progression decision
-              - "decision_time: float" # Must be < 1.0s
-          implementation_notes:
-            - "Analyze current position in testing pyramid"
-            - "Evaluate completion criteria (all tests passing, coverage targets met)"
-            - "Determine next logical progression step"
-            - "Return decision within 1 second"
-            - "Consider dependencies and prerequisites"
-          example_implementation: |
+
+            base_directory:      required_methods:
+
+              type: "str"        determine_next_progression:
+
+              description: "Base tests directory"          description: "Determine next workflow progression based on current context"
+
+            subdirectories:          parameters:
+
+              type: "List[str]"            current_position:
+
+              description: "Subdirectory names like ['unit', 'integration', 'e2e']"              type: "Dict[str, str]"
+
+          returns:              description: "Current layer/feature/system position"
+
+            type: "Dict[str, List[str]]"            completion_status:
+
+            description: "Mapping of subdirectory name to test file paths"              type: "Dict[str, Any]"
+
+          implementation_approach:              description: "Completion status of current position"
+
+            - "For each subdirectory, scan base_directory/subdirectory/"          returns:
+
+            - "Find all test_*.py files in each subdirectory"            type: "Dict[str, Any]"
+
+            - "Return dict mapping subdirectory name to file list"            fields:
+
+          example_implementation: |              - "next_layer: str" # Next layer to progress to
+
+            def discover_in_subdirectories(self, base_directory: str, subdirectories: List[str]) -> Dict[str, List[str]]:              - "next_feature: str" # Next feature to execute
+
+                results = {}              - "rationale: str" # Reason for progression decision
+
+                base_path = Path(base_directory)              - "decision_time: float" # Must be < 1.0s
+
+                for subdir in subdirectories:          implementation_notes:
+
+                    subdir_path = base_path / subdir            - "Analyze current position in testing pyramid"
+
+                    if subdir_path.exists():            - "Evaluate completion criteria (all tests passing, coverage targets met)"
+
+                        results[subdir] = sorted(str(p) for p in subdir_path.rglob('test_*.py'))            - "Determine next logical progression step"
+
+                    else:            - "Return decision within 1 second"
+
+                        results[subdir] = []            - "Consider dependencies and prerequisites"
+
+                return results          example_implementation: |
+
             import time
-            
-            def determine_next_progression(self, current_position, completion_status):
-                start = time.time()
-                
-                # Workflow progression logic
-                layer = current_position.get("layer")
-                feature = current_position.get("feature")
-                
-                # Check if current layer is complete
-                if completion_status.get("tests_passing", 0) < 100:
-                    next_step = {
-                        "next_layer": layer,
-                        "next_feature": feature,
-                        "rationale": "Current layer incomplete - continue testing"
-                    }
-                else:
+
+        list_all_tests:            
+
+          signature: "def list_all_tests(self, test_directory: str) -> List[str]"            def determine_next_progression(self, current_position, completion_status):
+
+          description: "List all test files in directory recursively"                start = time.time()
+
+          parameters:                
+
+            test_directory:                # Workflow progression logic
+
+              type: "str"                layer = current_position.get("layer")
+
+              description: "Directory to search"                feature = current_position.get("feature")
+
+          returns:                
+
+            type: "List[str]"                # Check if current layer is complete
+
+            description: "Complete list of all test files found"                if completion_status.get("tests_passing", 0) < 100:
+
+          implementation_approach:                    next_step = {
+
+            - "Recursively scan test_directory for test_*.py and *_test.py"                        "next_layer": layer,
+
+            - "Return sorted list of all test file paths"                        "next_feature": feature,
+
+          example_implementation: |                        "rationale": "Current layer incomplete - continue testing"
+
+            def list_all_tests(self, test_directory: str) -> List[str]:                    }
+
+                return self.discover_by_pattern(test_directory, ['test_*.py', '*_test.py'])                else:
+
                     # Progress to next layer in pyramid
-                    next_step = {
-                        "next_layer": self._get_next_layer(layer),
-                        "next_feature": self._get_next_feature(layer, feature),
-                        "rationale": "Current layer complete - progress to next"
-                    }
-                
-                decision_time = time.time() - start
-                next_step["decision_time"] = decision_time
-                return next_step
 
-        coordinate_automatic_triggers:
-          description: "Coordinate automatic workflow triggers based on completion events"
-          parameters:
-            event_type:
+  # --------------------------------------------------------------------------                    next_step = {
+
+  # COMPONENT 3: Test Categorization (REQ-INT-003)                        "next_layer": self._get_next_layer(layer),
+
+  # --------------------------------------------------------------------------                        "next_feature": self._get_next_feature(layer, feature),
+
+  test_categorization:                        "rationale": "Current layer complete - progress to next"
+
+    priority: "PHASE 2: PYRAMID ANALYSIS"                    }
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/test_categorization.py"                
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"                decision_time = time.time() - start
+
+    requirement: "REQ-INT-003: Test Categorization by Directory"                next_step["decision_time"] = decision_time
+
+    impact: "Enables categorizing tests as unit/integration/e2e based on directory"                return next_step
+
+    
+
+    failing_tests:        coordinate_automatic_triggers:
+
+      - "test_categorize_by_directory"          description: "Coordinate automatic workflow triggers based on completion events"
+
+      - "test_categorize_by_naming"          parameters:
+
+      - "test_count_by_category"            event_type:
+
               type: "str"
-              description: "Type of completion event (layer_complete, feature_complete, etc.)"
-            event_data:
-              type: "Dict[str, Any]"
-              description: "Event data and context"
+
+    minimal_implementation:              description: "Type of completion event (layer_complete, feature_complete, etc.)"
+
+      description: "Categorize tests by directory structure (tests/unit, tests/integration, tests/e2e)"            event_data:
+
+      class_name: "TestCategorization"              type: "Dict[str, Any]"
+
+      purpose: "Classify tests as Unit, Integration, or E2E based on path"              description: "Event data and context"
+
           returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "triggers_activated: List[str]" # List of triggered actions
-              - "coordination_successful: bool" # Must be True
-              - "next_actions: List[str]" # Recommended next actions
-          implementation_notes:
-            - "Listen for completion events (test suite complete, layer validated, etc.)"
-            - "Activate appropriate triggers (next test execution, coverage reports, etc.)"
-            - "Coordinate multiple concurrent workflows"
-            - "Return activated triggers and next recommended actions"
-          example_implementation: |
-            def coordinate_automatic_triggers(self, event_type, event_data):
-                triggers_activated = []
-                next_actions = []
-                
-                if event_type == "layer_complete":
-                    triggers_activated.append("generate_coverage_report")
-                    triggers_activated.append("validate_requirements")
-                    next_actions.append("progress_to_next_layer")
-                    next_actions.append("update_dashboard")
-                elif event_type == "feature_complete":
-                    triggers_activated.append("run_integration_tests")
-                    next_actions.append("validate_feature_requirements")
-                
-                return {
-                    "triggers_activated": triggers_activated,
-                    "coordination_successful": True,
-                    "next_actions": next_actions
+
+      required_methods:            type: "Dict[str, Any]"
+
+        categorize_by_directory:            fields:
+
+          signature: "def categorize_by_directory(self, test_items: List[str]) -> Dict[str, List[str]]"              - "triggers_activated: List[str]" # List of triggered actions
+
+          description: "Categorize tests based on directory structure"              - "coordination_successful: bool" # Must be True
+
+          parameters:              - "next_actions: List[str]" # Recommended next actions
+
+            test_items:          implementation_notes:
+
+              type: "List[str]"            - "Listen for completion events (test suite complete, layer validated, etc.)"
+
+              description: "List of test file paths"            - "Activate appropriate triggers (next test execution, coverage reports, etc.)"
+
+          returns:            - "Coordinate multiple concurrent workflows"
+
+            type: "Dict[str, List[str]]"            - "Return activated triggers and next recommended actions"
+
+            description: "Tests grouped by category (Unit, Integration, E2E)"          example_implementation: |
+
+          implementation_approach:            def coordinate_automatic_triggers(self, event_type, event_data):
+
+            - "Parse each test file path"                triggers_activated = []
+
+            - "If path contains 'tests/unit' or '/unit/' → categorize as 'Unit'"                next_actions = []
+
+            - "If path contains 'tests/integration' or '/integration/' → categorize as 'Integration'"                
+
+            - "If path contains 'tests/e2e' or '/e2e/' → categorize as 'E2E'"                if event_type == "layer_complete":
+
+            - "Return dict with categories as keys"                    triggers_activated.append("generate_coverage_report")
+
+          example_implementation: |                    triggers_activated.append("validate_requirements")
+
+            def categorize_by_directory(self, test_items: List[str]) -> Dict[str, List[str]]:                    next_actions.append("progress_to_next_layer")
+
+                categories = {'Unit': [], 'Integration': [], 'E2E': []}                    next_actions.append("update_dashboard")
+
+                for test_path in test_items:                elif event_type == "feature_complete":
+
+                    if '/unit/' in test_path or test_path.startswith('tests/unit'):                    triggers_activated.append("run_integration_tests")
+
+                        categories['Unit'].append(test_path)                    next_actions.append("validate_feature_requirements")
+
+                    elif '/integration/' in test_path or test_path.startswith('tests/integration'):                
+
+                        categories['Integration'].append(test_path)                return {
+
+                    elif '/e2e/' in test_path or test_path.startswith('tests/e2e'):                    "triggers_activated": triggers_activated,
+
+                        categories['E2E'].append(test_path)                    "coordination_successful": True,
+
+                return categories                    "next_actions": next_actions
+
                 }
 
-  mobile_auth_integration:
-    priority: "PHASE 2: MOBILE AUTHENTICATION"
-    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration.py"
-    status: "PARTIAL STUB EXISTS - NEEDS COMPLETION"
-    requirement: "Required for REQ-INT-003: Mobile Authentication Integration"
-    impact: "Enables secure mobile access with <1s authentication and 99.9% security compliance"
-    failing_tests:
-      - "test_mobile_authentication_endpoint_fails_initially"
-      - "test_device_registration_fails_initially"
-      - "test_mobile_authentication_performance_fails_initially"
-      - "test_mobile_api_reliability_fails_initially"
+        categorize_by_naming:
 
-    minimal_implementation:
-      class_name: "MobileAuthIntegration"
-      purpose: "Mobile authentication with JWT validation, device registration, and biometric support"
+          signature: "def categorize_by_naming(self, test_items: List[str]) -> Dict[str, List[str]]"  mobile_auth_integration:
 
-      required_methods:
-        authenticate_mobile_user:
-          description: "Authenticate mobile user with credentials and return JWT token"
-          parameters:
-            username:
-              type: "str"
-              description: "Mobile user username"
-            password:
-              type: "str"
-              description: "Mobile user password"
-            device_id:
-              type: "str"
-              description: "Unique device identifier"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "authenticated: bool" # Must be True for valid credentials
-              - "jwt_token: str" # JWT token for session
-              - "session_id: str" # Session identifier
-              - "expires_at: str" # Token expiration timestamp
-          implementation_notes:
-            - "Validate credentials against user database"
-            - "Generate JWT token with device_id claim"
-            - "Create session with expiration time"
-            - "Return token and session details"
-            - "Must complete in <1 second"
+          description: "Categorize tests by naming convention as fallback"    priority: "PHASE 2: MOBILE AUTHENTICATION"
+
+          parameters:    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration.py"
+
+            test_items:    status: "PARTIAL STUB EXISTS - NEEDS COMPLETION"
+
+              type: "List[str]"    requirement: "Required for REQ-INT-003: Mobile Authentication Integration"
+
+              description: "List of test file paths"    impact: "Enables secure mobile access with <1s authentication and 99.9% security compliance"
+
+          returns:    failing_tests:
+
+            type: "Dict[str, List[str]]"      - "test_mobile_authentication_endpoint_fails_initially"
+
+            description: "Tests grouped by inferred category from filename"      - "test_device_registration_fails_initially"
+
+          implementation_approach:      - "test_mobile_authentication_performance_fails_initially"
+
+            - "Parse filename from path"      - "test_mobile_api_reliability_fails_initially"
+
+            - "If filename contains 'unit' → categorize as 'Unit'"
+
+            - "If filename contains 'integration' or 'int' → categorize as 'Integration'"    minimal_implementation:
+
+            - "If filename contains 'e2e' or 'end_to_end' → categorize as 'E2E'"      class_name: "MobileAuthIntegration"
+
+            - "Default to 'Unit' if no match"      purpose: "Mobile authentication with JWT validation, device registration, and biometric support"
+
           example_implementation: |
-            import jwt
-            import datetime
-            
+
+            import os      required_methods:
+
+                    authenticate_mobile_user:
+
+            def categorize_by_naming(self, test_items: List[str]) -> Dict[str, List[str]]:          description: "Authenticate mobile user with credentials and return JWT token"
+
+                categories = {'Unit': [], 'Integration': [], 'E2E': []}          parameters:
+
+                for test_path in test_items:            username:
+
+                    filename = os.path.basename(test_path).lower()              type: "str"
+
+                    if 'e2e' in filename or 'end_to_end' in filename:              description: "Mobile user username"
+
+                        categories['E2E'].append(test_path)            password:
+
+                    elif 'integration' in filename or '_int_' in filename:              type: "str"
+
+                        categories['Integration'].append(test_path)              description: "Mobile user password"
+
+                    else:            device_id:
+
+                        categories['Unit'].append(test_path)              type: "str"
+
+                return categories              description: "Unique device identifier"
+
+          returns:
+
+        count_by_category:            type: "Dict[str, Any]"
+
+          signature: "def count_by_category(self, categorized_tests: Dict[str, List[str]]) -> Dict[str, int]"            fields:
+
+          description: "Count tests in each category"              - "authenticated: bool" # Must be True for valid credentials
+
+          parameters:              - "jwt_token: str" # JWT token for session
+
+            categorized_tests:              - "session_id: str" # Session identifier
+
+              type: "Dict[str, List[str]]"              - "expires_at: str" # Token expiration timestamp
+
+              description: "Tests grouped by category"          implementation_notes:
+
+          returns:            - "Validate credentials against user database"
+
+            type: "Dict[str, int]"            - "Generate JWT token with device_id claim"
+
+            description: "Count of tests per category"            - "Create session with expiration time"
+
+          implementation_approach:            - "Return token and session details"
+
+            - "For each category, count length of test list"            - "Must complete in <1 second"
+
+            - "Return dict mapping category name to count"          example_implementation: |
+
+          example_implementation: |            import jwt
+
+            def count_by_category(self, categorized_tests: Dict[str, List[str]]) -> Dict[str, int]:            import datetime
+
+                return {category: len(tests) for category, tests in categorized_tests.items()}            
+
             def authenticate_mobile_user(self, username, password, device_id):
-                # Validate credentials (simplified)
-                if not self._validate_credentials(username, password):
-                    return {
-                        "authenticated": False,
-                        "jwt_token": "",
-                        "session_id": "",
-                        "expires_at": ""
-                    }
-                
-                # Generate JWT token
-                payload = {
-                    "username": username,
-                    "device_id": device_id,
-                    "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+
+  # --------------------------------------------------------------------------                # Validate credentials (simplified)
+
+  # COMPONENT 4: Pyramid Ratio Calculator (REQ-INT-004)                if not self._validate_credentials(username, password):
+
+  # --------------------------------------------------------------------------                    return {
+
+  pyramid_calculator:                        "authenticated": False,
+
+    priority: "PHASE 2: PYRAMID ANALYSIS"                        "jwt_token": "",
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/pyramid_calculator.py"                        "session_id": "",
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"                        "expires_at": ""
+
+    requirement: "REQ-INT-004: Pyramid Ratio Calculation"                    }
+
+    impact: "Enables calculating test distribution ratios and validating pyramid shape"                
+
+                    # Generate JWT token
+
+    failing_tests:                payload = {
+
+      - "test_calculate_ratios"                    "username": username,
+
+      - "test_validate_pyramid_shape"                    "device_id": device_id,
+
+      - "test_detect_inverted_pyramid"                    "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+
                 }
-                token = jwt.encode(payload, "SECRET_KEY", algorithm="HS256")
-                
-                return {
-                    "authenticated": True,
+
+    minimal_implementation:                token = jwt.encode(payload, "SECRET_KEY", algorithm="HS256")
+
+      description: "Calculate pyramid ratios and validate proper test distribution"                
+
+      class_name: "PyramidRatioCalculator"                return {
+
+      purpose: "Calculate percentages and validate Unit > Integration > E2E"                    "authenticated": True,
+
                     "jwt_token": token,
-                    "session_id": f"session_{device_id}_{int(time.time())}",
-                    "expires_at": payload["exp"].isoformat()
-                }
 
-        register_mobile_device:
-          description: "Register new mobile device for authentication"
-          parameters:
-            device_id:
-              type: "str"
-              description: "Unique device identifier"
-            device_info:
-              type: "Dict[str, Any]"
-              description: "Device information (model, OS, version)"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "registered: bool" # Must be True
-              - "device_token: str" # Device registration token
-              - "registration_timestamp: str" # ISO 8601 timestamp
-          implementation_notes:
-            - "Store device information in registry"
+      required_methods:                    "session_id": f"session_{device_id}_{int(time.time())}",
+
+        calculate_ratios:                    "expires_at": payload["exp"].isoformat()
+
+          signature: "def calculate_ratios(self, test_counts: Dict[str, int]) -> Dict[str, float]"                }
+
+          description: "Calculate percentage of each test category"
+
+          parameters:        register_mobile_device:
+
+            test_counts:          description: "Register new mobile device for authentication"
+
+              type: "Dict[str, int]"          parameters:
+
+              description: "Count of tests per category (Unit, Integration, E2E)"            device_id:
+
+          returns:              type: "str"
+
+            type: "Dict[str, float]"              description: "Unique device identifier"
+
+            description: "Percentage of each category (0.0-100.0)"            device_info:
+
+          implementation_approach:              type: "Dict[str, Any]"
+
+            - "Sum total tests across all categories"              description: "Device information (model, OS, version)"
+
+            - "Calculate percentage for each category: (count / total) * 100"          returns:
+
+            - "Return dict with percentages"            type: "Dict[str, Any]"
+
+          example_implementation: |            fields:
+
+            def calculate_ratios(self, test_counts: Dict[str, int]) -> Dict[str, float]:              - "registered: bool" # Must be True
+
+                total = sum(test_counts.values())              - "device_token: str" # Device registration token
+
+                if total == 0:              - "registration_timestamp: str" # ISO 8601 timestamp
+
+                    return {category: 0.0 for category in test_counts}          implementation_notes:
+
+                return {category: (count / total) * 100.0 for category, count in test_counts.items()}            - "Store device information in registry"
+
             - "Generate unique device token"
-            - "Record registration timestamp"
-            - "Enable device-specific security policies"
-          example_implementation: |
-            def register_mobile_device(self, device_id, device_info):
-                # Store in device registry
-                device_token = f"dev_token_{device_id}_{int(time.time())}"
-                timestamp = datetime.datetime.utcnow().isoformat()
-                
-                # Persist device registration (simplified)
-                self._device_registry[device_id] = {
-                    "token": device_token,
-                    "info": device_info,
-                    "registered_at": timestamp
-                }
-                
-                return {
-                    "registered": True,
-                    "device_token": device_token,
-                    "registration_timestamp": timestamp
-                }
 
-        validate_auth_performance:
-          description: "Validate mobile authentication performance meets <1s target"
-          parameters: {}
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "average_auth_time: float" # Must be < 1.0s
-              - "meets_target: bool" # Must be True
-          implementation_notes:
-            - "Execute 10 sample authentication requests"
-            - "Measure time from request to JWT token generation"
-            - "Calculate average authentication time"
-            - "Validate < 1 second requirement"
-          example_implementation: |
-            def validate_auth_performance(self):
-                auth_times = []
-                for i in range(10):
-                    start = time.time()
-                    self.authenticate_mobile_user(
+        validate_pyramid_shape:            - "Record registration timestamp"
+
+          signature: "def validate_pyramid_shape(self, test_counts: Dict[str, int]) -> bool"            - "Enable device-specific security policies"
+
+          description: "Validate pyramid shape: Unit > Integration > E2E"          example_implementation: |
+
+          parameters:            def register_mobile_device(self, device_id, device_info):
+
+            test_counts:                # Store in device registry
+
+              type: "Dict[str, int]"                device_token = f"dev_token_{device_id}_{int(time.time())}"
+
+              description: "Count of tests per category"                timestamp = datetime.datetime.utcnow().isoformat()
+
+          returns:                
+
+            type: "bool"                # Persist device registration (simplified)
+
+            description: "True if valid pyramid (Unit > Integration > E2E)"                self._device_registry[device_id] = {
+
+          implementation_approach:                    "token": device_token,
+
+            - "Check test_counts['Unit'] > test_counts['Integration']"                    "info": device_info,
+
+            - "Check test_counts['Integration'] > test_counts['E2E']"                    "registered_at": timestamp
+
+            - "Return True only if both conditions met"                }
+
+          example_implementation: |                
+
+            def validate_pyramid_shape(self, test_counts: Dict[str, int]) -> bool:                return {
+
+                unit = test_counts.get('Unit', 0)                    "registered": True,
+
+                integration = test_counts.get('Integration', 0)                    "device_token": device_token,
+
+                e2e = test_counts.get('E2E', 0)                    "registration_timestamp": timestamp
+
+                return unit > integration and integration > e2e                }
+
+
+
+        detect_inverted_pyramid:        validate_auth_performance:
+
+          signature: "def detect_inverted_pyramid(self, test_counts: Dict[str, int]) -> bool"          description: "Validate mobile authentication performance meets <1s target"
+
+          description: "Detect inverted pyramid (E2E > Integration or E2E > Unit)"          parameters: {}
+
+          parameters:          returns:
+
+            test_counts:            type: "Dict[str, Any]"
+
+              type: "Dict[str, int]"            fields:
+
+              description: "Count of tests per category"              - "average_auth_time: float" # Must be < 1.0s
+
+          returns:              - "meets_target: bool" # Must be True
+
+            type: "bool"          implementation_notes:
+
+            description: "True if pyramid is inverted"            - "Execute 10 sample authentication requests"
+
+          implementation_approach:            - "Measure time from request to JWT token generation"
+
+            - "Check if E2E > Integration OR E2E > Unit"            - "Calculate average authentication time"
+
+            - "Return True if inverted"            - "Validate < 1 second requirement"
+
+          example_implementation: |          example_implementation: |
+
+            def detect_inverted_pyramid(self, test_counts: Dict[str, int]) -> bool:            def validate_auth_performance(self):
+
+                unit = test_counts.get('Unit', 0)                auth_times = []
+
+                integration = test_counts.get('Integration', 0)                for i in range(10):
+
+                e2e = test_counts.get('E2E', 0)                    start = time.time()
+
+                return e2e > integration or e2e > unit                    self.authenticate_mobile_user(
+
                         f"test_user_{i}",
-                        "test_password",
-                        f"device_{i}"
-                    )
-                    elapsed = time.time() - start
-                    auth_times.append(elapsed)
-                
-                avg_time = sum(auth_times) / len(auth_times)
-                return {
-                    "average_auth_time": avg_time,
-                    "meets_target": avg_time < 1.0
-                }
 
-        monitor_mobile_reliability:
-          description: "Monitor mobile API reliability for 99.5% availability target"
+  # --------------------------------------------------------------------------                        "test_password",
+
+  # COMPONENT 5: Result Collector (REQ-INT-005)                        f"device_{i}"
+
+  # --------------------------------------------------------------------------                    )
+
+  result_collector:                    elapsed = time.time() - start
+
+    priority: "PHASE 3: RESULTS AND VALIDATION"                    auth_times.append(elapsed)
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/result_collector.py"                
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"                avg_time = sum(auth_times) / len(auth_times)
+
+    requirement: "REQ-INT-005: Test Result Collection"                return {
+
+    impact: "Enables collecting test results and aggregating by pyramid level"                    "average_auth_time": avg_time,
+
+                        "meets_target": avg_time < 1.0
+
+    failing_tests:                }
+
+      - "test_collect_results"
+
+      - "test_aggregate_by_level"        monitor_mobile_reliability:
+
+      - "test_calculate_pass_rates"          description: "Monitor mobile API reliability for 99.5% availability target"
+
           parameters:
-            duration_seconds:
-              type: "int"
-              default: 60
-          returns:
+
+    minimal_implementation:            duration_seconds:
+
+      description: "Collect test results and aggregate by pyramid level"              type: "int"
+
+      class_name: "ResultCollector"              default: 60
+
+      purpose: "Aggregate test results and calculate pass rates per category"          returns:
+
             type: "Dict[str, Any]"
-            fields:
-              - "availability_percentage: float" # Must be >= 99.5
-              - "meets_target: bool" # Must be True
-          implementation_notes:
-            - "Make authentication requests at intervals"
-            - "Track successful vs failed requests"
-            - "Calculate availability percentage"
-            - "Validate >= 99.5% availability"
-          example_implementation: |
-            def monitor_mobile_reliability(self, duration_seconds=60):
-                successful = 0
-                failed = 0
-                for i in range(duration_seconds):
-                    try:
-                        result = self.authenticate_mobile_user(
-                            "test_user",
-                            "test_pass",
-                            f"device_{i}"
-                        )
-                        if result["authenticated"]:
-                            successful += 1
-                        else:
-                            failed += 1
-                    except:
-                        failed += 1
+
+      required_methods:            fields:
+
+        collect_results:              - "availability_percentage: float" # Must be >= 99.5
+
+          signature: "def collect_results(self, test_execution_output: Dict[str, Any]) -> List[Dict[str, Any]]"              - "meets_target: bool" # Must be True
+
+          description: "Collect individual test results from execution output"          implementation_notes:
+
+          parameters:            - "Make authentication requests at intervals"
+
+            test_execution_output:            - "Track successful vs failed requests"
+
+              type: "Dict[str, Any]"            - "Calculate availability percentage"
+
+              description: "Raw test execution results from pytest"            - "Validate >= 99.5% availability"
+
+          returns:          example_implementation: |
+
+            type: "List[Dict[str, Any]]"            def monitor_mobile_reliability(self, duration_seconds=60):
+
+            description: "List of test results with status and metadata"                successful = 0
+
+          implementation_approach:                failed = 0
+
+            - "Parse test_execution_output for individual test results"                for i in range(duration_seconds):
+
+            - "Extract test name, status (passed/failed), duration"                    try:
+
+            - "Return list of result dicts"                        result = self.authenticate_mobile_user(
+
+          example_implementation: |                            "test_user",
+
+            def collect_results(self, test_execution_output: Dict[str, Any]) -> List[Dict[str, Any]]:                            "test_pass",
+
+                results = []                            f"device_{i}"
+
+                for test_name, outcome in test_execution_output.get('tests', {}).items():                        )
+
+                    results.append({                        if result["authenticated"]:
+
+                        'test': test_name,                            successful += 1
+
+                        'status': outcome.get('status', 'unknown'),                        else:
+
+                        'duration': outcome.get('duration', 0.0)                            failed += 1
+
+                    })                    except:
+
+                return results                        failed += 1
+
                     time.sleep(1)
-                
-                total = successful + failed
-                availability = (successful / total * 100) if total > 0 else 0
-                return {
-                    "availability_percentage": availability,
-                    "meets_target": availability >= 99.5
-                }
 
-  mobile_auth_integration_iteration_8:
-    priority: "PHASE 2A: MOBILE AUTHENTICATION - ITERATION 8 (TDD RED-GREEN-REFACTOR)"
-    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration_iteration_8.py"
-    status: "RED PHASE COMPLETE - GREEN PHASE REQUIRED"
-    requirement: "Required for REQ-DATA-005: Mobile Session Management"
-    impact: "Enables mobile authentication integration, cross-platform session sync, and security context validation"
-    tdd_iteration: 8
-    red_phase_report: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/Failing Test Reports/Mobile_Auth_Integration_RED_Phase_Iteration_8_20251004_190125.md"
-    test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_mobile_authentication_integration_iteration_8.py"
-    
-    failing_tests:
-      - "test_integrate_mobile_authentication_fails_initially"
-      - "test_sync_session_across_platforms_fails_initially"
-      - "test_validate_mobile_security_context_fails_initially"
-    
-    red_phase_status:
-      total_tests: 3
-      failing_tests: 3
-      execution_time: "3.79s"
+        aggregate_by_level:                
+
+          signature: "def aggregate_by_level(self, results: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]"                total = successful + failed
+
+          description: "Aggregate results by pyramid level (Unit, Integration, E2E)"                availability = (successful / total * 100) if total > 0 else 0
+
+          parameters:                return {
+
+            results:                    "availability_percentage": availability,
+
+              type: "List[Dict[str, Any]]"                    "meets_target": availability >= 99.5
+
+              description: "Individual test results"                }
+
+          returns:
+
+            type: "Dict[str, Dict[str, int]]"  mobile_auth_integration_iteration_8:
+
+            description: "Results aggregated by level with passed/failed counts"    priority: "PHASE 2A: MOBILE AUTHENTICATION - ITERATION 8 (TDD RED-GREEN-REFACTOR)"
+
+          implementation_approach:    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/mobile_auth_integration_iteration_8.py"
+
+            - "Group results by inferred category from test path/name"    status: "RED PHASE COMPLETE - GREEN PHASE REQUIRED"
+
+            - "Count passed and failed for each category"    requirement: "Required for REQ-DATA-005: Mobile Session Management"
+
+            - "Return nested dict: {category: {'passed': N, 'failed': M}}"    impact: "Enables mobile authentication integration, cross-platform session sync, and security context validation"
+
+          example_implementation: |    tdd_iteration: 8
+
+            def aggregate_by_level(self, results: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:    red_phase_report: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/FEATURE-003-02-01 TESTING PYRAMID VALIDATION ENGINE/Failing Test Reports/Mobile_Auth_Integration_RED_Phase_Iteration_8_20251004_190125.md"
+
+                aggregated = {'Unit': {'passed': 0, 'failed': 0},    test_file: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/integration/test_mobile_authentication_integration_iteration_8.py"
+
+                             'Integration': {'passed': 0, 'failed': 0},    
+
+                             'E2E': {'passed': 0, 'failed': 0}}    failing_tests:
+
+                for result in results:      - "test_integrate_mobile_authentication_fails_initially"
+
+                    test_name = result.get('test', '')      - "test_sync_session_across_platforms_fails_initially"
+
+                    category = self._infer_category(test_name)      - "test_validate_mobile_security_context_fails_initially"
+
+                    if result['status'] == 'passed':    
+
+                        aggregated[category]['passed'] += 1    red_phase_status:
+
+                    else:      total_tests: 3
+
+                        aggregated[category]['failed'] += 1      failing_tests: 3
+
+                return aggregated      execution_time: "3.79s"
+
       coverage: "1%"
-      status: "✅ All tests correctly failing with NotImplementedError"
-      completed: "2025-10-04 19:01:25"
 
-    minimal_implementation:
-      description: "Mobile authentication integration for Iteration 8 with session management and security validation"
-      class_name: "MobileAuthIntegration"
-      purpose: "Integrate mobile authentication with session sync and security context validation"
+        calculate_pass_rates:      status: "✅ All tests correctly failing with NotImplementedError"
 
-      required_methods:
-        authenticate_mobile_user:
-          description: "Authenticate mobile user with credentials and security context"
-          parameters:
-            auth_request:
-              type: "Dict[str, Any]"
-              description: "Authentication request containing user_credentials, authentication_method, and security_level"
-              structure:
-                user_credentials:
-                  type: "Dict[str, str]"
-                  fields:
-                    - "username: str" # User identifier
-                    - "device_id: str" # Mobile device identifier
-                authentication_method:
-                  type: "str"
-                  values: ["biometric", "password", "multi_factor"]
+          signature: "def calculate_pass_rates(self, aggregated_results: Dict[str, Dict[str, int]]) -> Dict[str, float]"      completed: "2025-10-04 19:01:25"
+
+          description: "Calculate pass rate percentage for each category"
+
+          parameters:    minimal_implementation:
+
+            aggregated_results:      description: "Mobile authentication integration for Iteration 8 with session management and security validation"
+
+              type: "Dict[str, Dict[str, int]]"      class_name: "MobileAuthIntegration"
+
+              description: "Aggregated results by category"      purpose: "Integrate mobile authentication with session sync and security context validation"
+
+          returns:
+
+            type: "Dict[str, float]"      required_methods:
+
+            description: "Pass rate percentage per category (0.0-100.0)"        authenticate_mobile_user:
+
+          implementation_approach:          description: "Authenticate mobile user with credentials and security context"
+
+            - "For each category, calculate: (passed / (passed + failed)) * 100"          parameters:
+
+            - "Handle division by zero (return 0.0 if no tests)"            auth_request:
+
+            - "Return dict mapping category to pass rate"              type: "Dict[str, Any]"
+
+          example_implementation: |              description: "Authentication request containing user_credentials, authentication_method, and security_level"
+
+            def calculate_pass_rates(self, aggregated_results: Dict[str, Dict[str, int]]) -> Dict[str, float]:              structure:
+
+                pass_rates = {}                user_credentials:
+
+                for category, counts in aggregated_results.items():                  type: "Dict[str, str]"
+
+                    total = counts['passed'] + counts['failed']                  fields:
+
+                    if total == 0:                    - "username: str" # User identifier
+
+                        pass_rates[category] = 0.0                    - "device_id: str" # Mobile device identifier
+
+                    else:                authentication_method:
+
+                        pass_rates[category] = (counts['passed'] / total) * 100.0                  type: "str"
+
+                return pass_rates                  values: ["biometric", "password", "multi_factor"]
+
                 security_level:
-                  type: "str"
-                  values: ["low", "medium", "high"]
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "authenticated: bool" # True if authentication successful
-              - "session_id: str" # Generated session identifier
-              - "jwt_token: str" # JWT authentication token
-              - "user_id: str" # Authenticated user ID
-              - "device_registered: bool" # Device registration status
-              - "security_level: str" # Applied security level
-          implementation_notes:
-            - "Extract user credentials from auth_request"
-            - "Validate username and device_id are present"
-            - "Verify authentication method is supported"
-            - "Generate unique session ID for the authenticated session"
-            - "Create JWT token with user and device claims"
-            - "Return authentication result with session details"
-            - "Must handle biometric, password, and multi-factor methods"
-            - "Security level affects token expiration and permissions"
-          example_implementation: |
-            import jwt
-            import datetime
-            import uuid
-            
-            def authenticate_mobile_user(self, auth_request: Dict[str, Any]) -> Dict[str, Any]:
-                """Authenticate mobile user with credentials and security context"""
-                # Extract credentials
-                user_creds = auth_request.get("user_credentials", {})
-                username = user_creds.get("username")
-                device_id = user_creds.get("device_id")
-                auth_method = auth_request.get("authentication_method", "password")
-                security_level = auth_request.get("security_level", "medium")
-                
-                # Validate required fields
-                if not username or not device_id:
-                    return {
-                        "authenticated": False,
-                        "session_id": "",
-                        "jwt_token": "",
-                        "user_id": "",
-                        "device_registered": False,
-                        "security_level": security_level
-                    }
-                
-                # Generate session ID
-                session_id = f"sess_{uuid.uuid4().hex[:12]}"
-                
-                # Create JWT token
-                expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                payload = {
-                    "username": username,
-                    "device_id": device_id,
-                    "session_id": session_id,
-                    "auth_method": auth_method,
-                    "security_level": security_level,
-                    "exp": expiration
-                }
-                jwt_token = jwt.encode(payload, "SECRET_KEY_REPLACE_IN_PRODUCTION", algorithm="HS256")
-                
-                return {
-                    "authenticated": True,
-                    "session_id": session_id,
-                    "jwt_token": jwt_token,
-                    "user_id": username,
-                    "device_registered": True,
-                    "security_level": security_level
-                }
 
-        sync_session_across_platforms:
+  # --------------------------------------------------------------------------                  type: "str"
+
+  # COMPONENT 6: Validation Logic (REQ-INT-006)                  values: ["low", "medium", "high"]
+
+  # --------------------------------------------------------------------------          returns:
+
+  validation_logic:            type: "Dict[str, Any]"
+
+    priority: "PHASE 3: RESULTS AND VALIDATION"            fields:
+
+    file_path: "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/integration/validation_logic.py"              - "authenticated: bool" # True if authentication successful
+
+    status: "STUB EXISTS - NEEDS IMPLEMENTATION"              - "session_id: str" # Generated session identifier
+
+    requirement: "REQ-INT-006: Validation Logic"              - "jwt_token: str" # JWT authentication token
+
+    impact: "Enables determining overall pyramid compliance"              - "user_id: str" # Authenticated user ID
+
+                  - "device_registered: bool" # Device registration status
+
+    failing_tests:              - "security_level: str" # Applied security level
+
+      - "test_validate_minimum_counts"          implementation_notes:
+
+      - "test_validate_pass_rates"            - "Extract user credentials from auth_request"
+
+      - "test_determine_compliance"            - "Validate username and device_id are present"
+
+            - "Verify authentication method is supported"
+
+    minimal_implementation:            - "Generate unique session ID for the authenticated session"
+
+      description: "Determine overall pyramid compliance based on results and ratios"            - "Create JWT token with user and device claims"
+
+      class_name: "ValidationLogic"            - "Return authentication result with session details"
+
+      purpose: "Check minimum counts, pass rates, and determine compliance"            - "Must handle biometric, password, and multi-factor methods"
+
+            - "Security level affects token expiration and permissions"
+
+      required_methods:          example_implementation: |
+
+        validate_minimum_counts:            import jwt
+
+          signature: "def validate_minimum_counts(self, test_counts: Dict[str, int], minimum_requirements: Dict[str, int]) -> Tuple[bool, str]"            import datetime
+
+          description: "Validate each category meets minimum test count"            import uuid
+
+          parameters:            
+
+            test_counts:            def authenticate_mobile_user(self, auth_request: Dict[str, Any]) -> Dict[str, Any]:
+
+              type: "Dict[str, int]"                """Authenticate mobile user with credentials and security context"""
+
+              description: "Actual test counts per category"                # Extract credentials
+
+            minimum_requirements:                user_creds = auth_request.get("user_credentials", {})
+
+              type: "Dict[str, int]"                username = user_creds.get("username")
+
+              description: "Minimum required tests per category"                device_id = user_creds.get("device_id")
+
+          returns:                auth_method = auth_request.get("authentication_method", "password")
+
+            type: "Tuple[bool, str]"                security_level = auth_request.get("security_level", "medium")
+
+            description: "(is_valid, reason) - True if all minimums met"                
+
+          implementation_approach:                # Validate required fields
+
+            - "For each category in minimum_requirements, check if test_counts[category] >= requirement"                if not username or not device_id:
+
+            - "If any category fails, return (False, reason)"                    return {
+
+            - "If all pass, return (True, 'All minimum counts met')"                        "authenticated": False,
+
+          example_implementation: |                        "session_id": "",
+
+            def validate_minimum_counts(self, test_counts: Dict[str, int], minimum_requirements: Dict[str, int]) -> Tuple[bool, str]:                        "jwt_token": "",
+
+                for category, minimum in minimum_requirements.items():                        "user_id": "",
+
+                    actual = test_counts.get(category, 0)                        "device_registered": False,
+
+                    if actual < minimum:                        "security_level": security_level
+
+                        return (False, f"{category} has {actual} tests, minimum {minimum} required")                    }
+
+                return (True, "All minimum counts met")                
+
+                # Generate session ID
+
+        validate_pass_rates:                session_id = f"sess_{uuid.uuid4().hex[:12]}"
+
+          signature: "def validate_pass_rates(self, pass_rates: Dict[str, float], thresholds: Dict[str, float]) -> Tuple[bool, str]"                
+
+          description: "Validate pass rates meet thresholds"                # Create JWT token
+
+          parameters:                expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+
+            pass_rates:                payload = {
+
+              type: "Dict[str, float]"                    "username": username,
+
+              description: "Actual pass rates per category"                    "device_id": device_id,
+
+            thresholds:                    "session_id": session_id,
+
+              type: "Dict[str, float]"                    "auth_method": auth_method,
+
+              description: "Minimum pass rate thresholds per category"                    "security_level": security_level,
+
+          returns:                    "exp": expiration
+
+            type: "Tuple[bool, str]"                }
+
+            description: "(is_valid, reason) - True if all thresholds met"                jwt_token = jwt.encode(payload, "SECRET_KEY_REPLACE_IN_PRODUCTION", algorithm="HS256")
+
+          implementation_approach:                
+
+            - "For each category in thresholds, check if pass_rates[category] >= threshold"                return {
+
+            - "If any category fails, return (False, reason)"                    "authenticated": True,
+
+            - "If all pass, return (True, 'All pass rate thresholds met')"                    "session_id": session_id,
+
+          example_implementation: |                    "jwt_token": jwt_token,
+
+            def validate_pass_rates(self, pass_rates: Dict[str, float], thresholds: Dict[str, float]) -> Tuple[bool, str]:                    "user_id": username,
+
+                for category, threshold in thresholds.items():                    "device_registered": True,
+
+                    actual = pass_rates.get(category, 0.0)                    "security_level": security_level
+
+                    if actual < threshold:                }
+
+                        return (False, f"{category} pass rate {actual:.1f}% below threshold {threshold}%")
+
+                return (True, "All pass rate thresholds met")        sync_session_across_platforms:
+
           description: "Synchronize authentication session across multiple platforms (mobile, web, API)"
-          parameters:
-            sync_request:
-              type: "Dict[str, Any]"
-              description: "Session sync request containing session_id, source_platform, and target_platforms"
-              structure:
-                session_id:
-                  type: "str"
-                  description: "Session identifier to synchronize"
-                source_platform:
-                  type: "str"
-                  values: ["mobile", "web", "api"]
-                  description: "Platform initiating the sync"
-                target_platforms:
-                  type: "List[str]"
-                  values: ["mobile", "web", "api"]
-                  description: "Platforms to sync session to"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "session_id: str" # Original session ID
-              - "synced: bool" # True if sync successful
-              - "sync_timestamp: str" # ISO 8601 timestamp of sync
-              - "platforms_synced: List[str]" # List of platforms successfully synced
-              - "sync_failures: List[str]" # List of platforms that failed to sync
-          implementation_notes:
-            - "Extract session_id, source_platform, and target_platforms from request"
-            - "Validate session exists and is active"
-            - "Iterate through target platforms and sync session state"
-            - "Track successful syncs and failures separately"
-            - "Generate sync timestamp in ISO 8601 format"
-            - "Return sync status with detailed platform-level results"
-            - "Handle network failures gracefully"
-            - "Ensure idempotent sync operations"
-          example_implementation: |
-            import datetime
-            
+
+        determine_compliance:          parameters:
+
+          signature: "def determine_compliance(self, validation_context: Dict[str, Any]) -> Dict[str, Any]"            sync_request:
+
+          description: "Determine overall compliance based on all validation checks"              type: "Dict[str, Any]"
+
+          parameters:              description: "Session sync request containing session_id, source_platform, and target_platforms"
+
+            validation_context:              structure:
+
+              type: "Dict[str, Any]"                session_id:
+
+              description: "Context with pyramid_valid, minimum_counts_valid, pass_rates_valid"                  type: "str"
+
+          returns:                  description: "Session identifier to synchronize"
+
+            type: "Dict[str, Any]"                source_platform:
+
+            description: "Compliance result with is_compliant boolean and reasons"                  type: "str"
+
+          implementation_approach:                  values: ["mobile", "web", "api"]
+
+            - "Check validation_context['pyramid_valid'] (shape check)"                  description: "Platform initiating the sync"
+
+            - "Check validation_context['minimum_counts_valid'] (count check)"                target_platforms:
+
+            - "Check validation_context['pass_rates_valid'] (quality check)"                  type: "List[str]"
+
+            - "Compliant only if ALL checks pass"                  values: ["mobile", "web", "api"]
+
+            - "Return dict with is_compliant and list of reasons"                  description: "Platforms to sync session to"
+
+          example_implementation: |          returns:
+
+            def determine_compliance(self, validation_context: Dict[str, Any]) -> Dict[str, Any]:            type: "Dict[str, Any]"
+
+                checks = [            fields:
+
+                    validation_context.get('pyramid_valid', False),              - "session_id: str" # Original session ID
+
+                    validation_context.get('minimum_counts_valid', False),              - "synced: bool" # True if sync successful
+
+                    validation_context.get('pass_rates_valid', False)              - "sync_timestamp: str" # ISO 8601 timestamp of sync
+
+                ]              - "platforms_synced: List[str]" # List of platforms successfully synced
+
+                is_compliant = all(checks)              - "sync_failures: List[str]" # List of platforms that failed to sync
+
+                reasons = []          implementation_notes:
+
+                if not validation_context.get('pyramid_valid'):            - "Extract session_id, source_platform, and target_platforms from request"
+
+                    reasons.append("Pyramid shape invalid")            - "Validate session exists and is active"
+
+                if not validation_context.get('minimum_counts_valid'):            - "Iterate through target platforms and sync session state"
+
+                    reasons.append("Minimum test counts not met")            - "Track successful syncs and failures separately"
+
+                if not validation_context.get('pass_rates_valid'):            - "Generate sync timestamp in ISO 8601 format"
+
+                    reasons.append("Pass rate thresholds not met")            - "Return sync status with detailed platform-level results"
+
+                            - "Handle network failures gracefully"
+
+                return {            - "Ensure idempotent sync operations"
+
+                    'is_compliant': is_compliant,          example_implementation: |
+
+                    'reasons': reasons if not is_compliant else ['All validations passed']            import datetime
+
+                }            
+
             def sync_session_across_platforms(self, sync_request: Dict[str, Any]) -> Dict[str, Any]:
-                """Synchronize authentication session across multiple platforms"""
-                session_id = sync_request.get("session_id")
-                source_platform = sync_request.get("source_platform")
+
+# ============================================================================                """Synchronize authentication session across multiple platforms"""
+
+# IMPLEMENTATION STRATEGY                session_id = sync_request.get("session_id")
+
+# ============================================================================                source_platform = sync_request.get("source_platform")
+
                 target_platforms = sync_request.get("target_platforms", [])
+
+implementation_strategy:                
+
+  approach: "Incremental TDD - Implement one component at a time, verify tests pass"                # Validate session exists
+
+                  if not session_id:
+
+  phase_1_core_integration:                    return {
+
+    duration: "Day 1 (4-6 hours)"                        "session_id": "",
+
+    components:                        "synced": False,
+
+      - "PytestIntegration (REQ-INT-001) - 3 tests"                        "sync_timestamp": datetime.datetime.utcnow().isoformat(),
+
+      - "TestDiscovery (REQ-INT-002) - 3 tests"                        "platforms_synced": [],
+
+    deliverable: "6/18 tests passing - test discovery and execution working"                        "sync_failures": target_platforms
+
+    validation: "Run pytest tests/integration/test_integration_layer_simplified.py::TestPytestIntegration"                    }
+
                 
-                # Validate session exists
-                if not session_id:
-                    return {
-                        "session_id": "",
-                        "synced": False,
-                        "sync_timestamp": datetime.datetime.utcnow().isoformat(),
-                        "platforms_synced": [],
-                        "sync_failures": target_platforms
-                    }
-                
-                # Simulate platform sync
-                synced_platforms = []
-                failed_platforms = []
-                
-                for platform in target_platforms:
-                    # In real implementation, would make API call to each platform
-                    # For minimal GREEN implementation, assume sync succeeds
+
+  phase_2_pyramid_analysis:                # Simulate platform sync
+
+    duration: "Day 2 (4-6 hours)"                synced_platforms = []
+
+    components:                failed_platforms = []
+
+      - "TestCategorization (REQ-INT-003) - 3 tests"                
+
+      - "PyramidRatioCalculator (REQ-INT-004) - 3 tests"                for platform in target_platforms:
+
+    deliverable: "12/18 tests passing - categorization and ratio calculation working"                    # In real implementation, would make API call to each platform
+
+    validation: "Run pytest tests/integration/test_integration_layer_simplified.py::TestCategorization tests/integration/test_integration_layer_simplified.py::TestPyramidRatioCalculation"                    # For minimal GREEN implementation, assume sync succeeds
+
                     if platform in ["mobile", "web", "api"]:
-                        synced_platforms.append(platform)
-                    else:
-                        failed_platforms.append(platform)
-                
-                return {
-                    "session_id": session_id,
-                    "synced": len(synced_platforms) > 0,
+
+  phase_3_results_validation:                        synced_platforms.append(platform)
+
+    duration: "Day 3 (4-6 hours)"                    else:
+
+    components:                        failed_platforms.append(platform)
+
+      - "ResultCollector (REQ-INT-005) - 3 tests"                
+
+      - "ValidationLogic (REQ-INT-006) - 3 tests"                return {
+
+    deliverable: "18/18 tests passing - complete integration layer working"                    "session_id": session_id,
+
+    validation: "Run pytest tests/integration/test_integration_layer_simplified.py"                    "synced": len(synced_platforms) > 0,
+
                     "sync_timestamp": datetime.datetime.utcnow().isoformat(),
-                    "platforms_synced": synced_platforms,
-                    "sync_failures": failed_platforms
-                }
+
+  total_effort:                    "platforms_synced": synced_platforms,
+
+    estimate: "2-3 days part-time (12-18 hours total)"                    "sync_failures": failed_platforms
+
+    parallelization: "Single developer sequential implementation recommended"                }
+
+    risk_level: "Low - standard Python libraries, no external dependencies"
 
         validate_mobile_security_context:
-          description: "Validate mobile security context for active session"
-          parameters:
-            session_id:
+
+# ============================================================================          description: "Validate mobile security context for active session"
+
+# SUCCESS CRITERIA          parameters:
+
+# ============================================================================            session_id:
+
               type: "str"
-              description: "Session identifier to validate security context for"
-          returns:
-            type: "Dict[str, Any]"
-            fields:
-              - "session_id: str" # Validated session ID
+
+success_criteria:              description: "Session identifier to validate security context for"
+
+  test_pass_rate:          returns:
+
+    target: "100% (18/18 tests passing)"            type: "Dict[str, Any]"
+
+    current: "0% (all tests expect NotImplementedError)"            fields:
+
+    measurement: "pytest tests/integration/test_integration_layer_simplified.py -v"              - "session_id: str" # Validated session ID
+
               - "valid: bool" # True if security context is valid
-              - "security_checks_passed: int" # Number of security checks passed
-              - "security_checks_failed: int" # Number of security checks failed
-              - "risk_level: str" # Overall risk level: "low", "medium", "high"
-              - "validation_timestamp: str" # ISO 8601 timestamp
-              - "checks_performed: List[str]" # List of security checks performed
-          implementation_notes:
-            - "Retrieve session information for session_id"
+
+  code_coverage:              - "security_checks_passed: int" # Number of security checks passed
+
+    target: "95%+ for integration modules"              - "security_checks_failed: int" # Number of security checks failed
+
+    measurement: "pytest --cov=src/integration tests/integration/"              - "risk_level: str" # Overall risk level: "low", "medium", "high"
+
+                  - "validation_timestamp: str" # ISO 8601 timestamp
+
+  performance:              - "checks_performed: List[str]" # List of security checks performed
+
+    integration_overhead: "<5% of total test execution time"          implementation_notes:
+
+    result_capture: "100% reliability"            - "Retrieve session information for session_id"
+
             - "Perform security checks: device registration, token expiration, IP validation, etc."
-            - "Track passed and failed checks separately"
-            - "Calculate overall risk level based on check results"
-            - "Generate validation timestamp"
-            - "Return detailed security validation results"
+
+  integration_validation:            - "Track passed and failed checks separately"
+
+    business_logic_layer: "Successfully integrates with Business Logic Layer for pyramid validation"            - "Calculate overall risk level based on check results"
+
+    terminal_output: "Clean terminal output with pyramid validation results"            - "Generate validation timestamp"
+
+    no_enterprise_deps: "No dependencies on Context Engine, mobile APIs, or WebSocket"            - "Return detailed security validation results"
+
             - "Common checks: JWT validity, device trust, geolocation, session age"
-          example_implementation: |
-            import datetime
-            
-            def validate_mobile_security_context(self, session_id: str) -> Dict[str, Any]:
-                """Validate mobile security context for active session"""
-                # Validate session exists
-                if not session_id:
-                    return {
-                        "session_id": "",
-                        "valid": False,
-                        "security_checks_passed": 0,
-                        "security_checks_failed": 1,
-                        "risk_level": "high",
-                        "validation_timestamp": datetime.datetime.utcnow().isoformat(),
-                        "checks_performed": ["session_existence"]
+
+validation_checklist:          example_implementation: |
+
+  - "[ ] All 18 tests passing"            import datetime
+
+  - "[ ] No NotImplementedError exceptions"            
+
+  - "[ ] pytest integration working (discover and execute tests)"            def validate_mobile_security_context(self, session_id: str) -> Dict[str, Any]:
+
+  - "[ ] unittest fallback working"                """Validate mobile security context for active session"""
+
+  - "[ ] Test categorization by directory working"                # Validate session exists
+
+  - "[ ] Pyramid ratio calculation accurate"                if not session_id:
+
+  - "[ ] Inverted pyramid detection working"                    return {
+
+  - "[ ] Result collection and aggregation working"                        "session_id": "",
+
+  - "[ ] Pass rate calculation accurate"                        "valid": False,
+
+  - "[ ] Validation logic determining compliance correctly"                        "security_checks_passed": 0,
+
+  - "[ ] 95%+ code coverage achieved"                        "security_checks_failed": 1,
+
+  - "[ ] Integration overhead <5%"                        "risk_level": "high",
+
+  - "[ ] No external API dependencies"                        "validation_timestamp": datetime.datetime.utcnow().isoformat(),
+
+  - "[ ] Terminal output clean and informative"                        "checks_performed": ["session_existence"]
+
                     }
-                
-                # Perform security checks
-                checks_performed = [
+
+# ============================================================================                
+
+# TESTING APPROACH                # Perform security checks
+
+# ============================================================================                checks_performed = [
+
                     "session_existence",
-                    "jwt_token_validity",
-                    "device_registration",
-                    "session_expiration",
-                    "ip_validation"
-                ]
+
+testing_approach:                    "jwt_token_validity",
+
+  unit_testing:                    "device_registration",
+
+    - "Test each method in isolation with mock data"                    "session_expiration",
+
+    - "Verify correct calculations (ratios, percentages, booleans)"                    "ip_validation"
+
+    - "Test edge cases (empty lists, zero counts, missing keys)"                ]
+
                 
-                # For minimal GREEN implementation, assume most checks pass
-                checks_passed = 5
-                checks_failed = 0
-                
+
+  integration_testing:                # For minimal GREEN implementation, assume most checks pass
+
+    - "Test full pipeline: discover → categorize → calculate → validate"                checks_passed = 5
+
+    - "Use real test files in tests/unit, tests/integration, tests/e2e"                checks_failed = 0
+
+    - "Verify end-to-end pyramid validation workflow"                
+
                 # Determine risk level
-                if checks_failed == 0:
-                    risk_level = "low"
-                elif checks_failed <= 2:
-                    risk_level = "medium"
+
+  test_execution:                if checks_failed == 0:
+
+    red_to_green: "Replace NotImplementedError with real implementation, verify test passes"                    risk_level = "low"
+
+    incremental: "Implement one method, run its tests, verify pass, move to next method"                elif checks_failed <= 2:
+
+    continuous: "Run full test suite after each component completion"                    risk_level = "medium"
+
                 else:
-                    risk_level = "high"
-                
-                return {
+
+# ============================================================================                    risk_level = "high"
+
+# DEPENDENCIES AND LIBRARIES                
+
+# ============================================================================                return {
+
                     "session_id": session_id,
-                    "valid": checks_failed == 0,
-                    "security_checks_passed": checks_passed,
-                    "security_checks_failed": checks_failed,
-                    "risk_level": risk_level,
-                    "validation_timestamp": datetime.datetime.utcnow().isoformat(),
-                    "checks_performed": checks_performed
+
+dependencies:                    "valid": checks_failed == 0,
+
+  required:                    "security_checks_passed": checks_passed,
+
+    - "pytest (test discovery and execution)"                    "security_checks_failed": checks_failed,
+
+    - "unittest (fallback discovery)"                    "risk_level": risk_level,
+
+    - "pathlib (file system operations)"                    "validation_timestamp": datetime.datetime.utcnow().isoformat(),
+
+    - "typing (type hints)"                    "checks_performed": checks_performed
+
                 }
 
-      test_expectations:
+  optional:
+
+    - "pytest-cov (code coverage measurement)"      test_expectations:
+
         test_integrate_mobile_authentication_fails_initially:
-          description: "Test that mobile authentication integration works with valid credentials"
-          current_behavior: "Raises NotImplementedError (RED phase)"
-          expected_behavior: "Returns authentication result with session_id and jwt_token (GREEN phase)"
-          test_data:
+
+  deferred:          description: "Test that mobile authentication integration works with valid credentials"
+
+    - "requests (for Context Engine API - DEFERRED to SYSTEM-003-04)"          current_behavior: "Raises NotImplementedError (RED phase)"
+
+    - "websockets (for real-time streaming - DEFERRED to SYSTEM-003-04)"          expected_behavior: "Returns authentication result with session_id and jwt_token (GREEN phase)"
+
+    - "jwt (for mobile authentication - DEFERRED to SYSTEM-003-04)"          test_data:
+
             user_credentials:
-              username: "user_123"
-              device_id: "mobile_abc"
-            authentication_method: "biometric"
+
+# ============================================================================              username: "user_123"
+
+# NEXT STEPS AFTER GREEN PHASE              device_id: "mobile_abc"
+
+# ============================================================================            authentication_method: "biometric"
+
             security_level: "high"
-          validation:
-            - "authenticated field is True"
-            - "session_id is non-empty string"
-            - "jwt_token is valid JWT format"
-            - "user_id matches username"
-            - "device_registered is True"
-            - "security_level is preserved"
+
+next_steps:          validation:
+
+  refactor_phase:            - "authenticated field is True"
+
+    description: "REFACTOR phase - clean up code, improve structure, optimize performance"            - "session_id is non-empty string"
+
+    focus: "Code quality, maintainability, performance optimization"            - "jwt_token is valid JWT format"
+
+                - "user_id matches username"
+
+  business_logic_integration:            - "device_registered is True"
+
+    description: "Integrate with Business Logic Layer for complete pyramid validation"            - "security_level is preserved"
+
+    requirements: "Business Logic Layer must be implemented first"
 
         test_sync_session_across_platforms_fails_initially:
-          description: "Test that session synchronization works across platforms"
-          current_behavior: "Raises NotImplementedError (RED phase)"
-          expected_behavior: "Returns sync status with platforms_synced list (GREEN phase)"
+
+  ui_layer_enablement:          description: "Test that session synchronization works across platforms"
+
+    description: "Enable terminal output for pyramid validation results"          current_behavior: "Raises NotImplementedError (RED phase)"
+
+    requirements: "Integration Layer complete (this prompt's scope)"          expected_behavior: "Returns sync status with platforms_synced list (GREEN phase)"
+
           test_data:
-            session_id: "sess_789"
-            source_platform: "mobile"
-            target_platforms: ["web", "api"]
-          validation:
+
+  system_003_04_evaluation:            session_id: "sess_789"
+
+    description: "Evaluate need for enterprise features after core enforcer working"            source_platform: "mobile"
+
+    activation_criteria: "10+ users, distributed team, concrete mobile/dashboard need"            target_platforms: ["web", "api"]
+
+    estimated_effort: "10 weeks if needed"          validation:
+
             - "synced field is True"
-            - "platforms_synced contains 'web' and 'api'"
+
+---            - "platforms_synced contains 'web' and 'api'"
+
             - "sync_failures is empty list"
             - "sync_timestamp is valid ISO 8601 format"
 

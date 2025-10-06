@@ -1,736 +1,628 @@
 ---
-# Failing Tests Prompt - Integration Layer Contextual Pyramid Validation
+# Failing Tests Prompt - Integration Layer Simplified Pyramid Validation
 
 metadata:
   prompt_type: "failing_tests"
   feature_id: "FEATURE-003-02-01"
   layer_id: "LAYER-003-02-01-004"
-  feature_name: "Contextual Testing Pyramid Validation Engine"
-  layer_name: "Integration Layer"
+  feature_name: "Testing Pyramid Validation Engine"
+  layer_name: "Integration Layer - SIMPLIFIED"
   tdd_phase: "RED"
   created_date: "2025-10-03"
-  updated_date: "2025-10-03"
+  updated_date: "2025-10-06"
+  simplification_note: "Mobile, WebSocket, and real-time features moved to SYSTEM-003-04 (DEFERRED)"
 
 testing_context:
-  target_implementation: "LAYER-003-02-01-004 Integration Layer"
-  source_document: "LAYER-003-02-01-004_integration_requirements.md"
-  source_date: "2025-09-29"
+  target_implementation: "LAYER-003-02-01-004 Integration Layer (SIMPLIFIED)"
+  source_document: "LAYER-003-02-01-004_integration_requirements_SIMPLIFIED.md"
+  source_date: "2025-10-06"
   tdd_phase: "RED"
-  phase_description: "Create 24 Failing Tests for Integration Layer Requirements"
+  phase_description: "Create 18 Failing Tests for Simplified Integration Layer Requirements"
   test_scope: "INTEGRATION_LAYER_ONLY"
-  test_file_pattern: "test_integration_layer.py"
+  test_file_pattern: "test_integration_layer_simplified.py"
   project_scope:
-    - "REQ-INT-001 through REQ-INT-008: Functional Requirements"
-    - "REQ-PERF-INT-001 through REQ-PERF-INT-003: Performance Requirements"
-    - "REQ-REL-INT-001 through REQ-REL-INT-002: Reliability Requirements"
-    - "REQ-EXT-INT-001 through REQ-EXT-INT-003: External System Integration"
-    - "REQ-MOB-INT-001 through REQ-MOB-INT-002: Mobile Framework Integration"
-    - "REQ-SEC-INT-001 through REQ-SEC-INT-002: Security Requirements"
-  priority: "24 focused failing tests aligned to integration layer requirements"
+    - "REQ-INT-001: pytest/unittest Integration (3 tests)"
+    - "REQ-INT-002: Test Discovery (3 tests)"
+    - "REQ-INT-003: Test Categorization by Directory (3 tests)"
+    - "REQ-INT-004: Pyramid Ratio Calculation (3 tests)"
+    - "REQ-INT-005: Test Result Collection (3 tests)"
+    - "REQ-INT-006: Validation Logic (3 tests)"
+  priority: "18 focused failing tests aligned to simplified integration layer requirements"
   success_criteria:
-    - "Exactly 24 failing tests created"
-    - "Direct mapping to 8 functional + 10 non-functional requirements"
+    - "Exactly 18 failing tests created"
+    - "Direct mapping to 6 simplified functional requirements (3 tests each)"
     - "No repository-wide test execution"
     - "Integration Layer scope only"
     - "All tests must raise NotImplementedError initially"
+    - "Terminal-only output, no mobile/WebSocket/dashboards"
+  
+  deferred_features:
+    system_id: "SYSTEM-003-04 MOBILE_DASHBOARD_STREAMING"
+    deferred_items:
+      - "Context Engine real-time integration"
+      - "Mobile authentication endpoints"
+      - "Mobile command processing"
+      - "WebSocket real-time streaming"
+      - "Remote execution orchestration"
+      - "Cross-component integration testing (if not needed)"
+      - "Component compatibility validation"
+      - "Push notifications"
+      - "Real-time progress updates"
+    rationale: "Small team, terminal-based enforcer, no mobile/dashboard features needed yet"
+
 
 integration_layer_tests:
-  name: "INTEGRATION LAYER FAILING TESTS (24 TESTS TOTAL)"
-  description: "Focused failing tests for LAYER-003-02-01-004 Integration Layer requirements"
-  test_file: "test_integration_layer.py"
+  name: "INTEGRATION LAYER SIMPLIFIED FAILING TESTS (18 TESTS TOTAL)"
+  description: "Focused failing tests for LAYER-003-02-01-004 Integration Layer simplified requirements"
+  test_file: "test_integration_layer_simplified.py"
   execution_scope: "LAYER_ONLY"
 
   functional_requirements_tests:
-    name: "FUNCTIONAL REQUIREMENTS (REQ-INT-001 through REQ-INT-008)"
-    description: "16 tests for 8 functional requirements (2 tests each)"
+    name: "SIMPLIFIED FUNCTIONAL REQUIREMENTS (REQ-INT-001 through REQ-INT-006)"
+    description: "18 tests for 6 simplified functional requirements (3 tests each)"
 
     req_int_001_tests:
       requirement_id: "REQ-INT-001"
-      requirement_name: "Context Engine API Integration"
-      class_name: "TestContextEngineIntegration"
+      requirement_name: "pytest/unittest Integration"
+      class_name: "TestPytestIntegration"
+      description: "Integrate with standard Python test frameworks for test discovery and execution"
       tests:
-        - name: "test_context_engine_connection_fails_initially"
-          description: "Should establish real-time connection to Context Engine for position tracking"
-          expected_failure: "NotImplementedError - Context Engine integration not implemented"
+        - name: "test_pytest_test_discovery_fails_initially"
+          description: "Should discover tests using pytest collection API"
+          expected_failure: "NotImplementedError - pytest integration not implemented"
           test_code: |
             import pytest
-            from src.integration.context_engine_integration import ContextEngineIntegration
+            from src.integration.pytest_integration import PytestIntegration
             
-            def test_context_engine_connection_fails_initially():
-                """RED: Context Engine integration should fail before implementation"""
-                integration = ContextEngineIntegration()
+            def test_pytest_test_discovery_fails_initially():
+                """RED: pytest test discovery should fail before implementation"""
+                integration = PytestIntegration()
+                test_directory = "tests/"
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.establish_context_connection()
+                    integration.discover_tests(test_directory)
           requirements:
-            response_time: 0.2  # <200ms for Context Engine queries
-            reliability: 0.999  # 99.9% connectivity
-            features:
-              - "real_time_event_streaming"
-              - "position_change_notifications"
-              - "workflow_state_synchronization"
-              - "progression_events"
+            - "Use pytest collection API"
+            - "Support test_*.py and *_test.py patterns"
+            - "Return list of discovered test items"
 
-        - name: "test_position_query_fails_initially"
-          description: "Should query current position from Context Engine within 200ms"
-          expected_failure: "NotImplementedError - Position query not implemented"
+        - name: "test_pytest_test_execution_fails_initially"
+          description: "Should execute tests using pytest and capture results"
+          expected_failure: "NotImplementedError - pytest execution not implemented"
           test_code: |
             import pytest
-            from src.integration.context_engine_integration import ContextEngineIntegration
+            from src.integration.pytest_integration import PytestIntegration
             
-            def test_position_query_fails_initially():
-                """RED: Position query should fail before implementation"""
-                integration = ContextEngineIntegration()
-                position_request = {
-                    "component_id": "comp_123",
-                    "context_type": "layer_position"
-                }
+            def test_pytest_test_execution_fails_initially():
+                """RED: pytest test execution should fail before implementation"""
+                integration = PytestIntegration()
+                test_items = ["tests/unit/test_example.py::test_function"]
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.query_current_position(position_request)
-          assertions:
-            - "query_result['response_time'] < 0.2"
-            - "query_result['position_data'] is not None"
-            - "query_result['context_aware'] is True"
+                    integration.execute_tests(test_items)
+          requirements:
+            - "Execute pytest with provided test items"
+            - "Capture pass/fail status for each test"
+            - "Record execution time per test"
+
+        - name: "test_unittest_fallback_support_fails_initially"
+          description: "Should support unittest as fallback test framework"
+          expected_failure: "NotImplementedError - unittest support not implemented"
+          test_code: |
+            import pytest
+            from src.integration.pytest_integration import PytestIntegration
+            
+            def test_unittest_fallback_support_fails_initially():
+                """RED: unittest fallback support should fail before implementation"""
+                integration = PytestIntegration()
+                test_directory = "tests/"
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    integration.discover_tests_unittest(test_directory)
+          requirements:
+            - "Support unittest.TestLoader for discovery"
+            - "Execute unittest.TestSuite"
+            - "Convert unittest results to common format"
 
     req_int_002_tests:
       requirement_id: "REQ-INT-002"
-      requirement_name: "Contextual Workflow Integration"
-      class_name: "TestContextualWorkflowIntegration"
+      requirement_name: "Test Discovery"
+      class_name: "TestDiscovery"
+      description: "Discover tests in project directories using standard test naming conventions"
       tests:
-        - name: "test_workflow_progression_decision_fails_initially"
-          description: "Should integrate with workflow engine for intelligent progression decisions"
-          expected_failure: "NotImplementedError - Workflow integration not implemented"
+        - name: "test_discover_tests_by_pattern_fails_initially"
+          description: "Should discover tests matching test_*.py and *_test.py patterns"
+          expected_failure: "NotImplementedError - test discovery not implemented"
           test_code: |
             import pytest
-            from src.integration.workflow_integration import WorkflowIntegration
+            from src.integration.test_discovery import TestDiscovery
             
-            def test_workflow_progression_decision_fails_initially():
-                """RED: Workflow progression should fail before implementation"""
-                integration = WorkflowIntegration()
-                completion_event = {
-                    "component_id": "comp_456",
-                    "completion_type": "layer_complete",
-                    "progression_context": "ready_for_next"
-                }
+            def test_discover_tests_by_pattern_fails_initially():
+                """RED: test discovery by pattern should fail before implementation"""
+                discovery = TestDiscovery()
+                test_directory = "tests/"
+                patterns = ["test_*.py", "*_test.py"]
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.determine_next_progression(completion_event)
+                    discovery.discover_by_pattern(test_directory, patterns)
           requirements:
-            decision_time: 1.0  # <1 second for workflow decisions
-            features:
-              - "event_driven_triggers"
-              - "decision_based_branching"
-              - "progression_orchestration"
-              - "automatic_workflow_continuation"
+            - "Scan directories for test files"
+            - "Match test_*.py and *_test.py patterns"
+            - "Return file paths with test functions/classes"
 
-        - name: "test_automatic_trigger_coordination_fails_initially"
-          description: "Should coordinate automatic triggers based on completion events"
-          expected_failure: "NotImplementedError - Trigger coordination not implemented"
+        - name: "test_discover_tests_in_subdirectories_fails_initially"
+          description: "Should discover tests in unit/, integration/, e2e/ subdirectories"
+          expected_failure: "NotImplementedError - subdirectory discovery not implemented"
           test_code: |
             import pytest
-            from src.integration.workflow_integration import WorkflowIntegration
+            from src.integration.test_discovery import TestDiscovery
             
-            def test_automatic_trigger_coordination_fails_initially():
-                """RED: Trigger coordination should fail before implementation"""
-                integration = WorkflowIntegration()
-                trigger_context = {
-                    "trigger_type": "completion_based",
-                    "source_component": "comp_789",
-                    "target_actions": ["start_next_iteration", "notify_stakeholders"]
-                }
+            def test_discover_tests_in_subdirectories_fails_initially():
+                """RED: subdirectory discovery should fail before implementation"""
+                discovery = TestDiscovery()
+                base_directory = "tests/"
+                subdirectories = ["unit", "integration", "e2e"]
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.coordinate_automatic_triggers(trigger_context)
+                    discovery.discover_in_subdirectories(base_directory, subdirectories)
+          requirements:
+            - "Recursively scan subdirectories"
+            - "Preserve directory structure in results"
+            - "Return dict with subdirectory → test list mapping"
+
+        - name: "test_list_discovered_tests_fails_initially"
+          description: "Should provide list of all discovered tests with metadata"
+          expected_failure: "NotImplementedError - test listing not implemented"
+          test_code: |
+            import pytest
+            from src.integration.test_discovery import TestDiscovery
+            
+            def test_list_discovered_tests_fails_initially():
+                """RED: test listing should fail before implementation"""
+                discovery = TestDiscovery()
+                test_directory = "tests/"
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    test_list = discovery.list_all_tests(test_directory)
+          requirements:
+            - "Return list of test items"
+            - "Include file path, function/class name, directory"
+            - "Provide count by directory"
 
     req_int_003_tests:
       requirement_id: "REQ-INT-003"
-      requirement_name: "Mobile Authentication Integration"
-      class_name: "TestMobileAuthenticationIntegration"
+      requirement_name: "Test Categorization by Directory"
+      class_name: "TestCategorization"
+      description: "Categorize tests as unit/integration/e2e based on directory structure"
       tests:
-        - name: "test_mobile_authentication_endpoint_fails_initially"
-          description: "Should provide secure mobile authentication endpoint with JWT validation"
-          expected_failure: "NotImplementedError - Mobile auth endpoint not implemented"
+        - name: "test_categorize_by_directory_structure_fails_initially"
+          description: "Should categorize tests based on directory (tests/unit → Unit, tests/integration → Integration)"
+          expected_failure: "NotImplementedError - directory categorization not implemented"
           test_code: |
             import pytest
-            from src.integration.mobile_auth_integration import MobileAuthIntegration
+            from src.integration.test_categorization import TestCategorization
             
-            def test_mobile_authentication_endpoint_fails_initially():
-                """RED: Mobile authentication should fail before implementation"""
-                integration = MobileAuthIntegration()
-                auth_request = {
-                    "user_credentials": {"username": "user_123", "device_id": "mobile_abc"},
-                    "authentication_method": "biometric",
-                    "security_level": "high"
-                }
+            def test_categorize_by_directory_structure_fails_initially():
+                """RED: directory categorization should fail before implementation"""
+                categorization = TestCategorization()
+                test_items = [
+                    {"path": "tests/unit/test_example.py::test_func"},
+                    {"path": "tests/integration/test_api.py::test_endpoint"},
+                    {"path": "tests/e2e/test_workflow.py::test_complete"}
+                ]
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.authenticate_mobile_user(auth_request)
+                    categories = categorization.categorize_by_directory(test_items)
           requirements:
-            processing_time: 1.0  # <1 second authentication
-            security_compliance: 0.999  # 99.9% security compliance
-            endpoints:
-              - "/mobile/auth"
-              - "/mobile/validate-session"
-              - "/mobile/refresh-token"
-              - "/mobile/logout"
+            - "Parse directory path from test item"
+            - "Match /unit/ → Unit, /integration/ → Integration, /e2e/ → E2E"
+            - "Return dict with 'unit', 'integration', 'e2e' keys"
 
-        - name: "test_device_registration_fails_initially"
-          description: "Should register and verify mobile devices securely"
-          expected_failure: "NotImplementedError - Device registration not implemented"
+        - name: "test_categorize_by_naming_convention_fallback_fails_initially"
+          description: "Should use naming patterns as fallback if no standard directory structure"
+          expected_failure: "NotImplementedError - naming convention categorization not implemented"
           test_code: |
             import pytest
-            from src.integration.mobile_auth_integration import MobileAuthIntegration
+            from src.integration.test_categorization import TestCategorization
             
-            def test_device_registration_fails_initially():
-                """RED: Device registration should fail before implementation"""
-                integration = MobileAuthIntegration()
-                device_info = {
-                    "device_id": "mobile_xyz",
-                    "device_type": "android",
-                    "biometric_capability": True,
-                    "user_id": "user_456"
+            def test_categorize_by_naming_convention_fallback_fails_initially():
+                """RED: naming convention categorization should fail before implementation"""
+                categorization = TestCategorization()
+                test_items = [
+                    {"path": "tests/test_unit_example.py::test_func"},
+                    {"path": "tests/test_integration_api.py::test_endpoint"}
+                ]
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    categories = categorization.categorize_by_naming(test_items)
+          requirements:
+            - "Parse filename for 'unit', 'integration', 'e2e' keywords"
+            - "Use regex or string matching"
+            - "Default to 'unit' if ambiguous"
+
+        - name: "test_count_tests_by_category_fails_initially"
+          description: "Should count tests in each pyramid level category"
+          expected_failure: "NotImplementedError - category counting not implemented"
+          test_code: |
+            import pytest
+            from src.integration.test_categorization import TestCategorization
+            
+            def test_count_tests_by_category_fails_initially():
+                """RED: category counting should fail before implementation"""
+                categorization = TestCategorization()
+                categorized_tests = {
+                    'unit': [{'name': 'test_1'}, {'name': 'test_2'}],
+                    'integration': [{'name': 'test_3'}],
+                    'e2e': [{'name': 'test_4'}]
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.register_mobile_device(device_info)
+                    counts = categorization.count_by_category(categorized_tests)
+          requirements:
+            - "Count tests in each category"
+            - "Return dict with 'unit', 'integration', 'e2e' counts"
+            - "Handle empty categories (count = 0)"
 
     req_int_004_tests:
       requirement_id: "REQ-INT-004"
-      requirement_name: "Mobile Command Processing Endpoints"
-      class_name: "TestMobileCommandProcessing"
+      requirement_name: "Pyramid Ratio Calculation"
+      class_name: "TestPyramidRatioCalculation"
+      description: "Calculate pyramid ratios to validate proper test distribution"
       tests:
-        - name: "test_mobile_command_execution_fails_initially"
-          description: "Should process mobile validation commands with real-time status"
-          expected_failure: "NotImplementedError - Command processing not implemented"
+        - name: "test_calculate_pyramid_ratios_fails_initially"
+          description: "Should calculate test count ratios for pyramid levels"
+          expected_failure: "NotImplementedError - ratio calculation not implemented"
           test_code: |
             import pytest
-            from src.integration.mobile_command_integration import MobileCommandIntegration
+            from src.integration.pyramid_calculator import PyramidRatioCalculator
             
-            def test_mobile_command_execution_fails_initially():
-                """RED: Mobile command execution should fail before implementation"""
-                integration = MobileCommandIntegration()
-                command_request = {
-                    "command_type": "execute_validation",
-                    "parameters": {"layer": "business_logic", "iteration": 10},
-                    "context": {"user_id": "user_789", "device_id": "mobile_123"}
+            def test_calculate_pyramid_ratios_fails_initially():
+                """RED: pyramid ratio calculation should fail before implementation"""
+                calculator = PyramidRatioCalculator()
+                test_counts = {
+                    'unit': 50,
+                    'integration': 20,
+                    'e2e': 5
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.execute_mobile_command(command_request)
+                    ratios = calculator.calculate_ratios(test_counts)
           requirements:
-            acknowledgment_time: 2.0  # <2 seconds command acknowledgment
-            endpoints:
-              - "/mobile/execute-validation"
-              - "/mobile/get-status"
-              - "/mobile/get-results"
-              - "/mobile/cancel-execution"
+            - "Calculate total test count"
+            - "Calculate percentage for each level"
+            - "Return ratios dict with percentages"
 
-        - name: "test_real_time_command_status_fails_initially"
-          description: "Should provide real-time status updates for mobile commands"
-          expected_failure: "NotImplementedError - Status updates not implemented"
+        - name: "test_validate_pyramid_shape_fails_initially"
+          description: "Should determine if test distribution forms proper pyramid (unit > integration > e2e)"
+          expected_failure: "NotImplementedError - pyramid shape validation not implemented"
           test_code: |
             import pytest
-            from src.integration.mobile_command_integration import MobileCommandIntegration
+            from src.integration.pyramid_calculator import PyramidRatioCalculator
             
-            def test_real_time_command_status_fails_initially():
-                """RED: Real-time status should fail before implementation"""
-                integration = MobileCommandIntegration()
-                status_request = {
-                    "command_id": "cmd_456",
-                    "update_frequency": "real_time"
+            def test_validate_pyramid_shape_fails_initially():
+                """RED: pyramid shape validation should fail before implementation"""
+                calculator = PyramidRatioCalculator()
+                test_counts = {
+                    'unit': 50,
+                    'integration': 20,
+                    'e2e': 5
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.get_command_status(status_request)
+                    is_proper = calculator.validate_pyramid_shape(test_counts)
+          requirements:
+            - "Check unit_count > integration_count"
+            - "Check integration_count > e2e_count"
+            - "Return True if proper pyramid, False if inverted"
+
+        - name: "test_identify_inverted_pyramid_fails_initially"
+          description: "Should detect inverted pyramid (too many integration/e2e tests)"
+          expected_failure: "NotImplementedError - inverted pyramid detection not implemented"
+          test_code: |
+            import pytest
+            from src.integration.pyramid_calculator import PyramidRatioCalculator
+            
+            def test_identify_inverted_pyramid_fails_initially():
+                """RED: inverted pyramid detection should fail before implementation"""
+                calculator = PyramidRatioCalculator()
+                test_counts = {
+                    'unit': 5,
+                    'integration': 20,
+                    'e2e': 50  # Inverted!
+                }
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    result = calculator.detect_inverted_pyramid(test_counts)
+          requirements:
+            - "Detect when e2e > integration or integration > unit"
+            - "Return inverted status with reason"
+            - "Provide recommendation for fixing"
 
     req_int_005_tests:
       requirement_id: "REQ-INT-005"
-      requirement_name: "Cross-Component Integration Testing"
-      class_name: "TestCrossComponentIntegration"
+      requirement_name: "Test Result Collection"
+      class_name: "TestResultCollection"
+      description: "Collect all test results from execution and aggregate by pyramid level"
       tests:
-        - name: "test_component_integration_execution_fails_initially"
-          description: "Should execute integration tests between components"
-          expected_failure: "NotImplementedError - Cross-component testing not implemented"
+        - name: "test_collect_test_results_fails_initially"
+          description: "Should collect test results with pass/fail status and execution time"
+          expected_failure: "NotImplementedError - result collection not implemented"
           test_code: |
             import pytest
-            from src.integration.cross_component_integration import CrossComponentIntegration
+            from src.integration.result_collector import ResultCollector
             
-            def test_component_integration_execution_fails_initially():
-                """RED: Component integration testing should fail before implementation"""
-                integration = CrossComponentIntegration()
-                test_request = {
-                    "source_component": "comp_abc",
-                    "target_components": ["comp_def", "comp_ghi"],
-                    "test_type": "interface_contract"
+            def test_collect_test_results_fails_initially():
+                """RED: test result collection should fail before implementation"""
+                collector = ResultCollector()
+                test_execution_output = {
+                    'tests': [
+                        {'name': 'test_1', 'status': 'passed', 'duration': 0.05},
+                        {'name': 'test_2', 'status': 'failed', 'duration': 0.12}
+                    ]
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.execute_integration_tests(test_request)
+                    results = collector.collect_results(test_execution_output)
           requirements:
-            execution_time: 300.0  # <5 minutes for integration test suites
-            features:
-              - "interface_contract_validation"
-              - "compatibility_validation"
-              - "dependency_resolution_testing"
-              - "integration_test_suites"
+            - "Parse test execution output"
+            - "Extract test name, status, duration, error details"
+            - "Return structured result list"
 
-        - name: "test_interface_contract_validation_fails_initially"
-          description: "Should validate interface contracts between components"
-          expected_failure: "NotImplementedError - Contract validation not implemented"
+        - name: "test_aggregate_results_by_level_fails_initially"
+          description: "Should aggregate results by pyramid level (unit/integration/e2e)"
+          expected_failure: "NotImplementedError - result aggregation not implemented"
           test_code: |
             import pytest
-            from src.integration.cross_component_integration import CrossComponentIntegration
+            from src.integration.result_collector import ResultCollector
             
-            def test_interface_contract_validation_fails_initially():
-                """RED: Interface contract validation should fail before implementation"""
-                integration = CrossComponentIntegration()
-                contract_request = {
-                    "component_id": "comp_jkl",
-                    "interface_definition": "IComponentInterface",
-                    "validation_rules": ["method_signatures", "return_types", "exceptions"]
+            def test_aggregate_results_by_level_fails_initially():
+                """RED: result aggregation should fail before implementation"""
+                collector = ResultCollector()
+                results = [
+                    {'name': 'test_1', 'level': 'unit', 'status': 'passed'},
+                    {'name': 'test_2', 'level': 'unit', 'status': 'failed'},
+                    {'name': 'test_3', 'level': 'integration', 'status': 'passed'}
+                ]
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    aggregated = collector.aggregate_by_level(results)
+          requirements:
+            - "Group results by pyramid level"
+            - "Calculate totals and pass rates per level"
+            - "Return aggregated dict with level → summary"
+
+        - name: "test_calculate_pass_rates_fails_initially"
+          description: "Should calculate pass rates for each pyramid level"
+          expected_failure: "NotImplementedError - pass rate calculation not implemented"
+          test_code: |
+            import pytest
+            from src.integration.result_collector import ResultCollector
+            
+            def test_calculate_pass_rates_fails_initially():
+                """RED: pass rate calculation should fail before implementation"""
+                collector = ResultCollector()
+                aggregated_results = {
+                    'unit': {'total': 50, 'passed': 48, 'failed': 2},
+                    'integration': {'total': 20, 'passed': 18, 'failed': 2},
+                    'e2e': {'total': 5, 'passed': 5, 'failed': 0}
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    integration.validate_interface_contract(contract_request)
+                    pass_rates = collector.calculate_pass_rates(aggregated_results)
+          requirements:
+            - "Calculate pass_rate = passed / total for each level"
+            - "Return pass rates as percentages"
+            - "Handle division by zero (0 tests)"
 
     req_int_006_tests:
       requirement_id: "REQ-INT-006"
-      requirement_name: "Component Compatibility Validation"
-      class_name: "TestComponentCompatibility"
+      requirement_name: "Validation Logic"
+      class_name: "TestValidationLogic"
+      description: "Determine overall pyramid compliance based on results and ratios"
       tests:
-        - name: "test_compatibility_analysis_fails_initially"
-          description: "Should analyze compatibility between component interfaces"
-          expected_failure: "NotImplementedError - Compatibility analysis not implemented"
+        - name: "test_validate_minimum_test_counts_fails_initially"
+          description: "Should check if minimum test counts are met for each level"
+          expected_failure: "NotImplementedError - minimum count validation not implemented"
           test_code: |
             import pytest
-            from src.integration.component_compatibility import ComponentCompatibility
+            from src.integration.validation_logic import ValidationLogic
             
-            def test_compatibility_analysis_fails_initially():
-                """RED: Compatibility analysis should fail before implementation"""
-                validator = ComponentCompatibility()
-                compatibility_request = {
-                    "component_a": "comp_mno",
-                    "component_b": "comp_pqr",
-                    "analysis_type": "interface_compatibility"
+            def test_validate_minimum_test_counts_fails_initially():
+                """RED: minimum count validation should fail before implementation"""
+                validator = ValidationLogic()
+                test_counts = {'unit': 50, 'integration': 20, 'e2e': 5}
+                minimum_requirements = {'unit': 10, 'integration': 3, 'e2e': 1}
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    meets_minimums = validator.validate_minimum_counts(test_counts, minimum_requirements)
+          requirements:
+            - "Compare actual counts to minimum requirements"
+            - "Check all levels meet minimums"
+            - "Return True if all minimums met, False otherwise"
+
+        - name: "test_validate_pass_rate_thresholds_fails_initially"
+          description: "Should check if pass rates meet threshold requirements"
+          expected_failure: "NotImplementedError - pass rate threshold validation not implemented"
+          test_code: |
+            import pytest
+            from src.integration.validation_logic import ValidationLogic
+            
+            def test_validate_pass_rate_thresholds_fails_initially():
+                """RED: pass rate threshold validation should fail before implementation"""
+                validator = ValidationLogic()
+                pass_rates = {'unit': 0.95, 'integration': 0.90, 'e2e': 1.0}
+                thresholds = {'unit': 0.90, 'integration': 0.85, 'e2e': 0.90}
+                
+                # Should raise NotImplementedError initially
+                with pytest.raises(NotImplementedError):
+                    meets_thresholds = validator.validate_pass_rates(pass_rates, thresholds)
+          requirements:
+            - "Compare pass rates to thresholds"
+            - "Check all levels meet thresholds"
+            - "Return True if all thresholds met, False otherwise"
+
+        - name: "test_determine_overall_compliance_fails_initially"
+          description: "Should determine overall compliance (pass/fail) with detailed reasoning"
+          expected_failure: "NotImplementedError - overall compliance determination not implemented"
+          test_code: |
+            import pytest
+            from src.integration.validation_logic import ValidationLogic
+            
+            def test_determine_overall_compliance_fails_initially():
+                """RED: overall compliance determination should fail before implementation"""
+                validator = ValidationLogic()
+                validation_context = {
+                    'pyramid_shape': 'proper',
+                    'meets_minimums': True,
+                    'meets_pass_rates': True,
+                    'test_counts': {'unit': 50, 'integration': 20, 'e2e': 5}
                 }
                 
                 # Should raise NotImplementedError initially
                 with pytest.raises(NotImplementedError):
-                    validator.analyze_compatibility(compatibility_request)
+                    compliance_result = validator.determine_compliance(validation_context)
           requirements:
-            analysis_time: 30.0  # <30 seconds for compatibility validation
-            accuracy: 0.98  # 98%+ accuracy
-            features:
-              - "version_compatibility_checking"
-              - "conflict_detection"
-              - "resolution_recommendations"
-              - "dependency_resolution"
+            - "Check pyramid shape AND minimum counts AND pass rates"
+            - "Return compliant=True only if all conditions met"
+            - "Provide detailed reason for pass/fail decision"
 
-        - name: "test_conflict_detection_fails_initially"
-          description: "Should detect conflicts between component versions"
-          expected_failure: "NotImplementedError - Conflict detection not implemented"
-          test_code: |
-            import pytest
-            from src.integration.component_compatibility import ComponentCompatibility
-            
-            def test_conflict_detection_fails_initially():
-                """RED: Conflict detection should fail before implementation"""
-                validator = ComponentCompatibility()
-                conflict_request = {
-                    "components": ["comp_stu", "comp_vwx"],
-                    "check_types": ["version_conflicts", "dependency_conflicts"]
-                }
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    validator.detect_conflicts(conflict_request)
 
-    req_int_007_tests:
-      requirement_id: "REQ-INT-007"
-      requirement_name: "Remote Execution Orchestration"
-      class_name: "TestRemoteExecutionOrchestration"
-      tests:
-        - name: "test_remote_execution_planning_fails_initially"
-          description: "Should orchestrate remote execution for mobile-initiated commands"
-          expected_failure: "NotImplementedError - Remote execution not implemented"
-          test_code: |
-            import pytest
-            from src.integration.remote_execution import RemoteExecutionOrchestrator
-            
-            def test_remote_execution_planning_fails_initially():
-                """RED: Remote execution orchestration should fail before implementation"""
-                orchestrator = RemoteExecutionOrchestrator()
-                execution_request = {
-                    "command_id": "cmd_789",
-                    "execution_context": "mobile_initiated",
-                    "resource_requirements": {"cpu": "medium", "memory": "high"}
-                }
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    orchestrator.plan_remote_execution(execution_request)
-          requirements:
-            orchestration_time: 5.0  # <5 seconds for execution orchestration
-            features:
-              - "resource_allocation"
-              - "execution_monitoring"
-              - "result_collection"
-              - "context_propagation"
-
-        - name: "test_execution_monitoring_fails_initially"
-          description: "Should monitor remote execution with real-time status"
-          expected_failure: "NotImplementedError - Execution monitoring not implemented"
-          test_code: |
-            import pytest
-            from src.integration.remote_execution import RemoteExecutionOrchestrator
-            
-            def test_execution_monitoring_fails_initially():
-                """RED: Execution monitoring should fail before implementation"""
-                orchestrator = RemoteExecutionOrchestrator()
-                monitoring_request = {
-                    "execution_id": "exec_123",
-                    "monitoring_interval": 1.0  # seconds
-                }
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    orchestrator.monitor_execution(monitoring_request)
-
-    req_int_008_tests:
-      requirement_id: "REQ-INT-008"
-      requirement_name: "Real-Time Progress Integration"
-      class_name: "TestRealTimeProgressIntegration"
-      tests:
-        - name: "test_websocket_progress_updates_fails_initially"
-          description: "Should deliver real-time progress updates via WebSocket"
-          expected_failure: "NotImplementedError - WebSocket integration not implemented"
-          test_code: |
-            import pytest
-            from src.integration.realtime_progress import RealTimeProgressIntegration
-            
-            def test_websocket_progress_updates_fails_initially():
-                """RED: WebSocket progress updates should fail before implementation"""
-                integration = RealTimeProgressIntegration()
-                progress_config = {
-                    "client_id": "mobile_client_456",
-                    "update_types": ["execution_progress", "status_changes", "completion_notifications"]
-                }
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.establish_websocket_connection(progress_config)
-          requirements:
-            delivery_time: 1.0  # <1 second delivery to mobile clients
-            reliability: 0.99  # 99% delivery reliability
-            features:
-              - "websocket_connections"
-              - "push_notifications"
-              - "mobile_optimized_messaging"
-              - "offline_support"
-
-        - name: "test_progress_notification_delivery_fails_initially"
-          description: "Should deliver progress notifications with guaranteed ordering"
-          expected_failure: "NotImplementedError - Notification delivery not implemented"
-          test_code: |
-            import pytest
-            from src.integration.realtime_progress import RealTimeProgressIntegration
-            
-            def test_progress_notification_delivery_fails_initially():
-                """RED: Progress notification delivery should fail before implementation"""
-                integration = RealTimeProgressIntegration()
-                notification = {
-                    "notification_type": "execution_complete",
-                    "client_id": "mobile_client_789",
-                    "payload": {"status": "success", "results": "validation_passed"}
-                }
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.deliver_progress_notification(notification)
-
-  performance_requirements_tests:
-    name: "PERFORMANCE REQUIREMENTS (REQ-PERF-INT-001 through REQ-PERF-INT-003)"
-    description: "6 tests for 3 performance requirements (2 tests each)"
-
-    req_perf_int_001_tests:
-      requirement_id: "REQ-PERF-INT-001"
-      requirement_name: "Context Engine Integration Performance"
-      class_name: "TestContextEnginePerformance"
-      tests:
-        - name: "test_context_query_response_time_fails_initially"
-          description: "Should query Context Engine within 200ms response time"
-          expected_failure: "NotImplementedError - Performance testing not implemented"
-          test_code: |
-            import pytest
-            from src.integration.context_engine_integration import ContextEngineIntegration
-            
-            def test_context_query_response_time_fails_initially():
-                """RED: Context Engine performance validation should fail"""
-                integration = ContextEngineIntegration()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.validate_query_performance()
-          requirements:
-            max_query_time: 0.2  # <200ms
-            max_sync_time: 0.5  # <500ms for synchronization
-
-        - name: "test_context_synchronization_performance_fails_initially"
-          description: "Should synchronize context within 500ms"
-          expected_failure: "NotImplementedError - Sync performance not implemented"
-          test_code: |
-            import pytest
-            from src.integration.context_engine_integration import ContextEngineIntegration
-            
-            def test_context_synchronization_performance_fails_initially():
-                """RED: Context synchronization performance should fail"""
-                integration = ContextEngineIntegration()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.validate_sync_performance()
-
-    req_perf_int_002_tests:
-      requirement_id: "REQ-PERF-INT-002"
-      requirement_name: "Mobile API Performance"
-      class_name: "TestMobileAPIPerformance"
-      tests:
-        - name: "test_mobile_authentication_performance_fails_initially"
-          description: "Should authenticate mobile users within 1 second"
-          expected_failure: "NotImplementedError - Auth performance not implemented"
-          test_code: |
-            import pytest
-            from src.integration.mobile_auth_integration import MobileAuthIntegration
-            
-            def test_mobile_authentication_performance_fails_initially():
-                """RED: Mobile auth performance validation should fail"""
-                integration = MobileAuthIntegration()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.validate_auth_performance()
-          requirements:
-            max_auth_time: 1.0  # <1 second
-            max_command_processing: 2.0  # <2 seconds
-
-        - name: "test_mobile_command_processing_performance_fails_initially"
-          description: "Should process mobile commands within 2 seconds"
-          expected_failure: "NotImplementedError - Command performance not implemented"
-          test_code: |
-            import pytest
-            from src.integration.mobile_command_integration import MobileCommandIntegration
-            
-            def test_mobile_command_processing_performance_fails_initially():
-                """RED: Command processing performance should fail"""
-                integration = MobileCommandIntegration()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.validate_command_performance()
-
-    req_perf_int_003_tests:
-      requirement_id: "REQ-PERF-INT-003"
-      requirement_name: "Cross-Component Integration Performance"
-      class_name: "TestCrossComponentPerformance"
-      tests:
-        - name: "test_integration_test_suite_execution_time_fails_initially"
-          description: "Should execute integration test suites within 5 minutes"
-          expected_failure: "NotImplementedError - Suite execution time not validated"
-          test_code: |
-            import pytest
-            from src.integration.cross_component_integration import CrossComponentIntegration
-            
-            def test_integration_test_suite_execution_time_fails_initially():
-                """RED: Integration suite performance should fail"""
-                integration = CrossComponentIntegration()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    integration.validate_suite_execution_performance()
-          requirements:
-            max_suite_time: 300.0  # <5 minutes
-            max_compatibility_analysis: 30.0  # <30 seconds
-
-        - name: "test_compatibility_validation_performance_fails_initially"
-          description: "Should validate compatibility within 30 seconds"
-          expected_failure: "NotImplementedError - Compatibility performance not validated"
-          test_code: |
-            import pytest
-            from src.integration.component_compatibility import ComponentCompatibility
-            
-            def test_compatibility_validation_performance_fails_initially():
-                """RED: Compatibility validation performance should fail"
-                ""
-                validator = ComponentCompatibility()
-                
-                # Should raise NotImplementedError initially
-                with pytest.raises(NotImplementedError):
-                    validator.validate_compatibility_performance()
-
-  reliability_requirements_tests:
-    name: "RELIABILITY REQUIREMENTS (REQ-REL-INT-001 through REQ-REL-INT-002)"
-    description: "2 tests for 2 reliability requirements (1 test each)"
-
-    req_rel_int_001_test:
-      requirement_id: "REQ-REL-INT-001"
-      requirement_name: "Context Engine Integration Reliability"
-      class_name: "TestContextEngineReliability"
-      test:
-        name: "test_context_engine_reliability_fails_initially"
-        description: "Should maintain 99.9% Context Engine connectivity"
-        expected_failure: "NotImplementedError - Reliability monitoring not implemented"
-        test_code: |
-          import pytest
-          from src.integration.context_engine_integration import ContextEngineIntegration
-          
-          def test_context_engine_reliability_fails_initially():
-              """RED: Context Engine reliability should fail"""
-              integration = ContextEngineIntegration()
-              
-              # Should raise NotImplementedError initially
-              with pytest.raises(NotImplementedError):
-                  integration.monitor_reliability()
-        requirements:
-          uptime: 0.999  # 99.9% connectivity
-          data_consistency: 1.0  # Zero conflicts
-
-    req_rel_int_002_test:
-      requirement_id: "REQ-REL-INT-002"
-      requirement_name: "Mobile API Reliability"
-      class_name: "TestMobileAPIReliability"
-      test:
-        name: "test_mobile_api_reliability_fails_initially"
-        description: "Should maintain 99.5% mobile API availability"
-        expected_failure: "NotImplementedError - Mobile reliability not implemented"
-        test_code: |
-          import pytest
-          from src.integration.mobile_auth_integration import MobileAuthIntegration
-          
-          def test_mobile_api_reliability_fails_initially():
-              """RED: Mobile API reliability should fail"""
-              integration = MobileAuthIntegration()
-              
-              # Should raise NotImplementedError initially
-              with pytest.raises(NotImplementedError):
-                  integration.monitor_mobile_reliability()
-        requirements:
-          availability: 0.995  # 99.5% API availability
-          command_failure_rate: 0.01  # <1% failures
-
-execution_guidance:
-  name: "INTEGRATION LAYER TEST EXECUTION"
-  description: "Execute 24 failing tests for Integration Layer requirements"
-  
-  test_file_creation:
-    file_path: "projects/PROJECT-003 TDD ENFORCER/tests/integration/test_integration_layer.py"
-    total_tests: 24
-    expected_result: "24/24 tests FAILING with NotImplementedError"
-    
-  test_distribution:
-    functional_tests: 16  # 8 requirements × 2 tests each
-    performance_tests: 6  # 3 requirements × 2 tests each
-    reliability_tests: 2  # 2 requirements × 1 test each
-    
-  execution_command:
-    command: "python -m pytest tests/integration/test_integration_layer.py -v"
-    working_directory: "projects/PROJECT-003 TDD ENFORCER"
-    expected_failures: 24
-    expected_passes: 0
+  non_functional_requirements_tests:
+    name: "NON-FUNCTIONAL REQUIREMENTS (Performance & Reliability)"
+    description: "No explicit non-functional tests for simplified version - performance expectations embedded in functional tests"
+    note: "Simplified approach focuses on correctness over performance metrics. Integration overhead should be <5% of total execution time."
     
   success_criteria:
-    - "All 24 tests created and executable"
-    - "All 24 tests raise NotImplementedError"
-    - "Test names match requirement IDs"
-    - "Performance targets documented in tests"
-    - "Security requirements validated in tests"
-    - "Integration patterns clearly defined"
+    - "All 18 tests created and executable"
+    - "All 18 tests raise NotImplementedError"
+    - "Test names match simplified requirement IDs (REQ-INT-001 through REQ-INT-006)"
+    - "Tests focus on pytest/unittest integration, NOT mobile/WebSocket/real-time"
+    - "Terminal-only output validation"
+    - "Simple pyramid validation logic"
 
 implementation_file_stubs:
-  description: "RED phase implementation stubs (all raise NotImplementedError)"
+  description: "RED phase implementation stubs for simplified requirements (all raise NotImplementedError)"
   
   files_to_create:
-    - path: "src/integration/context_engine_integration.py"
-      class: "ContextEngineIntegration"
+    - path: "src/integration/pytest_integration.py"
+      class: "PytestIntegration"
       methods:
-        - "establish_context_connection() -> raises NotImplementedError"
-        - "query_current_position() -> raises NotImplementedError"
-        - "validate_query_performance() -> raises NotImplementedError"
-        - "validate_sync_performance() -> raises NotImplementedError"
-        - "monitor_reliability() -> raises NotImplementedError"
+        - "discover_tests(test_directory) -> raises NotImplementedError"
+        - "execute_tests(test_items) -> raises NotImplementedError"
+        - "discover_tests_unittest(test_directory) -> raises NotImplementedError"
         
-    - path: "src/integration/workflow_integration.py"
-      class: "WorkflowIntegration"
+    - path: "src/integration/test_discovery.py"
+      class: "TestDiscovery"
       methods:
-        - "determine_next_progression() -> raises NotImplementedError"
-        - "coordinate_automatic_triggers() -> raises NotImplementedError"
+        - "discover_by_pattern(test_directory, patterns) -> raises NotImplementedError"
+        - "discover_in_subdirectories(base_directory, subdirectories) -> raises NotImplementedError"
+        - "list_all_tests(test_directory) -> raises NotImplementedError"
         
-    - path: "src/integration/mobile_auth_integration.py"
-      class: "MobileAuthIntegration"
+    - path: "src/integration/test_categorization.py"
+      class: "TestCategorization"
       methods:
-        - "authenticate_mobile_user() -> raises NotImplementedError"
-        - "register_mobile_device() -> raises NotImplementedError"
-        - "validate_auth_performance() -> raises NotImplementedError"
-        - "monitor_mobile_reliability() -> raises NotImplementedError"
+        - "categorize_by_directory(test_items) -> raises NotImplementedError"
+        - "categorize_by_naming(test_items) -> raises NotImplementedError"
+        - "count_by_category(categorized_tests) -> raises NotImplementedError"
         
-    - path: "src/integration/mobile_command_integration.py"
-      class: "MobileCommandIntegration"
+    - path: "src/integration/pyramid_calculator.py"
+      class: "PyramidRatioCalculator"
       methods:
-        - "execute_mobile_command() -> raises NotImplementedError"
-        - "get_command_status() -> raises NotImplementedError"
-        - "validate_command_performance() -> raises NotImplementedError"
+        - "calculate_ratios(test_counts) -> raises NotImplementedError"
+        - "validate_pyramid_shape(test_counts) -> raises NotImplementedError"
+        - "detect_inverted_pyramid(test_counts) -> raises NotImplementedError"
         
-    - path: "src/integration/cross_component_integration.py"
-      class: "CrossComponentIntegration"
+    - path: "src/integration/result_collector.py"
+      class: "ResultCollector"
       methods:
-        - "execute_integration_tests() -> raises NotImplementedError"
-        - "validate_interface_contract() -> raises NotImplementedError"
-        - "validate_suite_execution_performance() -> raises NotImplementedError"
+        - "collect_results(test_execution_output) -> raises NotImplementedError"
+        - "aggregate_by_level(results) -> raises NotImplementedError"
+        - "calculate_pass_rates(aggregated_results) -> raises NotImplementedError"
         
-    - path: "src/integration/component_compatibility.py"
-      class: "ComponentCompatibility"
+    - path: "src/integration/validation_logic.py"
+      class: "ValidationLogic"
       methods:
-        - "analyze_compatibility() -> raises NotImplementedError"
-        - "detect_conflicts() -> raises NotImplementedError"
-        - "validate_compatibility_performance() -> raises NotImplementedError"
-        
-    - path: "src/integration/remote_execution.py"
-      class: "RemoteExecutionOrchestrator"
-      methods:
-        - "plan_remote_execution() -> raises NotImplementedError"
-        - "monitor_execution() -> raises NotImplementedError"
-        
-    - path: "src/integration/realtime_progress.py"
-      class: "RealTimeProgressIntegration"
-      methods:
-        - "establish_websocket_connection() -> raises NotImplementedError"
-        - "deliver_progress_notification() -> raises NotImplementedError"
+        - "validate_minimum_counts(test_counts, minimum_requirements) -> raises NotImplementedError"
+        - "validate_pass_rates(pass_rates, thresholds) -> raises NotImplementedError"
+        - "determine_compliance(validation_context) -> raises NotImplementedError"
+
+deferred_features:
+  system_id: "SYSTEM-003-04 MOBILE_DASHBOARD_STREAMING"
+  description: "Enterprise features removed from simplified Integration Layer"
+  location: "/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-02 EXTENDED VALIDATION ENGINE/SYSTEM-003-04 MOBILE_DASHBOARD_STREAMING/"
+  
+  removed_files_not_needed:
+    - "context_engine_integration.py - Real-time Context Engine integration"
+    - "workflow_integration.py - Workflow progression decision-making (if not needed for simple case)"
+    - "mobile_auth_integration.py - Mobile authentication endpoints"
+    - "mobile_command_integration.py - Mobile command processing"
+    - "cross_component_integration.py - Cross-component testing (if not needed)"
+    - "component_compatibility.py - Component compatibility validation"
+    - "remote_execution.py - Remote execution orchestration"
+    - "realtime_progress.py - WebSocket real-time progress updates"
+  
+  activation_criteria:
+    - "Core enforcer working with terminal output"
+    - "10+ users requiring remote access"
+    - "Proven need for mobile/dashboard features"
+    - "Distributed team coordination required"
 
 next_phase:
   phase: "GREEN"
-  description: "Implement minimal working versions to pass all 24 tests"
+  description: "Implement minimal working versions to pass all 18 simplified tests"
   prompt: "2. GREEN Phase Minimal Implementation Prompt.yaml"
-  estimated_duration: "6-8 hours for all 8 Integration Layer components"
+  estimated_duration: "2-3 days for all 6 simplified Integration Layer components"
   
+  implementation_approach:
+    - "Use pytest API for test discovery and execution"
+    - "Simple directory-based categorization (tests/unit, tests/integration, tests/e2e)"
+    - "Basic ratio calculation (count comparison)"
+    - "Straightforward validation logic (boolean checks)"
+    - "Terminal output only - no WebSocket, no mobile APIs"
+    - "Build upon existing files where possible (30.6% compliance already)"
+
 conclusion:
-  summary: "24 failing tests created for Integration Layer (LAYER-003-02-01-004)"
-  total_requirements_covered: 18  # 8 functional + 3 performance + 2 reliability + 5 integration
+  summary: "18 failing tests created for Simplified Integration Layer (LAYER-003-02-01-004)"
+  total_requirements_covered: 6  # 6 simplified functional requirements
   test_coverage_target: "95%+ after GREEN phase implementation"
-  production_readiness: "Integration Layer enables UI Layer functionality (11/16 UI requirements blocked)"
+  effort_saved: "94% reduction (50 days → 3-4 days)"
+  
+  simplification_impact:
+    - "Removed: 24 enterprise tests (mobile, WebSocket, Context Engine real-time)"
+    - "Created: 18 simplified tests (pytest, discovery, categorization, validation)"
+    - "Focus: Terminal-based enforcer for small team"
+    - "Deferred: All enterprise features to SYSTEM-003-04"
+  
+  production_readiness: "Integration Layer enables simplified UI Layer functionality (terminal output only)"
+  
   critical_dependencies_resolved:
-    - "Mobile authentication endpoints for UI Layer REQ-UI-001"
-    - "Context Engine integration for UI Layer REQ-UI-003, REQ-UI-004"
-    - "Mobile command processing for UI Layer REQ-UI-002"
-    - "Component integration for UI Layer REQ-UI-005, REQ-UI-006"
-    - "Real-time progress for UI Layer REQ-UI-007, REQ-UI-008"
-    - "WebSocket integration for UI Layer REQ-RT-UI-001, REQ-RT-UI-002"
+    - "pytest/unittest integration for test discovery and execution"
+    - "Directory-based test categorization for pyramid analysis"
+    - "Pyramid ratio calculation for proper shape validation"
+    - "Test result collection for comprehensive reporting"
+    - "Validation logic for compliance determination"
+    - "Simple API for Business Logic Layer integration"
+  
+  blocked_dependencies_removed:
+    - "❌ NO mobile authentication endpoints (deferred)"
+    - "❌ NO Context Engine real-time integration (deferred)"
+    - "❌ NO mobile command processing (deferred)"
+    - "❌ NO WebSocket real-time streaming (deferred)"
+    - "❌ NO remote execution orchestration (deferred)"
+    - "❌ NO dashboard visualizations (deferred)"
