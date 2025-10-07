@@ -49,6 +49,7 @@ class PytestIntegration:
             Test execution results with pass/fail status and timing
         """
         if not test_items:
+            # No tests to execute - return zero counts
             return {"passed": 0, "failed": 0, "total": 0}
         
         # Execute tests using pytest and capture exit code

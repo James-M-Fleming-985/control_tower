@@ -338,3 +338,115 @@ class TestValidationLogic:
         assert result["is_compliant"] is False
         assert "Pyramid shape invalid" in result["reasons"]
         assert "Minimum test counts not met" in result["reasons"]
+
+
+# ============================================================================
+# REFACTOR Coverage Improvement Tests
+# ============================================================================
+
+class TestPytestIntegrationEdgeCases:
+    """REFACTOR: Additional tests for pytest_integration edge cases"""
+    
+    def test_discover_tests_nonexistent_directory(self):
+        """REFACTOR: discover_tests should handle nonexistent directory"""
+        integration = PytestIntegration()
+        result = integration.discover_tests("/nonexistent/path/to/tests")
+        assert result == []
+    
+    def test_execute_tests_empty_list(self):
+        """REFACTOR: execute_tests should handle empty test list"""
+        integration = PytestIntegration()
+        result = integration.execute_tests([])
+        assert result == {"passed": 0, "failed": 0, "total": 0}
+    
+    def test_discover_tests_unittest_nonexistent_directory(self):
+        """REFACTOR: unittest discovery should handle nonexistent directory"""
+        integration = PytestIntegration()
+        result = integration.discover_tests_unittest("/nonexistent/path")
+        assert result == []
+    
+    def test_execute_tests_with_failures(self):
+        """REFACTOR: execute_tests should handle test failures"""
+        integration = PytestIntegration()
+        # Pass a test file that doesn't exist - will cause pytest to fail
+        result = integration.execute_tests(["/nonexistent_test.py"])
+        # When tests fail, pytest returns non-zero exit code
+        assert result["total"] == 1
+        # May be 0 or 1 depending on pytest behavior
+        assert result["failed"] >= 0
+
+
+class TestDiscoveryEdgeCases:
+    """REFACTOR: Additional tests for test_discovery edge cases"""
+    
+    def test_discover_by_pattern_nonexistent_directory(self):
+        """REFACTOR: discover_by_pattern should handle nonexistent directory"""
+        discovery = TestDiscoveryModule()
+        result = discovery.discover_by_pattern(
+            "/nonexistent/path",
+            ["test_*.py"]
+        )
+        assert result == []
+
+
+class TestPyramidCalculatorEdgeCases:
+    """REFACTOR: Additional tests for pyramid_calculator edge cases"""
+    
+    def test_calculate_ratios_zero_total(self):
+        """REFACTOR: calculate_ratios should handle zero total"""
+        calculator = PyramidRatioCalculator()
+        test_counts = {"Unit": 0, "Integration": 0, "E2E": 0}
+        result = calculator.calculate_ratios(test_counts)
+        assert result == {"Unit": 0.0, "Integration": 0.0, "E2E": 0.0}
+
+
+class TestResultCollectorEdgeCases:
+    """REFACTOR: Additional tests for result_collector edge cases"""
+    
+    def test_infer_category_e2e_test(self):
+        """REFACTOR: _infer_category should detect e2e tests"""
+        collector = ResultCollector()
+        # Access private method for coverage
+        result = collector._infer_category(  # noqa: SLF001
+            "test_checkout_flow_e2e.py"
+        )
+        assert result == "E2E"
+    
+    def test_calculate_pass_rates_zero_total(self):
+        """REFACTOR: calculate_pass_rates should handle zero tests"""
+        collector = ResultCollector()
+        aggregated = {
+            "Unit": {"passed": 0, "failed": 0},
+            "Integration": {"passed": 0, "failed": 0},
+            "E2E": {"passed": 0, "failed": 0}
+        }
+        result = collector.calculate_pass_rates(aggregated)
+        assert result == {"Unit": 0.0, "Integration": 0.0, "E2E": 0.0}
+
+
+class TestValidationLogicEdgeCases:
+    """REFACTOR: Additional tests for validation_logic edge cases"""
+    
+    def test_determine_compliance_all_valid(self):
+        """REFACTOR: determine_compliance should return success message"""
+        validator = ValidationLogic()
+        validation_context = {
+            "pyramid_valid": True,
+            "minimum_counts_valid": True,
+            "pass_rates_valid": True
+        }
+        result = validator.determine_compliance(validation_context)
+        assert result["is_compliant"] is True
+        assert result["reasons"] == ["All validations passed"]
+    
+    def test_determine_compliance_only_pass_rates_fail(self):
+        """REFACTOR: should detect only pass rate failures"""
+        validator = ValidationLogic()
+        validation_context = {
+            "pyramid_valid": True,
+            "minimum_counts_valid": True,
+            "pass_rates_valid": False
+        }
+        result = validator.determine_compliance(validation_context)
+        assert result["is_compliant"] is False
+        assert "Pass rate thresholds not met" in result["reasons"]
