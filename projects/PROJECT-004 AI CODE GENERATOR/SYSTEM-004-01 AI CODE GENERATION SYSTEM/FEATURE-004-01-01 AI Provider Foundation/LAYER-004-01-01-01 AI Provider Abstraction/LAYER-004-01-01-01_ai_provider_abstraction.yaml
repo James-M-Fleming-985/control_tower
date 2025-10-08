@@ -1,0 +1,314 @@
+# LAYER-004-01-01-01: AI Provider Abstraction
+# EXECUTABLE REQUIREMENTS SPECIFICATION
+# This YAML file drives automated test generation, execution, and verification
+
+metadata:
+  requirement_id: LAYER-004-01-01-01
+  requirement_name: AI Provider Abstraction
+  requirement_type: Layer
+  parent_feature: FEATURE-004-01-01
+  parent_system: SYSTEM-004-01
+  parent_project: PROJECT-004 AI CODE GENERATOR
+  
+  team_size: small
+  risk_level: high
+  
+  estimated_effort_hours: 4
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: planned
+
+# EXECUTABLE TESTING PYRAMID REQUIREMENTS
+testing_requirements:
+  test_pyramid:
+    enforce_pyramid_ratio: true
+    unit_to_integration_ratio: 2.0
+    
+  unit_tests:
+    required: true
+    minimum_count: 10
+    maximum_count: 15
+    coverage_threshold: 0.95
+    mock_usage_allowed: true  # Mock AI API calls in unit tests
+    focus_areas:
+      - Provider interface contract
+      - OpenAI provider implementation
+      - Anthropic provider implementation
+      - Provider factory pattern
+    expected_test_methods:
+      - test_ai_provider_interface_contract
+      - test_openai_provider_initialization
+      - test_openai_provider_generate_code
+      - test_openai_provider_api_key_validation
+      - test_anthropic_provider_initialization
+      - test_anthropic_provider_generate_code
+      - test_anthropic_provider_api_key_validation
+      - test_provider_factory_creates_openai
+      - test_provider_factory_creates_anthropic
+      - test_provider_factory_invalid_provider_raises_error
+  
+  integration_tests:
+    required: true
+    minimum_count: 5
+    maximum_count: 8
+    coverage_threshold: 0.90
+    focus_areas:
+      - Real OpenAI API calls (with test API key)
+      - Real Anthropic API calls (with test API key)
+      - API response parsing
+      - Error handling for API failures
+    expected_test_methods:
+      - test_openai_provider_real_api_call
+      - test_anthropic_provider_real_api_call
+      - test_provider_handles_api_timeout
+      - test_provider_handles_invalid_api_key
+      - test_provider_handles_rate_limit_error
+  
+  e2e_tests:
+    required: false
+    minimum_count: 0
+
+# EXECUTABLE QUALITY GATES
+quality_gates:
+  enforcement_level: strict
+  
+  red_phase:
+    tests_must_fail: true
+    fail_reason_must_be_clear: true
+    no_implementation_allowed: true
+    
+  green_phase:
+    all_tests_must_pass: true
+    coverage_thresholds_met: true
+    no_skipped_tests: true
+    
+  refactor_phase:
+    tests_still_passing: true
+    coverage_maintained_or_improved: true
+    no_regression_allowed: true
+    
+  verification:
+    full_traceability_required: true
+    all_acceptance_criteria_tested: true
+    evidence_collection_complete: true
+    test_pyramid_ratio_valid: true
+
+# EXECUTABLE ACCEPTANCE CRITERIA
+acceptance_criteria:
+  - criterion_id: AC-001
+    criterion: "Define AIProviderInterface with generate_code() method"
+    status: planned
+    priority: critical
+    verification_method: unit_tests
+    required_tests:
+      - test_ai_provider_interface_contract
+    implementation_method: AIProviderInterface
+    traceability:
+      feature_ac: FEATURE-004-01-01.AC-001
+      system_req: SYSTEM-004-01.SYSTEM-AC-001
+    
+  - criterion_id: AC-002
+    criterion: "Implement OpenAIProvider with GPT-4 integration"
+    status: planned
+    priority: critical
+    verification_method: unit_tests, integration_tests
+    required_tests:
+      - test_openai_provider_initialization
+      - test_openai_provider_generate_code
+      - test_openai_provider_api_key_validation
+      - test_openai_provider_real_api_call
+    implementation_method: OpenAIProvider
+    traceability:
+      feature_ac: FEATURE-004-01-01.AC-001
+      system_req: SYSTEM-004-01.SYSTEM-AC-001
+    
+  - criterion_id: AC-003
+    criterion: "Implement AnthropicProvider with Claude integration"
+    status: planned
+    priority: high
+    verification_method: unit_tests, integration_tests
+    required_tests:
+      - test_anthropic_provider_initialization
+      - test_anthropic_provider_generate_code
+      - test_anthropic_provider_api_key_validation
+      - test_anthropic_provider_real_api_call
+    implementation_method: AnthropicProvider
+    traceability:
+      feature_ac: FEATURE-004-01-01.AC-002
+      system_req: SYSTEM-004-01.SYSTEM-AC-001
+    
+  - criterion_id: AC-004
+    criterion: "Implement AIProviderFactory for provider creation"
+    status: planned
+    priority: high
+    verification_method: unit_tests
+    required_tests:
+      - test_provider_factory_creates_openai
+      - test_provider_factory_creates_anthropic
+      - test_provider_factory_invalid_provider_raises_error
+    implementation_method: AIProviderFactory
+    traceability:
+      feature_ac: FEATURE-004-01-01.AC-001
+
+# EXECUTABLE TRACEABILITY
+traceability:
+  requirement_to_test_mapping:
+    AC-001:
+      acceptance_criterion: "Define AIProviderInterface with generate_code() method"
+      implementation_method: AIProviderInterface
+      implementation_file: src/ai_provider/interface.py
+      unit_tests:
+        - test_ai_provider_interface_contract
+      integration_tests: []
+      
+    AC-002:
+      acceptance_criterion: "Implement OpenAIProvider with GPT-4 integration"
+      implementation_method: OpenAIProvider
+      implementation_file: src/ai_provider/openai_provider.py
+      unit_tests:
+        - test_openai_provider_initialization
+        - test_openai_provider_generate_code
+        - test_openai_provider_api_key_validation
+      integration_tests:
+        - test_openai_provider_real_api_call
+        
+    AC-003:
+      acceptance_criterion: "Implement AnthropicProvider with Claude integration"
+      implementation_method: AnthropicProvider
+      implementation_file: src/ai_provider/anthropic_provider.py
+      unit_tests:
+        - test_anthropic_provider_initialization
+        - test_anthropic_provider_generate_code
+        - test_anthropic_provider_api_key_validation
+      integration_tests:
+        - test_anthropic_provider_real_api_call
+        
+    AC-004:
+      acceptance_criterion: "Implement AIProviderFactory for provider creation"
+      implementation_method: AIProviderFactory
+      implementation_file: src/ai_provider/factory.py
+      unit_tests:
+        - test_provider_factory_creates_openai
+        - test_provider_factory_creates_anthropic
+        - test_provider_factory_invalid_provider_raises_error
+      integration_tests: []
+
+# REQUIREMENTS VERIFICATION
+requirements_verification:
+  verification_checklist:
+    - item: "All acceptance criteria have corresponding tests"
+      automated: true
+      validation_method: "Check AC-001 through AC-004 tests exist"
+      
+    - item: "Test pyramid ratio is valid (2:1 unit:integration)"
+      automated: true
+      validation_method: "Count tests and validate ratio"
+      
+    - item: "Coverage thresholds met (95% unit, 90% integration)"
+      automated: true
+      validation_method: "Run pytest with coverage"
+      
+    - item: "All tests pass in GREEN phase"
+      automated: true
+      validation_method: "pytest exit code == 0"
+      
+    - item: "No skipped tests"
+      automated: true
+      validation_method: "pytest output shows 0 skipped"
+      
+    - item: "Traceability matrix complete"
+      automated: true
+      validation_method: "Validate requirement_to_test_mapping"
+      
+    - item: "Evidence collection complete"
+      automated: true
+      validation_method: "Verify Testing Outputs/ files exist"
+      
+    - item: "Verification files generated"
+      automated: true
+      validation_method: "Verify Requirements Verification/ files exist"
+
+# EXECUTABLE OUTPUT SPECIFICATION
+output_specification:
+  base_path: "LAYER-004-01-01-01 AI Provider Abstraction"
+  
+  testing_outputs_dir: "Testing Outputs"
+  testing_files:
+    red_phase:
+      - file: "red_phase_results_{timestamp}.xml"
+        type: junit_xml
+      - file: "red_phase_log_{timestamp}.txt"
+        type: execution_log
+    
+    green_phase:
+      - file: "green_phase_results_{timestamp}.txt"
+        type: test_results
+      - file: "coverage_report_{timestamp}.txt"
+        type: coverage_report
+      - file: "test_pyramid_validation_{timestamp}.json"
+        type: validation_report
+    
+    refactor_phase:
+      - file: "refactor_phase_results_{timestamp}.xml"
+        type: junit_xml
+      - file: "refactor_phase_log_{timestamp}.txt"
+        type: execution_log
+  
+  requirements_verification_dir: "Requirements Verification"
+  verification_files:
+    - file: "requirements_verification_template.yaml"
+      required: true
+      phase: "refactor_phase"
+      
+    - file: "execution_evidence.json"
+      required: true
+      phase: "refactor_phase"
+      
+    - file: "traceability_matrix_{timestamp}.yaml"
+      required: true
+      phase: "refactor_phase"
+      
+    - file: "test_pyramid_report_{timestamp}.yaml"
+      required: true
+      phase: "green_phase"
+      
+    - file: "quality_gates_report_{timestamp}.yaml"
+      required: true
+      phase: "refactor_phase"
+      
+    - file: "requirements_verification_complete.yaml"
+      required: true
+      phase: "refactor_phase"
+      description: "Final marker file - layer complete when this exists"
+
+# Implementation guidance
+implementation_guidance:
+  class_structure:
+    AIProviderInterface:
+      type: "Abstract Base Class"
+      methods:
+        - "generate_code(prompt: str) -> str"
+      
+    OpenAIProvider:
+      type: "Concrete Implementation"
+      inherits_from: AIProviderInterface
+      dependencies:
+        - openai library
+      configuration:
+        - model: "gpt-4-turbo-preview"
+        - temperature: 0.2
+        - max_tokens: 4000
+      
+    AnthropicProvider:
+      type: "Concrete Implementation"
+      inherits_from: AIProviderInterface
+      dependencies:
+        - anthropic library
+      configuration:
+        - model: "claude-3-opus-20240229"
+        - max_tokens: 4000
+      
+    AIProviderFactory:
+      type: "Factory"
+      method:
+        - "create(provider: str, api_key: str) -> AIProviderInterface"

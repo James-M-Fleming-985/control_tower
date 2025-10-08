@@ -18,31 +18,78 @@ metadata:
   status: implemented
 
 testing_requirements:
+  test_pyramid:
+    enforce_pyramid_ratio: true
+    unit_to_integration_ratio: 2.0
+    allow_deviation_percent: 10
+  
   unit_tests:
     required: true
     minimum_count: 10
+    maximum_count: 15
     coverage_threshold: 0.90
     focus_areas:
       - Tool detection logic
       - Version checking
       - Installation guidance generation
+    expected_test_methods:
+      - test_detect_pytest_installed
+      - test_detect_pytest_not_installed
+      - test_validate_pytest_version_sufficient
+      - test_validate_pytest_version_insufficient
+      - test_detect_coverage_tool_installed
+      - test_detect_coverage_tool_not_installed
+      - test_detect_yaml_parser_available
+      - test_detect_yaml_parser_unavailable
+      - test_generate_pip_install_command
+      - test_generate_conda_install_command
   
   integration_tests:
     required: true
     minimum_count: 5
+    maximum_count: 8
     coverage_threshold: 0.80
     focus_areas:
       - Integration with package managers (pip, conda)
       - Tool execution verification
+    expected_test_methods:
+      - test_integration_check_all_tools_available
+      - test_integration_missing_tool_guidance
+      - test_integration_pip_package_manager
+      - test_integration_conda_package_manager
+      - test_integration_version_validation_workflow
   
   e2e_tests:
     required: false
 
 quality_gates:
-  no_mocks_unless_specified: true
-  real_failing_tests_required: true
-  team_size_enforcement: true
-  full_requirements_verification: true
+  enforcement_level: strict
+  
+  red_phase:
+    tests_must_fail: true
+    no_implementation_allowed: true
+    minimum_test_count_met: true
+    test_pyramid_ratio_valid: true
+  
+  green_phase:
+    all_tests_must_pass: true
+    coverage_thresholds_met: true
+    no_skipped_tests: true
+    no_mocks_unless_specified: true
+    test_count_within_bounds: true
+    test_pyramid_ratio_valid: true
+  
+  refactor_phase:
+    tests_still_passing: true
+    coverage_maintained_or_improved: true
+    no_regression_allowed: true
+    code_quality_improved: true
+  
+  verification:
+    full_traceability_required: true
+    all_acceptance_criteria_tested: true
+    evidence_files_generated: true
+    test_pyramid_ratio_valid: true
 
 acceptance_criteria:
   - criterion: "AC-001: Validate pytest available and correct version"
@@ -92,12 +139,121 @@ implementations:
     refactored_files: []
 
 traceability:
-  auto_discovered: []
-  manually_registered:
-    - file: src/prerequisites/tool_checker.py
-      requirements: [LAYER-003-03-02-02]
-      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
-  verification_status: pending
+  requirement_to_test_mapping:
+    AC-001:
+      acceptance_criterion: "Validate pytest available and correct version"
+      implementation_method: validate_pytest_availability
+      unit_tests:
+        - test_detect_pytest_installed
+        - test_detect_pytest_not_installed
+        - test_validate_pytest_version_sufficient
+      integration_tests:
+        - test_integration_check_all_tools_available
+    
+    AC-002:
+      acceptance_criterion: "Validate coverage tool available"
+      implementation_method: validate_coverage_tool_availability
+      unit_tests:
+        - test_detect_coverage_tool_installed
+        - test_detect_coverage_tool_not_installed
+      integration_tests:
+        - test_integration_check_all_tools_available
+    
+    AC-003:
+      acceptance_criterion: "Check for YAML parser availability"
+      implementation_method: check_yaml_parser_availability
+      unit_tests:
+        - test_detect_yaml_parser_available
+        - test_detect_yaml_parser_unavailable
+      integration_tests:
+        - test_integration_version_validation_workflow
+    
+    AC-004:
+      acceptance_criterion: "Provide installation commands for missing tools"
+      implementation_method: generate_installation_guidance
+      unit_tests:
+        - test_generate_pip_install_command
+        - test_generate_conda_install_command
+      integration_tests:
+        - test_integration_missing_tool_guidance
+        - test_integration_pip_package_manager
+
+requirements_verification:
+  verification_checklist:
+    - item: All acceptance criteria have corresponding tests
+      automated: true
+      gate: green_phase
+      
+    - item: Test count meets pyramid requirements (10 unit, 5 integration)
+      automated: true
+      gate: red_phase
+      
+    - item: Coverage thresholds met (90% unit, 80% integration)
+      automated: true
+      gate: green_phase
+      
+    - item: All tests pass in GREEN phase
+      automated: true
+      gate: green_phase
+      
+    - item: Tests still pass in REFACTOR phase
+      automated: true
+      gate: refactor_phase
+      
+    - item: Full traceability AC → Test → Implementation
+      automated: true
+      gate: refactor_phase
+      
+    - item: Evidence files generated for all phases
+      automated: true
+      gate: refactor_phase
+      
+    - item: Test pyramid ratio valid (2:1 unit:integration)
+      automated: true
+      gate: green_phase
+
+output_specification:
+  testing_outputs_dir: "Testing Outputs"
+  requirements_verification_dir: "Requirements Verification"
+  
+  testing_files:
+    red_phase:
+      - file: "red_phase_results_{timestamp}.xml"
+        format: "junit"
+      - file: "red_phase_log_{timestamp}.txt"
+        format: "text"
+    
+    green_phase:
+      - file: "green_phase_results_{timestamp}.txt"
+        format: "text"
+      - file: "coverage_{timestamp}.json"
+        format: "json"
+      - file: "test_pyramid_validation_{timestamp}.json"
+        format: "json"
+    
+    refactor_phase:
+      - file: "refactor_phase_results_{timestamp}.xml"
+        format: "junit"
+      - file: "refactor_phase_log_{timestamp}.txt"
+        format: "text"
+  
+  verification_files:
+    - file: "test_pyramid_report_{timestamp}.yaml"
+      phase: "green_phase"
+      required: true
+    
+    - file: "traceability_matrix_{timestamp}.yaml"
+      phase: "refactor_phase"
+      required: true
+    
+    - file: "quality_gates_report_{timestamp}.yaml"
+      phase: "refactor_phase"
+      required: true
+    
+    - file: "requirements_verification_complete.yaml"
+      phase: "refactor_phase"
+      required: true
+      description: "Final verification marker - layer complete when this exists"
 
 success_criteria:
   - "All required tools detected correctly"

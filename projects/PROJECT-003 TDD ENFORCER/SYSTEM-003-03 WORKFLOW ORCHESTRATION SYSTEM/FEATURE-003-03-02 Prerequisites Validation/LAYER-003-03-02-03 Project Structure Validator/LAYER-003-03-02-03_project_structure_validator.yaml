@@ -18,31 +18,81 @@ metadata:
   status: in_progress
 
 testing_requirements:
+  test_pyramid:
+    enforce_pyramid_ratio: true
+    unit_to_integration_ratio: 2.0
+    allow_deviation_percent: 10
+  
   unit_tests:
     required: true
     minimum_count: 12
+    maximum_count: 18
     coverage_threshold: 0.90
     focus_areas:
       - Directory structure validation
       - Required file checking
       - Template availability verification
+    expected_test_methods:
+      - test_validate_src_directory_exists
+      - test_validate_src_directory_missing
+      - test_validate_tests_directory_exists
+      - test_validate_tests_directory_missing
+      - test_check_requirements_template_exists
+      - test_check_requirements_template_missing
+      - test_validate_pyproject_toml_exists
+      - test_validate_setup_py_exists
+      - test_validate_no_config_file_exists
+      - test_generate_structure_creation_guidance
+      - test_generate_template_setup_guidance
+      - test_validate_directory_permissions
   
   integration_tests:
     required: true
     minimum_count: 6
+    maximum_count: 9
     coverage_threshold: 0.80
     focus_areas:
       - Integration with file system
       - Template loading and validation
+    expected_test_methods:
+      - test_integration_validate_complete_structure
+      - test_integration_missing_directories_workflow
+      - test_integration_template_loading
+      - test_integration_config_file_validation
+      - test_integration_structure_creation_workflow
+      - test_integration_end_to_end_validation
   
   e2e_tests:
     required: false
 
 quality_gates:
-  no_mocks_unless_specified: true
-  real_failing_tests_required: true
-  team_size_enforcement: true
-  full_requirements_verification: true
+  enforcement_level: strict
+  
+  red_phase:
+    tests_must_fail: true
+    no_implementation_allowed: true
+    minimum_test_count_met: true
+    test_pyramid_ratio_valid: true
+  
+  green_phase:
+    all_tests_must_pass: true
+    coverage_thresholds_met: true
+    no_skipped_tests: true
+    no_mocks_unless_specified: true
+    test_count_within_bounds: true
+    test_pyramid_ratio_valid: true
+  
+  refactor_phase:
+    tests_still_passing: true
+    coverage_maintained_or_improved: true
+    no_regression_allowed: true
+    code_quality_improved: true
+  
+  verification:
+    full_traceability_required: true
+    all_acceptance_criteria_tested: true
+    evidence_files_generated: true
+    test_pyramid_ratio_valid: true
 
 acceptance_criteria:
   - criterion: "AC-001: Validate src/ and tests/ directories exist"
@@ -93,12 +143,123 @@ implementations:
     refactored_files: []
 
 traceability:
-  auto_discovered: []
-  manually_registered:
-    - file: src/prerequisites/structure_validator.py
-      requirements: [LAYER-003-03-02-03]
-      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
-  verification_status: pending
+  requirement_to_test_mapping:
+    AC-001:
+      acceptance_criterion: "Validate src/ and tests/ directories exist"
+      implementation_method: validate_directory_structure
+      unit_tests:
+        - test_validate_src_directory_exists
+        - test_validate_src_directory_missing
+        - test_validate_tests_directory_exists
+        - test_validate_tests_directory_missing
+      integration_tests:
+        - test_integration_validate_complete_structure
+        - test_integration_missing_directories_workflow
+    
+    AC-002:
+      acceptance_criterion: "Check for requirements template files"
+      implementation_method: check_template_availability
+      unit_tests:
+        - test_check_requirements_template_exists
+        - test_check_requirements_template_missing
+      integration_tests:
+        - test_integration_template_loading
+    
+    AC-003:
+      acceptance_criterion: "Validate pyproject.toml or setup.py exists"
+      implementation_method: validate_project_config
+      unit_tests:
+        - test_validate_pyproject_toml_exists
+        - test_validate_setup_py_exists
+        - test_validate_no_config_file_exists
+      integration_tests:
+        - test_integration_config_file_validation
+    
+    AC-004:
+      acceptance_criterion: "Provide guidance for missing structure elements"
+      implementation_method: generate_structure_guidance
+      unit_tests:
+        - test_generate_structure_creation_guidance
+        - test_generate_template_setup_guidance
+      integration_tests:
+        - test_integration_structure_creation_workflow
+
+requirements_verification:
+  verification_checklist:
+    - item: All acceptance criteria have corresponding tests
+      automated: true
+      gate: green_phase
+      
+    - item: Test count meets pyramid requirements (12 unit, 6 integration)
+      automated: true
+      gate: red_phase
+      
+    - item: Coverage thresholds met (90% unit, 80% integration)
+      automated: true
+      gate: green_phase
+      
+    - item: All tests pass in GREEN phase
+      automated: true
+      gate: green_phase
+      
+    - item: Tests still pass in REFACTOR phase
+      automated: true
+      gate: refactor_phase
+      
+    - item: Full traceability AC → Test → Implementation
+      automated: true
+      gate: refactor_phase
+      
+    - item: Evidence files generated for all phases
+      automated: true
+      gate: refactor_phase
+      
+    - item: Test pyramid ratio valid (2:1 unit:integration)
+      automated: true
+      gate: green_phase
+
+output_specification:
+  testing_outputs_dir: "Testing Outputs"
+  requirements_verification_dir: "Requirements Verification"
+  
+  testing_files:
+    red_phase:
+      - file: "red_phase_results_{timestamp}.xml"
+        format: "junit"
+      - file: "red_phase_log_{timestamp}.txt"
+        format: "text"
+    
+    green_phase:
+      - file: "green_phase_results_{timestamp}.txt"
+        format: "text"
+      - file: "coverage_{timestamp}.json"
+        format: "json"
+      - file: "test_pyramid_validation_{timestamp}.json"
+        format: "json"
+    
+    refactor_phase:
+      - file: "refactor_phase_results_{timestamp}.xml"
+        format: "junit"
+      - file: "refactor_phase_log_{timestamp}.txt"
+        format: "text"
+  
+  verification_files:
+    - file: "test_pyramid_report_{timestamp}.yaml"
+      phase: "green_phase"
+      required: true
+    
+    - file: "traceability_matrix_{timestamp}.yaml"
+      phase: "refactor_phase"
+      required: true
+    
+    - file: "quality_gates_report_{timestamp}.yaml"
+      phase: "refactor_phase"
+      required: true
+    
+    - file: "requirements_verification_complete.yaml"
+      phase: "refactor_phase"
+      required: true
+      description: "Final verification marker - layer complete when this exists"
 
 success_criteria:
   - "Project structure validated correctly"

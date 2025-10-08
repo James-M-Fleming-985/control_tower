@@ -1,0 +1,171 @@
+# FEATURE-004-01-02: Core Code Generation
+# =========================================
+# AI-powered generation of tests and implementations from YAML requirements
+
+metadata:
+  requirement_id: FEATURE-004-01-02
+  requirement_name: Core Code Generation
+  requirement_type: Feature
+  parent_system: SYSTEM-004-01
+  parent_project: PROJECT-004 AI CODE GENERATOR
+  
+  team_size: small
+  risk_level: high  # Core functionality
+  
+  estimated_effort_hours: 16
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: planned
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 25
+    coverage_threshold: 0.95
+    focus_areas:
+      - Prompt template generation
+      - YAML parsing and extraction
+      - Code validation (syntax, quality)
+      - Test generation logic
+      - Implementation generation logic
+      - File writing and organization
+  
+  integration_tests:
+    required: true
+    minimum_count: 15
+    coverage_threshold: 0.90
+    focus_areas:
+      - AI provider integration for code generation
+      - Generated code execution
+      - Multi-file generation
+      - Test-implementation consistency
+  
+  e2e_tests:
+    required: true
+    minimum_count: 5
+    coverage_threshold: 0.85
+    focus_areas:
+      - Complete test generation from YAML
+      - Complete implementation generation from tests
+      - Generated code passes tests
+
+quality_gates:
+  no_mocks_unless_specified: false
+  mock_policy:
+    ai_api_calls_may_be_mocked: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+  
+  # Special gates for code generation
+  generated_code_quality:
+    must_be_syntactically_valid: true
+    must_have_docstrings: true
+    must_have_type_hints: true
+    must_pass_linting: true
+
+acceptance_criteria:
+  - criterion_id: AC-001
+    criterion: "Generate pytest test files from YAML acceptance criteria"
+    status: planned
+    priority: critical
+    verification_method: e2e_tests
+    layers: [LAYER-004-01-02-01]
+    
+  - criterion_id: AC-002
+    criterion: "Generated tests must fail in RED phase (no implementation)"
+    status: planned
+    priority: critical
+    verification_method: e2e_tests
+    layers: [LAYER-004-01-02-01]
+    
+  - criterion_id: AC-003
+    criterion: "Generate implementation code that passes generated tests"
+    status: planned
+    priority: critical
+    verification_method: e2e_tests
+    layers: [LAYER-004-01-02-02]
+    
+  - criterion_id: AC-004
+    criterion: "Validate generated code syntax before saving"
+    status: planned
+    priority: high
+    verification_method: unit_tests
+    layers: [LAYER-004-01-02-02]
+    
+  - criterion_id: AC-005
+    criterion: "Generate code with proper docstrings and type hints"
+    status: planned
+    priority: medium
+    verification_method: unit_tests
+    layers: [LAYER-004-01-02-01, LAYER-004-01-02-02]
+    
+  - criterion_id: AC-006
+    criterion: "Use YAML traceability mapping to generate correct methods"
+    status: planned
+    priority: high
+    verification_method: integration_tests
+    layers: [LAYER-004-01-02-02]
+
+layers:
+  - layer_id: LAYER-004-01-02-01
+    name: "Test Code Generator"
+    description: "AI-powered test generation from acceptance criteria"
+    priority: 1
+    estimated_hours: 8
+    
+  - layer_id: LAYER-004-01-02-02
+    name: "Implementation Code Generator"
+    description: "AI-powered implementation generation to pass tests"
+    priority: 2
+    estimated_hours: 8
+
+implementation_notes:
+  design_decisions:
+    - "Use Jinja2 templates for prompt engineering"
+    - "Parse YAML with PyYAML"
+    - "Validate syntax with ast.parse()"
+    - "Use black for code formatting"
+    - "Use pylint for quality checking"
+  
+  code_structure:
+    - "code_generation/prompt_templates.py - PromptTemplateEngine"
+    - "code_generation/test_generator.py - TestCodeGenerator"
+    - "code_generation/impl_generator.py - ImplementationCodeGenerator"
+    - "code_generation/code_validator.py - CodeValidator"
+    - "code_generation/yaml_parser.py - YAMLRequirementsParser"
+
+prompt_engineering_strategy:
+  test_generation_prompt:
+    structure: |
+      System: "You are a pytest expert generating test files from requirements."
+      User: "Generate pytest tests for:
+             Acceptance Criteria: {criteria}
+             Expected Methods: {methods}
+             Focus Areas: {focus}
+             Output: Complete pytest file with no placeholders."
+  
+  implementation_generation_prompt:
+    structure: |
+      System: "You are a Python developer implementing code to pass tests."
+      User: "Generate implementation for:
+             Failing Tests: {test_code}
+             Requirements: {acceptance_criteria}
+             Traceability: {mapping}
+             Output: Complete implementation file, minimal code to pass tests."
+
+dependencies:
+  external_libraries:
+    - jinja2>=3.1.0
+    - black>=23.0.0
+    - pylint>=2.17.0
+  
+  internal_dependencies:
+    - FEATURE-004-01-01 (AI Provider Foundation)
+
+success_criteria:
+  - "Generate valid pytest tests from YAML"
+  - "Generated tests fail without implementation"
+  - "Generate implementation that passes tests"
+  - "Generated code has 8.0+ pylint score"
+  - "Generated code has proper docstrings and type hints"

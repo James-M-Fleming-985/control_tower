@@ -1,0 +1,180 @@
+# FEATURE-004-01-03: TDD Cycle Orchestration
+# ===========================================
+# Complete workflow orchestration with concurrent execution support
+
+metadata:
+  requirement_id: FEATURE-004-01-03
+  requirement_name: TDD Cycle Orchestration
+  requirement_type: Feature
+  parent_system: SYSTEM-004-01
+  parent_project: PROJECT-004 AI CODE GENERATOR
+  
+  team_size: small
+  risk_level: medium
+  
+  estimated_effort_hours: 16
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: planned
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 20
+    coverage_threshold: 0.90
+    focus_areas:
+      - Orchestrator state management
+      - Phase transitions (RED->GREEN->REFACTOR)
+      - Concurrent execution coordination
+      - Progress reporting
+      - Error aggregation
+  
+  integration_tests:
+    required: true
+    minimum_count: 12
+    coverage_threshold: 0.85
+    focus_areas:
+      - Integration with execute_layer.py
+      - Full TDD cycle execution
+      - Concurrent multi-layer execution
+      - Verification report generation
+  
+  e2e_tests:
+    required: true
+    minimum_count: 5
+    coverage_threshold: 0.80
+    focus_areas:
+      - Complete layer generation end-to-end
+      - Concurrent execution of 5 layers
+      - Error recovery and retry
+
+quality_gates:
+  no_mocks_unless_specified: false
+  mock_policy:
+    test_execution_may_be_mocked: true  # Long-running test execution
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion_id: AC-001
+    criterion: "Execute complete RED->GREEN->REFACTOR cycle automatically"
+    status: planned
+    priority: critical
+    verification_method: e2e_tests
+    layers: [LAYER-004-01-03-01]
+    
+  - criterion_id: AC-002
+    criterion: "Support concurrent execution of up to 5 layers"
+    status: planned
+    priority: high
+    verification_method: integration_tests
+    layers: [LAYER-004-01-03-02]
+    
+  - criterion_id: AC-003
+    criterion: "Integrate with PROJECT-003 execute_layer.py infrastructure"
+    status: planned
+    priority: critical
+    verification_method: integration_tests
+    layers: [LAYER-004-01-03-03]
+    
+  - criterion_id: AC-004
+    criterion: "Display real-time progress for concurrent execution"
+    status: planned
+    priority: medium
+    verification_method: integration_tests
+    layers: [LAYER-004-01-03-02]
+    
+  - criterion_id: AC-005
+    criterion: "Handle failures gracefully with retry logic"
+    status: planned
+    priority: high
+    verification_method: integration_tests
+    layers: [LAYER-004-01-03-01, LAYER-004-01-03-02]
+    
+  - criterion_id: AC-006
+    criterion: "Generate complete verification reports"
+    status: planned
+    priority: medium
+    verification_method: e2e_tests
+    layers: [LAYER-004-01-03-01]
+
+layers:
+  - layer_id: LAYER-004-01-03-01
+    name: "AI Code Generator Orchestrator"
+    description: "Main orchestrator for complete TDD cycle execution"
+    priority: 1
+    estimated_hours: 6
+    
+  - layer_id: LAYER-004-01-03-02
+    name: "Concurrent Layer Executor"
+    description: "Concurrent execution with queue management and progress reporting"
+    priority: 2
+    estimated_hours: 6
+    
+  - layer_id: LAYER-004-01-03-03
+    name: "Execute Layer Integration"
+    description: "Integration with PROJECT-003 execute_layer.py"
+    priority: 3
+    estimated_hours: 4
+
+implementation_notes:
+  design_decisions:
+    - "Use asyncio for concurrent execution"
+    - "Use Semaphore to limit concurrent API calls"
+    - "Reuse execute_layer.py for validation and test execution"
+    - "Add --ai-generate flag to execute_layer.py"
+    - "Create new execute_requirements.py script"
+  
+  code_structure:
+    - "orchestration/orchestrator.py - AICodeGeneratorOrchestrator"
+    - "orchestration/concurrent_executor.py - ConcurrentLayerExecutor"
+    - "orchestration/progress_reporter.py - ProgressReporter"
+    - "scripts/execute_requirements.py - CLI entry point"
+    - "scripts/execute_layer.py - Modified with AI integration"
+
+concurrent_execution_architecture:
+  max_concurrent_layers: 5
+  queueing_strategy: "priority_fifo"
+  progress_reporting:
+    - "Real-time queue status"
+    - "Per-layer phase tracking"
+    - "ETA calculation"
+    - "Resource usage monitoring"
+  
+  error_handling:
+    - "Continue on failure (other layers proceed)"
+    - "Retry failed layers (up to 2 retries)"
+    - "Aggregate error reporting"
+    - "Partial success allowed"
+
+integration_with_execute_layer:
+  modifications_required:
+    - "Add --ai-generate CLI flag"
+    - "Add AICodeGenerator initialization"
+    - "Replace generate_implementation_stubs() call with AI generation"
+    - "Replace generate_test_files() call with AI generation"
+    - "Keep all validation logic unchanged"
+  
+  new_entry_points:
+    - "execute_requirements.py --yaml LAYER-XXX.yaml"
+    - "execute_requirements.py --yaml-dir <directory> --concurrent 5"
+    - "execute_layer.py --layer LAYER-XXX --phase full-cycle --ai-generate"
+
+dependencies:
+  external_libraries:
+    - aiohttp>=3.9.0
+    - asyncio (stdlib)
+  
+  internal_dependencies:
+    - FEATURE-004-01-01 (AI Provider Foundation)
+    - FEATURE-004-01-02 (Core Code Generation)
+    - PROJECT-003 SYSTEM-003-03 (execute_layer.py infrastructure)
+
+success_criteria:
+  - "Execute complete TDD cycle for 1 layer successfully"
+  - "Execute 5 layers concurrently successfully"
+  - "Real-time progress reporting works"
+  - "Integration with execute_layer.py preserves existing functionality"
+  - "Error handling and retry logic works"
+  - "Verification reports generated correctly"

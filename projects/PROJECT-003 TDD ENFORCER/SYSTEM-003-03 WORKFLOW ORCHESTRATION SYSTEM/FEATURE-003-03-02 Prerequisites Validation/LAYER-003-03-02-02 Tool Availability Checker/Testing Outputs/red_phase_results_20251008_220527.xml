@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="7.120" timestamp="2025-10-08T22:05:27.926845+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.tool_availability_checker.test_tool_availability_checker_integration.TestToolAvailabilityCheckerIntegration" name="test_standalone_integration" time="0.001"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/tool_availability_checker/test_tool_availability_checker_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.tool_availability_checker.test_tool_availability_checker_unit.TestToolAvailabilityCheckerUnit" name="test_validate_pytest_available_and_correct_version" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/tool_availability_checker/test_tool_availability_checker_unit.py:42: in test_validate_pytest_available_and_correct_version
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.tool_availability_checker.test_tool_availability_checker_unit.TestToolAvailabilityCheckerUnit" name="test_validate_coverage_tool_available" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/tool_availability_checker/test_tool_availability_checker_unit.py:64: in test_validate_coverage_tool_available
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.tool_availability_checker.test_tool_availability_checker_unit.TestToolAvailabilityCheckerUnit" name="test_check_for_yaml_parser_availability" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/tool_availability_checker/test_tool_availability_checker_unit.py:86: in test_check_for_yaml_parser_availability
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.tool_availability_checker.test_tool_availability_checker_unit.TestToolAvailabilityCheckerUnit" name="test_provide_installation_commands_for_missing_tools" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/tool_availability_checker/test_tool_availability_checker_unit.py:108: in test_provide_installation_commands_for_missing_tools
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase></testsuite></testsuites>

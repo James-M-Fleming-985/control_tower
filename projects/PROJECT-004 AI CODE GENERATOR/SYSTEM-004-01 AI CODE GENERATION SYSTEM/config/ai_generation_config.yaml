@@ -1,0 +1,112 @@
+# AI Provider Configuration
+# =======================
+# Configuration for AI code generation providers
+
+ai_provider:
+  # Default provider to use if not specified
+  default: "openai"
+  
+  # OpenAI GPT-4 Configuration
+  openai:
+    model: "gpt-4-turbo-preview"
+    temperature: 0.2  # Low temperature for deterministic code generation
+    max_tokens: 4000
+    api_key_env: "OPENAI_API_KEY"  # Environment variable name
+    timeout_seconds: 60
+    
+    # Rate limiting
+    rate_limit:
+      requests_per_minute: 700  # Adjust based on your API tier
+      tokens_per_minute: 150000
+  
+  # Anthropic Claude Configuration
+  anthropic:
+    model: "claude-3-opus-20240229"
+    max_tokens: 4000
+    api_key_env: "ANTHROPIC_API_KEY"
+    timeout_seconds: 60
+    
+    # Rate limiting
+    rate_limit:
+      requests_per_minute: 400
+      tokens_per_minute: 200000
+  
+  # Local LLM Configuration (Ollama)
+  local:
+    model_path: "~/.ollama/models/codellama"
+    model_name: "codellama:13b"
+    api_url: "http://localhost:11434"
+    timeout_seconds: 120  # Local models are slower
+
+# Concurrent Execution Settings
+concurrent_execution:
+  max_concurrent_layers: 5  # Maximum layers to process simultaneously
+  retry_on_failure: true
+  max_retries: 2
+  retry_delay_seconds: 30
+  exponential_backoff: true
+  backoff_multiplier: 2
+
+# Code Quality Settings
+code_quality:
+  # Automatic formatting
+  run_black_formatter: true
+  black_line_length: 100
+  
+  # Linting
+  run_pylint: true
+  min_quality_score: 8.0
+  
+  # Validation
+  validate_syntax: true
+  validate_imports: true
+  
+  # Code standards
+  require_docstrings: true
+  require_type_hints: true
+
+# Prompt Engineering Settings
+prompt_engineering:
+  # Test generation prompts
+  test_generation:
+    system_prompt: "You are an expert pytest test generator. Generate complete, working pytest test files with no placeholders."
+    temperature: 0.2
+    
+  # Implementation generation prompts
+  implementation_generation:
+    system_prompt: "You are a Python developer implementing code to pass tests. Generate minimal, working code following TDD principles."
+    temperature: 0.2
+    
+  # Refactoring prompts
+  refactoring:
+    system_prompt: "You are a code quality expert. Refactor code to improve quality while keeping all tests passing."
+    temperature: 0.3
+
+# Output Settings
+output:
+  verbose: true
+  progress_updates: true
+  update_frequency_seconds: 10
+  
+  # Logging
+  log_level: "INFO"
+  log_file: "ai_code_generation.log"
+  
+  # Reports
+  generate_reports: true
+  report_format: "yaml"
+
+# Performance Settings
+performance:
+  max_generation_time_per_file: 60  # seconds
+  max_retries_on_api_failure: 3
+  cache_enabled: true
+  cache_directory: ".cache/ai_generation"
+
+# Debugging Settings
+debug:
+  enabled: false
+  save_prompts: false
+  save_responses: false
+  prompt_directory: "debug/prompts"
+  response_directory: "debug/responses"

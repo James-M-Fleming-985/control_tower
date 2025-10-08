@@ -1,5 +1,6 @@
 # LAYER-003-03-02-01: Environment Validation
-# Validates Python environment and required tools
+# EXECUTABLE REQUIREMENTS SPECIFICATION
+# This YAML file drives automated test generation, execution, and verification
 
 metadata:
   requirement_id: LAYER-003-03-02-01
@@ -13,87 +14,493 @@ metadata:
   risk_level: medium
   
   estimated_effort_hours: 4
-  actual_effort_hours: 4.5
-  progress_percentage: 100
-  status: implemented
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: not_started
 
+# EXECUTABLE TESTING PYRAMID REQUIREMENTS
+# Script MUST enforce these counts and validate pyramid ratios
 testing_requirements:
+  test_pyramid:
+    enforce_pyramid_ratio: true
+    unit_to_integration_ratio: 2.0  # 2:1 ratio (unit >= integration * 2)
+    
   unit_tests:
     required: true
     minimum_count: 8
+    maximum_count: 12
     coverage_threshold: 0.90
+    mock_usage_allowed: false
     focus_areas:
-      - Python version checking
-      - Environment variable validation
-      - Virtual environment detection
+      - Python version checking (3 tests minimum)
+      - Environment variable validation (3 tests minimum)
+      - Virtual environment detection (2 tests minimum)
+    expected_test_methods:
+      - test_validate_python_version_3_8
+      - test_validate_python_version_below_3_8_fails
+      - test_python_version_exactly_3_8
+      - test_detect_venv_when_active
+      - test_detect_venv_when_not_active
+      - test_detect_conda_environment
+      - test_validate_env_vars_all_present
+      - test_validate_env_vars_when_missing
   
   integration_tests:
     required: true
     minimum_count: 4
+    maximum_count: 6
     coverage_threshold: 0.80
     focus_areas:
-      - Integration with system environment
-      - Cross-platform compatibility (Linux/Mac/Windows)
+      - Integration with real system environment
+      - Cross-platform validation (Linux/Mac/Windows detection)
+      - Complete validation workflow
+      - Error handling and recovery
+    expected_test_methods:
+      - test_complete_validation_workflow
+      - test_validation_report_generation
+      - test_cross_platform_compatibility
+      - test_error_handling_invalid_environment
   
   e2e_tests:
     required: false
+    minimum_count: 0
 
+# EXECUTABLE QUALITY GATES
+# Script MUST validate ALL gates before marking phase complete
 quality_gates:
-  no_mocks_unless_specified: true
-  real_failing_tests_required: true
-  team_size_enforcement: true
-  full_requirements_verification: true
-
-acceptance_criteria:
-  - criterion: "AC-001: Validate Python version >= 3.8"
-    status: implemented
-    test_file: tests/layer/test_python_version.py
-    related_feature_ac: FEATURE-003-03-02.AC-001
-    
-  - criterion: "AC-002: Detect virtual environment activation"
-    status: implemented
-    test_file: tests/layer/test_venv_detection.py
-    
-  - criterion: "AC-003: Validate required environment variables"
-    status: implemented
-    test_file: tests/layer/test_env_vars.py
-
-implementations:
+  enforcement_level: strict  # Options: strict, warning, disabled
+  
+  # RED Phase Gates
   red_phase:
-    status: completed
-    test_files:
-      - path: tests/layer/environment/test_environment_validator.py
-        requirement_id: LAYER-003-03-02-01
-        acceptance_criteria: [AC-001, AC-002, AC-003]
-        coverage_target: 0.90
-        test_count: 10
-        status: completed
+    tests_must_fail: true
+    fail_reason_must_be_clear: true
+    no_implementation_allowed: true
+    
+  # GREEN Phase Gates  
+  green_phase:
+    all_tests_must_pass: true
+    coverage_thresholds_met: true
+    no_skipped_tests: true
+    no_mocks_unless_specified: true
+    
+  # REFACTOR Phase Gates
+  refactor_phase:
+    tests_still_passing: true
+    coverage_maintained_or_improved: true
+    no_regression_allowed: true
+    
+  # Requirements Verification Gates
+  verification:
+    full_traceability_required: true
+    all_acceptance_criteria_tested: true
+    evidence_collection_complete: true
+    test_pyramid_ratio_valid: true
+
+# EXECUTABLE ACCEPTANCE CRITERIA
+# Each criterion MUST have corresponding tests that validate it
+acceptance_criteria:
+  - criterion_id: AC-001
+    criterion: "Validate Python version >= 3.8"
+    status: not_started
+    priority: critical
+    verification_method: unit_tests
+    required_tests:
+      - test_validate_python_version_3_8
+      - test_validate_python_version_below_3_8_fails
+      - test_python_version_exactly_3_8
+    test_file: tests/layer/environment_validation/test_environment_validation_unit.py
+    implementation_method: validate_python_version_3_8
+    traceability:
+      feature_ac: FEATURE-003-03-02.AC-001
+      system_req: SYSTEM-003-03.REQ-002
+    
+  - criterion_id: AC-002
+    criterion: "Detect virtual environment activation"
+    status: not_started
+    priority: high
+    verification_method: unit_tests
+    required_tests:
+      - test_detect_venv_when_active
+      - test_detect_venv_when_not_active
+      - test_detect_conda_environment
+    test_file: tests/layer/environment_validation/test_environment_validation_unit.py
+    implementation_method: detect_virtual_environment_activation
+    traceability:
+      feature_ac: FEATURE-003-03-02.AC-002
+    
+  - criterion_id: AC-003
+    criterion: "Validate required environment variables"
+    status: not_started
+    priority: high
+    verification_method: unit_tests
+    required_tests:
+      - test_validate_env_vars_all_present
+      - test_validate_env_vars_when_missing
+    test_file: tests/layer/environment_validation/test_environment_validation_unit.py
+    implementation_method: validate_required_environment_variables
+    traceability:
+      feature_ac: FEATURE-003-03-02.AC-003
+
+# EXECUTABLE OUTPUT SPECIFICATION
+# Defines exactly where each result file must be saved
+output_specification:
+  base_path: "LAYER-003-03-02-01 Environment Validation"
+  
+  # Testing evidence (test results, logs, coverage)
+  testing_outputs_dir: "Testing Outputs"
+  testing_outputs_path: "LAYER-003-03-02-01 Environment Validation/Testing Outputs"
+  testing_files:
+    red_phase:
+      - file: "red_phase_results_{timestamp}.xml"
+        type: junit_xml
+        description: "JUnit XML test results from RED phase"
+      - file: "red_phase_log_{timestamp}.txt"
+        type: execution_log
+        description: "Complete pytest output and execution log"
+    
+    green_phase:
+      - file: "green_phase_results_{timestamp}.txt"
+        type: test_results
+        description: "Test results with coverage information"
+      - file: "coverage_report_{timestamp}.txt"
+        type: coverage_report
+        description: "Detailed coverage report for layer files"
+      - file: "test_pyramid_validation_{timestamp}.json"
+        type: validation_report
+        description: "Test pyramid ratio validation results"
+    
+    refactor_phase:
+      - file: "refactor_phase_results_{timestamp}.xml"
+        type: junit_xml
+        description: "JUnit XML test results from REFACTOR phase"
+      - file: "refactor_phase_log_{timestamp}.txt"
+        type: execution_log
+        description: "Complete pytest output from refactor phase"
+  
+  # Requirements verification (traceability, verification reports)
+  requirements_verification_dir: "Requirements Verification"
+  requirements_verification_path: "LAYER-003-03-02-01 Environment Validation/Requirements Verification"
+  verification_files:
+    - file: "requirements_verification_template.yaml"
+      type: verification_template
+      description: "Template updated with execution evidence"
+      auto_updated: true
+      
+    - file: "execution_evidence.json"
+      type: evidence_collection
+      description: "All evidence entries from RED/GREEN/REFACTOR phases"
+      auto_generated: true
+      
+    - file: "traceability_matrix_{timestamp}.yaml"
+      type: traceability_report
+      description: "Full AC→Implementation→Tests traceability mapping"
+      generated_in: refactor_phase
+      
+    - file: "test_pyramid_report_{timestamp}.yaml"
+      type: pyramid_validation
+      description: "Test pyramid validation with unit/integration counts and ratios"
+      generated_in: green_phase
+      
+    - file: "quality_gates_report_{timestamp}.yaml"
+      type: quality_gates
+      description: "Quality gates validation results for all phases"
+      generated_in: refactor_phase
+      
+    - file: "requirements_verification_complete.yaml"
+      type: final_verification
+      description: "Final comprehensive verification report"
+      generated_in: refactor_phase
+      required_for_completion: true
+
+# EXECUTABLE REQUIREMENTS VERIFICATION
+# Script MUST generate and populate this during execution
+requirements_verification:
+  auto_generate: true
+  verification_template: Requirements Verification/requirements_verification_template.yaml
+  
+  # What the script MUST verify
+  verification_checklist:
+    - item: All acceptance criteria have corresponding tests
+      automated: true
+      gate: green_phase
+      
+    - item: Test count meets pyramid requirements
+      automated: true
+      gate: red_phase
+      
+    - item: Coverage thresholds met (90% unit, 80% integration)
+      automated: true
+      gate: green_phase
+      
+    - item: All tests pass in GREEN phase
+      automated: true
+      gate: green_phase
+      
+    - item: Tests still pass in REFACTOR phase
+      automated: true
+      gate: refactor_phase
+      
+    - item: Full traceability AC → Test → Implementation
+      automated: true
+      gate: refactor_phase
+      
+    - item: Evidence files generated for all phases
+      automated: true
+      gate: refactor_phase
+      
+    - item: Test pyramid ratio valid (2:1 unit:integration)
+      automated: true
+      gate: green_phase
+
+# EXECUTABLE TDD PHASE TRACKING
+# Script MUST update these during execution
+tdd_phases:
+  red_phase:
+    status: not_started
+    required_actions:
+      - Generate unit tests from acceptance criteria
+      - Generate integration tests from focus areas
+      - Ensure tests fail (no implementation exists)
+      - Validate test count meets minimum_count requirements
+      - Validate test pyramid ratio
+    exit_criteria:
+      - Tests generated: true
+      - All tests failing: true
+      - Test count valid: true
+      - Evidence collected: true
+    evidence_files:
+      - red_phase_results_{timestamp}.xml
+      - red_phase_log_{timestamp}.txt
   
   green_phase:
-    status: completed
-    implementation_files:
-      - path: src/prerequisites/environment_validator.py
-        requirement_id: LAYER-003-03-02-01
-        acceptance_criteria: [AC-001, AC-002, AC-003]
-        implements:
-          - "Check Python version"
-          - "Detect virtual environment"
-          - "Validate environment variables"
-        status: implemented
+    status: not_started
+    required_actions:
+      - Generate implementation stubs
+      - Implement all acceptance criteria
+      - Ensure all tests pass
+      - Validate coverage thresholds met
+      - Validate test pyramid ratio maintained
+    exit_criteria:
+      - Implementation complete: true
+      - All tests passing: true
+      - Unit coverage >= 90%: true
+      - Integration coverage >= 80%: true
+      - No skipped tests: true
+      - Evidence collected: true
+    evidence_files:
+      - green_phase_results_{timestamp}.txt
+      - coverage_report_{timestamp}.txt
   
   refactor_phase:
     status: not_started
-    refactored_files: []
+    required_actions:
+      - Verify tests still pass after refactoring
+      - Ensure coverage maintained or improved
+      - Validate no regression
+      - Complete full requirements verification
+    exit_criteria:
+      - Tests still passing: true
+      - Coverage maintained: true
+      - No regression: true
+      - Full traceability verified: true
+      - Evidence collected: true
+    evidence_files:
+      - refactor_phase_results_{timestamp}.xml
+      - refactor_phase_log_{timestamp}.txt
+      - requirements_verification_complete.yaml
 
-traceability:
-  auto_discovered: []
-  manually_registered:
-    - file: src/prerequisites/environment_validator.py
-      requirements: [LAYER-003-03-02-01]
+# EXECUTABLE IMPLEMENTATION SPECIFICATION
+# Script uses this to generate files and validate structure
+implementation_spec:
+  target_files:
+    - path: src/layer/environment_validation/environment_validation.py
+      type: implementation
+      class_name: EnvironmentValidation
+      required_methods:
+        - name: __init__
+          params: []
+          returns: None
+          acceptance_criteria: []
+          
+        - name: validate_python_version_3_8
+          params: []
+          returns: bool
+          acceptance_criteria: [AC-001]
+          must_implement: true
+          
+        - name: detect_virtual_environment_activation
+          params: []
+          returns: bool
+          acceptance_criteria: [AC-002]
+          must_implement: true
+          
+        - name: validate_required_environment_variables
+          params: []
+          returns: bool
+          acceptance_criteria: [AC-003]
+          must_implement: true
+          
+        - name: get_validation_report
+          params: []
+          returns: Dict
+          acceptance_criteria: [AC-001, AC-002, AC-003]
+          must_implement: true
+          
+        - name: validate_all
+          params: []
+          returns: Tuple[bool, Dict]
+          acceptance_criteria: [AC-001, AC-002, AC-003]
+          must_implement: true
+    
+    - path: src/layer/environment_validation/__init__.py
+      type: package_init
+      exports: [EnvironmentValidation]
+    
+    - path: tests/layer/environment_validation/test_environment_validation_unit.py
+      type: unit_test
+      test_class: TestEnvironmentValidationUnit
+      minimum_test_count: 8
       acceptance_criteria: [AC-001, AC-002, AC-003]
-  verification_status: matches
+      
+    - path: tests/layer/environment_validation/test_environment_validation_integration.py
+      type: integration_test
+      test_class: TestEnvironmentValidationIntegration
+      minimum_test_count: 4
+      acceptance_criteria: [AC-001, AC-002, AC-003]
 
+# EXECUTABLE TRACEABILITY MATRIX
+# Script MUST auto-discover and validate this during execution
+traceability:
+  auto_discovery_enabled: true
+  validation_required: true
+  
+  # AC → Implementation → Tests mapping
+  requirement_to_test_mapping:
+    AC-001:
+      acceptance_criterion: "Validate Python version >= 3.8"
+      implementation_method: validate_python_version_3_8
+      implementation_file: src/layer/environment_validation/environment_validation.py
+      unit_tests:
+        - test_validate_python_version_3_8
+        - test_validate_python_version_below_3_8_fails
+        - test_python_version_exactly_3_8
+      integration_tests:
+        - test_complete_validation_workflow
+      coverage_target: 0.90
+      
+    AC-002:
+      acceptance_criterion: "Detect virtual environment activation"
+      implementation_method: detect_virtual_environment_activation
+      implementation_file: src/layer/environment_validation/environment_validation.py
+      unit_tests:
+        - test_detect_venv_when_active
+        - test_detect_venv_when_not_active
+        - test_detect_conda_environment
+      integration_tests:
+        - test_complete_validation_workflow
+      coverage_target: 0.90
+      
+    AC-003:
+      acceptance_criterion: "Validate required environment variables"
+      implementation_method: validate_required_environment_variables
+      implementation_file: src/layer/environment_validation/environment_validation.py
+      unit_tests:
+        - test_validate_env_vars_all_present
+        - test_validate_env_vars_when_missing
+      integration_tests:
+        - test_complete_validation_workflow
+        - test_error_handling_invalid_environment
+      coverage_target: 0.90
+  
+  # Orphaned code detection
+  orphaned_code_check:
+    enabled: true
+    fail_on_orphaned: true
+    
+  # Missing tests detection
+  missing_tests_check:
+    enabled: true
+    fail_on_missing: true
+
+# EXECUTABLE SUCCESS CRITERIA
+# Script MUST validate ALL before marking layer complete
 success_criteria:
-  - "Python version validated correctly"
-  - "Virtual environment detected"
-  - "Environment variables checked"
+  phase_completion:
+    - criterion: RED phase completed with all tests failing
+      automated: true
+      validated_by: execute_layer.py
+      
+    - criterion: GREEN phase completed with all tests passing
+      automated: true
+      validated_by: execute_layer.py
+      
+    - criterion: REFACTOR phase completed with tests still passing
+      automated: true
+      validated_by: execute_layer.py
+      
+  quality_validation:
+    - criterion: Unit test count >= 8
+      automated: true
+      current_value: null
+      
+    - criterion: Integration test count >= 4
+      automated: true
+      current_value: null
+      
+    - criterion: Unit coverage >= 90%
+      automated: true
+      current_value: null
+      
+    - criterion: Integration coverage >= 80%
+      automated: true
+      current_value: null
+      
+    - criterion: Test pyramid ratio valid (2:1)
+      automated: true
+      current_value: null
+      
+  requirements_validation:
+    - criterion: All acceptance criteria have tests
+      automated: true
+      validated_by: traceability check
+      
+    - criterion: Full traceability AC→Implementation→Tests
+      automated: true
+      validated_by: traceability check
+      
+    - criterion: No orphaned code detected
+      automated: true
+      validated_by: traceability check
+      
+    - criterion: Evidence files complete for all phases
+      automated: true
+      validated_by: file existence check
+
+# EXECUTION RESULTS (Auto-populated by script)
+execution_results:
+  last_execution: null
+  red_phase:
+    executed_at: null
+    status: not_started
+    tests_generated: 0
+    tests_failing: 0
+    evidence_file: null
+    
+  green_phase:
+    executed_at: null
+    status: not_started
+    tests_passing: 0
+    tests_failing: 0
+    unit_coverage: 0.0
+    integration_coverage: 0.0
+    evidence_file: null
+    
+  refactor_phase:
+    executed_at: null
+    status: not_started
+    tests_passing: 0
+    regression_detected: false
+    evidence_file: null
+    
+  verification_complete: false
+  all_gates_passed: false

@@ -1,0 +1,190 @@
+# PROJECT-004: AI Code Generator
+# ================================
+# Automated code generation from YAML requirements using AI
+# Following TDD best practices for implementation
+
+metadata:
+  project_id: PROJECT-004
+  project_name: AI Code Generator
+  project_type: Infrastructure Tool
+  created_date: 2025-10-08
+  status: planned
+  priority: critical
+  
+  purpose: |
+    Enable YAML requirements files to be fully executable by using AI to automatically generate:
+    - Test files from acceptance criteria (RED phase)
+    - Implementation code to pass tests (GREEN phase)
+    - Refactored improvements (REFACTOR phase)
+    - All verification reports and traceability documentation
+    
+    This transforms static YAML requirements into complete, tested, verified implementations
+    with zero manual coding required.
+  
+  business_value: |
+    - Eliminates manual implementation time (80% time savings)
+    - Ensures consistent TDD adherence (100% of layers)
+    - Enables rapid prototyping from requirements
+    - Scales to concurrent layer implementation
+    - Provides full traceability automatically
+
+project_scope:
+  systems:
+    - SYSTEM-004-01: AI Code Generation System
+  
+  total_features: 3
+  total_layers: 7
+  
+  estimated_effort:
+    total_hours: 40
+    total_days: 5
+    team_size: 1-2 developers
+
+# Testing requirements for PROJECT level
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 50
+    coverage_threshold: 0.95  # Project level (95%) - critical infrastructure
+    
+  integration_tests:
+    required: true
+    minimum_count: 30
+    coverage_threshold: 0.90  # Project level (90%)
+    
+  e2e_tests:
+    required: true
+    minimum_count: 10
+    coverage_threshold: 0.85  # Project level (85%)
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+  
+  # Special gates for AI code generation
+  ai_code_quality_gates:
+    generated_code_must_pass_linting: true
+    generated_code_must_have_docstrings: true
+    generated_tests_must_fail_in_red_phase: true
+    generated_implementation_must_pass_tests: true
+
+# Project-level acceptance criteria
+acceptance_criteria:
+  - criterion_id: PROJECT-AC-001
+    criterion: "AI generates syntactically valid Python code from YAML"
+    status: planned
+    priority: critical
+    
+  - criterion_id: PROJECT-AC-002
+    criterion: "Generated tests fail in RED phase as expected"
+    status: planned
+    priority: critical
+    
+  - criterion_id: PROJECT-AC-003
+    criterion: "Generated implementations pass all tests in GREEN phase"
+    status: planned
+    priority: critical
+    
+  - criterion_id: PROJECT-AC-004
+    criterion: "Complete TDD cycle executes without human intervention"
+    status: planned
+    priority: critical
+    
+  - criterion_id: PROJECT-AC-005
+    criterion: "Concurrent execution supports 5 layers simultaneously"
+    status: planned
+    priority: high
+    
+  - criterion_id: PROJECT-AC-006
+    criterion: "Full traceability maintained throughout generation process"
+    status: planned
+    priority: high
+
+dependencies:
+  external_projects:
+    - PROJECT-003: TDD ENFORCER (uses execute_layer.py infrastructure)
+  
+  external_services:
+    - OpenAI GPT-4 API (or Anthropic Claude or Local LLM)
+  
+  python_libraries:
+    - openai>=1.3.0
+    - anthropic>=0.8.0
+    - tenacity>=8.2.3  # Retry logic
+    - aiohttp>=3.9.0   # Async HTTP
+
+technology_stack:
+  language: Python 3.8+
+  frameworks:
+    - pytest (testing)
+    - asyncio (concurrent execution)
+  
+  ai_providers:
+    primary: OpenAI GPT-4 Turbo
+    secondary: Anthropic Claude 3 Opus
+    tertiary: Local LLM (Ollama)
+
+success_metrics:
+  mvp_success:
+    - "1 layer executes successfully end-to-end with AI generation"
+    - "All quality gates pass"
+    - "Generated code has 90%+ quality score"
+  
+  production_success:
+    - "All 7 layers in this project implemented successfully"
+    - "Can generate code for PROJECT-003 layers successfully"
+    - "95%+ success rate on AI code generation"
+    - "Concurrent execution works for 5 layers"
+  
+  stretch_goals:
+    - "10+ layers execute concurrently"
+    - "Multi-AI-provider support working"
+    - "CI/CD pipeline integration complete"
+
+implementation_timeline:
+  phase_1_foundation:
+    duration_days: 1
+    systems: ["SYSTEM-004-01"]
+    features: ["FEATURE-004-01-01"]
+    layers: ["LAYER-004-01-01-01", "LAYER-004-01-01-02"]
+  
+  phase_2_core_generation:
+    duration_days: 1.5
+    features: ["FEATURE-004-01-02"]
+    layers: ["LAYER-004-01-02-01", "LAYER-004-01-02-02"]
+  
+  phase_3_orchestration:
+    duration_days: 1.5
+    features: ["FEATURE-004-01-03"]
+    layers: ["LAYER-004-01-03-01", "LAYER-004-01-03-02", "LAYER-004-01-03-03"]
+  
+  phase_4_testing_polish:
+    duration_days: 1
+    tasks:
+      - "End-to-end integration testing"
+      - "Documentation completion"
+      - "Performance optimization"
+
+documentation:
+  required_documents:
+    - PROJECT-004_ai_code_generator.md (overview)
+    - IMPLEMENTATION_GUIDE.md
+    - API_PROVIDER_SETUP_GUIDE.md
+    - TROUBLESHOOTING_GUIDE.md
+    - CONCURRENT_EXECUTION_GUIDE.md
+    - USER_GUIDE.md
+
+status_tracking:
+  current_phase: "Planning"
+  next_milestone: "SYSTEM-004-01 setup complete"
+  blockers: []
+  risks:
+    - risk: "AI API quality varies"
+      mitigation: "Implement validation and retry logic"
+      severity: medium
+    
+    - risk: "API rate limits with concurrent execution"
+      mitigation: "Implement queueing and throttling"
+      severity: low

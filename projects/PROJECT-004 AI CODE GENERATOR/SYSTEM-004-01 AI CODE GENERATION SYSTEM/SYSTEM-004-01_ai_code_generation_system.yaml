@@ -1,0 +1,303 @@
+# SYSTEM-004-01: AI Code Generation System
+# ==========================================
+# Core AI-powered code generation system that transforms YAML requirements
+# into complete, tested Python implementations
+
+metadata:
+  requirement_id: SYSTEM-004-01
+  requirement_name: AI Code Generation System
+  requirement_type: Application System
+  parent_project: PROJECT-004 AI CODE GENERATOR
+  
+  team_size: small  # 1-2 developers for this infrastructure tool
+  risk_level: high  # Critical infrastructure for all future code generation
+  
+  estimated_effort_hours: 40
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: planned
+  
+  dependencies:
+    - PROJECT-003 SYSTEM-003-03 (reuses execute_layer.py infrastructure)
+
+# Testing requirements based on system level + high risk
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 50
+    coverage_threshold: 0.95  # System level (95%) + high risk
+    focus_areas:
+      - AI provider abstraction
+      - Prompt template generation
+      - Code parsing and validation
+      - YAML requirements parsing
+      - Test generation logic
+      - Implementation generation logic
+      - Syntax validation
+      - Error handling
+    
+  integration_tests:
+    required: true
+    minimum_count: 30
+    coverage_threshold: 0.90  # System level (90%)
+    focus_areas:
+      - AI API integration (OpenAI, Anthropic)
+      - File generation and writing
+      - Test execution integration
+      - Multi-file code generation
+      - Error recovery and retry logic
+      - Rate limit handling
+    
+  e2e_tests:
+    required: true
+    minimum_count: 10
+    coverage_threshold: 0.85  # System level (85%)
+    focus_areas:
+      - Complete RED->GREEN->REFACTOR cycle
+      - Full layer generation end-to-end
+      - Concurrent layer execution
+      - Quality gate enforcement
+      - Verification report generation
+
+quality_gates:
+  # Standard TDD gates
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+  
+  # AI-specific quality gates
+  ai_code_quality:
+    generated_code_must_be_syntactically_valid: true
+    generated_code_must_pass_linting: true
+    generated_tests_must_fail_in_red_phase: true
+    generated_implementation_must_pass_tests: true
+    generated_code_must_have_docstrings: true
+    generated_code_must_have_type_hints: true
+  
+  # Performance gates
+  performance:
+    max_generation_time_per_file: 60  # seconds
+    max_retries_on_api_failure: 3
+    max_concurrent_api_calls: 5
+
+# System-level acceptance criteria
+acceptance_criteria:
+  - criterion_id: SYSTEM-AC-001
+    criterion: "Support multiple AI providers (OpenAI, Anthropic, Local LLM)"
+    status: planned
+    priority: critical
+    features: [FEATURE-004-01-01]
+    
+  - criterion_id: SYSTEM-AC-002
+    criterion: "Generate syntactically valid Python test files from YAML acceptance criteria"
+    status: planned
+    priority: critical
+    features: [FEATURE-004-01-02]
+    
+  - criterion_id: SYSTEM-AC-003
+    criterion: "Generate working implementations that pass generated tests"
+    status: planned
+    priority: critical
+    features: [FEATURE-004-01-02]
+    
+  - criterion_id: SYSTEM-AC-004
+    criterion: "Execute complete TDD cycle (RED->GREEN->REFACTOR) automatically"
+    status: planned
+    priority: critical
+    features: [FEATURE-004-01-03]
+    
+  - criterion_id: SYSTEM-AC-005
+    criterion: "Support concurrent execution of multiple layers (up to 5)"
+    status: planned
+    priority: high
+    features: [FEATURE-004-01-03]
+    
+  - criterion_id: SYSTEM-AC-006
+    criterion: "Handle AI API errors gracefully with retry logic"
+    status: planned
+    priority: high
+    features: [FEATURE-004-01-01, FEATURE-004-01-03]
+    
+  - criterion_id: SYSTEM-AC-007
+    criterion: "Validate generated code quality before saving"
+    status: planned
+    priority: high
+    features: [FEATURE-004-01-02]
+    
+  - criterion_id: SYSTEM-AC-008
+    criterion: "Generate complete verification reports and traceability"
+    status: planned
+    priority: medium
+    features: [FEATURE-004-01-03]
+
+# Features that compose this system
+features:
+  - feature_id: FEATURE-004-01-01
+    name: "AI Provider Foundation"
+    description: "Abstraction layer for multiple AI providers with error handling"
+    priority: 1
+    layers: 2
+    estimated_hours: 8
+    
+  - feature_id: FEATURE-004-01-02
+    name: "Core Code Generation"
+    description: "AI-powered test and implementation generation from YAML"
+    priority: 2
+    layers: 2
+    estimated_hours: 16
+    
+  - feature_id: FEATURE-004-01-03
+    name: "TDD Cycle Orchestration"
+    description: "Complete workflow orchestration with concurrent execution"
+    priority: 3
+    layers: 3
+    estimated_hours: 16
+
+# Architecture overview
+architecture:
+  components:
+    ai_provider_layer:
+      purpose: "Abstract AI API interactions"
+      classes:
+        - AIProviderInterface
+        - OpenAIProvider
+        - AnthropicProvider
+        - LocalLLMProvider
+        - AIProviderFactory
+    
+    code_generation_layer:
+      purpose: "Generate code from YAML using AI"
+      classes:
+        - PromptTemplateEngine
+        - TestCodeGenerator
+        - ImplementationCodeGenerator
+        - CodeValidator
+    
+    orchestration_layer:
+      purpose: "Coordinate complete TDD cycle"
+      classes:
+        - AICodeGeneratorOrchestrator
+        - ConcurrentLayerExecutor
+        - ExecuteLayerIntegration
+  
+  data_flow:
+    - "1. Load YAML requirements"
+    - "2. Generate prompts from YAML using PromptTemplateEngine"
+    - "3. Call AI provider to generate code"
+    - "4. Validate generated code syntax and quality"
+    - "5. Save to appropriate files"
+    - "6. Execute tests using execute_layer.py infrastructure"
+    - "7. Iterate through RED/GREEN/REFACTOR phases"
+    - "8. Generate verification reports"
+
+# Integration with existing PROJECT-003 infrastructure
+integration_points:
+  reused_components:
+    - "execute_layer.py (validation, test execution, evidence collection)"
+    - "validate_traceability.py (traceability verification)"
+    - "Testing requirements structure (test pyramid, quality gates)"
+    - "Requirements Verification structure (output files, templates)"
+  
+  new_components:
+    - "AI provider abstraction"
+    - "Prompt engineering templates"
+    - "Code generation logic"
+    - "Concurrent execution coordinator"
+  
+  integration_strategy:
+    - "Add --ai-generate flag to execute_layer.py"
+    - "Inject AICodeGenerator at generation points"
+    - "Reuse all validation and verification logic"
+    - "Extend with new ai_code_generator.py module"
+
+# Configuration requirements
+configuration:
+  config_file: "config/ai_generation_config.yaml"
+  config_structure:
+    ai_provider:
+      default: "openai"
+      openai:
+        model: "gpt-4-turbo-preview"
+        temperature: 0.2
+        max_tokens: 4000
+        api_key_env: "OPENAI_API_KEY"
+      anthropic:
+        model: "claude-3-opus-20240229"
+        max_tokens: 4000
+        api_key_env: "ANTHROPIC_API_KEY"
+      local:
+        model_path: "~/.ollama/models/codellama"
+    
+    concurrent_execution:
+      max_concurrent_layers: 5
+      retry_on_failure: true
+      max_retries: 2
+    
+    code_quality:
+      run_black_formatter: true
+      run_pylint: true
+      min_quality_score: 8.0
+    
+    output:
+      verbose: true
+      progress_updates: true
+
+# Success criteria for system completion
+success_criteria:
+  system_complete_when:
+    - "All 3 features implemented and tested"
+    - "All 7 layers passing tests"
+    - "End-to-end integration test passing"
+    - "Can successfully generate code for PROJECT-003 layers"
+    - "Concurrent execution works for 5 layers"
+    - "Documentation complete"
+  
+  quality_metrics:
+    - "95%+ unit test coverage"
+    - "90%+ integration test coverage"
+    - "85%+ e2e test coverage"
+    - "90%+ AI generation success rate"
+    - "Zero critical bugs"
+
+# Risk assessment
+risks:
+  high_risks:
+    - risk: "AI generates invalid or buggy code"
+      mitigation: "Syntax validation, test execution, retry logic"
+      owner: "Code Generation feature"
+    
+    - risk: "API rate limits block concurrent execution"
+      mitigation: "Queueing, throttling, exponential backoff"
+      owner: "Orchestration feature"
+  
+  medium_risks:
+    - risk: "Prompt engineering takes longer than expected"
+      mitigation: "Start simple, iterate based on results"
+      owner: "Code Generation feature"
+    
+    - risk: "Integration with execute_layer.py breaks existing functionality"
+      mitigation: "Comprehensive integration tests, feature flags"
+      owner: "Integration layer"
+
+# Implementation roadmap
+roadmap:
+  week_1:
+    - "Set up project structure"
+    - "Implement FEATURE-004-01-01 (AI Provider Foundation)"
+    - "Basic OpenAI integration working"
+  
+  week_2:
+    - "Implement FEATURE-004-01-02 (Core Code Generation)"
+    - "Test generation working"
+    - "Implementation generation working"
+  
+  week_3:
+    - "Implement FEATURE-004-01-03 (TDD Cycle Orchestration)"
+    - "Full cycle working for 1 layer"
+    - "Concurrent execution working"
+  
+  week_4:
+    - "Integration with PROJECT-003"
+    - "Documentation and polish"
+    - "End-to-end validation"

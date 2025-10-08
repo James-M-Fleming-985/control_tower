@@ -1,0 +1,23 @@
+GREEN PHASE TEST EXECUTION
+======================================================================
+Layer: LAYER-003-03-02-02
+Timestamp: 2025-10-08T22:00:52.806196
+Command: pytest /workspaces/control_tower/tests/layer/tool_availability_checker -v --tb=short --cov=src/layer/tool_availability_checker --cov-report=term-missing --cov-fail-under=0
+======================================================================
+
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/py-utils/venvs/pytest/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... ✅ Added /workspaces/control_tower to sys.path
+collected 0 items
+
+============================ no tests ran in 0.01s =============================
+
+
+STDERR:
+ERROR: file or directory not found: /workspaces/control_tower/tests/layer/tool_availability_checker
+

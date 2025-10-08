@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="6" time="5.142" timestamp="2025-10-08T15:59:00.979334+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.environment_validation.test_environment_validation_integration.TestEnvironmentValidationIntegration" name="test_standalone_integration" time="0.001"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/environment_validation/test_environment_validation_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.environment_validation.test_environment_validation_unit.TestEnvironmentValidationUnit" name="test_validate_python_version_3_8" time="0.001"><failure message="NotImplementedError: AC-001 not implemented">tests/layer/environment_validation/test_environment_validation_unit.py:31: in test_validate_python_version_3_8
+    result = self.validator.validate_python_version_3_8()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/layer/environment_validation/environment_validation.py:42: in validate_python_version_3_8
+    raise NotImplementedError("AC-001 not implemented")
+E   NotImplementedError: AC-001 not implemented</failure></testcase><testcase classname="tests.layer.environment_validation.test_environment_validation_unit.TestEnvironmentValidationUnit" name="test_detect_virtual_environment_activation" time="0.001"><failure message="NotImplementedError: AC-002 not implemented">tests/layer/environment_validation/test_environment_validation_unit.py:53: in test_detect_virtual_environment_activation
+    result = self.validator.detect_virtual_environment_activation()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/layer/environment_validation/environment_validation.py:55: in detect_virtual_environment_activation
+    raise NotImplementedError("AC-002 not implemented")
+E   NotImplementedError: AC-002 not implemented</failure></testcase><testcase classname="tests.layer.environment_validation.test_environment_validation_unit.TestEnvironmentValidationUnit" name="test_validate_required_environment_variables" time="0.001"><failure message="NotImplementedError: AC-003 not implemented">tests/layer/environment_validation/test_environment_validation_unit.py:71: in test_validate_required_environment_variables
+    result = self.validator.validate_required_environment_variables()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/layer/environment_validation/environment_validation.py:68: in validate_required_environment_variables
+    raise NotImplementedError("AC-003 not implemented")
+E   NotImplementedError: AC-003 not implemented</failure></testcase><testcase classname="tests.layer.environment_validation.test_environment_validation_unit.TestEnvironmentValidationUnit" name="test_get_validation_report" time="0.001"><failure message="NotImplementedError: AC-001 not implemented">tests/layer/environment_validation/test_environment_validation_unit.py:82: in test_get_validation_report
+    self.validator.validate_python_version_3_8()
+src/layer/environment_validation/environment_validation.py:42: in validate_python_version_3_8
+    raise NotImplementedError("AC-001 not implemented")
+E   NotImplementedError: AC-001 not implemented</failure></testcase><testcase classname="tests.layer.environment_validation.test_environment_validation_unit.TestEnvironmentValidationUnit" name="test_validate_all" time="0.001"><failure message="AttributeError: 'EnvironmentValidation' object has no attribute 'validate_all'">tests/layer/environment_validation/test_environment_validation_unit.py:99: in test_validate_all
+    all_valid, report = self.validator.validate_all()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'EnvironmentValidation' object has no attribute 'validate_all'</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,18 @@
+REFACTOR PHASE TEST EXECUTION
+======================================================================
+Layer: LAYER-003-03-02-03
+Timestamp: 2025-10-08T21:56:11.219084
+======================================================================
+
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/py-utils/venvs/pytest/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... ✅ Added /workspaces/control_tower to sys.path
+collected 0 items
+
+- generated xml file: /workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-03 Project Structure Validator/Testing Outputs/refactor_phase_results_20251008_215610.xml -
+============================ no tests ran in 0.01s =============================

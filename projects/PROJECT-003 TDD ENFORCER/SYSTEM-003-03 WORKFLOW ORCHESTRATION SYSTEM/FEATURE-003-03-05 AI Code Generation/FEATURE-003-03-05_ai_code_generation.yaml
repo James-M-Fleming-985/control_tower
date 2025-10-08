@@ -1,0 +1,69 @@
+# FEATURE-003-03-05: AI Code Generation
+# ======================================
+# Automated code generation from YAML requirements using AI
+
+feature:
+  id: "FEATURE-003-03-05"
+  name: "AI Code Generation"
+  description: |
+    AI-powered code generation system that reads YAML requirements and generates
+    tests, implementations, and refactorings automatically.
+  parent_system: "SYSTEM-003-03"
+  status: "planned"
+  priority: "critical"
+  
+  purpose: |
+    Enable YAML requirements to be fully executable by using AI to generate:
+    - Test files from acceptance criteria
+    - Implementations to pass tests
+    - Refactored code improvements
+    - Verification reports
+    
+    This makes requirements truly executable with zero manual coding.
+
+layer_structure:
+  priority_1_foundation:
+    - LAYER-003-03-05-01: "AI Provider Abstraction"
+    - LAYER-003-03-05-02: "Prompt Template Engine"
+  
+  priority_2_core_generation:
+    - LAYER-003-03-05-03: "Test Code Generator"
+    - LAYER-003-03-05-04: "Implementation Code Generator"
+  
+  priority_3_orchestration:
+    - LAYER-003-03-05-05: "AI Code Generator Orchestrator"
+    - LAYER-003-03-05-06: "Concurrent Layer Executor"
+  
+  priority_4_integration:
+    - LAYER-003-03-05-07: "Execute Layer Integration"
+
+dependencies:
+  system_dependencies:
+    - "SYSTEM-003-03: Workflow Orchestration System"
+  
+  feature_dependencies:
+    - "FEATURE-003-03-02: Prerequisites Validation"
+    - "FEATURE-003-03-03: Orchestration Layer"
+
+success_criteria:
+  - All 7 layers implemented following TDD
+  - Each layer has passing tests
+  - Full integration tested
+  - Can generate code for existing layers successfully
+  - Concurrent execution works for multiple layers
+
+estimated_effort:
+  total_hours: 40
+  total_days: 5
+  breakdown:
+    priority_1: "8 hours (1 day)"
+    priority_2: "12 hours (1.5 days)"
+    priority_3: "12 hours (1.5 days)"
+    priority_4: "8 hours (1 day)"
+
+implementation_order:
+  phase_1: "Implement Priority 1 layers (foundation)"
+  phase_2: "Implement Priority 2 layers (core generation)"
+  phase_3: "Implement Priority 3 layers (orchestration)"
+  phase_4: "Implement Priority 4 layers (integration)"
+  phase_5: "End-to-end testing on existing layers"

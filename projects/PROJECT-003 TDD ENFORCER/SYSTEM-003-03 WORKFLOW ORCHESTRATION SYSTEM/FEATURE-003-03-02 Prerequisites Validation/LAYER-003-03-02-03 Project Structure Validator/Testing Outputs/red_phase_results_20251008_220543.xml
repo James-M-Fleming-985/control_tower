@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="18.944" timestamp="2025-10-08T22:05:43.957363+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.project_structure_validator.test_project_structure_validator_integration.TestProjectStructureValidatorIntegration" name="test_standalone_integration" time="0.022"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/project_structure_validator/test_project_structure_validator_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.project_structure_validator.test_project_structure_validator_unit.TestProjectStructureValidatorUnit" name="test_validate_src_and_tests_directories_exist" time="0.007"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/project_structure_validator/test_project_structure_validator_unit.py:42: in test_validate_src_and_tests_directories_exist
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.project_structure_validator.test_project_structure_validator_unit.TestProjectStructureValidatorUnit" name="test_check_for_requirements_template_files" time="0.003"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/project_structure_validator/test_project_structure_validator_unit.py:64: in test_check_for_requirements_template_files
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.project_structure_validator.test_project_structure_validator_unit.TestProjectStructureValidatorUnit" name="test_validate_pyproject_toml_or_setup_py" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/project_structure_validator/test_project_structure_validator_unit.py:86: in test_validate_pyproject_toml_or_setup_py
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.project_structure_validator.test_project_structure_validator_unit.TestProjectStructureValidatorUnit" name="test_provide_guidance_for_missing_structure_elements" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/project_structure_validator/test_project_structure_validator_unit.py:108: in test_provide_guidance_for_missing_structure_elements
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase></testsuite></testsuites>
