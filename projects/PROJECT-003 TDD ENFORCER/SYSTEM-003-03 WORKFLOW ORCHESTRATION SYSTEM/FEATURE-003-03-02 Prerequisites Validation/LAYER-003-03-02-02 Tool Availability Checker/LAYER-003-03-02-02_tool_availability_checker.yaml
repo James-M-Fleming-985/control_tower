@@ -1,0 +1,105 @@
+# LAYER-003-03-02-02: Tool Availability Checker
+# Validates availability of required development tools (pytest, coverage, etc.)
+
+metadata:
+  requirement_id: LAYER-003-03-02-02
+  requirement_name: Tool Availability Checker
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-02
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: medium
+  
+  estimated_effort_hours: 5
+  actual_effort_hours: 4.8
+  progress_percentage: 95
+  status: implemented
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 10
+    coverage_threshold: 0.90
+    focus_areas:
+      - Tool detection logic
+      - Version checking
+      - Installation guidance generation
+  
+  integration_tests:
+    required: true
+    minimum_count: 5
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with package managers (pip, conda)
+      - Tool execution verification
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Validate pytest available and correct version"
+    status: implemented
+    test_file: tests/layer/test_pytest_validation.py
+    related_feature_ac: FEATURE-003-03-02.AC-002
+    
+  - criterion: "AC-002: Validate coverage tool available"
+    status: implemented
+    test_file: tests/layer/test_coverage_validation.py
+    related_feature_ac: FEATURE-003-03-02.AC-002
+    
+  - criterion: "AC-003: Check for YAML parser availability"
+    status: implemented
+    test_file: tests/layer/test_yaml_parser.py
+    
+  - criterion: "AC-004: Provide installation commands for missing tools"
+    status: in_progress
+    test_file: tests/layer/test_installation_guidance.py
+
+implementations:
+  red_phase:
+    status: completed
+    test_files:
+      - path: tests/layer/tool_checker/test_tool_availability_checker.py
+        requirement_id: LAYER-003-03-02-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 12
+        status: completed
+  
+  green_phase:
+    status: in_progress
+    implementation_files:
+      - path: src/prerequisites/tool_checker.py
+        requirement_id: LAYER-003-03-02-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Check pytest availability and version"
+          - "Check coverage tool availability"
+          - "Check YAML parser availability"
+          - "Generate installation guidance"
+        status: in_progress
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/prerequisites/tool_checker.py
+      requirements: [LAYER-003-03-02-02]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+success_criteria:
+  - "All required tools detected correctly"
+  - "Tool versions validated"
+  - "Clear installation guidance provided for missing tools"

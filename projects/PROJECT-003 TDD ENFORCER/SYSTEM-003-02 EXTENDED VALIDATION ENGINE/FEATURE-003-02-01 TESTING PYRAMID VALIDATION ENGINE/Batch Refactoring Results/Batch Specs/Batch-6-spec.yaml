@@ -1,0 +1,30 @@
+---
+# Batch 6: Git Write Operations (Part 3 of 3)
+# Created: 2025-10-08
+# Behaviors: 15
+
+metadata:
+  batch_number: 6
+  batch_name: "Git Write Operations - Part 3"
+  target_days: "Day 7"
+  estimated_hours: 6.0
+  total_behaviors: 15
+  priority: "HIGH"
+  dependencies: ["Batch-5"]
+
+objective: |
+  Complete Git operations refactoring. Part 3 focuses on 
+  tdd_phase_repository_backup.py operations.
+
+behaviors:
+  - behavior_id: "BATCH-6-001 through BATCH-6-015"
+    note: "Git operations from tdd_phase_repository_backup.py"
+    description: "Complete Git write to validation refactoring"
+
+checkpoint:
+  after_completion:
+    - "All Git operations refactored across all 3 batches"
+    - "Zero Git write operations in PROJECT-003"
+    - "All validation receiving data from PROJECT-002"
+
+next_batch: "Batch-7-spec.yaml"

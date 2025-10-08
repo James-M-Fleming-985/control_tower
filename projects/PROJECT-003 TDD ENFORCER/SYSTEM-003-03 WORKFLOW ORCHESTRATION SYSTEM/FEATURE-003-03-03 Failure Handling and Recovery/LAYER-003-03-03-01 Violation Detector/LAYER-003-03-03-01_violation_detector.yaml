@@ -1,0 +1,147 @@
+# LAYER-003-03-03-01: Violation Detector
+# Detects quality gate violations and categorizes failures
+
+metadata:
+  requirement_id: LAYER-003-03-03-01
+  requirement_name: Violation Detector
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-03
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: high  # Violation detection is critical for enforcement
+  
+  estimated_effort_hours: 12
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: not_started
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 20
+    coverage_threshold: 0.90
+    focus_areas:
+      - Mock detection logic
+      - Placeholder test detection
+      - Coverage threshold validation
+      - Team size mismatch detection
+      - Orphaned code detection
+      - Traceability mismatch detection
+  
+  integration_tests:
+    required: true
+    minimum_count: 10
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with code analysis tools
+      - Integration with coverage reports
+      - Integration with requirements tracer
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Detect mock usage in tests (unless requirement allows)"
+    status: not_implemented
+    test_file: tests/layer/test_mock_detection.py
+    related_feature_ac: FEATURE-003-03-03.AC-001
+    
+  - criterion: "AC-002: Detect placeholder tests (assert True, pass)"
+    status: not_implemented
+    test_file: tests/layer/test_placeholder_detection.py
+    related_feature_ac: FEATURE-003-03-03.AC-001
+    
+  - criterion: "AC-003: Detect coverage below threshold violations"
+    status: not_implemented
+    test_file: tests/layer/test_coverage_violations.py
+    related_feature_ac: FEATURE-003-03-03.AC-001
+    
+  - criterion: "AC-004: Detect team size mismatch violations"
+    status: not_implemented
+    test_file: tests/layer/test_team_size_violations.py
+    related_feature_ac: FEATURE-003-03-03.AC-001
+    
+  - criterion: "AC-005: Categorize violations by type and severity"
+    status: not_implemented
+    test_file: tests/layer/test_violation_categorization.py
+    related_feature_ac: FEATURE-003-03-03.AC-002
+
+implementations:
+  red_phase:
+    status: not_started
+    test_files:
+      - path: tests/layer/violation_detector/test_violation_detector.py
+        requirement_id: LAYER-003-03-03-01
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+        coverage_target: 0.90
+        test_count: 22
+        status: not_started
+  
+  green_phase:
+    status: not_started
+    implementation_files:
+      - path: src/validation/violation_detector.py
+        requirement_id: LAYER-003-03-03-01
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+        implements:
+          - "Detect mock usage patterns in test files"
+          - "Detect placeholder test patterns"
+          - "Validate coverage against thresholds"
+          - "Detect team size mismatches"
+          - "Categorize violations by type/severity"
+        status: not_started
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/validation/violation_detector.py
+      requirements: [LAYER-003-03-03-01]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+  verification_status: pending
+
+# Violation types this layer must detect
+violation_types:
+  quality_gates:
+    - type: mock_detected
+      severity: error
+      pattern: "unittest.mock|pytest.mock|@patch|MagicMock"
+      
+    - type: placeholder_test
+      severity: error
+      patterns: ["assert True", "pass  # TODO", "pass  # placeholder"]
+      
+    - type: coverage_below_threshold
+      severity: error
+      check: "actual_coverage < required_coverage"
+      
+    - type: team_size_mismatch
+      severity: error
+      checks:
+        - "small team with enterprise patterns"
+        - "large team with overly simple implementation"
+    
+    - type: orphaned_code
+      severity: warning
+      check: "file without # REQ-XXX comment"
+    
+    - type: traceability_mismatch
+      severity: error
+      check: "auto_discovered != manually_registered"
+
+success_criteria:
+  - "All quality gate violations detected"
+  - "Violations categorized correctly"
+  - "Mock usage detected accurately"
+  - "Placeholder tests identified"

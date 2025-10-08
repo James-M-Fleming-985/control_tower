@@ -1,0 +1,107 @@
+# LAYER-003-03-02-03: Project Structure Validator
+# Validates project directory structure and required files
+
+metadata:
+  requirement_id: LAYER-003-03-02-03
+  requirement_name: Project Structure Validator
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-02
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: medium
+  
+  estimated_effort_hours: 7
+  actual_effort_hours: 4.9
+  progress_percentage: 70
+  status: in_progress
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 12
+    coverage_threshold: 0.90
+    focus_areas:
+      - Directory structure validation
+      - Required file checking
+      - Template availability verification
+  
+  integration_tests:
+    required: true
+    minimum_count: 6
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with file system
+      - Template loading and validation
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Validate src/ and tests/ directories exist"
+    status: implemented
+    test_file: tests/layer/test_directory_structure.py
+    related_feature_ac: FEATURE-003-03-02.AC-003
+    
+  - criterion: "AC-002: Check for requirements template files"
+    status: in_progress
+    test_file: tests/layer/test_template_availability.py
+    related_feature_ac: FEATURE-003-03-02.AC-004
+    
+  - criterion: "AC-003: Validate pyproject.toml or setup.py exists"
+    status: implemented
+    test_file: tests/layer/test_project_config.py
+    
+  - criterion: "AC-004: Provide guidance for missing structure elements"
+    status: in_progress
+    test_file: tests/layer/test_structure_guidance.py
+    related_feature_ac: FEATURE-003-03-02.AC-005
+
+implementations:
+  red_phase:
+    status: in_progress
+    test_files:
+      - path: tests/layer/structure_validator/test_project_structure_validator.py
+        requirement_id: LAYER-003-03-02-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 14
+        status: in_progress
+  
+  green_phase:
+    status: in_progress
+    implementation_files:
+      - path: src/prerequisites/structure_validator.py
+        requirement_id: LAYER-003-03-02-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Validate directory structure (src/, tests/)"
+          - "Check template availability"
+          - "Validate project configuration files"
+          - "Generate structure setup guidance"
+        status: in_progress
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/prerequisites/structure_validator.py
+      requirements: [LAYER-003-03-02-03]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+success_criteria:
+  - "Project structure validated correctly"
+  - "Template files verified"
+  - "Configuration files checked"
+  - "Setup guidance provided"

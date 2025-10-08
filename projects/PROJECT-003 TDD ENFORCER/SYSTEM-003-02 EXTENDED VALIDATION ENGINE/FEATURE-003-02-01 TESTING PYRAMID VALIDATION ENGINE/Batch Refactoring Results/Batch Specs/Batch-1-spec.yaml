@@ -1,0 +1,245 @@
+---
+# Batch 1: Test File Generation - MANUAL REFACTORING SPECIFICATION
+# Created: 2025-10-08
+# Phase: RED-GREEN-REFACTOR (MANUAL IMPLEMENTATION REQUIRED)
+# Behaviors: 10
+
+# ⚠️  IMPORTANT: This is a SPECIFICATION for MANUAL refactoring
+# ⚠️  The batch_refactoring_automation.py tool is a PLANNING/TRACKING tool only
+# ⚠️  You must MANUALLY edit each file listed below to implement refactoring
+# ⚠️  The tool generates test templates, tracks progress, and verifies results
+# ⚠️  The tool does NOT automatically refactor code
+
+metadata:
+  batch_number: 1
+  batch_name: "Test File Generation"
+  target_days: "Days 1-2"
+  estimated_hours: 8.0
+  total_behaviors: 10
+  priority: "HIGH"
+  dependencies: []
+  automation_level: "MANUAL"  # Tool provides planning/tracking only
+  implementation_type: "DEVELOPER_MANUAL_REFACTORING"
+
+objective: |
+  MANUAL REFACTORING OBJECTIVE:
+  Refactor all test file generation behaviors from ACTOR (creating files) 
+  to VALIDATOR (validating file paths). These methods should receive file 
+  paths from PROJECT-002 instead of creating files themselves.
+  
+  YOU MUST MANUALLY:
+  1. Open each file listed in behaviors section below
+  2. Navigate to the line number
+  3. Change the ACTOR code to VALIDATOR code (see refactoring_pattern)
+  4. Update method signatures to accept file paths
+  5. Return ValidationResult instead of creating files
+  6. Run tests to verify refactoring is correct
+
+refactoring_pattern: |
+  BEFORE (ACTOR):
+    test_file.write_text(test_content)  # Creates file
+  
+  AFTER (VALIDATOR):
+    def validate_test_file(test_file_path: str) -> ValidationResult:
+        if not Path(test_file_path).exists():
+            return ValidationResult(status="FAIL", reason="File not found")
+        # Validate content
+        return ValidationResult(status="PASS")
+
+behaviors:
+  - behavior_id: "BATCH-1-001"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 299
+    method: "_generate_test_file_for_criterion"
+    current_behavior: "test_file.write_text(test_content)"
+    target_behavior: "validate_test_file(test_file_path: str)"
+    description: "Creates test file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def _generate_test_file_for_criterion(self, criterion, requirement, test_dir, index)"
+      after: "def validate_test_file_for_criterion(self, test_file_path: str, criterion, requirement)"
+    refactoring_notes: |
+      - Remove file creation logic
+      - Accept test_file_path as parameter
+      - Return ValidationResult
+      - Validate file exists and contains correct structure
+
+  - behavior_id: "BATCH-1-002"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 533
+    method: "generate_implementation_stub"
+    current_behavior: "impl_file.write_text(impl_content)"
+    target_behavior: "validate_implementation_file(impl_file_path: str)"
+    description: "Creates implementation file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def generate_implementation_stub(self, requirement, workspace)"
+      after: "def validate_implementation_file(self, impl_file_path: str, requirement)"
+    refactoring_notes: |
+      - Remove file creation logic
+      - Accept impl_file_path as parameter
+      - Return ValidationResult
+      - Validate file exists and has correct structure
+
+  - behavior_id: "BATCH-1-003"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 574
+    method: "update_test_with_implementation"
+    current_behavior: "test_file.write_text(updated_content)"
+    target_behavior: "validate_test_update(test_file_path: str)"
+    description: "Updates test file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def update_test_with_implementation(self, test_path, impl_path)"
+      after: "def validate_test_update(self, test_file_path: str, expected_updates)"
+    refactoring_notes: |
+      - Remove file update logic
+      - Accept test_file_path as parameter
+      - Return ValidationResult
+      - Validate test was updated correctly by PROJECT-002
+
+  - behavior_id: "BATCH-1-004"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 596
+    method: "_write_python_file"
+    current_behavior: "py_file.write_text('\\n'.join(lines))"
+    target_behavior: "validate_python_file(py_file_path: str)"
+    description: "Writes Python file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def _write_python_file(self, path, lines)"
+      after: "def validate_python_file(self, py_file_path: str, expected_content)"
+    refactoring_notes: |
+      - Remove file writing logic
+      - Accept py_file_path as parameter
+      - Return ValidationResult
+      - Validate file content matches expected
+
+  - behavior_id: "BATCH-1-005"
+    file: "src/data_access/test_generation_data_access.py"
+    line: 391
+    method: "create_demo_test"
+    current_behavior: "demo_test.write_text(test_content)"
+    target_behavior: "validate_demo_test(demo_test_path: str)"
+    description: "Creates demo test - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def create_demo_test(self, base_path, requirement)"
+      after: "def validate_demo_test(self, demo_test_path: str, requirement)"
+    refactoring_notes: |
+      - Remove demo test creation
+      - Accept demo_test_path as parameter
+      - Return ValidationResult
+      - Validate demo test structure and content
+
+  - behavior_id: "BATCH-1-006"
+    file: "src/business_logic/test_generation_verification_logic.py"
+    line: 907
+    method: "generate_verification_test"
+    current_behavior: "demo_test.write_text(test_content)"
+    target_behavior: "validate_generated_test(test_path: str)"
+    description: "Generates test file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def generate_verification_test(self, working_directory, requirement)"
+      after: "def validate_generated_test(self, test_path: str, requirement)"
+    refactoring_notes: |
+      - Remove test generation
+      - Accept test_path as parameter
+      - Return ValidationResult
+      - Validate test was generated correctly
+
+  - behavior_id: "BATCH-1-007"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 480
+    method: "_create_parser_file"
+    current_behavior: "f.write(parser_content)"
+    target_behavior: "validate_parser_file(parser_file_path: str)"
+    description: "Creates parser file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def _create_parser_file(self, output_path)"
+      after: "def validate_parser_file(self, parser_file_path: str)"
+    refactoring_notes: |
+      - Remove parser file creation
+      - Accept parser_file_path as parameter
+      - Return ValidationResult
+      - Validate parser file exists and is correct
+
+  - behavior_id: "BATCH-1-008"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 504
+    method: "_create_generator_file"
+    current_behavior: "f.write(generator_content)"
+    target_behavior: "validate_generator_file(generator_file_path: str)"
+    description: "Creates generator file - should validate instead"
+    review_needed: false
+    signature_change:
+      before: "def _create_generator_file(self, output_path)"
+      after: "def validate_generator_file(self, generator_file_path: str)"
+    refactoring_notes: |
+      - Remove generator file creation
+      - Accept generator_file_path as parameter
+      - Return ValidationResult
+      - Validate generator file exists and is correct
+
+  - behavior_id: "BATCH-1-009"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 820
+    method: "_save_baseline"
+    current_behavior: "baseline_file.write(...)"
+    target_behavior: "validate_baseline_file(baseline_path: str)"
+    description: "Creates baseline file - REVIEW if EVIDENCE"
+    review_needed: true
+    signature_change:
+      before: "def _save_baseline(self, output_path, baseline_data)"
+      after: "def validate_baseline_file(self, baseline_path: str)"
+    refactoring_notes: |
+      REVIEW NEEDED: Determine if this is EVIDENCE (OK to keep) or ACTOR (refactor)
+      - If EVIDENCE (.json/.xml): Keep as-is (validation evidence)
+      - If ACTOR (.py test file): Refactor to validator
+      - Check actual file extension and content
+
+  - behavior_id: "BATCH-1-010"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 863
+    method: "_save_results"
+    current_behavior: "results_file.write(...)"
+    target_behavior: "validate_results_file(results_path: str)"
+    description: "Creates results file - REVIEW if EVIDENCE"
+    review_needed: true
+    signature_change:
+      before: "def _save_results(self, output_path, results_data)"
+      after: "def validate_results_file(self, results_path: str)"
+    refactoring_notes: |
+      REVIEW NEEDED: Determine if this is EVIDENCE (OK to keep) or ACTOR (refactor)
+      - If EVIDENCE (.json/.xml/.html): Keep as-is (validation evidence)
+      - If ACTOR (.py test file): Refactor to validator
+      - Check actual file extension and content
+
+success_criteria:
+  red_phase:
+    - "10 tests created in tests/test_batch_1_refactoring.py"
+    - "Tests FAIL or SKIP with current code (actor behavior detected)"
+    - "Clear error messages showing file creation attempts"
+  
+  green_phase:
+    - "All 10 behaviors refactored to validator pattern"
+    - "Methods accept file paths instead of creating files"
+    - "All tests PASS (no file creation detected)"
+    - "ValidationResult returned from all methods"
+  
+  refactor_phase:
+    - "Code quality improved (pylint, black)"
+    - "All tests still PASS"
+    - "Documentation updated"
+    - "Type hints added"
+
+checkpoint:
+  after_completion:
+    - "Run full FEATURE-003-02-01 test suite (66 tests)"
+    - "Verify all tests still pass"
+    - "Commit changes with message: 'Batch 1 complete: Test file generation refactored'"
+    - "Tag: batch-1-complete"
+
+next_batch: "Batch-2-spec.yaml"

@@ -1,0 +1,22 @@
+---
+# Batch 9: Evidence Storage Review (Part 3 of 4)
+# Created: 2025-10-08
+# Behaviors: ~50
+
+metadata:
+  batch_number: 9
+  batch_name: "Evidence Storage Review - Part 3"
+  target_days: "Day 9 Morning"
+  estimated_hours: 3.0
+  total_behaviors: 50
+  priority: "MEDIUM"
+  dependencies: ["Batch-8"]
+  review_only: true
+
+objective: "Continue evidence storage review (operations 101-150)"
+
+behaviors:
+  - behavior_id: "BATCH-9-001 through BATCH-9-050"
+    note: "Third 50 evidence storage operations to review"
+
+next_batch: "Batch-10-spec.yaml"

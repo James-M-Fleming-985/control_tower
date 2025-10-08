@@ -255,49 +255,86 @@ class TDDWorkflowEngine:
         
         return result
     
-    def _generate_test_file_for_criterion(self, criterion: AcceptanceCriterion, 
-                                        requirement: ParsedRequirement, 
-                                        test_dir: Path, index: int) -> Path:
-        """Generate a single test file for an acceptance criterion"""
-        
-        # Create test file name
-        safe_title = requirement.title.lower().replace(" ", "_").replace("-", "_")
-        test_file = test_dir / f"test_{safe_title}_{criterion.id.lower()}.py"
-        
-        # Generate test content
-        test_content = f'''"""
-Generated test file for {requirement.title}
-Acceptance Criterion: {criterion.description}
-
-This test should FAIL initially (RED phase)
-Implementation will be created in GREEN phase
-"""
-import pytest
-
-
-class Test{requirement.title.replace(" ", "").replace("-", "")}_{criterion.id}:
-    """Test class for {criterion.description}"""
-    
-    def test_{criterion.id.lower()}_{safe_title}(self):
+    def validate_test_file_for_criterion(self, test_file_path: str, 
+                                        criterion: AcceptanceCriterion, 
+                                        requirement: ParsedRequirement) -> 'ValidationResult':
         """
-        Test: {criterion.description}
+        Validate that test file exists and has correct structure for criterion.
         
-        This test is intentionally failing to start RED phase of TDD cycle.
-        Implementation will be added in GREEN phase.
+        REFACTORED: Changed from ACTOR (creating files) to VALIDATOR (validating files).
+        File creation is now handled by PROJECT-002.
+        This method validates files created by the actor.
         """
-        # This assertion will fail until implementation is created
-        assert False, "Implementation not yet created - RED phase active"
+        from pathlib import Path
         
-        # TODO: Replace with actual test logic in GREEN phase
-        # Example test structure for this criterion:
-        # Given: {criterion.description}
-        # When: [trigger condition]
-        # Then: [expected result]
-'''
+        test_file = Path(test_file_path)
         
-        # Write test file
-        test_file.write_text(test_content)
-        return test_file
+        # Validate file exists
+        if not test_file.exists():
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Test file not found: {test_file_path}"],
+                allows_progression=False
+            )
+        
+        # Validate file is actually a file (not directory)
+        if not test_file.is_file():
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Path is not a file: {test_file_path}"],
+                allows_progression=False
+            )
+        
+        # Validate file has .py extension
+        if test_file.suffix != '.py':
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Test file must be .py: {test_file_path}"],
+                allows_progression=False
+            )
+        
+        # Read and validate content
+        try:
+            content = test_file.read_text()
+            
+            # Validate test contains expected criterion ID
+            if criterion.id.lower() not in content.lower():
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=[f"Test file missing criterion {criterion.id}"],
+                    allows_progression=False
+                )
+            
+            # Validate test contains test class
+            if "class Test" not in content:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=["Test file missing test class"],
+                    allows_progression=False
+                )
+            
+            # Validate test contains test method
+            if "def test_" not in content:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=["Test file missing test method"],
+                    allows_progression=False
+                )
+            
+            # All validations passed
+            return ValidationResult(
+                is_valid=True,
+                rejection_reasons=None,
+                allows_progression=True,
+                validation_score=1.0
+            )
+            
+        except Exception as e:
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Error reading test file: {str(e)}"],
+                allows_progression=False
+            )
     
     # =====================================================
     # FR-BL-003-002: RED-GREEN-REFACTOR Automation
@@ -485,93 +522,170 @@ class Test{requirement.title.replace(" ", "").replace("-", "")}_{criterion.id}:
         except Exception as e:
             return {"total": 0, "passed": 0, "failed": 0, "failures": [str(e)], "output": f"Error: {e}"}
     
-    def _create_minimal_implementation(self, requirement: ParsedRequirement, workspace: Path) -> List[Path]:
-        """Create minimal implementation to make tests pass"""
-        impl_files = []
+    def validate_implementation_file(self, impl_file_path: str, requirement: ParsedRequirement) -> 'ValidationResult':
+        """
+        Validate that implementation file exists and has correct structure.
         
-        # Create source directory
-        src_dir = workspace / "src"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate minimal implementation based on requirement
-        safe_title = requirement.title.lower().replace(" ", "_").replace("-", "_")
-        impl_file = src_dir / f"{safe_title}.py"
-        
-        impl_content = f'''"""
-Minimal implementation for {requirement.title}
-Generated during GREEN phase of TDD cycle
-
-This implementation provides the minimum code needed to make tests pass.
-Further enhancements will be added during REFACTOR phase.
-"""
-
-
-class {requirement.title.replace(" ", "").replace("-", "")}:
-    """Minimal implementation for {requirement.title}"""
-    
-    def __init__(self):
-        """Initialize {requirement.title}"""
-        self.initialized = True
-    
-    def execute(self):
-        """Basic execution method - minimal implementation"""
-        # TODO: Implement actual business logic
-        return True
-
-
-# Module-level functions for immediate test compatibility
-def process_requirement():
-    """Process requirement - basic implementation for test compatibility"""
-    return True
-
-
-def validate_input(data):
-    """Validate input - basic implementation"""
-    return data is not None
-'''
-        
-        impl_file.write_text(impl_content)
-        impl_files.append(impl_file)
-        
-        # Update test files to use implementation instead of failing
-        test_dir = workspace / "tests"
-        if test_dir.exists():
-            for test_file in test_dir.rglob("test_*.py"):
-                self._update_test_file_for_green_phase(test_file, impl_file)
-        
-        return impl_files
-    
-    def _update_test_file_for_green_phase(self, test_file: Path, impl_file: Path):
-        """Update test file to use implementation instead of failing assertions"""
-        content = test_file.read_text()
-        
-        # Replace the hardcoded failure with basic implementation test
-        updated_content = content.replace(
-            'assert False, "Implementation not yet created - RED phase active"',
-            '''# Import the implementation
-        import sys
-        sys.path.append(str(Path(__file__).parent.parent.parent / "src"))
+        REFACTORED: Changed from ACTOR (creating files) to VALIDATOR (validating files).
+        File creation is now handled by PROJECT-002.
+        This method validates implementation files created by the actor.
+        """
         from pathlib import Path
         
-        # Basic implementation test - GREEN phase
-        assert True, "Basic implementation created - GREEN phase active"'''
-        )
+        impl_file = Path(impl_file_path)
         
-        # Add import at the top if not present
-        if "from pathlib import Path" not in updated_content:
-            lines = updated_content.split('\n')
-            # Insert after existing imports
-            import_line = "from pathlib import Path"
-            if import_line not in updated_content:
-                # Find the last import line
-                last_import_idx = 0
-                for i, line in enumerate(lines):
-                    if line.strip().startswith(('import ', 'from ')):
-                        last_import_idx = i
-                lines.insert(last_import_idx + 1, import_line)
-                updated_content = '\n'.join(lines)
+        # Validate file exists
+        if not impl_file.exists():
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Implementation file not found: {impl_file_path}"],
+                allows_progression=False
+            )
         
-        test_file.write_text(updated_content)
+        # Validate file is actually a file
+        if not impl_file.is_file():
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Path is not a file: {impl_file_path}"],
+                allows_progression=False
+            )
+        
+        # Validate file has .py extension
+        if impl_file.suffix != '.py':
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Implementation file must be .py: {impl_file_path}"],
+                allows_progression=False
+            )
+        
+        # Read and validate content
+        try:
+            content = impl_file.read_text()
+            
+            # Validate file contains a class or function
+            if "class " not in content and "def " not in content:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=["Implementation file must contain class or function definitions"],
+                    allows_progression=False
+                )
+            
+            # Validate basic Python syntax (try to compile)
+            try:
+                compile(content, impl_file_path, 'exec')
+            except SyntaxError as e:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=[f"Syntax error in implementation: {str(e)}"],
+                    allows_progression=False
+                )
+            
+            # All validations passed
+            return ValidationResult(
+                is_valid=True,
+                rejection_reasons=None,
+                allows_progression=True,
+                validation_score=1.0
+            )
+            
+        except Exception as e:
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Error reading implementation file: {str(e)}"],
+                allows_progression=False
+            )
+    
+    def _update_test_files_for_implementation(self, test_dir: Path, impl_file: Path) -> List['ValidationResult']:
+        """
+        Validate that test files have been updated to use implementation.
+        
+        REFACTORED: Changed from modifying test files to validating they've been updated.
+        Returns list of validation results for each test file.
+        """
+        results = []
+        
+        if not test_dir.exists():
+            return [ValidationResult(
+                is_valid=False,
+                rejection_reasons=["Test directory does not exist"],
+                allows_progression=False
+            )]
+        
+        for test_file in test_dir.rglob("test_*.py"):
+            result = self.validate_test_update(str(test_file), str(impl_file))
+            results.append(result)
+        
+        return results
+    
+    def validate_test_update(self, test_file_path: str, impl_file_path: str) -> 'ValidationResult':
+        """
+        Validate that test file has been updated to use implementation.
+        
+        REFACTORED: Changed from ACTOR (updating files) to VALIDATOR (validating updates).
+        File updates are now handled by PROJECT-002.
+        This method validates that tests have been properly updated.
+        """
+        from pathlib import Path
+        
+        test_file = Path(test_file_path)
+        
+        # Validate test file exists
+        if not test_file.exists():
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Test file not found: {test_file_path}"],
+                allows_progression=False
+            )
+        
+        try:
+            content = test_file.read_text()
+            
+            # Validate test no longer has RED phase failure assertion
+            if 'assert False, "Implementation not yet created - RED phase active"' in content:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=["Test still contains RED phase failure - not updated for GREEN phase"],
+                    allows_progression=False
+                )
+            
+            # Validate test has been updated to test actual implementation
+            has_implementation_test = (
+                "GREEN phase" in content or
+                "implementation" in content.lower() or
+                "import" in content  # At minimum should import something
+            )
+            
+            if not has_implementation_test:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=["Test does not appear to test implementation"],
+                    allows_progression=False
+                )
+            
+            # Validate test file has valid Python syntax
+            try:
+                compile(content, test_file_path, 'exec')
+            except SyntaxError as e:
+                return ValidationResult(
+                    is_valid=False,
+                    rejection_reasons=[f"Syntax error in test file: {str(e)}"],
+                    allows_progression=False
+                )
+            
+            # All validations passed
+            return ValidationResult(
+                is_valid=True,
+                rejection_reasons=None,
+                allows_progression=True,
+                validation_score=1.0
+            )
+            
+        except Exception as e:
+            return ValidationResult(
+                is_valid=False,
+                rejection_reasons=[f"Error validating test update: {str(e)}"],
+                allows_progression=False
+            )
     
     def _apply_refactoring_improvements(self, workspace: Path) -> int:
         """Apply code quality improvements during REFACTOR phase"""

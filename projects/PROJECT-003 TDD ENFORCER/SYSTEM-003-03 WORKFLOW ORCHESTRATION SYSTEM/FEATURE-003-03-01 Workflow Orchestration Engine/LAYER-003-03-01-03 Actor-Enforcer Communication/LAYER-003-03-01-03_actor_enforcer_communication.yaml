@@ -1,0 +1,140 @@
+# LAYER-003-03-01-03: Actor-Enforcer Communication
+# Handles subprocess communication between PROJECT-002 (Actor) and PROJECT-003 (Enforcer)
+
+metadata:
+  requirement_id: LAYER-003-03-01-03
+  requirement_name: Actor-Enforcer Communication
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-01
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: high  # Communication interface is critical
+  
+  estimated_effort_hours: 6
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: not_started
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 10
+    coverage_threshold: 0.90
+    focus_areas:
+      - JSON request parsing
+      - JSON response generation
+      - Schema validation
+      - Error response formatting
+  
+  integration_tests:
+    required: true
+    minimum_count: 8
+    coverage_threshold: 0.80
+    focus_areas:
+      - Subprocess communication with actor
+      - Request/response round-trip
+      - Error handling and recovery
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Parse JSON request from actor with validation"
+    status: not_implemented
+    test_file: tests/layer/test_request_parsing.py
+    related_feature_ac: FEATURE-003-03-01.AC-001
+    
+  - criterion: "AC-002: Generate structured JSON response for actor"
+    status: not_implemented
+    test_file: tests/layer/test_response_generation.py
+    related_feature_ac: FEATURE-003-03-01.AC-003
+    
+  - criterion: "AC-003: Validate request schema (requirement_file, team_size, risk_level)"
+    status: not_implemented
+    test_file: tests/layer/test_schema_validation.py
+    
+  - criterion: "AC-004: Never crash - always return valid JSON (even on errors)"
+    status: not_implemented
+    test_file: tests/layer/test_error_handling.py
+
+implementations:
+  red_phase:
+    status: not_started
+    test_files:
+      - path: tests/layer/actor_enforcer/test_communication_interface.py
+        requirement_id: LAYER-003-03-01-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 12
+        status: not_started
+  
+  green_phase:
+    status: not_started
+    implementation_files:
+      - path: src/integration/actor_enforcer_interface.py
+        requirement_id: LAYER-003-03-01-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Parse and validate JSON requests from actor"
+          - "Generate structured JSON responses"
+          - "Validate request/response schemas"
+          - "Handle errors gracefully with JSON error responses"
+        status: not_started
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/integration/actor_enforcer_interface.py
+      requirements: [LAYER-003-03-01-03]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+dependencies:
+  - requirement_id: LAYER-003-03-01-01
+    name: Workflow State Management
+    relationship: "Interface uses state for response generation"
+  - requirement_id: LAYER-003-03-01-02
+    name: Stage Sequencing Engine
+    relationship: "Interface triggers sequencer based on request"
+
+# JSON Contract Specification (from SYSTEM-003-03)
+json_contract:
+  request_schema:
+    type: object
+    required: [requirement_file, layer_name, team_size, risk_level]
+    properties:
+      requirement_file: {type: string, description: "Path to requirement YAML"}
+      layer_name: {type: string, description: "Layer being validated"}
+      team_size: {type: string, enum: [small, medium, large, enterprise]}
+      risk_level: {type: string, enum: [low, medium, high, critical]}
+      workflow_mode: {type: string, enum: [full, stage_by_stage], default: full}
+      actor_metadata: {type: object, description: "Additional context"}
+  
+  response_schema:
+    type: object
+    required: [status, violations, results, traceability]
+    properties:
+      status: {type: string, enum: [success, failure, warning]}
+      violations: {type: array, description: "Quality gate violations"}
+      results: {type: object, description: "Stage execution results"}
+      traceability: {type: object, description: "Requirements coverage"}
+      remediation_options: {type: array, description: "Options for actor"}
+      workflow_state: {type: object, description: "State for restart"}
+
+success_criteria:
+  - "JSON requests parsed and validated correctly"
+  - "JSON responses generated with all required fields"
+  - "Schema violations detected and reported"
+  - "Enforcer never crashes - always returns JSON"

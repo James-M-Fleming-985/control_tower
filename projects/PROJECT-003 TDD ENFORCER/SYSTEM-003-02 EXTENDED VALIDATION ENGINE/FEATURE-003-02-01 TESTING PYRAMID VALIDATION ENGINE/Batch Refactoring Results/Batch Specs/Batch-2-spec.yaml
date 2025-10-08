@@ -1,0 +1,126 @@
+---
+# Batch 2: Test Directory Creation
+# Created: 2025-10-08
+# Phase: RED-GREEN-REFACTOR
+# Behaviors: 8
+
+metadata:
+  batch_number: 2
+  batch_name: "Test Directory Creation"
+  target_days: "Day 3"
+  estimated_hours: 4.0
+  total_behaviors: 8
+  priority: "HIGH"
+  dependencies: ["Batch-1"]
+
+objective: |
+  Refactor all test directory creation behaviors from ACTOR (creating directories) 
+  to VALIDATOR (validating directory paths). These methods should receive directory 
+  paths from PROJECT-002 instead of creating directories themselves.
+
+refactoring_pattern: |
+  BEFORE (ACTOR):
+    test_dir.mkdir(parents=True, exist_ok=True)  # Creates directory
+  
+  AFTER (VALIDATOR):
+    def validate_test_directory(test_dir_path: str) -> ValidationResult:
+        if not Path(test_dir_path).exists():
+            return ValidationResult(status="FAIL", reason="Directory not found")
+        if not Path(test_dir_path).is_dir():
+            return ValidationResult(status="FAIL", reason="Path is not a directory")
+        return ValidationResult(status="PASS")
+
+behaviors:
+  - behavior_id: "BATCH-2-001"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 444
+    method: "_setup_test_environment"
+    current_behavior: "test_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_test_directory(test_dir_path: str)"
+    description: "Creates test directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-002"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 199
+    method: "setup_workspace"
+    current_behavior: "workspace.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_workspace(workspace_path: str)"
+    description: "Creates workspace directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-003"
+    file: "src/user_interface/tdd_workflow_interface.py"
+    line: 562
+    method: "_ensure_output_directory"
+    current_behavior: "output_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_output_directory(output_dir_path: str)"
+    description: "Creates output directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-004"
+    file: "src/user_interface/tdd_workflow_interface.py"
+    line: 569
+    method: "_create_report_directory"
+    current_behavior: "report_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_report_directory(report_dir_path: str)"
+    description: "Creates report directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-005"
+    file: "src/data_access/test_generation_data_access.py"
+    line: 125
+    method: "_ensure_test_directory_exists"
+    current_behavior: "test_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_test_directory_structure(test_dir_path: str)"
+    description: "Creates test directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-006"
+    file: "legacy/utilities/tdd_workflow_engine.py"
+    line: 345
+    method: "_create_implementation_directory"
+    current_behavior: "impl_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_implementation_directory(impl_dir_path: str)"
+    description: "Creates implementation directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-007"
+    file: "src/business_logic/test_generation_verification_logic.py"
+    line: 234
+    method: "_prepare_test_workspace"
+    current_behavior: "workspace_dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_test_workspace(workspace_path: str)"
+    description: "Creates workspace directory - should validate instead"
+    review_needed: false
+
+  - behavior_id: "BATCH-2-008"
+    file: "legacy/utilities/tdd_workflow_enforcer.py"
+    line: 678
+    method: "_initialize_output_structure"
+    current_behavior: "for dir in dirs: dir.mkdir(parents=True, exist_ok=True)"
+    target_behavior: "validate_output_structure(base_path: str, expected_dirs: List[str])"
+    description: "Creates multiple directories - should validate instead"
+    review_needed: false
+
+success_criteria:
+  red_phase:
+    - "8 tests created in tests/test_batch_2_refactoring.py"
+    - "Tests FAIL with current code (directory creation detected)"
+  
+  green_phase:
+    - "All 8 behaviors refactored to validator pattern"
+    - "Methods accept directory paths instead of creating directories"
+    - "All tests PASS"
+  
+  refactor_phase:
+    - "Code quality improved"
+    - "All tests still PASS"
+
+checkpoint:
+  after_completion:
+    - "Run full test suite"
+    - "Verify all tests pass"
+    - "Commit: 'Batch 2 complete: Directory creation refactored'"
+
+next_batch: "Batch-3-spec.yaml"

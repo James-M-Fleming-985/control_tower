@@ -1,0 +1,105 @@
+---
+# Batch 1 Refactoring Specification
+# Generated: 2025-10-08T09:01:26.245161
+
+metadata:
+  prompt_type: failing_tests
+  refactor_id: REFACTOR-BATCH-1
+  batch_name: Test File Generation
+  phase: RED
+  created: 2025-10-08
+  behaviors_count: 10
+
+refactoring_context:
+  objective: |
+    Systematic refactoring of 10 actor behaviors in Batch 1.
+    These behaviors currently create/write files (ACTOR behavior).
+    Target: Change to validate files (VALIDATOR behavior).
+  
+  approach: |
+    RED-GREEN-REFACTOR TDD approach for each behavior:
+    1. RED: Write test enforcing validator behavior → test FAILS
+    2. GREEN: Refactor code to validator behavior → test PASSES
+    3. REFACTOR: Improve code quality → tests still PASS
+
+behaviors:
+
+  behavior_001:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 299
+    current_behavior: test_file.write_text(test_content)
+    target_behavior: validate_test_file(test_file_path: str)
+    description: Creates test file - should validate instead
+    review_needed: False
+
+  behavior_002:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 533
+    current_behavior: impl_file.write_text(impl_content)
+    target_behavior: validate_implementation_file(impl_file_path: str)
+    description: Creates implementation file - should validate instead
+    review_needed: False
+
+  behavior_003:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 574
+    current_behavior: test_file.write_text(updated_content)
+    target_behavior: validate_test_update(test_file_path: str)
+    description: Updates test file - should validate instead
+    review_needed: False
+
+  behavior_004:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 596
+    current_behavior: py_file.write_text('\n'.join(lines))
+    target_behavior: validate_python_file(py_file_path: str)
+    description: Writes Python file - should validate instead
+    review_needed: False
+
+  behavior_005:
+    file: src/data_access/test_generation_data_access.py
+    line: 391
+    current_behavior: demo_test.write_text(test_content)
+    target_behavior: validate_demo_test(demo_test_path: str)
+    description: Creates demo test - should validate instead
+    review_needed: False
+
+  behavior_006:
+    file: src/business_logic/test_generation_verification_logic.py
+    line: 907
+    current_behavior: demo_test.write_text(test_content)
+    target_behavior: validate_generated_test(test_path: str)
+    description: Generates test file - should validate instead
+    review_needed: False
+
+  behavior_007:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 480
+    current_behavior: f.write(parser_content)
+    target_behavior: validate_parser_file(parser_file_path: str)
+    description: Creates parser file - should validate instead
+    review_needed: False
+
+  behavior_008:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 504
+    current_behavior: f.write(generator_content)
+    target_behavior: validate_generator_file(generator_file_path: str)
+    description: Creates generator file - should validate instead
+    review_needed: False
+
+  behavior_009:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 820
+    current_behavior: baseline_file.write(...)
+    target_behavior: validate_baseline_file(baseline_path: str)
+    description: Creates baseline file - REVIEW if EVIDENCE
+    review_needed: True
+
+  behavior_010:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 863
+    current_behavior: results_file.write(...)
+    target_behavior: validate_results_file(results_path: str)
+    description: Creates results file - REVIEW if EVIDENCE
+    review_needed: True

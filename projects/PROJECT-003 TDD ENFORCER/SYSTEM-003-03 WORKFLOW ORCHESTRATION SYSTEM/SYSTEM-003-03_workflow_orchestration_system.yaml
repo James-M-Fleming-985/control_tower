@@ -1,0 +1,494 @@
+# SYSTEM-003-03: Workflow Orchestration System
+# Machine-readable requirement specification for TDD workflow orchestration
+# This system coordinates the complete TDD enforcement workflow with actor-enforcer architecture
+
+metadata:
+  requirement_id: SYSTEM-003-03
+  requirement_name: Workflow Orchestration System
+  requirement_type: Application System
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  # Team size determines implementation complexity expectations
+  team_size: medium  # 4-10 developers for infrastructure system
+  
+  # Risk level determines test coverage thresholds
+  risk_level: high  # Enforcer is critical infrastructure for all development
+  
+  # Timeline and status
+  estimated_effort_hours: 72
+  actual_effort_hours: 61.2
+  progress_percentage: 85
+  status: in_progress
+  
+  # Dependencies
+  dependencies:
+    - SYSTEM-003-01  # Core TDD Workflow Engine
+    - SYSTEM-003-02  # Extended Validation Engine
+    - PROJECT-002    # Actor system that invokes this enforcer
+
+# Testing requirements based on system level + high risk
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 30
+    coverage_threshold: 0.95  # System level (95%) base
+    focus_areas:
+      - Workflow state management
+      - Stage orchestration logic
+      - Actor-enforcer JSON contract validation
+      - Team size validation logic
+      - Requirements traceability algorithms
+      - Test quality validation (no mocks detection)
+    
+  integration_tests:
+    required: true
+    minimum_count: 20
+    coverage_threshold: 0.90  # System level (90%) base
+    focus_areas:
+      - Core workflow engine integration (SYSTEM-003-01)
+      - Extended validation engine integration (SYSTEM-003-02)
+      - Subprocess communication with actor
+      - End-to-end stage execution
+      - Failure handling and recovery
+      - Prerequisites validation
+    
+  e2e_tests:
+    required: true
+    minimum_count: 12
+    coverage_threshold: 0.80  # System level (80%) base
+    focus_areas:
+      - Complete workflow orchestration (all 10 stages)
+      - Actor-enforcer subprocess integration
+      - Multi-stage failure and recovery
+      - Quality gates enforcement
+      - Requirements traceability validation
+      - Team size appropriateness validation
+
+  # Financial domain is HIGH RISK - special requirements
+  financial_domain_requirements:
+    applicable: false  # This is infrastructure, not financial logic
+    
+  # Performance testing for critical infrastructure
+  performance_tests:
+    required: true
+    max_workflow_duration_seconds: 900  # 15 minutes
+    max_prerequisites_validation_seconds: 30
+    max_stage_execution_seconds: 120
+
+# Quality gates that enforcer MUST enforce
+quality_gates:
+  # No mocks unless requirement explicitly allows
+  no_mocks_unless_specified: true
+  mock_policy:
+    default: prohibited
+    exceptions:
+      - requirement_contains: "demo"
+      - requirement_contains: "sample"
+      - requirement_contains: "mock"
+    max_mock_percentage: 0.50  # If mocks allowed, must be < 50% of test
+  
+  # Real failing tests required - no placeholders
+  real_failing_tests_required: true
+  prohibited_patterns:
+    - "assert True"
+    - "pass  # TODO"
+    - "# placeholder test"
+  required_patterns:
+    - "assert .* == .*"  # Real assertions
+    - "assert raises"    # Exception testing
+    - "assert .* in .*"  # State verification
+  
+  # Team size enforcement
+  team_size_enforcement: true
+  team_size_rules:
+    small:  # 1-3 developers
+      max_features_per_system: 5
+      max_abstraction_layers: 2
+      allowed_patterns: ["Factory", "Strategy", "Simple Repository"]
+      prohibited_patterns: ["CQRS", "Event Sourcing", "Microservices"]
+    medium:  # 4-10 developers
+      max_features_per_system: 15
+      max_abstraction_layers: 3
+      allowed_patterns: ["MVC", "Repository", "Service Layer", "Factory"]
+      prohibited_patterns: ["Over-complicated DDD", "Unnecessary microservices"]
+    large:  # 11-50 developers
+      max_features_per_system: 40
+      max_abstraction_layers: 4
+      allowed_patterns: ["CQRS", "Event Sourcing", "DDD", "Microservices"]
+      prohibited_patterns: ["Too simple for team size", "Missing coordination"]
+    enterprise:  # 50+ developers
+      max_features_per_system: 999  # No limit
+      max_abstraction_layers: 999    # No limit
+      required_patterns: ["Distributed systems", "Event-driven", "Multi-region"]
+      prohibited_patterns: ["Monolithic without justification"]
+  
+  # Full requirements verification (not keyword-based)
+  full_requirements_verification: true
+  traceability_requirements:
+    auto_discovery_required: true
+    manual_registry_required: true
+    must_match: true
+    orphaned_code_allowed: false
+    coverage_requirement: 1.0  # 100% of acceptance criteria must be implemented
+
+# Actor-Enforcer Architecture
+actor_enforcer_integration:
+  communication_method: subprocess
+  interface_type: JSON
+  
+  # JSON Request from Actor to Enforcer
+  request_schema:
+    type: object
+    required:
+      - requirement_file
+      - layer_name
+      - team_size
+      - risk_level
+    properties:
+      requirement_file:
+        type: string
+        description: "Absolute path to requirement YAML file"
+      layer_name:
+        type: string
+        description: "Name of layer being validated"
+      team_size:
+        type: string
+        enum: ["small", "medium", "large", "enterprise"]
+      risk_level:
+        type: string
+        enum: ["low", "medium", "high", "critical"]
+      workflow_mode:
+        type: string
+        enum: ["full", "stage_by_stage"]
+        default: "full"
+      actor_metadata:
+        type: object
+        description: "Additional context from actor"
+  
+  # JSON Response from Enforcer to Actor
+  response_schema:
+    type: object
+    required:
+      - status
+      - violations
+      - results
+      - traceability
+    properties:
+      status:
+        type: string
+        enum: ["success", "failure", "warning"]
+      violations:
+        type: array
+        description: "List of quality gate violations detected"
+        items:
+          type: object
+          properties:
+            violation_type:
+              type: string
+              enum: ["mock_detected", "placeholder_test", "coverage_below_threshold", 
+                     "team_size_mismatch", "missing_requirement", "orphaned_code",
+                     "traceability_mismatch", "no_red_phase", "green_before_red"]
+            severity:
+              type: string
+              enum: ["error", "warning", "info"]
+            file_path:
+              type: string
+            line_number:
+              type: integer
+            description:
+              type: string
+            remediation_suggestion:
+              type: string
+      results:
+        type: object
+        description: "Detailed stage execution results"
+        properties:
+          stages_completed:
+            type: array
+          stages_failed:
+            type: array
+          coverage_metrics:
+            type: object
+          performance_metrics:
+            type: object
+      traceability:
+        type: object
+        description: "Requirements coverage analysis"
+        properties:
+          auto_discovered:
+            type: array
+          manually_registered:
+            type: array
+          orphaned_files:
+            type: array
+          missing_implementations:
+            type: array
+      remediation_options:
+        type: array
+        description: "Options for actor to present to user"
+        items:
+          type: object
+          properties:
+            option_id:
+              type: string
+            description:
+              type: string
+            action:
+              type: string
+              enum: ["fix_and_retry", "continue_with_warning", "abort"]
+      workflow_state:
+        type: object
+        description: "State for restart capability"
+  
+  # Error handling - enforcer NEVER crashes
+  error_handling:
+    enforcer_must_not_crash: true
+    always_return_json: true
+    error_response_schema:
+      type: object
+      properties:
+        status:
+          type: string
+          const: "failure"
+        error_type:
+          type: string
+        error_message:
+          type: string
+        stack_trace:
+          type: string
+        remediation:
+          type: string
+
+# Implementation tracking (TDD phases)
+implementations:
+  red_phase:
+    status: in_progress
+    test_files:
+      # System-level tests
+      - path: tests/system/test_workflow_orchestration.py
+        requirement_id: SYSTEM-003-03
+        coverage_target: 0.95
+        test_count: 15
+        status: in_progress
+      
+      - path: tests/system/test_actor_enforcer_integration.py
+        requirement_id: SYSTEM-003-03
+        coverage_target: 0.90
+        test_count: 10
+        status: not_started
+      
+      - path: tests/system/test_quality_gates.py
+        requirement_id: SYSTEM-003-03
+        coverage_target: 0.95
+        test_count: 12
+        status: not_started
+      
+      - path: tests/system/test_team_size_validation.py
+        requirement_id: SYSTEM-003-03
+        coverage_target: 0.90
+        test_count: 8
+        status: not_started
+      
+      - path: tests/system/test_requirements_traceability.py
+        requirement_id: SYSTEM-003-03
+        coverage_target: 0.95
+        test_count: 10
+        status: not_started
+    
+    validation:
+      all_tests_failing_initially: true
+      tests_specify_acceptance_criteria: true
+      no_placeholder_tests: true
+  
+  green_phase:
+    status: in_progress
+    implementation_files:
+      # Core orchestration
+      - path: src/orchestration/workflow_orchestrator.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-FUNC-001  # Actor-triggered workflow
+          - REQ-FUNC-006  # Prerequisites validation
+          - REQ-FUNC-007  # Stage dependency management
+        status: in_progress
+      
+      # Actor-enforcer interface
+      - path: src/integration/actor_enforcer_interface.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-INT-003  # Subprocess integration
+          - REQ-INT-004  # Make command integration
+        status: not_started
+      
+      # Quality gates enforcement
+      - path: src/validation/quality_gates_enforcer.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-FUNC-002  # No mocks enforcement
+          - REQ-FUNC-003  # Team size validation
+          - REQ-FUNC-005  # Context-aware coverage
+        status: not_started
+      
+      # Requirements traceability
+      - path: src/validation/requirements_tracer.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-FUNC-004  # Full traceability
+          - REQ-TEST-006  # Traceability validation
+        status: not_started
+      
+      # Failure handling
+      - path: src/orchestration/failure_handler.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-FUNC-008  # Failure detection
+        status: not_started
+      
+      # Progress tracking
+      - path: src/monitoring/progress_tracker.py
+        requirement_id: SYSTEM-003-03
+        implements:
+          - REQ-FUNC-009  # Progress tracking
+        status: in_progress
+    
+    validation:
+      all_tests_passing: false  # In progress
+      coverage_thresholds_met: false  # In progress
+      no_over_engineering: true
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+    quality_metrics:
+      cyclomatic_complexity_max: 10
+      code_duplication_max_percentage: 0.05
+      maintainability_index_min: 70
+    validation:
+      all_tests_still_passing: null
+      coverage_maintained: null
+      quality_improved: null
+
+# Requirements traceability
+traceability:
+  # Auto-discovered via code scanning for # REQ-XXX comments
+  auto_discovered:
+    mechanism: "Scan all .py files for # REQ-XXX-XX-XX comments"
+    status: not_implemented
+    discovered_files: []
+  
+  # Manually registered in this YAML
+  manually_registered:
+    - file: src/orchestration/workflow_orchestrator.py
+      requirements: [REQ-FUNC-001, REQ-FUNC-006, REQ-FUNC-007]
+    - file: src/integration/actor_enforcer_interface.py
+      requirements: [REQ-INT-003, REQ-INT-004]
+    - file: src/validation/quality_gates_enforcer.py
+      requirements: [REQ-FUNC-002, REQ-FUNC-003, REQ-FUNC-005]
+    - file: src/validation/requirements_tracer.py
+      requirements: [REQ-FUNC-004, REQ-TEST-006]
+    - file: src/orchestration/failure_handler.py
+      requirements: [REQ-FUNC-008]
+    - file: src/monitoring/progress_tracker.py
+      requirements: [REQ-FUNC-009]
+  
+  # Validation status
+  verification_status: pending
+  mismatches: []
+  orphaned_files: []
+  missing_implementations:
+    - REQ-FUNC-002  # Real test enforcement - implementation pending
+    - REQ-FUNC-003  # Team size validation - implementation pending
+    - REQ-FUNC-004  # Full traceability - implementation pending
+    - REQ-FUNC-005  # Context-aware coverage - implementation pending
+
+# Features breakdown
+features:
+  - feature_id: FEATURE-003-03-01
+    name: Complete Workflow Orchestration Engine
+    requirement_file: FEATURE-003-03-01_workflow_orchestration_engine.yaml
+    status: in_progress
+    
+  - feature_id: FEATURE-003-03-02
+    name: Prerequisites Validation System
+    requirement_file: FEATURE-003-03-02_prerequisites_validation.yaml
+    status: in_progress
+    
+  - feature_id: FEATURE-003-03-03
+    name: Failure Handling and Recovery System
+    requirement_file: FEATURE-003-03-03_failure_handling.yaml
+    status: not_started
+    
+  - feature_id: FEATURE-003-03-04
+    name: Progress Monitoring and Reporting System
+    requirement_file: FEATURE-003-03-04_progress_monitoring.yaml
+    status: in_progress
+
+# Success criteria
+success_criteria:
+  functional:
+    - criterion: "Actor (PROJECT-002) successfully invokes enforcer via subprocess"
+      status: not_implemented
+      verification_method: "UAT with actor simulator"
+    
+    - criterion: "Real failing tests enforced - no mocks/placeholders unless specified"
+      status: not_implemented
+      verification_method: "Run enforcer against demo code with mocks - should detect"
+    
+    - criterion: "Team size validation prevents over/under-engineering"
+      status: not_implemented
+      verification_method: "Test small team with enterprise features - should reject"
+    
+    - criterion: "Full requirements traceability verified (auto + manual match)"
+      status: not_implemented
+      verification_method: "Test with orphaned code - should detect"
+    
+    - criterion: "Context-aware testing (unit/integration/e2e) based on risk level"
+      status: not_implemented
+      verification_method: "Test high-risk with low coverage - should reject"
+  
+  performance:
+    - criterion: "Complete workflow in < 15 minutes"
+      status: in_progress
+      verification_method: "Performance test with real project"
+  
+  integration:
+    - criterion: "Actor triggers enforcer with JSON contract"
+      status: not_implemented
+      verification_method: "Integration test with actor simulator"
+  
+  quality:
+    - criterion: "Enforcer never crashes - always returns JSON"
+      status: not_implemented
+      verification_method: "Chaos testing with invalid inputs"
+
+# Documentation requirements
+documentation:
+  required_documents:
+    - name: "Actor-Enforcer Integration Guide"
+      path: docs/actor_enforcer_integration.md
+      status: not_started
+    
+    - name: "Quality Gates Reference"
+      path: docs/quality_gates_reference.md
+      status: not_started
+    
+    - name: "Team Size Validation Rules"
+      path: docs/team_size_validation.md
+      status: not_started
+    
+    - name: "Requirements Traceability Guide"
+      path: docs/requirements_traceability.md
+      status: not_started
+    
+    - name: "JSON Contract Specification"
+      path: docs/json_contract_specification.md
+      status: not_started
+
+# Notes
+notes:
+  - "This system is the orchestration layer for PROJECT-003 TDD ENFORCER"
+  - "Actor-enforcer pattern ensures separation: PROJECT-002 creates, PROJECT-003 validates"
+  - "Quality gates prevent common TDD anti-patterns (mocks, placeholders, wrong test types)"
+  - "Team size validation prevents over/under-engineering based on team capacity"
+  - "Full traceability ensures no orphaned code and complete requirements coverage"
+  - "Context-aware testing applies appropriate rigor based on hierarchy and risk"

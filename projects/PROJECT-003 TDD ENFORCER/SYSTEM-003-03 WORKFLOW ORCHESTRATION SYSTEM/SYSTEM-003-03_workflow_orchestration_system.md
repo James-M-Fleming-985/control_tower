@@ -35,10 +35,13 @@ The Workflow Orchestration System provides unified coordination of all 10 TDD st
 
 ### **Success Criteria**
 ```
-✅ Functional Requirements: Single command executes all 10 stages with proper coordination
+✅ Functional Requirements: Actor (PROJECT-002) invokes enforcer (PROJECT-003) via subprocess
+✅ Quality Requirements: Real failing tests required - no mocks/placeholders unless specified
+✅ Team Size Enforcement: Validates implementations match team size (small/medium/large/enterprise)
+✅ Requirements Traceability: Full verification of ALL implementations linked to requirements
+✅ Test Coverage: Context-aware testing (unit/integration/e2e) based on risk level
 ✅ Performance Requirements: Complete workflow in < 15 minutes with real-time progress
-✅ Integration Requirements: Seamless coordination of core and extended systems
-✅ Quality Requirements: Graceful failure handling with clear remediation guidance
+✅ Integration Requirements: Actor triggers enforcer with JSON contract
 ✅ Documentation Requirements: Comprehensive workflow monitoring and audit trails
 ```
 
@@ -143,35 +146,90 @@ The Workflow Orchestration System provides unified coordination of all 10 TDD st
 
 ### **Workflow Orchestration**
 ```
-🔧 REQ-FUNC-001: Complete Workflow Execution
-   ├── Description: Execute all 10 TDD stage gates in proper sequence
-   ├── Inputs: Requirements file, layer name, next layer name
-   ├── Processing: Orchestrate core and extended systems, manage dependencies
-   ├── Outputs: Complete workflow results, layer completion certificate
-   └── Success Criteria: All 10 stages execute successfully with evidence
+🔧 REQ-FUNC-001: Actor-Triggered Workflow Execution
+   ├── Description: Actor (PROJECT-002) triggers enforcer (PROJECT-003) via subprocess with JSON contract
+   ├── Inputs: Requirements file, layer name, team size, risk level (from actor via JSON)
+   ├── Processing: Enforcer validates and orchestrates all 10 TDD stages
+   ├── Outputs: ValidationResult with complete workflow results sent back to actor
+   ├── Communication: Subprocess call with JSON schema for request/response
+   └── Success Criteria: Actor successfully triggers enforcer, receives structured results
 
-🔧 REQ-FUNC-002: Prerequisites Validation
+🔧 REQ-FUNC-002: Real Test Enforcement (No Mocks/Placeholders)
+   ├── Description: Enforce real failing tests that validate business logic (no mocks unless specified)
+   ├── Inputs: Test files from RED phase, requirement specifications
+   ├── Processing: Validate tests contain real assertions, not assert True/pass/excessive mocks
+   ├── Outputs: Test quality validation results, mock violation reports
+   ├── Exceptions: Mocks allowed ONLY when requirement explicitly specifies "demo" or "mock"
+   └── Success Criteria: All tests validate real business requirements, not placeholders
+
+🔧 REQ-FUNC-003: Team Size Appropriateness Validation
+   ├── Description: Validate implementation complexity matches team size (prevent over/under engineering)
+   ├── Inputs: Team size metadata (small 1-3, medium 4-10, large 11-50, enterprise 50+)
+   ├── Processing: Check feature count, abstraction levels, architecture patterns against team size
+   ├── Outputs: Team size compliance report, over/under-engineering warnings
+   ├── Validation Rules:
+   │   ├── Small (1-3): Simple, direct implementations, minimal abstraction
+   │   ├── Medium (4-10): Moderate complexity, basic patterns, some abstraction
+   │   ├── Large (11-50): Structured architecture, design patterns, layered approach
+   │   └── Enterprise (50+): Full enterprise patterns, microservices, extensive infrastructure
+   └── Success Criteria: Implementation complexity appropriate for team size
+
+🔧 REQ-FUNC-004: Full Requirements Traceability
+   ├── Description: Verify ALL implementations linked to requirements (no orphaned code, no partial verification)
+   ├── Inputs: Requirement IDs, implementation files, test files
+   ├── Processing: 
+   │   ├── Auto-discover: Scan code for `# REQ-XXX-XX-XX` comments
+   │   ├── Manual registry: Validate against manifest file
+   │   ├── Both match: Ensure auto-discovered matches registered implementations
+   │   └── Aggregate: Roll up layer → feature → system → project traceability
+   ├── Outputs: Complete traceability matrix, orphaned code report, missing links
+   ├── Verification Levels:
+   │   ├── Layer: All layer implementations traced to layer requirements
+   │   ├── Feature: All feature implementations aggregated and traced
+   │   ├── System: All system implementations aggregated and traced
+   │   └── Project: Complete project traceability matrix
+   └── Success Criteria: 100% traceability, no orphaned code, no assumptions
+
+🔧 REQ-FUNC-005: Context-Aware Test Coverage
+   ├── Description: Enforce appropriate test types and coverage based on hierarchy level and risk
+   ├── Inputs: Requirement level (layer/feature/system), risk classification (low/medium/high/critical)
+   ├── Processing: Apply TDD best practices for test type and coverage thresholds
+   ├── Outputs: Test coverage report by type, risk-adjusted validation results
+   ├── Test Type Requirements by Level:
+   │   ├── Layer: Unit (90%) + Integration (80%) required
+   │   ├── Feature: Unit (90%) + Integration (85%) + E2E (70%) required
+   │   ├── System: Unit (95%) + Integration (90%) + E2E (80%) required
+   │   └── Project: Full coverage with risk-based adjustments
+   ├── Risk-Based Adjustments:
+   │   ├── Low Risk: Standard thresholds apply
+   │   ├── Medium Risk: +5% to all thresholds
+   │   ├── High Risk (Financial): +10% to all thresholds, additional edge case testing
+   │   └── Critical Risk: +15% to all thresholds, full boundary testing, chaos testing
+   └── Success Criteria: Coverage meets context-aware thresholds for level and risk
+
+🔧 REQ-FUNC-006: Prerequisites Validation
    ├── Description: Validate all prerequisites before beginning TDD workflow
    ├── Inputs: Development environment, project structure
    ├── Processing: Check tools, templates, dependencies, project setup
    ├── Outputs: Prerequisites status, setup guidance for missing items
    └── Success Criteria: All prerequisites met or clear guidance provided
 
-🔧 REQ-FUNC-003: Stage Dependency Management
+🔧 REQ-FUNC-007: Stage Dependency Management
    ├── Description: Manage dependencies between stages and prevent invalid sequences
    ├── Inputs: Stage execution requests, current workflow state
    ├── Processing: Validate stage dependencies, enforce proper sequence
    ├── Outputs: Stage execution authorization, dependency violation warnings
    └── Success Criteria: Stages execute only when dependencies are satisfied
 
-🔧 REQ-FUNC-004: Failure Detection and Handling
-   ├── Description: Detect stage failures and provide remediation guidance
-   ├── Inputs: Stage execution results, error conditions
-   ├── Processing: Analyze failures, determine root causes, generate guidance
-   ├── Outputs: Failure analysis, remediation steps, restart instructions
-   └── Success Criteria: All failures detected with actionable remediation
+🔧 REQ-FUNC-008: Failure Detection and Handling
+   ├── Description: Detect violations/failures and report to actor with remediation options
+   ├── Inputs: Stage execution results, error conditions, violations detected
+   ├── Processing: Analyze failures, provide remediation guidance, offer actor choices
+   ├── Outputs: Violation reports sent to actor (JSON), remediation options, restart capability
+   ├── Actor Options: Fix issues and retry, Continue despite warnings (with acknowledgment), Abort workflow
+   └── Success Criteria: All violations detected, actor has clear choices, can fix and continue
 
-🔧 REQ-FUNC-005: Progress Tracking and Reporting
+🔧 REQ-FUNC-009: Progress Tracking and Reporting
    ├── Description: Track workflow progress and generate comprehensive reports
    ├── Inputs: Stage execution status, timing data, results
    ├── Processing: Calculate progress, generate reports, maintain audit trails
@@ -243,16 +301,44 @@ The Workflow Orchestration System provides unified coordination of all 10 TDD st
    ├── Data Exchange: Advanced stage parameters, validation results, certificates
    └── Success Criteria: Extended stages execute under orchestrator control
 
-🔗 REQ-INT-003: Development Environment Integration
-   ├── Description: Integration with standard development tools and workflows
-   ├── Interface: Command line interface, make command integration
-   ├── Data Exchange: Workflow parameters, execution status, completion results
-   └── Success Criteria: Natural integration into development workflow
+🔗 REQ-INT-003: Actor-Enforcer Subprocess Integration
+   ├── Description: PROJECT-002 (Actor) invokes PROJECT-003 (Enforcer) via subprocess
+   ├── Interface: Subprocess call with JSON request/response contract
+   ├── JSON Request Schema:
+   │   {
+   │     "requirement_file": "/path/to/requirement.yaml",
+   │     "layer_name": "DATA ACCESS LAYER-01",
+   │     "team_size": "small|medium|large|enterprise",
+   │     "risk_level": "low|medium|high|critical",
+   │     "workflow_mode": "full|stage_by_stage",
+   │     "actor_metadata": {...}
+   │   }
+   ├── JSON Response Schema:
+   │   {
+   │     "status": "success|failure|warning",
+   │     "violations": [...],  # Quality gate violations
+   │     "results": {...},     # Detailed stage results
+   │     "traceability": {...}, # Requirements coverage
+   │     "remediation_options": [...],  # For actor decision
+   │     "workflow_state": {...}  # For restart capability
+   │   }
+   ├── Error Handling: Enforcer never crashes - always returns structured response
+   └── Success Criteria: Actor successfully triggers enforcer, receives actionable results
 
-🔗 REQ-INT-004: Make Command Integration
-   ├── Description: Integration with Makefile for standard development commands
-   ├── Interface: Standard make targets for TDD enforcement
-   ├── Data Exchange: Layer parameters, workflow results, certificate generation
+🔗 REQ-INT-004: Make Command to Actor Integration
+   ├── Description: Make commands invoke actor, which invokes enforcer
+   ├── Interface: make enforce-tdd → actor.py → enforcer.py (subprocess)
+   ├── Data Flow: 
+   │   ├── User runs: make enforce-tdd REQUIREMENT=REQ-XXX
+   │   ├── Make calls: python actor.py --requirement REQ-XXX
+   │   ├── Actor calls: subprocess.run(['python', 'enforcer.py', '--json', json_request])
+   │   ├── Enforcer returns: JSON response to actor
+   │   ├── Actor presents: Results to user with remediation options
+   │   └── Actor decides: Fix/Continue/Abort based on user input
+   ├── Separation of Concerns:
+   │   ├── Make: Simple entry point, parameter passing
+   │   ├── Actor (PROJECT-002): Workflow execution, artifact creation, user interaction
+   │   └── Enforcer (PROJECT-003): Validation only, no user interaction, JSON output
    └── Success Criteria: TDD enforcement available through standard make commands
 ```
 
@@ -292,6 +378,150 @@ The Workflow Orchestration System provides unified coordination of all 10 TDD st
    ├── Manual Intervention: Complex issues requiring developer action
    ├── Workflow Restart: Resume from last successful stage
    └── Escalation: Critical issues requiring expert intervention
+```
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+### **Context-Aware Test Strategy**
+```
+🎯 REQ-TEST-001: Hierarchy-Appropriate Test Coverage
+   ├── Description: Apply appropriate test types based on requirement hierarchy level
+   ├── Layer Level Requirements:
+   │   ├── Unit Tests: 90% coverage minimum
+   │   ├── Integration Tests: 80% coverage minimum
+   │   ├── E2E Tests: Not required at layer level
+   │   └── Focus: Component behavior, layer boundaries
+   ├── Feature Level Requirements:
+   │   ├── Unit Tests: 90% coverage minimum
+   │   ├── Integration Tests: 85% coverage minimum
+   │   ├── E2E Tests: 70% coverage minimum
+   │   └── Focus: Feature workflows, cross-layer integration
+   ├── System Level Requirements:
+   │   ├── Unit Tests: 95% coverage minimum
+   │   ├── Integration Tests: 90% coverage minimum
+   │   ├── E2E Tests: 80% coverage minimum
+   │   └── Focus: Complete system workflows, all integrations
+   └── Success Criteria: Coverage meets hierarchy-appropriate thresholds
+
+🎯 REQ-TEST-002: Risk-Based Coverage Adjustment
+   ├── Description: Adjust coverage thresholds based on risk classification
+   ├── Risk Level Adjustments:
+   │   ├── Low Risk: Standard thresholds apply
+   │   ├── Medium Risk: +5% to all coverage thresholds
+   │   ├── High Risk (Financial/Investment): +10% to all thresholds + edge cases
+   │   └── Critical Risk: +15% to all thresholds + boundary testing + chaos testing
+   ├── Financial Domain Special Requirements:
+   │   ├── All calculations tested with edge cases (0, negative, max values)
+   │   ├── Currency handling tested for precision and rounding
+   │   ├── Transaction validation tested for fraud scenarios
+   │   └── Performance tested under load for financial operations
+   └── Success Criteria: Risk-adjusted coverage thresholds met
+
+🎯 REQ-TEST-003: Real Test Validation (No Placeholders)
+   ├── Description: All tests must validate real business logic, not placeholders
+   ├── Prohibited Patterns:
+   │   ├── assert True  # Always passes - not a real test
+   │   ├── pass  # Empty test - not a real test
+   │   ├── Excessive mocking (>50% of test is mocks)
+   │   └── Tests that don't assert business requirements
+   ├── Allowed Patterns:
+   │   ├── assert actual_result == expected_result
+   │   ├── assert raises(ExpectedException)
+   │   ├── assert actual_state matches expected_state
+   │   └── Minimal mocking for external dependencies only
+   ├── Mock Policy:
+   │   ├── Mocks prohibited UNLESS requirement specifies "demo" or "mock"
+   │   ├── If mocks allowed, must be minimal and clearly justified
+   │   └── Real implementations preferred over mocks when feasible
+   └── Success Criteria: All tests validate business requirements, no placeholders
+
+🎯 REQ-TEST-004: TDD Best Practice Compliance
+   ├── Description: Follow TDD best practices for test implementation
+   ├── RED Phase Requirements:
+   │   ├── Tests written BEFORE implementation
+   │   ├── Tests fail initially (proving they test something real)
+   │   ├── Tests clearly specify acceptance criteria
+   │   └── Test names describe expected behavior
+   ├── GREEN Phase Requirements:
+   │   ├── Minimal code to make tests pass
+   │   ├── All tests pass after implementation
+   │   ├── No over-engineering beyond requirements
+   │   └── Coverage thresholds met
+   ├── REFACTOR Phase Requirements:
+   │   ├── All tests still pass after refactoring
+   │   ├── Coverage maintained or improved
+   │   ├── Code quality improved (complexity, duplication reduced)
+   │   └── Performance maintained or improved
+   └── Success Criteria: TDD cycle properly executed with evidence
+```
+
+### **Team Size Validation**
+```
+🎯 REQ-TEST-005: Team Size Appropriateness Validation
+   ├── Description: Validate implementation complexity matches team size capabilities
+   ├── Small Team (1-3 developers):
+   │   ├── Feature Count: ≤ 5 features per system
+   │   ├── Abstraction Levels: ≤ 2 layers (minimal abstraction)
+   │   ├── Design Patterns: Simple patterns only (Factory, Strategy)
+   │   ├── Architecture: Monolithic or simple modular
+   │   ├── Infrastructure: Minimal - direct implementations
+   │   └── Violations: Enterprise patterns, microservices, complex abstractions
+   ├── Medium Team (4-10 developers):
+   │   ├── Feature Count: 5-15 features per system
+   │   ├── Abstraction Levels: 2-3 layers
+   │   ├── Design Patterns: Common patterns (MVC, Repository, Service)
+   │   ├── Architecture: Modular monolith or simple services
+   │   ├── Infrastructure: Basic CI/CD, simple deployment
+   │   └── Violations: Over-engineered enterprise features, too simple for team size
+   ├── Large Team (11-50 developers):
+   │   ├── Feature Count: 15-40 features per system
+   │   ├── Abstraction Levels: 3-4 layers
+   │   ├── Design Patterns: Full enterprise patterns (CQRS, Event Sourcing)
+   │   ├── Architecture: Microservices, event-driven, domain-driven design
+   │   ├── Infrastructure: Full CI/CD, orchestration, monitoring
+   │   └── Violations: Too simple (missing needed structure), over-complicated
+   ├── Enterprise Team (50+ developers):
+   │   ├── Feature Count: 40+ features per system
+   │   ├── Abstraction Levels: 4+ layers
+   │   ├── Design Patterns: Full enterprise suite + custom patterns
+   │   ├── Architecture: Distributed systems, multi-region, high availability
+   │   ├── Infrastructure: Full DevOps, SRE, multi-cloud, observability
+   │   └── Violations: Any simplification that limits scalability
+   └── Success Criteria: Implementation complexity appropriate for team size
+```
+
+### **Requirements Traceability Validation**
+```
+🎯 REQ-TEST-006: Full Requirements Traceability
+   ├── Description: Verify ALL implementations and tests traced to requirements
+   ├── Auto-Discovery Mechanism:
+   │   ├── Scan all code files for # REQ-XXX-XX-XX comments
+   │   ├── Build traceability map: requirement → [files]
+   │   ├── Identify orphaned code (no requirement comment)
+   │   └── Generate auto-discovered traceability report
+   ├── Manual Registry Mechanism:
+   │   ├── Requirement YAML contains implementations section
+   │   ├── Developers register files in manifest
+   │   ├── Build expected traceability map: requirement → [registered files]
+   │   └── Generate registered traceability report
+   ├── Validation Process:
+   │   ├── Compare auto-discovered vs registered implementations
+   │   ├── Report mismatches (found but not registered, registered but not found)
+   │   ├── Report orphaned code (no requirement linkage)
+   │   └── Validate ALL acceptance criteria have implementations
+   ├── Aggregation Hierarchy:
+   │   ├── Layer Level: All layer implementations traced
+   │   ├── Feature Level: Aggregate all layer traceability + feature-level code
+   │   ├── System Level: Aggregate all feature traceability + system-level code
+   │   └── Project Level: Complete traceability matrix for entire project
+   ├── Rejection Criteria:
+   │   ├── Any acceptance criterion without implementation
+   │   ├── Any implementation file without requirement comment
+   │   ├── Mismatch between auto-discovered and registered
+   │   └── Orphaned code without justification
+   └── Success Criteria: 100% traceability, no orphans, auto/manual match
 ```
 
 ---
@@ -361,8 +591,7 @@ The Workflow Orchestration System provides unified coordination of all 10 TDD st
 🔗 External Dependencies:
    ├── Core TDD Workflow Engine (SYSTEM-003-01)
    ├── Extended Validation Engine (SYSTEM-003-02)
-   ├── Development environment and tools
-   └── Make command integration framework
+   ├── Development environment and tools  
 ```
 
 ---

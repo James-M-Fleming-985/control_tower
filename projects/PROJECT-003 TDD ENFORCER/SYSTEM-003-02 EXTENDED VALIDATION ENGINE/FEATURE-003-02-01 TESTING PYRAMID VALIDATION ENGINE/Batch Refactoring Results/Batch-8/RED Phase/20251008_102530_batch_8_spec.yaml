@@ -1,0 +1,33 @@
+---
+# Batch 8 Refactoring Specification
+# Generated: 2025-10-08T10:25:30.773853
+
+metadata:
+  prompt_type: failing_tests
+  refactor_id: REFACTOR-BATCH-8
+  batch_name: Evidence Storage Review - Part 2
+  phase: RED
+  created: 2025-10-08
+  behaviors_count: 1
+
+refactoring_context:
+  objective: |
+    Systematic refactoring of 1 actor behaviors in Batch 8.
+    These behaviors currently create/write files (ACTOR behavior).
+    Target: Change to validate files (VALIDATOR behavior).
+  
+  approach: |
+    RED-GREEN-REFACTOR TDD approach for each behavior:
+    1. RED: Write test enforcing validator behavior → test FAILS
+    2. GREEN: Refactor code to validator behavior → test PASSES
+    3. REFACTOR: Improve code quality → tests still PASS
+
+behaviors:
+
+  behavior_001:
+    file: 
+    line: 0
+    current_behavior: 
+    target_behavior: 
+    description: 
+    review_needed: False

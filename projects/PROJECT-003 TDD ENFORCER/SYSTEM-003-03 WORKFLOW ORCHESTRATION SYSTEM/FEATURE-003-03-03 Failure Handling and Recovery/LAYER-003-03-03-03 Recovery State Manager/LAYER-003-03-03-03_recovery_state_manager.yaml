@@ -1,0 +1,155 @@
+# LAYER-003-03-03-03: Recovery State Manager
+# Manages workflow state persistence for restart and recovery capability
+
+metadata:
+  requirement_id: LAYER-003-03-03-03
+  requirement_name: Recovery State Manager
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-03
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: high  # State management for recovery is critical
+  
+  estimated_effort_hours: 10
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: not_started
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 12
+    coverage_threshold: 0.90
+    focus_areas:
+      - State serialization/deserialization
+      - Checkpoint creation
+      - State restoration
+      - State validation
+  
+  integration_tests:
+    required: true
+    minimum_count: 6
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with workflow orchestrator
+      - Integration with persistence layer
+      - End-to-end recovery scenarios
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Persist workflow state at each stage completion"
+    status: not_implemented
+    test_file: tests/layer/test_state_persistence.py
+    related_feature_ac: FEATURE-003-03-03.AC-004
+    
+  - criterion: "AC-002: Enable workflow restart from last successful stage"
+    status: not_implemented
+    test_file: tests/layer/test_workflow_restart.py
+    related_feature_ac: FEATURE-003-03-03.AC-005
+    
+  - criterion: "AC-003: Validate state integrity before restoration"
+    status: not_implemented
+    test_file: tests/layer/test_state_validation.py
+    
+  - criterion: "AC-004: Include workflow state in JSON response to actor"
+    status: not_implemented
+    test_file: tests/layer/test_state_in_response.py
+    related_feature_ac: FEATURE-003-03-03.AC-004
+
+implementations:
+  red_phase:
+    status: not_started
+    test_files:
+      - path: tests/layer/recovery/test_recovery_state_manager.py
+        requirement_id: LAYER-003-03-03-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 14
+        status: not_started
+  
+  green_phase:
+    status: not_started
+    implementation_files:
+      - path: src/orchestration/recovery_manager.py
+        requirement_id: LAYER-003-03-03-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Persist workflow state at checkpoints"
+          - "Enable restart from last successful stage"
+          - "Validate state before restoration"
+          - "Include state in actor response"
+        status: not_started
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/orchestration/recovery_manager.py
+      requirements: [LAYER-003-03-03-03]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+dependencies:
+  - requirement_id: LAYER-003-03-01-01
+    name: Workflow State Management
+    relationship: "Recovery manager extends workflow state with persistence"
+
+# Workflow state schema for recovery
+workflow_state_schema:
+  type: object
+  required: [workflow_id, current_stage, completed_stages, timestamp]
+  properties:
+    workflow_id:
+      type: string
+      description: "Unique identifier for workflow instance"
+    
+    current_stage:
+      type: integer
+      description: "Current stage number (1-10)"
+    
+    completed_stages:
+      type: array
+      items:
+        type: object
+        properties:
+          stage_number: {type: integer}
+          stage_name: {type: string}
+          status: {type: string, enum: [passed, failed, skipped]}
+          timestamp: {type: string, format: datetime}
+          results: {type: object}
+    
+    failed_stage:
+      type: object
+      description: "Details of failed stage if applicable"
+      properties:
+        stage_number: {type: integer}
+        violations: {type: array}
+        can_retry: {type: boolean}
+    
+    timestamp:
+      type: string
+      format: datetime
+      description: "Last state update time"
+    
+    recovery_checkpoint:
+      type: string
+      description: "File path to persisted state"
+
+success_criteria:
+  - "Workflow state persisted at each stage"
+  - "Workflow can restart from checkpoints"
+  - "State integrity validated"
+  - "State included in actor responses"

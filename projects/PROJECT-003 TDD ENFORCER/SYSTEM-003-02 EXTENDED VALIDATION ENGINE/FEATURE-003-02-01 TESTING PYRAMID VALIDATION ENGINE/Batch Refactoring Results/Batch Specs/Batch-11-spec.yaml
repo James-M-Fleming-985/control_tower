@@ -1,0 +1,70 @@
+---
+# Batch 11: Cleanup and Final Validation
+# Created: 2025-10-08
+# Behaviors: Variable (10-20 flagged from evidence review + edge cases)
+
+metadata:
+  batch_number: 11
+  batch_name: "Cleanup and Final Validation"
+  target_days: "Day 10"
+  estimated_hours: 8.0
+  total_behaviors: "Variable (depends on Batches 7-10 findings)"
+  priority: "CRITICAL"
+  dependencies: ["Batch-1", "Batch-2", "Batch-3", "Batch-4", "Batch-5", "Batch-6", "Batch-7", "Batch-8", "Batch-9", "Batch-10"]
+
+objective: |
+  Final cleanup and validation:
+  1. Refactor any ACTOR behaviors flagged during evidence review (Batches 7-10)
+  2. Handle edge cases and special situations
+  3. Run comprehensive final detection scan
+  4. Verify Phase 2 completion criteria
+
+tasks:
+  - task: "Refactor flagged ACTOR behaviors"
+    description: "Any behaviors identified in evidence review that need refactoring"
+    estimated_count: "10-20 behaviors"
+  
+  - task: "Handle edge cases"
+    description: "Special situations not covered in previous batches"
+    estimated_count: "5-10 edge cases"
+  
+  - task: "Final detection scan"
+    description: "Run comprehensive_actor_detection.py to verify zero actor behaviors"
+    expected_result: "~200 evidence behaviors, 0 actor behaviors"
+  
+  - task: "Verification"
+    description: "Run all test suites to ensure nothing broken"
+    test_suites:
+      - "FEATURE-003-02-01 tests (66 tests)"
+      - "All batch refactoring tests (Batch 1-11)"
+      - "Full PROJECT-003 test suite"
+  
+  - task: "Documentation"
+    description: "Generate Phase 2 completion certificate"
+    deliverables:
+      - "PHASE_2_COMPLETE_CERTIFICATE.md"
+      - "REFACTORING_SUMMARY_REPORT.md"
+      - "ACTOR_TO_VALIDATOR_MIGRATION_COMPLETE.md"
+
+success_criteria:
+  critical:
+    - "Zero actor behaviors detected"
+    - "All tests passing"
+    - "~200 evidence behaviors remaining (EVIDENCE - OK)"
+    - "PROJECT-003 is pure validator + orchestrator"
+  
+  documentation:
+    - "Phase 2 completion certificate generated"
+    - "Summary report with metrics"
+    - "Migration guide for PROJECT-002 integration"
+
+checkpoint:
+  final_validation:
+    - "Run: python tools/comprehensive_actor_detection.py"
+    - "Expected: 0 actor behaviors, ~200 evidence behaviors"
+    - "All tests pass: pytest tests/ -v"
+    - "Generate certificate: python tools/generate_phase_2_certificate.py"
+    - "Commit: 'Phase 2 COMPLETE: PROJECT-003 refactored to pure validator'"
+    - "Tag: phase-2-complete"
+
+next_phase: "SYSTEM-003-03 Orchestration Coordinator Implementation"

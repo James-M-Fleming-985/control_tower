@@ -1,0 +1,22 @@
+---
+# Batch 8: Evidence Storage Review (Part 2 of 4)
+# Created: 2025-10-08
+# Behaviors: ~50
+
+metadata:
+  batch_number: 8
+  batch_name: "Evidence Storage Review - Part 2"
+  target_days: "Day 8 Afternoon"
+  estimated_hours: 3.0
+  total_behaviors: 50
+  priority: "MEDIUM"
+  dependencies: ["Batch-7"]
+  review_only: true
+
+objective: "Continue evidence storage review (operations 51-100)"
+
+behaviors:
+  - behavior_id: "BATCH-8-001 through BATCH-8-050"
+    note: "Second 50 evidence storage operations to review"
+
+next_batch: "Batch-9-spec.yaml"

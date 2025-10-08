@@ -1,0 +1,153 @@
+# LAYER-003-03-04-03: Report Generator
+# Generates comprehensive workflow reports and summaries
+
+metadata:
+  requirement_id: LAYER-003-03-04-03
+  requirement_name: Report Generator
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-04
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: medium
+  
+  estimated_effort_hours: 6
+  actual_effort_hours: 4.0
+  progress_percentage: 65
+  status: in_progress
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 12
+    coverage_threshold: 0.90
+    focus_areas:
+      - Report template rendering
+      - Data formatting
+      - Summary generation
+      - Stage-by-stage detail formatting
+  
+  integration_tests:
+    required: true
+    minimum_count: 6
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with metrics collector
+      - Integration with workflow state
+      - Report output validation
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Generate executive summary of workflow"
+    status: in_progress
+    test_file: tests/layer/test_executive_summary.py
+    related_feature_ac: FEATURE-003-03-04.AC-003
+    
+  - criterion: "AC-002: Include stage-by-stage detailed results"
+    status: in_progress
+    test_file: tests/layer/test_detailed_results.py
+    related_feature_ac: FEATURE-003-03-04.AC-004
+    
+  - criterion: "AC-003: Include performance analysis and metrics"
+    status: in_progress
+    test_file: tests/layer/test_performance_analysis.py
+    
+  - criterion: "AC-004: Include quality metrics and compliance status"
+    status: not_implemented
+    test_file: tests/layer/test_quality_reporting.py
+    
+  - criterion: "AC-005: Format report in multiple formats (JSON, Markdown, HTML)"
+    status: not_implemented
+    test_file: tests/layer/test_report_formats.py
+
+implementations:
+  red_phase:
+    status: in_progress
+    test_files:
+      - path: tests/layer/reporting/test_report_generator.py
+        requirement_id: LAYER-003-03-04-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+        coverage_target: 0.90
+        test_count: 14
+        status: in_progress
+  
+  green_phase:
+    status: in_progress
+    implementation_files:
+      - path: src/monitoring/report_generator.py
+        requirement_id: LAYER-003-03-04-03
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+        implements:
+          - "Generate executive summary"
+          - "Generate stage-by-stage details"
+          - "Include performance analysis"
+          - "Include quality metrics"
+          - "Support multiple output formats"
+        status: in_progress
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/monitoring/report_generator.py
+      requirements: [LAYER-003-03-04-03]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004, AC-005]
+  verification_status: pending
+
+dependencies:
+  - requirement_id: LAYER-003-03-04-01
+    name: Progress Tracker
+    relationship: "Report generator uses progress data"
+  - requirement_id: LAYER-003-03-04-02
+    name: Metrics Collector
+    relationship: "Report generator uses collected metrics"
+
+# Report structure
+report_structure:
+  executive_summary:
+    - workflow_status: {type: string, enum: [success, failure, partial]}
+    - total_stages: {type: integer}
+    - stages_completed: {type: integer}
+    - total_duration: {type: string}
+    - overall_compliance: {type: string}
+  
+  stage_details:
+    - type: array
+    - items:
+        stage_number: {type: integer}
+        stage_name: {type: string}
+        status: {type: string}
+        duration: {type: string}
+        tests_run: {type: integer}
+        coverage: {type: number}
+        violations: {type: array}
+  
+  performance_analysis:
+    - total_duration: {type: string}
+    - stage_durations: {type: array}
+    - bottlenecks: {type: array}
+    - efficiency_score: {type: number}
+  
+  quality_metrics:
+    - total_violations: {type: integer}
+    - violations_by_type: {type: object}
+    - compliance_score: {type: number}
+    - requirements_coverage: {type: number}
+
+success_criteria:
+  - "Executive summary generated correctly"
+  - "Stage-by-stage details included"
+  - "Performance analysis complete"
+  - "Multiple output formats supported"

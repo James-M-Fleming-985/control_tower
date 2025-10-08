@@ -1,0 +1,124 @@
+# LAYER-003-03-04-02: Metrics Collector
+# Collects performance metrics, timing data, and quality metrics
+
+metadata:
+  requirement_id: LAYER-003-03-04-02
+  requirement_name: Metrics Collector
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-04
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: medium
+  
+  estimated_effort_hours: 4
+  actual_effort_hours: 3.0
+  progress_percentage: 75
+  status: in_progress
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 8
+    coverage_threshold: 0.90
+    focus_areas:
+      - Metric collection logic
+      - Timing measurement
+      - Metric aggregation
+      - Data structure validation
+  
+  integration_tests:
+    required: true
+    minimum_count: 4
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with stage execution
+      - Integration with reporting system
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Collect stage execution times"
+    status: implemented
+    test_file: tests/layer/test_timing_collection.py
+    related_feature_ac: FEATURE-003-03-04.AC-005
+    
+  - criterion: "AC-002: Collect test execution metrics (count, coverage)"
+    status: in_progress
+    test_file: tests/layer/test_test_metrics.py
+    
+  - criterion: "AC-003: Collect quality metrics (violations, compliance)"
+    status: in_progress
+    test_file: tests/layer/test_quality_metrics.py
+    
+  - criterion: "AC-004: Aggregate metrics for reporting"
+    status: implemented
+    test_file: tests/layer/test_metric_aggregation.py
+
+implementations:
+  red_phase:
+    status: in_progress
+    test_files:
+      - path: tests/layer/metrics/test_metrics_collector.py
+        requirement_id: LAYER-003-03-04-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 10
+        status: in_progress
+  
+  green_phase:
+    status: in_progress
+    implementation_files:
+      - path: src/monitoring/metrics_collector.py
+        requirement_id: LAYER-003-03-04-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Collect stage timing data"
+          - "Collect test execution metrics"
+          - "Collect quality metrics"
+          - "Aggregate metrics for reports"
+        status: in_progress
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/monitoring/metrics_collector.py
+      requirements: [LAYER-003-03-04-02]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+# Metrics schema
+metrics_schema:
+  performance_metrics:
+    - stage_execution_times: {type: array, items: {stage: string, duration_seconds: number}}
+    - total_workflow_duration_seconds: {type: number}
+    - average_stage_duration: {type: number}
+  
+  test_metrics:
+    - total_tests_run: {type: integer}
+    - tests_passed: {type: integer}
+    - tests_failed: {type: integer}
+    - coverage_percentage: {type: number}
+  
+  quality_metrics:
+    - violations_detected: {type: integer}
+    - violations_by_type: {type: object}
+    - compliance_score: {type: number}
+
+success_criteria:
+  - "Stage timing collected accurately"
+  - "Test metrics captured completely"
+  - "Quality metrics tracked"
+  - "Metrics aggregated for reporting"

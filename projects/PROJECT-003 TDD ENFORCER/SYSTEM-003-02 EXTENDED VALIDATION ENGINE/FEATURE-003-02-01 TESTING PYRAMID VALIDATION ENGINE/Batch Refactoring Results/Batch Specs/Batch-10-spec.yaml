@@ -1,0 +1,27 @@
+---
+# Batch 10: Evidence Storage Review (Part 4 of 4)
+# Created: 2025-10-08
+# Behaviors: ~50
+
+metadata:
+  batch_number: 10
+  batch_name: "Evidence Storage Review - Part 4"
+  target_days: "Day 9 Afternoon"
+  estimated_hours: 3.0
+  total_behaviors: 50
+  priority: "MEDIUM"
+  dependencies: ["Batch-9"]
+  review_only: true
+
+objective: "Complete evidence storage review (operations 151-200)"
+
+behaviors:
+  - behavior_id: "BATCH-10-001 through BATCH-10-050"
+    note: "Fourth 50 evidence storage operations to review"
+
+deliverable:
+  - "Complete evidence review report (all 4 parts)"
+  - "Final list: EVIDENCE behaviors to keep (~180-190)"
+  - "Final list: ACTOR behaviors to refactor (~10-20)"
+
+next_batch: "Batch-11-spec.yaml"

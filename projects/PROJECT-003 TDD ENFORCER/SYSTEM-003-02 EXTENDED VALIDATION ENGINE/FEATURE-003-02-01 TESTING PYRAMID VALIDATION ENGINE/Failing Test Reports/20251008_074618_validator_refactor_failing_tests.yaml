@@ -1,0 +1,585 @@
+---
+# Failing Tests Prompt - Validator Refactoring (Actor to Validator Conversion)
+
+metadata:
+  prompt_type: "failing_tests"
+  feature_id: "FEATURE-003-02-01"
+  refactor_id: "REFACTOR-BATCH-1"
+  feature_name: "Testing Pyramid Validation Engine - Validator Refactoring"
+  refactor_phase: "Test File Generation (Batch 1)"
+  tdd_phase: "RED"
+  created_date: "2025-10-08"
+  updated_date: "2025-10-08"
+  refactor_scope: "Convert actor behaviors to pure validator behaviors"
+  refactor_note: "Systematic refactoring of 461 actor behaviors - Starting with Batch 1 (10 test file generation behaviors)"
+
+refactoring_context:
+  target_implementation: "Actor to Validator Conversion - Test File Generation"
+  source_document: "SYSTEMATIC_REFACTORING_PLAN.md"
+  detection_report: "COMPREHENSIVE_ACTOR_DETECTION_RESULTS_20251007.md"
+  source_date: "2025-10-08"
+  tdd_phase: "RED"
+  phase_description: "Create failing tests that enforce validator-only behavior (no file creation)"
+  test_scope: "VALIDATOR_BEHAVIOR_ENFORCEMENT"
+  test_file_pattern: "test_validator_no_actor_behavior.py"
+  batch_scope:
+    - "legacy/utilities/tdd_workflow_engine.py (lines 299, 533, 574, 596)"
+    - "src/data_access/test_generation_data_access.py (line 391)"
+    - "src/business_logic/test_generation_verification_logic.py (line 907)"
+    - "legacy/utilities/tdd_workflow_enforcer.py (lines 480, 504)"
+  total_behaviors_batch_1: 10
+  priority: "HIGH - Critical actor behaviors that conflict with PROJECT-002"
+  success_criteria:
+    - "Exactly 10 failing tests created for Batch 1"
+    - "Tests enforce validator behavior (receive file paths, not create files)"
+    - "All tests must FAIL with current actor implementation"
+    - "Tests will PASS after refactoring to validator"
+    - "Clear error messages indicating actor behavior detected"
+  
+  architecture_goal:
+    project_002_role: "ACTOR - Generates test files, code files, executes tests"
+    project_003_role: "VALIDATOR - Validates files exist, validates test results"
+    separation_principle: "PROJECT-003 must NEVER create files - only validate received paths"
+
+
+validator_refactoring_tests:
+  name: "BATCH 1: TEST FILE GENERATION VALIDATOR TESTS (10 TESTS TOTAL)"
+  description: "Failing tests that enforce validator behavior - no test file creation allowed"
+  test_file: "tests/test_validator_no_actor_behavior.py"
+  execution_scope: "VALIDATOR_ENFORCEMENT"
+
+  test_file_generation_refactoring:
+    name: "TEST FILE GENERATION REFACTORING TESTS"
+    description: "10 tests enforcing validator behavior for test file generation"
+
+    behavior_001_test:
+      file: "legacy/utilities/tdd_workflow_engine.py"
+      line: 299
+      current_behavior: "test_file.write_text(test_content)"
+      target_behavior: "validate_test_file_exists(test_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_workflow_engine_does_not_create_test_files_line_299"
+          description: "Workflow engine must validate test files, not create them (line 299)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_engine import TDDWorkflowEngine
+            
+            def test_workflow_engine_does_not_create_test_files_line_299():
+                """RED: Validator must not create test files - should fail with current actor code"""
+                engine = TDDWorkflowEngine()
+                test_file_path = "/tmp/test_validator_check_299.py"
+                
+                # Clean up if exists
+                if os.path.exists(test_file_path):
+                    os.remove(test_file_path)
+                
+                # Current code creates file (actor behavior) - this should be refactored
+                # After refactoring, this method should validate file exists, not create it
+                try:
+                    # This will currently CREATE the file (actor behavior)
+                    result = engine.generate_test_file(test_file_path, "test_content")
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(test_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Validator created test file at line 299"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring - validator receives path instead
+                    pass
+                finally:
+                    # Cleanup
+                    if os.path.exists(test_file_path):
+                        os.remove(test_file_path)
+          refactoring_requirement:
+            before: "Creates test file using write_text()"
+            after: "Receives test_file_path and validates it exists"
+            signature_change: "generate_test_file() → validate_test_file(test_file_path: str)"
+
+    behavior_002_test:
+      file: "legacy/utilities/tdd_workflow_engine.py"
+      line: 533
+      current_behavior: "impl_file.write_text(impl_content)"
+      target_behavior: "validate_implementation_file_exists(impl_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_workflow_engine_does_not_create_impl_files_line_533"
+          description: "Workflow engine must validate implementation files, not create them (line 533)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_engine import TDDWorkflowEngine
+            
+            def test_workflow_engine_does_not_create_impl_files_line_533():
+                """RED: Validator must not create implementation files - should fail with current actor code"""
+                engine = TDDWorkflowEngine()
+                impl_file_path = "/tmp/test_validator_check_533.py"
+                
+                # Clean up if exists
+                if os.path.exists(impl_file_path):
+                    os.remove(impl_file_path)
+                
+                try:
+                    # This will currently CREATE the file (actor behavior)
+                    result = engine.generate_implementation_file(impl_file_path, "impl_content")
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(impl_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Validator created implementation file at line 533"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(impl_file_path):
+                        os.remove(impl_file_path)
+          refactoring_requirement:
+            before: "Creates implementation file using write_text()"
+            after: "Receives impl_file_path and validates it exists"
+            signature_change: "generate_implementation_file() → validate_implementation_file(impl_file_path: str)"
+
+    behavior_003_test:
+      file: "legacy/utilities/tdd_workflow_engine.py"
+      line: 574
+      current_behavior: "test_file.write_text(updated_content)"
+      target_behavior: "validate_test_file_updated(test_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_workflow_engine_does_not_update_test_files_line_574"
+          description: "Workflow engine must validate test file updates, not perform updates (line 574)"
+          expected_failure: "AssertionError - File was modified by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_engine import TDDWorkflowEngine
+            
+            def test_workflow_engine_does_not_update_test_files_line_574():
+                """RED: Validator must not update test files - should fail with current actor code"""
+                engine = TDDWorkflowEngine()
+                test_file_path = "/tmp/test_validator_check_574.py"
+                
+                # Create initial file
+                Path(test_file_path).write_text("original content")
+                original_mtime = os.path.getmtime(test_file_path)
+                
+                try:
+                    # This will currently UPDATE the file (actor behavior)
+                    result = engine.update_test_file(test_file_path, "updated_content")
+                    
+                    # ASSERTION: File should NOT have been modified
+                    new_mtime = os.path.getmtime(test_file_path)
+                    assert original_mtime == new_mtime, \
+                        "ACTOR BEHAVIOR DETECTED: Validator modified test file at line 574"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(test_file_path):
+                        os.remove(test_file_path)
+          refactoring_requirement:
+            before: "Updates test file using write_text()"
+            after: "Receives test_file_path and validates content is correct"
+            signature_change: "update_test_file() → validate_test_file_content(test_file_path: str, expected_content: str)"
+
+    behavior_004_test:
+      file: "legacy/utilities/tdd_workflow_engine.py"
+      line: 596
+      current_behavior: "py_file.write_text('\\n'.join(lines))"
+      target_behavior: "validate_python_file_format(py_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_workflow_engine_does_not_write_py_files_line_596"
+          description: "Workflow engine must validate Python files, not write them (line 596)"
+          expected_failure: "AssertionError - File was created/modified by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_engine import TDDWorkflowEngine
+            
+            def test_workflow_engine_does_not_write_py_files_line_596():
+                """RED: Validator must not write Python files - should fail with current actor code"""
+                engine = TDDWorkflowEngine()
+                py_file_path = "/tmp/test_validator_check_596.py"
+                
+                # Clean up if exists
+                if os.path.exists(py_file_path):
+                    os.remove(py_file_path)
+                
+                try:
+                    # This will currently WRITE the file (actor behavior)
+                    result = engine.format_python_file(py_file_path, ["line1", "line2"])
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(py_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Validator wrote Python file at line 596"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(py_file_path):
+                        os.remove(py_file_path)
+          refactoring_requirement:
+            before: "Writes Python file using write_text()"
+            after: "Receives py_file_path and validates format is correct"
+            signature_change: "format_python_file() → validate_python_file_format(py_file_path: str)"
+
+    behavior_005_test:
+      file: "src/data_access/test_generation_data_access.py"
+      line: 391
+      current_behavior: "demo_test.write_text(test_content)"
+      target_behavior: "validate_demo_test_exists(demo_test_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_data_access_does_not_create_demo_tests_line_391"
+          description: "Data access layer must validate demo tests, not create them (line 391)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from src.data_access.test_generation_data_access import TestGenerationDataAccess
+            
+            def test_data_access_does_not_create_demo_tests_line_391():
+                """RED: Validator must not create demo test files - should fail with current actor code"""
+                data_access = TestGenerationDataAccess()
+                demo_test_path = "/tmp/test_validator_check_391.py"
+                
+                # Clean up if exists
+                if os.path.exists(demo_test_path):
+                    os.remove(demo_test_path)
+                
+                try:
+                    # This will currently CREATE the demo test file (actor behavior)
+                    result = data_access.create_demo_test(demo_test_path)
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(demo_test_path), \
+                        "ACTOR BEHAVIOR DETECTED: Data access created demo test file at line 391"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(demo_test_path):
+                        os.remove(demo_test_path)
+          refactoring_requirement:
+            before: "Creates demo test file using write_text()"
+            after: "Receives demo_test_path and validates it exists with correct content"
+            signature_change: "create_demo_test() → validate_demo_test(demo_test_path: str)"
+
+    behavior_006_test:
+      file: "src/business_logic/test_generation_verification_logic.py"
+      line: 907
+      current_behavior: "demo_test.write_text(test_template)"
+      target_behavior: "validate_test_template_applied(demo_test_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_business_logic_does_not_generate_tests_line_907"
+          description: "Business logic must validate test generation, not generate tests (line 907)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from src.business_logic.test_generation_verification_logic import TestGenerationVerificationLogic
+            
+            def test_business_logic_does_not_generate_tests_line_907():
+                """RED: Validator must not generate test files - should fail with current actor code"""
+                logic = TestGenerationVerificationLogic()
+                demo_test_path = "/tmp/test_validator_check_907.py"
+                
+                # Clean up if exists
+                if os.path.exists(demo_test_path):
+                    os.remove(demo_test_path)
+                
+                try:
+                    # This will currently CREATE the test file (actor behavior)
+                    result = logic.generate_test_from_template(demo_test_path, "template")
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(demo_test_path), \
+                        "ACTOR BEHAVIOR DETECTED: Business logic generated test file at line 907"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(demo_test_path):
+                        os.remove(demo_test_path)
+          refactoring_requirement:
+            before: "Generates test file from template using write_text()"
+            after: "Receives demo_test_path and validates template was applied correctly"
+            signature_change: "generate_test_from_template() → validate_test_template(demo_test_path: str, expected_template: str)"
+
+    behavior_007_test:
+      file: "legacy/utilities/tdd_workflow_enforcer.py"
+      line: 480
+      current_behavior: "f.write(parser_content)"
+      target_behavior: "validate_parser_file_exists(parser_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_enforcer_does_not_create_parser_files_line_480"
+          description: "Enforcer must validate parser files, not create them (line 480)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_enforcer import TDDWorkflowEnforcer
+            
+            def test_enforcer_does_not_create_parser_files_line_480():
+                """RED: Validator must not create parser files - should fail with current actor code"""
+                enforcer = TDDWorkflowEnforcer()
+                parser_file_path = "/tmp/test_validator_check_480.py"
+                
+                # Clean up if exists
+                if os.path.exists(parser_file_path):
+                    os.remove(parser_file_path)
+                
+                try:
+                    # This will currently CREATE the parser file (actor behavior)
+                    result = enforcer.create_parser_file(parser_file_path, "parser_content")
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(parser_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Enforcer created parser file at line 480"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(parser_file_path):
+                        os.remove(parser_file_path)
+          refactoring_requirement:
+            before: "Creates parser file using f.write()"
+            after: "Receives parser_file_path and validates it exists with correct content"
+            signature_change: "create_parser_file() → validate_parser_file(parser_file_path: str)"
+
+    behavior_008_test:
+      file: "legacy/utilities/tdd_workflow_enforcer.py"
+      line: 504
+      current_behavior: "f.write(generator_content)"
+      target_behavior: "validate_generator_file_exists(generator_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_enforcer_does_not_create_generator_files_line_504"
+          description: "Enforcer must validate generator files, not create them (line 504)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_enforcer import TDDWorkflowEnforcer
+            
+            def test_enforcer_does_not_create_generator_files_line_504():
+                """RED: Validator must not create generator files - should fail with current actor code"""
+                enforcer = TDDWorkflowEnforcer()
+                generator_file_path = "/tmp/test_validator_check_504.py"
+                
+                # Clean up if exists
+                if os.path.exists(generator_file_path):
+                    os.remove(generator_file_path)
+                
+                try:
+                    # This will currently CREATE the generator file (actor behavior)
+                    result = enforcer.create_generator_file(generator_file_path, "generator_content")
+                    
+                    # ASSERTION: File should NOT have been created
+                    assert not os.path.exists(generator_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Enforcer created generator file at line 504"
+                    
+                except NotImplementedError:
+                    # Expected after refactoring
+                    pass
+                finally:
+                    if os.path.exists(generator_file_path):
+                        os.remove(generator_file_path)
+          refactoring_requirement:
+            before: "Creates generator file using f.write()"
+            after: "Receives generator_file_path and validates it exists with correct content"
+            signature_change: "create_generator_file() → validate_generator_file(generator_file_path: str)"
+
+    behavior_009_test:
+      file: "legacy/utilities/tdd_workflow_enforcer.py"
+      line: 820
+      current_behavior: "baseline_file.write(baseline_data)"
+      target_behavior: "validate_baseline_file_exists(baseline_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_enforcer_does_not_create_baseline_files_line_820"
+          description: "Enforcer should validate baseline files exist, not create them (line 820)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          note: "This might be EVIDENCE behavior (creating validation baseline) - needs context review"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_enforcer import TDDWorkflowEnforcer
+            
+            def test_enforcer_does_not_create_baseline_files_line_820():
+                """RED: Validator baseline creation - needs context review (might be EVIDENCE)"""
+                enforcer = TDDWorkflowEnforcer()
+                baseline_file_path = "/tmp/test_validator_check_820.json"
+                
+                # Clean up if exists
+                if os.path.exists(baseline_file_path):
+                    os.remove(baseline_file_path)
+                
+                try:
+                    # This currently creates baseline file
+                    # QUESTION: Is this EVIDENCE (OK) or ACTOR (refactor)?
+                    result = enforcer.save_baseline(baseline_file_path, {"data": "baseline"})
+                    
+                    # IF this is test/code file baseline → ACTOR behavior (refactor)
+                    # IF this is validation evidence baseline → EVIDENCE behavior (keep)
+                    # For now, assuming ACTOR until proven otherwise
+                    assert not os.path.exists(baseline_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Enforcer created baseline file at line 820"
+                    
+                except NotImplementedError:
+                    pass
+                finally:
+                    if os.path.exists(baseline_file_path):
+                        os.remove(baseline_file_path)
+          refactoring_requirement:
+            before: "Creates baseline file"
+            after: "Receives baseline_file_path OR keep if EVIDENCE"
+            signature_change: "TBD - depends on context analysis"
+            review_needed: true
+
+    behavior_010_test:
+      file: "legacy/utilities/tdd_workflow_enforcer.py"
+      line: 863
+      current_behavior: "results_file.write(results_data)"
+      target_behavior: "validate_results_file_exists(results_file_path)"
+      class_name: "TestValidatorNoFileCreation"
+      tests:
+        - name: "test_enforcer_does_not_create_results_files_line_863"
+          description: "Enforcer should validate results files exist, not create them (line 863)"
+          expected_failure: "AssertionError - File was created by validator (actor behavior detected)"
+          note: "This might be EVIDENCE behavior (creating validation results) - needs context review"
+          test_code: |
+            import pytest
+            import os
+            from pathlib import Path
+            from legacy.utilities.tdd_workflow_enforcer import TDDWorkflowEnforcer
+            
+            def test_enforcer_does_not_create_results_files_line_863():
+                """RED: Validator results creation - needs context review (might be EVIDENCE)"""
+                enforcer = TDDWorkflowEnforcer()
+                results_file_path = "/tmp/test_validator_check_863.json"
+                
+                # Clean up if exists
+                if os.path.exists(results_file_path):
+                    os.remove(results_file_path)
+                
+                try:
+                    # This currently creates results file
+                    # QUESTION: Is this EVIDENCE (OK) or ACTOR (refactor)?
+                    result = enforcer.save_results(results_file_path, {"data": "results"})
+                    
+                    # IF this is test execution results → ACTOR behavior (refactor)
+                    # IF this is validation evidence results → EVIDENCE behavior (keep)
+                    # For now, assuming ACTOR until proven otherwise
+                    assert not os.path.exists(results_file_path), \
+                        "ACTOR BEHAVIOR DETECTED: Enforcer created results file at line 863"
+                    
+                except NotImplementedError:
+                    pass
+                finally:
+                    if os.path.exists(results_file_path):
+                        os.remove(results_file_path)
+          refactoring_requirement:
+            before: "Creates results file"
+            after: "Receives results_file_path OR keep if EVIDENCE"
+            signature_change: "TBD - depends on context analysis"
+            review_needed: true
+
+
+execution_plan:
+  name: "BATCH 1 EXECUTION PLAN (Day 1)"
+  description: "Systematic refactoring of 10 test file generation behaviors"
+  
+  morning_session:
+    duration: "4 hours"
+    activities:
+      - "Create tests/test_validator_no_actor_behavior.py"
+      - "Write all 10 RED tests (copy from this YAML)"
+      - "Run pytest → Confirm all 10 tests FAIL ✅"
+      - "Document which tests fail as expected"
+  
+  afternoon_session:
+    duration: "4 hours"
+    activities:
+      - "Refactor behaviors 001-005 (first 5)"
+      - "Change signatures to receive file paths"
+      - "Remove file creation code"
+      - "Add validation logic"
+      - "Run pytest → Confirm first 5 tests PASS ✅"
+  
+  checkpoint:
+    frequency: "After afternoon session"
+    validation:
+      - "Run full test suite: pytest tests/ -v"
+      - "Run FEATURE-003-02-01 tests: 66/66 should still pass"
+      - "Verify no regressions"
+      - "Commit progress"
+
+  day_2_plan:
+    activities:
+      - "Refactor behaviors 006-010 (remaining 5)"
+      - "REFACTOR phase: Improve code quality"
+      - "Final checkpoint: All 10 tests PASS"
+      - "Review behaviors 009-010 (might be EVIDENCE, not ACTOR)"
+
+
+success_metrics:
+  batch_1_complete_when:
+    - "All 10 RED tests created and FAILING with current code"
+    - "All 10 tests PASSING after refactoring"
+    - "Zero test files created by validator code"
+    - "All existing tests still passing (66/66)"
+    - "Code signatures changed to receive paths instead of creating files"
+  
+  validator_interface_established:
+    - "validate_test_file(test_file_path: str) → ValidationResult"
+    - "validate_implementation_file(impl_file_path: str) → ValidationResult"
+    - "validate_parser_file(parser_file_path: str) → ValidationResult"
+    - "validate_generator_file(generator_file_path: str) → ValidationResult"
+    - "All methods receive file paths from PROJECT-002 (actor)"
+    - "All methods validate existence and content, never create"
+
+  evidence_vs_actor_review:
+    - "Behaviors 009-010 need context review"
+    - "If baseline/results are validation evidence → Keep"
+    - "If baseline/results are test execution data → Refactor"
+    - "Document decision in refactoring log"
+
+
+next_batches:
+  batch_2:
+    name: "Test Directory Creation"
+    behaviors: 8
+    target_date: "Day 3 (2025-10-10)"
+    files:
+      - "legacy/utilities/tdd_workflow_enforcer.py (line 444)"
+      - "legacy/utilities/tdd_workflow_engine.py (line 199)"
+      - "src/user_interface/tdd_workflow_interface.py (lines 562, 569)"
+  
+  batch_3:
+    name: "Test Execution Subprocess"
+    behaviors: 15
+    target_date: "Day 4 (2025-10-11)"
+    files:
+      - "legacy/utilities/tdd_workflow_enforcer.py (lines 1062, 1135, 1400, 1540, 1696)"
+      - "legacy/utilities/real_tdd_gates.py (lines 46, 63, 112, 169, 186)"
+      - "legacy/utilities/real_tdd_green_phase_engine.py (lines 105, 130, 186, 206)"

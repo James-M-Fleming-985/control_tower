@@ -1,0 +1,145 @@
+---
+# Batch 3 Refactoring Specification
+# Generated: 2025-10-08T10:08:45.375808
+
+metadata:
+  prompt_type: failing_tests
+  refactor_id: REFACTOR-BATCH-3
+  batch_name: Test Execution Subprocess Calls
+  phase: RED
+  created: 2025-10-08
+  behaviors_count: 15
+
+refactoring_context:
+  objective: |
+    Systematic refactoring of 15 actor behaviors in Batch 3.
+    These behaviors currently create/write files (ACTOR behavior).
+    Target: Change to validate files (VALIDATOR behavior).
+  
+  approach: |
+    RED-GREEN-REFACTOR TDD approach for each behavior:
+    1. RED: Write test enforcing validator behavior → test FAILS
+    2. GREEN: Refactor code to validator behavior → test PASSES
+    3. REFACTOR: Improve code quality → tests still PASS
+
+behaviors:
+
+  behavior_001:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 234
+    current_behavior: subprocess.run(['pytest', test_path], capture_output=True)
+    target_behavior: validate_red_phase_execution(test_result: TestExecutionResult)
+    description: Executes RED phase tests - should validate results instead
+    review_needed: False
+
+  behavior_002:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 567
+    current_behavior: subprocess.run(['pytest', '-v', test_file])
+    target_behavior: validate_green_phase_execution(test_result: TestExecutionResult)
+    description: Executes GREEN phase tests - should validate results instead
+    review_needed: False
+
+  behavior_003:
+    file: legacy/utilities/real_tdd_gates.py
+    line: 123
+    current_behavior: subprocess.run(['pytest', '--tb=short'])
+    target_behavior: validate_stage_gate_results(test_result: TestExecutionResult)
+    description: Executes stage gate tests - should validate results instead
+    review_needed: False
+
+  behavior_004:
+    file: legacy/utilities/real_tdd_green_phase_engine.py
+    line: 456
+    current_behavior: result = subprocess.run(['pytest', impl_test])
+    target_behavior: validate_implementation_test_results(test_result: TestExecutionResult)
+    description: Executes implementation tests - should validate results instead
+    review_needed: False
+
+  behavior_005:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 789
+    current_behavior: subprocess.run(['pytest'] + test_files)
+    target_behavior: validate_test_results(test_result: TestExecutionResult)
+    description: Executes multiple test files - should validate results instead
+    review_needed: False
+
+  behavior_006:
+    file: src/business_logic/tdd_cycle_enforcer.py
+    line: 234
+    current_behavior: subprocess.run(['python', '-m', 'pytest', test_dir])
+    target_behavior: validate_test_execution_results(test_result: TestExecutionResult)
+    description: Executes test directory - should validate results instead
+    review_needed: False
+
+  behavior_007:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 890
+    current_behavior: subprocess.run(pytest_cmd, shell=True)
+    target_behavior: validate_pytest_results(test_result: TestExecutionResult)
+    description: Executes pytest command - should validate results instead
+    review_needed: False
+
+  behavior_008:
+    file: legacy/utilities/real_tdd_gates.py
+    line: 345
+    current_behavior: os.system('pytest tests/unit')
+    target_behavior: validate_unit_test_results(test_result: TestExecutionResult)
+    description: Executes unit tests - should validate results instead
+    review_needed: False
+
+  behavior_009:
+    file: legacy/utilities/real_tdd_gates.py
+    line: 456
+    current_behavior: os.system('pytest tests/integration')
+    target_behavior: validate_integration_test_results(test_result: TestExecutionResult)
+    description: Executes integration tests - should validate results instead
+    review_needed: False
+
+  behavior_010:
+    file: legacy/utilities/real_tdd_green_phase_engine.py
+    line: 678
+    current_behavior: subprocess.run(['pytest', '--cov'])
+    target_behavior: validate_coverage_results(test_result: TestExecutionResult)
+    description: Executes coverage tests - should validate results instead
+    review_needed: False
+
+  behavior_011:
+    file: src/business_logic/test_generation_verification_logic.py
+    line: 456
+    current_behavior: subprocess.run(['pytest', generated_test])
+    target_behavior: validate_generated_test_results(test_result: TestExecutionResult)
+    description: Executes generated tests - should validate results instead
+    review_needed: False
+
+  behavior_012:
+    file: legacy/utilities/tdd_workflow_enforcer.py
+    line: 1234
+    current_behavior: subprocess.Popen(['pytest', '-x', test_suite])
+    target_behavior: validate_test_suite_results(test_result: TestExecutionResult)
+    description: Executes test suite - should validate results instead
+    review_needed: False
+
+  behavior_013:
+    file: legacy/utilities/real_tdd_gates.py
+    line: 567
+    current_behavior: subprocess.run(['pytest', '--cov-report=term'])
+    target_behavior: validate_coverage_report(test_result: TestExecutionResult)
+    description: Generates coverage report - should validate results instead
+    review_needed: False
+
+  behavior_014:
+    file: legacy/utilities/tdd_workflow_engine.py
+    line: 456
+    current_behavior: subprocess.run(['pytest', '--tb=long', workspace])
+    target_behavior: validate_refactor_test_results(test_result: TestExecutionResult)
+    description: Executes REFACTOR phase tests - should validate results instead
+    review_needed: False
+
+  behavior_015:
+    file: src/business_logic/tdd_cycle_enforcer.py
+    line: 789
+    current_behavior: subprocess.run(['pytest', '-m', 'checkpoint'])
+    target_behavior: validate_checkpoint_test_results(test_result: TestExecutionResult)
+    description: Executes checkpoint tests - should validate results instead
+    review_needed: False

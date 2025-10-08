@@ -1,0 +1,134 @@
+# LAYER-003-03-03-02: Remediation Generator
+# Generates actionable remediation options for detected violations
+
+metadata:
+  requirement_id: LAYER-003-03-03-02
+  requirement_name: Remediation Generator
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-03
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+  
+  team_size: medium
+  risk_level: medium
+  
+  estimated_effort_hours: 8
+  actual_effort_hours: 0
+  progress_percentage: 0
+  status: not_started
+
+testing_requirements:
+  unit_tests:
+    required: true
+    minimum_count: 15
+    coverage_threshold: 0.90
+    focus_areas:
+      - Remediation option generation
+      - Context-aware suggestions
+      - Fix command generation
+      - Guidance message formatting
+  
+  integration_tests:
+    required: true
+    minimum_count: 8
+    coverage_threshold: 0.80
+    focus_areas:
+      - Integration with violation detector
+      - Integration with actor response format
+  
+  e2e_tests:
+    required: false
+
+quality_gates:
+  no_mocks_unless_specified: true
+  real_failing_tests_required: true
+  team_size_enforcement: true
+  full_requirements_verification: true
+
+acceptance_criteria:
+  - criterion: "AC-001: Generate fix-and-retry options for violations"
+    status: not_implemented
+    test_file: tests/layer/test_fix_retry_generation.py
+    related_feature_ac: FEATURE-003-03-03.AC-003
+    
+  - criterion: "AC-002: Generate continue-with-warning options where appropriate"
+    status: not_implemented
+    test_file: tests/layer/test_continue_warning_generation.py
+    related_feature_ac: FEATURE-003-03-03.AC-003
+    
+  - criterion: "AC-003: Provide specific guidance for each violation type"
+    status: not_implemented
+    test_file: tests/layer/test_specific_guidance.py
+    related_feature_ac: FEATURE-003-03-03.AC-003
+    
+  - criterion: "AC-004: Format options for actor presentation to user"
+    status: not_implemented
+    test_file: tests/layer/test_option_formatting.py
+
+implementations:
+  red_phase:
+    status: not_started
+    test_files:
+      - path: tests/layer/remediation/test_remediation_generator.py
+        requirement_id: LAYER-003-03-03-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        coverage_target: 0.90
+        test_count: 16
+        status: not_started
+  
+  green_phase:
+    status: not_started
+    implementation_files:
+      - path: src/orchestration/remediation_generator.py
+        requirement_id: LAYER-003-03-03-02
+        acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+        implements:
+          - "Generate fix-and-retry options"
+          - "Generate continue-with-warning options"
+          - "Create violation-specific guidance"
+          - "Format options for actor"
+        status: not_started
+  
+  refactor_phase:
+    status: not_started
+    refactored_files: []
+
+traceability:
+  auto_discovered: []
+  manually_registered:
+    - file: src/orchestration/remediation_generator.py
+      requirements: [LAYER-003-03-03-02]
+      acceptance_criteria: [AC-001, AC-002, AC-003, AC-004]
+  verification_status: pending
+
+# Remediation templates for different violation types
+remediation_templates:
+  mock_detected:
+    option_id: fix_mock_usage
+    action: fix_and_retry
+    description: "Remove or replace mocks with real implementations"
+    guidance: "Mocks detected in {file}:{line}. Replace with real implementations or add 'demo' to requirement if mocks are intentional."
+    
+  placeholder_test:
+    option_id: fix_placeholder
+    action: fix_and_retry
+    description: "Replace placeholder tests with real assertions"
+    guidance: "Placeholder test detected in {file}:{line}. Replace 'assert True' with real business logic assertions."
+    
+  coverage_below_threshold:
+    option_id: increase_coverage
+    action: fix_and_retry
+    description: "Add tests to meet {threshold}% coverage requirement"
+    guidance: "Coverage is {actual}%, need {required}%. Add tests for: {untested_functions}"
+    
+  team_size_mismatch:
+    option_id: adjust_complexity
+    action: fix_and_retry
+    description: "Adjust implementation complexity for {team_size} team"
+    guidance: "Implementation too {complex|simple} for {team_size} team. {specific_changes}"
+
+success_criteria:
+  - "Remediation options generated for all violation types"
+  - "Options include specific actionable guidance"
+  - "Fix-and-retry and continue-with-warning supported"
+  - "Options formatted correctly for actor"

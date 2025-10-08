@@ -1,0 +1,50 @@
+---
+# Batch 7: Evidence Storage Review (Part 1 of 4)
+# Created: 2025-10-08
+# Behaviors: ~50
+
+metadata:
+  batch_number: 7
+  batch_name: "Evidence Storage Review - Part 1"
+  target_days: "Day 8 Morning"
+  estimated_hours: 3.0
+  total_behaviors: 50
+  priority: "MEDIUM"
+  dependencies: ["Batch-6"]
+  review_only: true
+
+objective: |
+  REVIEW ONLY - Do not refactor automatically!
+  
+  Examine evidence file operations to determine:
+  1. Are they writing .json/.xml/.html (EVIDENCE - OK to keep)?
+  2. Are they writing .py test/code files (ACTOR - needs refactoring)?
+  
+  This is validator behavior IF creating validation evidence.
+  This is actor behavior IF creating code/test files.
+
+review_criteria:
+  keep_as_is:
+    - "Files with .json extension (validation evidence)"
+    - "Files with .xml extension (test results)"
+    - "Files with .html extension (coverage reports)"
+    - "Files with .md extension (documentation)"
+    - "Files with .txt extension (logs)"
+  
+  flag_for_refactoring:
+    - "Files with .py extension (code/test files)"
+    - "Files that execute code"
+    - "Files that create test infrastructure"
+
+behaviors:
+  - behavior_id: "BATCH-7-001 through BATCH-7-050"
+    note: "First 50 evidence storage operations to review"
+    file_pattern: "src/data_access/evidence_storage.py"
+    description: "Review file extension and purpose"
+
+deliverable:
+  - "Evidence review report (Batch 7)"
+  - "List of operations to KEEP (EVIDENCE)"
+  - "List of operations to REFACTOR (ACTOR)"
+
+next_batch: "Batch-8-spec.yaml"

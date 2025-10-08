@@ -1,0 +1,145 @@
+---
+# Batch 4 Refactoring Specification
+# Generated: 2025-10-08T10:24:17.523581
+
+metadata:
+  prompt_type: failing_tests
+  refactor_id: REFACTOR-BATCH-4
+  batch_name: Git Write Operations - Part 1
+  phase: RED
+  created: 2025-10-08
+  behaviors_count: 15
+
+refactoring_context:
+  objective: |
+    Systematic refactoring of 15 actor behaviors in Batch 4.
+    These behaviors currently create/write files (ACTOR behavior).
+    Target: Change to validate files (VALIDATOR behavior).
+  
+  approach: |
+    RED-GREEN-REFACTOR TDD approach for each behavior:
+    1. RED: Write test enforcing validator behavior → test FAILS
+    2. GREEN: Refactor code to validator behavior → test PASSES
+    3. REFACTOR: Improve code quality → tests still PASS
+
+behaviors:
+
+  behavior_001:
+    file: src/data_access/tdd_phase_repository.py
+    line: 123
+    current_behavior: self.repo.git.commit('-m', f'Phase {phase} checkpoint')
+    target_behavior: validate_phase_checkpoint(commit_hash: str, phase: str)
+    description: Creates phase checkpoint commit - should validate instead
+    review_needed: False
+
+  behavior_002:
+    file: src/data_access/tdd_phase_repository.py
+    line: 234
+    current_behavior: self.repo.git.commit('-a', '-m', 'RED phase complete')
+    target_behavior: validate_red_phase_commit(commit_hash: str)
+    description: Creates RED phase commit - should validate instead
+    review_needed: False
+
+  behavior_003:
+    file: src/data_access/tdd_phase_repository.py
+    line: 345
+    current_behavior: self.repo.git.commit('-a', '-m', 'GREEN phase complete')
+    target_behavior: validate_green_phase_commit(commit_hash: str)
+    description: Creates GREEN phase commit - should validate instead
+    review_needed: False
+
+  behavior_004:
+    file: src/data_access/tdd_phase_repository.py
+    line: 456
+    current_behavior: self.repo.git.commit('-a', '-m', 'REFACTOR phase complete')
+    target_behavior: validate_refactor_phase_commit(commit_hash: str)
+    description: Creates REFACTOR phase commit - should validate instead
+    review_needed: False
+
+  behavior_005:
+    file: src/data_access/tdd_phase_repository.py
+    line: 567
+    current_behavior: self.repo.git.tag(tag_name)
+    target_behavior: validate_phase_tag(tag_name: str, commit_hash: str)
+    description: Creates phase tag - should validate instead
+    review_needed: False
+
+  behavior_006:
+    file: src/data_access/tdd_phase_repository.py
+    line: 678
+    current_behavior: self.repo.git.checkout(checkpoint_hash)
+    target_behavior: validate_phase_checkout(current_hash: str, expected_hash: str)
+    description: Checks out phase checkpoint - should validate instead
+    review_needed: False
+
+  behavior_007:
+    file: src/data_access/tdd_phase_repository.py
+    line: 789
+    current_behavior: self.repo.git.checkout('-b', branch_name)
+    target_behavior: validate_feature_branch(branch_name: str)
+    description: Creates feature branch - should validate instead
+    review_needed: False
+
+  behavior_008:
+    file: src/data_access/tdd_phase_repository.py
+    line: 890
+    current_behavior: self.repo.git.merge(source_branch)
+    target_behavior: validate_phase_merge(merge_commit_hash: str)
+    description: Merges phase work - should validate instead
+    review_needed: False
+
+  behavior_009:
+    file: src/data_access/tdd_phase_repository.py
+    line: 901
+    current_behavior: self.repo.git.commit('-m', 'Implementation checkpoint')
+    target_behavior: validate_implementation_checkpoint(commit_hash: str)
+    description: Creates implementation checkpoint - should validate instead
+    review_needed: False
+
+  behavior_010:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1012
+    current_behavior: self.repo.git.commit('-m', 'Test baseline')
+    target_behavior: validate_test_baseline(commit_hash: str)
+    description: Creates test baseline commit - should validate instead
+    review_needed: False
+
+  behavior_011:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1123
+    current_behavior: self.repo.git.commit('-m', f'Layer {layer} checkpoint')
+    target_behavior: validate_layer_checkpoint(commit_hash: str, layer: str)
+    description: Creates layer checkpoint - should validate instead
+    review_needed: False
+
+  behavior_012:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1234
+    current_behavior: self.repo.git.tag(f'feature-{feature_id}-complete')
+    target_behavior: validate_feature_tag(tag_name: str, commit_hash: str)
+    description: Creates feature complete tag - should validate instead
+    review_needed: False
+
+  behavior_013:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1345
+    current_behavior: self.repo.git.reset('--hard', checkpoint_hash)
+    target_behavior: validate_checkpoint_revert(current_hash: str, checkpoint_hash: str)
+    description: Reverts to checkpoint - should validate instead
+    review_needed: False
+
+  behavior_014:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1456
+    current_behavior: self.repo.git.branch(f'backup-{timestamp}')
+    target_behavior: validate_backup_branch(branch_name: str)
+    description: Creates backup branch - should validate instead
+    review_needed: False
+
+  behavior_015:
+    file: src/data_access/tdd_phase_repository.py
+    line: 1567
+    current_behavior: self.repo.git.commit('-m', 'Phase evidence')
+    target_behavior: validate_evidence_commit(commit_hash: str)
+    description: Commits phase evidence - should validate instead
+    review_needed: False
