@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="9.812" timestamp="2025-10-09T08:34:43.419269+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.error_handling_and_retry_logic.test_error_handling_and_retry_logic_integration.TestErrorHandlingAndRetryLogicIntegration" name="test_standalone_integration" time="0.005"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/error_handling_and_retry_logic/test_error_handling_and_retry_logic_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.error_handling_and_retry_logic.test_error_handling_and_retry_logic_unit.TestErrorHandlingAndRetryLogicUnit" name="test_implement_exponential_backoff_retry_logic" time="0.004"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/error_handling_and_retry_logic/test_error_handling_and_retry_logic_unit.py:42: in test_implement_exponential_backoff_retry_logic
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.error_handling_and_retry_logic.test_error_handling_and_retry_logic_unit.TestErrorHandlingAndRetryLogicUnit" name="test_handle_api_timeout_errors_gracefully" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/error_handling_and_retry_logic/test_error_handling_and_retry_logic_unit.py:64: in test_handle_api_timeout_errors_gracefully
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.error_handling_and_retry_logic.test_error_handling_and_retry_logic_unit.TestErrorHandlingAndRetryLogicUnit" name="test_handle_rate_limit_errors_with_queueing" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/error_handling_and_retry_logic/test_error_handling_and_retry_logic_unit.py:86: in test_handle_rate_limit_errors_with_queueing
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.error_handling_and_retry_logic.test_error_handling_and_retry_logic_unit.TestErrorHandlingAndRetryLogicUnit" name="test_validate_ai_api_responses_for_code" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/error_handling_and_retry_logic/test_error_handling_and_retry_logic_unit.py:108: in test_validate_ai_api_responses_for_code
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase></testsuite></testsuites>

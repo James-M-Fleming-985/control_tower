@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="8.655" timestamp="2025-10-09T10:26:07.380930+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.test_code_generator.test_test_code_generator_integration.TestTestCodeGeneratorIntegration" name="test_standalone_integration" time="0.007"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/test_code_generator/test_test_code_generator_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.test_code_generator.test_test_code_generator_unit.TestTestCodeGeneratorUnit" name="test_generate_pytest_test_files_from_yaml" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/test_code_generator/test_test_code_generator_unit.py:42: in test_generate_pytest_test_files_from_yaml
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.test_code_generator.test_test_code_generator_unit.TestTestCodeGeneratorUnit" name="test_generated_tests_must_fail_in_red" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/test_code_generator/test_test_code_generator_unit.py:64: in test_generated_tests_must_fail_in_red
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.test_code_generator.test_test_code_generator_unit.TestTestCodeGeneratorUnit" name="test_build_prompts_from_yaml_using_template" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/test_code_generator/test_test_code_generator_unit.py:86: in test_build_prompts_from_yaml_using_template
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase></testsuite></testsuites>

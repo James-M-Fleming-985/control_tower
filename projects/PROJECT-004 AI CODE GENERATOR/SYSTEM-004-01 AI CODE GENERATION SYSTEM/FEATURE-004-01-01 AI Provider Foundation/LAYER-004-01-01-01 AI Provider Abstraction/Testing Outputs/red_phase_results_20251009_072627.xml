@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="13.661" timestamp="2025-10-09T07:26:29.088567+00:00" hostname="codespaces-c5f1c4"><testcase classname="tests.layer.ai_provider_abstraction.test_ai_provider_abstraction_integration.TestAiProviderAbstractionIntegration" name="test_standalone_integration" time="0.002"><failure message="AssertionError: Integration tests not implemented&#10;assert False">tests/layer/ai_provider_abstraction/test_ai_provider_abstraction_integration.py:22: in test_standalone_integration
+    assert False, "Integration tests not implemented"
+E   AssertionError: Integration tests not implemented
+E   assert False</failure></testcase><testcase classname="tests.layer.ai_provider_abstraction.test_ai_provider_abstraction_unit.TestAiProviderAbstractionUnit" name="test_define_aiproviderinterface_with_generate_code_method" time="0.002"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/ai_provider_abstraction/test_ai_provider_abstraction_unit.py:42: in test_define_aiproviderinterface_with_generate_code_method
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.ai_provider_abstraction.test_ai_provider_abstraction_unit.TestAiProviderAbstractionUnit" name="test_implement_openaiprovider_with_gpt_4_integration" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/ai_provider_abstraction/test_ai_provider_abstraction_unit.py:64: in test_implement_openaiprovider_with_gpt_4_integration
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.ai_provider_abstraction.test_ai_provider_abstraction_unit.TestAiProviderAbstractionUnit" name="test_implement_anthropicprovider_with_claude_integration" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/ai_provider_abstraction/test_ai_provider_abstraction_unit.py:86: in test_implement_anthropicprovider_with_claude_integration
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase><testcase classname="tests.layer.ai_provider_abstraction.test_ai_provider_abstraction_unit.TestAiProviderAbstractionUnit" name="test_implement_aiproviderfactory_for_provider_creation" time="0.001"><failure message="AssertionError: Implementation not complete&#10;assert None is not None">tests/layer/ai_provider_abstraction/test_ai_provider_abstraction_unit.py:108: in test_implement_aiproviderfactory_for_provider_creation
+    assert result is not None, "Implementation not complete"
+E   AssertionError: Implementation not complete
+E   assert None is not None</failure></testcase></testsuite></testsuites>

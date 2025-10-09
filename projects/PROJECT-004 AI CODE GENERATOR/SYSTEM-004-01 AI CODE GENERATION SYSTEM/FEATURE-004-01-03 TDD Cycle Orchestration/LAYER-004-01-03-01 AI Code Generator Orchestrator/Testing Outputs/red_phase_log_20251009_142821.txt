@@ -1,0 +1,120 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 15 items
+
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_execute_full_tdd_cycle FAILED [  6%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_test_generator FAILED [ 13%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_implementation_generator FAILED [ 20%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_verification_report_generation FAILED [ 26%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_end_to_end_layer_execution FAILED [ 33%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_orchestrator_initialization FAILED [ 40%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_load_yaml_requirements FAILED [ 46%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_red_phase FAILED [ 53%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_green_phase FAILED [ 60%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_refactor_phase FAILED [ 66%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_verification_phase FAILED [ 73%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_validate_phase_transitions FAILED [ 80%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_collect_evidence_per_phase FAILED [ 86%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_generate_verification_reports FAILED [ 93%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_handle_phase_failures FAILED [100%]
+ERROR: Coverage failure: total of 0 is less than fail-under=95
+
+
+=================================== FAILURES ===================================
+____ TestAICodeGeneratorOrchestratorIntegration.test_execute_full_tdd_cycle ____
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py:21: in test_execute_full_tdd_cycle
+    from src.layer.orchestrator.ai_code_generator_orchestrator import (
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_ TestAICodeGeneratorOrchestratorIntegration.test_integration_with_test_generator _
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py:59: in test_integration_with_test_generator
+    from src.layer.orchestrator.ai_code_generator_orchestrator import (
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_ TestAICodeGeneratorOrchestratorIntegration.test_integration_with_implementation_generator _
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py:85: in test_integration_with_implementation_generator
+    from src.layer.orchestrator.ai_code_generator_orchestrator import (
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_ TestAICodeGeneratorOrchestratorIntegration.test_verification_report_generation _
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py:117: in test_verification_report_generation
+    from src.layer.orchestrator.ai_code_generator_orchestrator import (
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+__ TestAICodeGeneratorOrchestratorIntegration.test_end_to_end_layer_execution __
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py:168: in test_end_to_end_layer_execution
+    from src.layer.orchestrator.ai_code_generator_orchestrator import (
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_____ TestAICodeGeneratorOrchestratorUnit.test_orchestrator_initialization _____
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:23: in test_orchestrator_initialization
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_______ TestAICodeGeneratorOrchestratorUnit.test_load_yaml_requirements ________
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:45: in test_load_yaml_requirements
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+__________ TestAICodeGeneratorOrchestratorUnit.test_execute_red_phase __________
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:64: in test_execute_red_phase
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_________ TestAICodeGeneratorOrchestratorUnit.test_execute_green_phase _________
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:88: in test_execute_green_phase
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_______ TestAICodeGeneratorOrchestratorUnit.test_execute_refactor_phase ________
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:115: in test_execute_refactor_phase
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_____ TestAICodeGeneratorOrchestratorUnit.test_execute_verification_phase ______
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:137: in test_execute_verification_phase
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_____ TestAICodeGeneratorOrchestratorUnit.test_validate_phase_transitions ______
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:160: in test_validate_phase_transitions
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+_____ TestAICodeGeneratorOrchestratorUnit.test_collect_evidence_per_phase ______
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:186: in test_collect_evidence_per_phase
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+____ TestAICodeGeneratorOrchestratorUnit.test_generate_verification_reports ____
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:211: in test_generate_verification_reports
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+________ TestAICodeGeneratorOrchestratorUnit.test_handle_phase_failures ________
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py:239: in test_handle_phase_failures
+    from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+E   ModuleNotFoundError: No module named 'src.layer.orchestrator'
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
+src/__init__.py                                                                0      0   100%
+src/layer/__init__.py                                                          0      0   100%
+src/layer/implementation_code_generator/__init__.py                            2      2     0%   3-8
+src/layer/implementation_code_generator/implementation_code_generator.py     140    140     0%   11-507
+src/layer/test_code_generator/__init__.py                                      2      2     0%   3-5
+src/layer/test_code_generator/test_code_generator.py                          11     11     0%   11-68
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                        155    155     0%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 0.00%
+=========================== short test summary info ============================
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_execute_full_tdd_cycle - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_test_generator - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_implementation_generator - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_verification_report_generation - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_end_to_end_layer_execution - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_orchestrator_initialization - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_load_yaml_requirements - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_red_phase - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_green_phase - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_refactor_phase - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_verification_phase - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_validate_phase_transitions - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_collect_evidence_per_phase - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_generate_verification_reports - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+FAILED tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_handle_phase_failures - ModuleNotFoundError: No module named 'src.layer.orchestrator'
+============================== 15 failed in 0.84s ==============================

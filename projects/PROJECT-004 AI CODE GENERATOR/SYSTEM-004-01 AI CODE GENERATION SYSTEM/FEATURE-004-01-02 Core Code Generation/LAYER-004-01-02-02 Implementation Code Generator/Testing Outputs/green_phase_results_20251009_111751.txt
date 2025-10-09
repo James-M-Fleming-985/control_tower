@@ -1,0 +1,57 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 29 items
+
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_generate_from_real_yaml_file PASSED [  3%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_generated_code_is_syntactically_valid PASSED [  6%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_generated_code_has_required_quality PASSED [ 10%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_multiple_yaml_files_generation PASSED [ 13%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_traceability_mapping_affects_generation PASSED [ 17%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_end_to_end_workflow PASSED [ 20%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_integration.py::TestImplementationCodeGeneratorIntegration::test_generated_implementation_has_all_methods PASSED [ 24%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestCodeValidatorUnit::test_validate_syntax_valid_code PASSED [ 27%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestCodeValidatorUnit::test_validate_syntax_invalid_code PASSED [ 31%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestCodeValidatorUnit::test_validate_quality_complete_code PASSED [ 34%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_parse_yaml_file_valid PASSED [ 37%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_parse_yaml_file_missing PASSED [ 41%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_extract_acceptance_criteria PASSED [ 44%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_extract_acceptance_criteria_empty PASSED [ 48%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_extract_traceability_mapping PASSED [ 51%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_extract_traceability_mapping_missing PASSED [ 55%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_generate_implementation_class PASSED [ 58%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_generate_implementation_methods PASSED [ 62%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_generate_implementation_from_yaml PASSED [ 65%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_add_docstrings PASSED [ 68%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_format_code PASSED [ 72%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_to_class_name PASSED [ 75%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_to_snake_case PASSED [ 79%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_to_method_name PASSED [ 82%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_parse_failing_tests_valid_file PASSED [ 86%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_parse_failing_tests_missing_file PASSED [ 89%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_add_type_hints PASSED [ 93%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_parse_yaml_file_empty PASSED [ 96%]
+tests/layer/implementation_code_generator/test_implementation_code_generator_unit.py::TestImplementationCodeGeneratorUnit::test_generate_implementation_from_yaml_invalid_syntax PASSED [100%]
+ERROR: Coverage failure: total of 89 is less than fail-under=95
+
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
+src/__init__.py                                                                0      0   100%
+src/layer/__init__.py                                                          0      0   100%
+src/layer/implementation_code_generator/__init__.py                            2      0   100%
+src/layer/implementation_code_generator/implementation_code_generator.py     121      2    98%   338, 366
+src/layer/test_code_generator/__init__.py                                      2      2     0%   3-5
+src/layer/test_code_generator/test_code_generator.py                          11     11     0%   11-68
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                        136     15    89%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 88.97%
+============================== 29 passed in 0.74s ==============================

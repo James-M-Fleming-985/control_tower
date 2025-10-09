@@ -1,0 +1,6 @@
+test_pyramid_validation:
+  actual_ratio: 1.57
+  integration_tests: 7
+  required_ratio: 2.0
+  status: FAILED
+  unit_tests: 11
