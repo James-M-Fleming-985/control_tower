@@ -132,7 +132,7 @@ layers:
   
   - layer_id: LAYER-003-03-01-02
     name: Stage Sequencing Engine
-    requirement_file: LAYER-003-03-01-02_stage_sequencing.yaml
+    requirement_file: LAYER-003-03-01-02_stage_sequencing_engine.yaml
     status: in_progress
   
   - layer_id: LAYER-003-03-01-03

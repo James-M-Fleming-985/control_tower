@@ -1,0 +1,37 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/py-utils/venvs/pytest/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 6 items
+
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_execute_layer_with_ai_generate_flag XFAIL [ 16%]
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_execute_requirements_script_integration XFAIL [ 33%]
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_backward_compatibility_without_ai_flag XFAIL [ 50%]
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_integration_with_existing_execute_layer XFAIL [ 66%]
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_ai_orchestrator_lifecycle_integration XFAIL [ 83%]
+tests/test_execute_layer_integration_integration.py::TestExecuteLayerIntegrationIntegration::test_concurrent_execution_integration XFAIL [100%]
+ERROR: Coverage failure: total of 0 is less than fail-under=95
+
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
+src/__init__.py                                                                0      0   100%
+src/concurrent_layer_executor.py                                              73     73     0%   17-333
+src/layer/__init__.py                                                          0      0   100%
+src/layer/implementation_code_generator/__init__.py                            2      2     0%   3-8
+src/layer/implementation_code_generator/implementation_code_generator.py     140    140     0%   11-507
+src/layer/orchestrator/__init__.py                                             2      2     0%   5-9
+src/layer/orchestrator/ai_code_generator_orchestrator.py                      98     98     0%   8-457
+src/layer/test_code_generator/__init__.py                                      2      2     0%   3-5
+src/layer/test_code_generator/test_code_generator.py                          11     11     0%   11-68
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                        328    328     0%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 95% not reached. Total coverage: 0.00%
+============================== 6 xfailed in 0.45s ==============================

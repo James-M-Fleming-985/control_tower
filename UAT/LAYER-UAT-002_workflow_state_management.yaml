@@ -1,0 +1,344 @@
+# UAT TEST SPECIFICATION
+# Layer: LAYER-003-03-01-01 Workflow State Management
+# Purpose: User Acceptance Testing for SYSTEM-004-01 AI Code Generation System
+# Test Date: 2025-10-10
+# Feature: Real production feature from PROJECT-003 TDD ENFORCER
+
+layer_metadata:
+  requirement_id: LAYER-003-03-01-01
+  requirement_name: "Workflow State Management"
+  requirement_type: Layer
+  parent_feature: FEATURE-003-03-01
+  parent_system: SYSTEM-003-03
+  parent_project: PROJECT-003 TDD ENFORCER
+
+  team_size: medium
+  risk_level: high
+  
+  description: >
+    This layer manages workflow execution state, stage tracking, and persistence
+    for the TDD Enforcer's 10-stage workflow orchestration system. It tracks
+    which stages have completed, maintains current execution state, and provides
+    recovery capabilities through state persistence.
+
+acceptance_criteria:
+  AC-001:
+    criterion_id: AC-001
+    criterion: "Initialize workflow state with all stages"
+    description: >
+      Create a WorkflowStateManager class that initializes a workflow with all
+      10 TDD stages, tracking their status (pending, in_progress, completed, failed)
+    priority: critical
+    
+    function_signature: "WorkflowStateManager.__init__(workflow_id: str, stages: List[str])"
+    
+    examples:
+      - scenario: "Initialize with 10 standard TDD stages"
+        input:
+          workflow_id: "wf-001"
+          stages: 
+            - "stage_gate_1_requirement_parsing"
+            - "stage_gate_2_test_specification"
+            - "stage_gate_3_test_generation"
+            - "stage_gate_4_test_validation"
+            - "stage_gate_5_red_phase"
+            - "stage_gate_6_implementation"
+            - "stage_gate_7_green_phase"
+            - "stage_gate_8_refactoring"
+            - "stage_gate_9_documentation"
+            - "stage_gate_10_verification"
+        expected_state:
+          workflow_id: "wf-001"
+          total_stages: 10
+          current_stage_index: 0
+          status: "initialized"
+          all_stages_status: "pending"
+    
+    edge_cases:
+      - input:
+          workflow_id: ""
+          stages: []
+        expected_behavior: "Raise ValueError('Workflow ID cannot be empty')"
+        description: "Reject empty workflow ID"
+      
+      - input:
+          workflow_id: "wf-002"
+          stages: ["stage1"]
+        expected_state:
+          workflow_id: "wf-002"
+          total_stages: 1
+        description: "Support single-stage workflow"
+    
+    error_conditions:
+      - condition: "Workflow ID is None or empty"
+        expected_behavior: "Raise ValueError"
+      - condition: "Stages list is None"
+        expected_behavior: "Raise ValueError"
+
+  AC-002:
+    criterion_id: AC-002
+    criterion: "Track current stage and completion status"
+    description: >
+      Provide methods to advance to next stage, mark stages as completed/failed,
+      and query current workflow status
+    priority: critical
+    
+    methods:
+      - signature: "get_current_stage() -> str"
+        description: "Return the name of the current stage"
+        returns: "str - Current stage name"
+      
+      - signature: "advance_to_next_stage() -> bool"
+        description: "Move workflow to next stage"
+        returns: "bool - True if advanced, False if at last stage"
+      
+      - signature: "mark_stage_completed(stage_name: str) -> None"
+        description: "Mark a specific stage as completed"
+        raises: "ValueError if stage doesn't exist"
+      
+      - signature: "mark_stage_failed(stage_name: str, error: str) -> None"
+        description: "Mark a specific stage as failed with error message"
+        raises: "ValueError if stage doesn't exist"
+      
+      - signature: "get_workflow_status() -> Dict[str, Any]"
+        description: "Return complete workflow status summary"
+        returns: "Dict with workflow_id, current_stage, completed_count, failed_count, status"
+    
+    examples:
+      - scenario: "Track progression through stages"
+        steps:
+          - action: "get_current_stage()"
+            expected: "stage_gate_1_requirement_parsing"
+          - action: "mark_stage_completed('stage_gate_1_requirement_parsing')"
+            expected: "stage 1 marked completed"
+          - action: "advance_to_next_stage()"
+            expected: "True (advanced to stage 2)"
+          - action: "get_current_stage()"
+            expected: "stage_gate_2_test_specification"
+          - action: "get_workflow_status()"
+            expected:
+              completed_count: 1
+              failed_count: 0
+              current_stage: "stage_gate_2_test_specification"
+              status: "in_progress"
+      
+      - scenario: "Handle stage failure"
+        steps:
+          - action: "mark_stage_failed('stage_gate_3_test_generation', 'Syntax error in generated test')"
+            expected: "stage 3 marked failed"
+          - action: "get_workflow_status()"
+            expected:
+              failed_count: 1
+              status: "failed"
+    
+    edge_cases:
+      - scenario: "Attempt to advance past last stage"
+        steps:
+          - action: "advance to stage 10"
+          - action: "advance_to_next_stage()"
+            expected: "False (cannot advance beyond last stage)"
+      
+      - scenario: "Mark non-existent stage"
+        action: "mark_stage_completed('invalid_stage')"
+        expected_behavior: "Raise ValueError('Stage invalid_stage not found')"
+    
+    error_conditions:
+      - condition: "Stage name doesn't exist in workflow"
+        expected_behavior: "Raise ValueError"
+
+  AC-003:
+    criterion_id: AC-003
+    criterion: "Persist state for recovery capability"
+    description: >
+      Save workflow state to persistent storage (JSON file) and restore from
+      saved state to enable workflow recovery after failures
+    priority: high
+    
+    methods:
+      - signature: "save_state(file_path: str) -> None"
+        description: "Persist current workflow state to JSON file"
+        raises: "IOError if file cannot be written"
+      
+      - signature: "load_state(file_path: str) -> WorkflowStateManager"
+        description: "Restore workflow state from JSON file"
+        returns: "WorkflowStateManager instance with restored state"
+        is_classmethod: true
+        raises: "IOError if file cannot be read, ValueError if invalid format"
+    
+    examples:
+      - scenario: "Save and restore workflow state"
+        steps:
+          - action: "Initialize workflow wf-003"
+          - action: "Complete stages 1-3"
+          - action: "save_state('/tmp/workflow_state.json')"
+            expected: "State saved to file"
+          - action: "load_state('/tmp/workflow_state.json')"
+            expected:
+              workflow_id: "wf-003"
+              completed_count: 3
+              current_stage: "stage_gate_4_test_validation"
+              status: "in_progress"
+    
+    edge_cases:
+      - scenario: "Save to non-existent directory"
+        action: "save_state('/invalid/path/state.json')"
+        expected_behavior: "Raise IOError"
+      
+      - scenario: "Load from non-existent file"
+        action: "load_state('/nonexistent/state.json')"
+        expected_behavior: "Raise IOError"
+      
+      - scenario: "Load from corrupted JSON"
+        setup: "Create file with invalid JSON"
+        action: "load_state('corrupted.json')"
+        expected_behavior: "Raise ValueError('Invalid state file format')"
+    
+    error_conditions:
+      - condition: "File path is None or empty"
+        expected_behavior: "Raise ValueError"
+      - condition: "File cannot be created/written"
+        expected_behavior: "Raise IOError"
+      - condition: "File contains invalid JSON"
+        expected_behavior: "Raise ValueError"
+
+  AC-004:
+    criterion_id: AC-004
+    criterion: "Validate state transitions"
+    description: >
+      Ensure workflow state transitions are valid (e.g., can't skip stages,
+      can't complete a stage that hasn't been started, can't restart completed workflow)
+    priority: high
+    
+    methods:
+      - signature: "can_advance() -> bool"
+        description: "Check if workflow can advance to next stage"
+        returns: "bool - True if current stage is completed and not at end"
+      
+      - signature: "validate_transition(from_stage: str, to_stage: str) -> bool"
+        description: "Validate if transition from one stage to another is allowed"
+        returns: "bool - True if transition is valid"
+      
+      - signature: "is_workflow_complete() -> bool"
+        description: "Check if all stages are completed"
+        returns: "bool - True if workflow is fully completed"
+    
+    examples:
+      - scenario: "Prevent skipping stages"
+        steps:
+          - action: "Initialize workflow"
+          - action: "validate_transition('stage_gate_1_requirement_parsing', 'stage_gate_3_test_generation')"
+            expected: "False (cannot skip stage 2)"
+          - action: "validate_transition('stage_gate_1_requirement_parsing', 'stage_gate_2_test_specification')"
+            expected: "True (sequential transition allowed)"
+      
+      - scenario: "Prevent advancing with incomplete current stage"
+        steps:
+          - action: "get_current_stage() returns stage 1"
+          - action: "can_advance()"
+            expected: "False (current stage not marked completed)"
+          - action: "mark_stage_completed('stage_gate_1_requirement_parsing')"
+          - action: "can_advance()"
+            expected: "True (current stage completed)"
+      
+      - scenario: "Detect workflow completion"
+        steps:
+          - action: "Complete stages 1-9"
+          - action: "is_workflow_complete()"
+            expected: "False (stage 10 pending)"
+          - action: "mark_stage_completed('stage_gate_10_verification')"
+          - action: "is_workflow_complete()"
+            expected: "True (all stages completed)"
+    
+    edge_cases:
+      - scenario: "Check completion with failed stages"
+        steps:
+          - action: "Complete stages 1-8"
+          - action: "mark_stage_failed('stage_gate_9_documentation', 'Error')"
+          - action: "is_workflow_complete()"
+            expected: "False (workflow has failures)"
+    
+    error_conditions:
+      - condition: "Invalid stage name in transition validation"
+        expected_behavior: "Raise ValueError"
+
+# Performance Requirements
+performance_requirements:
+  - requirement: "State initialization completes in < 100ms"
+    metric: "execution_time"
+    threshold: 0.1
+    test_file: "tests/layer/workflow_state/test_performance.py"
+  
+  - requirement: "State save/load operations complete in < 500ms"
+    metric: "io_operation_time"
+    threshold: 0.5
+    test_file: "tests/layer/workflow_state/test_performance.py"
+
+# Quality Requirements
+quality_requirements:
+  - requirement: "All public methods have type hints"
+    verification: "static_analysis"
+    
+  - requirement: "All public methods have docstrings"
+    verification: "static_analysis"
+    
+  - requirement: "Code follows PEP 8 style guidelines"
+    verification: "linter"
+    
+  - requirement: "Test coverage >= 90%"
+    verification: "coverage_report"
+
+# Expected Artifacts
+expected_artifacts:
+  implementation:
+    - file: "src/orchestration/state/workflow_state_manager.py"
+      classes:
+        - "WorkflowStateManager"
+      estimated_lines: 200-300
+  
+  tests:
+    - file: "tests/layer/workflow_state/test_workflow_state_manager_unit.py"
+      test_count: 12
+      categories: ["initialization", "tracking", "persistence", "validation"]
+    
+    - file: "tests/layer/workflow_state/test_workflow_state_manager_integration.py"
+      test_count: 6
+      categories: ["persistence_integration", "state_recovery"]
+  
+  verification:
+    - file: "Requirements Verification/requirements_verification_complete.yaml"
+    - file: "Requirements Verification/test_pyramid_report.yaml"
+    - file: "Requirements Verification/quality_gates_report.yaml"
+    - file: "Requirements Verification/execution_evidence.json"
+
+# Success Criteria
+success_criteria:
+  critical:
+    - "All 4 acceptance criteria implemented and tested"
+    - "All unit tests pass (100% pass rate)"
+    - "All integration tests pass (100% pass rate)"
+    - "Test pyramid ratio >= 2:1 (unit:integration)"
+    - "Test coverage >= 90%"
+    - "All quality gates PASSED (RED → GREEN → REFACTOR)"
+    - "Code is syntactically valid Python"
+  
+  quality:
+    - "All public methods have type hints"
+    - "All public methods have docstrings"
+    - "No PEP 8 violations"
+    - "Comprehensive error handling"
+    - "Clear and descriptive error messages"
+  
+  excellence:
+    - "Performance requirements met"
+    - "Edge cases thoroughly tested"
+    - "State recovery robustly tested"
+    - "Validation logic comprehensive"
+
+# Notes for AI Generator
+ai_generation_notes:
+  - "This is a REAL production feature for the TDD Enforcer system"
+  - "WorkflowStateManager must track 10 distinct TDD stages"
+  - "State persistence uses JSON format for human readability"
+  - "Validation prevents invalid workflow progressions"
+  - "Recovery capability is critical for long-running workflows"
+  - "This layer will be used by the Stage Sequencing Engine (LAYER-003-03-01-02)"

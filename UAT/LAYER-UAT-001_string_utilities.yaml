@@ -1,0 +1,95 @@
+# UAT TEST LAYER SPECIFICATION
+# Layer: LAYER-UAT-001 String Utilities
+# Purpose: User Acceptance Testing for SYSTEM-004-01 AI Code Generation System
+# Test Date: 2025-10-10
+
+layer_metadata:
+  requirement_id: LAYER-UAT-001
+  requirement_name: "String Utilities"
+  requirement_type: Layer
+  parent_feature: FEATURE-UAT-001
+  parent_system: SYSTEM-UAT-001
+  parent_project: PROJECT-UAT
+
+  team_size: small
+  risk_level: low
+
+acceptance_criteria:
+  AC-001:
+    criterion_id: AC-001
+    criterion: "Implement capitalize_words() function"
+    description: "Create a function that capitalizes the first letter of each word in a string"
+    priority: high
+    
+    function_signature: "capitalize_words(text: str) -> str"
+    
+    examples:
+      - input: "hello world"
+        expected_output: "Hello World"
+      - input: "python is awesome"
+        expected_output: "Python Is Awesome"
+      - input: "already Capitalized"
+        expected_output: "Already Capitalized"
+    
+    edge_cases:
+      - input: ""
+        expected_output: ""
+        description: "Empty string should return empty string"
+      - input: "   spaces   "
+        expected_output: "   Spaces   "
+        description: "Preserve leading/trailing spaces"
+    
+    error_conditions:
+      - condition: "Input is not a string"
+        expected_behavior: "Raise TypeError"
+
+  AC-002:
+    criterion_id: AC-002
+    criterion: "Implement reverse_words() function"
+    description: "Create a function that reverses the order of words in a string"
+    priority: high
+    
+    function_signature: "reverse_words(text: str) -> str"
+    
+    examples:
+      - input: "hello world"
+        expected_output: "world hello"
+      - input: "one two three"
+        expected_output: "three two one"
+    
+    edge_cases:
+      - input: ""
+        expected_output: ""
+      - input: "single"
+        expected_output: "single"
+    
+    error_conditions:
+      - condition: "Input is not a string"
+        expected_behavior: "Raise TypeError"
+
+  AC-003:
+    criterion_id: AC-003
+    criterion: "Implement count_vowels() function"
+    description: "Create a function that counts the number of vowels (a,e,i,o,u) in a string"
+    priority: medium
+    
+    function_signature: "count_vowels(text: str) -> int"
+    
+    examples:
+      - input: "hello"
+        expected_output: 2
+      - input: "AEIOU"
+        expected_output: 5
+      - input: "xyz"
+        expected_output: 0
+    
+    edge_cases:
+      - input: ""
+        expected_output: 0
+      - input: "Hello World!"
+        expected_output: 3
+        description: "Case insensitive and ignore non-letters"
+    
+    error_conditions:
+      - condition: "Input is not a string"
+        expected_behavior: "Raise TypeError"

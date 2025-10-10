@@ -1,0 +1,688 @@
+---
+# Failing Tests Prompt - AI Code Generator Orchestrator Integration
+# RED PHASE: Tests for AI Provider Integration
+
+metadata:
+  prompt_type: "failing_tests"
+  feature_id: "FEATURE-004-01-03"
+  layer_id: "LAYER-004-01-03-01"
+  feature_name: "TDD Cycle Orchestration"
+  layer_name: "AI Code Generator Orchestrator"
+  tdd_phase: "RED"
+  created_date: "2025-10-10"
+  timestamp: "20251010_214607"
+  issue: "Orchestrator is stub implementation - does not call AI providers"
+  fix_scope: "Integrate LAYER-004-01-01-01 (AI Provider Abstraction) into orchestrator"
+
+testing_context:
+  target_implementation: "LAYER-004-01-03-01 AI Code Generator Orchestrator"
+  source_document: "LAYER-004-01-03-01_ai_code_generator_orchestrator.yaml"
+  tdd_phase: "RED"
+  phase_description: "Create failing tests for AI provider integration"
+  test_scope: "AI_PROVIDER_INTEGRATION"
+  test_file_pattern: "test_ai_code_generator_orchestrator_integration.py"
+  
+  current_problem:
+    description: "Orchestrator returns mock success without calling AI providers"
+    evidence:
+      - "execute_full_cycle() returns stub data"
+      - "execute_red_phase() returns fake test file names"
+      - "execute_green_phase() returns fake implementation"
+      - "No calls to AIProviderFactory or provider.generate_code()"
+      - "Empty output directories after build_feature.py runs"
+    
+  acceptance_criteria:
+    AC-001:
+      criterion: "Execute complete RED->GREEN->REFACTOR cycle automatically"
+      status: "FAILING - stub implementation only"
+      priority: "critical"
+      
+  dependencies:
+    working_layer: "LAYER-004-01-01-01 AI Provider Abstraction"
+    status: "COMPLETE ✅"
+    location: "src/layer/ai_provider_abstraction/ai_provider_abstraction.py"
+    classes:
+      - "AIProviderInterface (ABC)"
+      - "OpenAIProvider"
+      - "AnthropicProvider"
+      - "AIProviderFactory"
+
+orchestrator_integration_tests:
+  name: "AI PROVIDER INTEGRATION FAILING TESTS"
+  description: "Tests that verify orchestrator actually calls AI providers to generate code"
+  test_file: "tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py"
+  execution_scope: "ORCHESTRATOR_AI_INTEGRATION"
+
+  integration_requirements_tests:
+    name: "AI PROVIDER INTEGRATION REQUIREMENTS"
+    description: "Tests for real AI provider integration in orchestrator"
+
+    ai_provider_initialization_tests:
+      requirement_id: "REQ-ORCH-INT-001"
+      requirement_name: "Initialize AI Provider from Config"
+      class_name: "TestOrchestratorAIProviderIntegration"
+      description: "Orchestrator must initialize AI provider using AIProviderFactory"
+      
+      tests:
+        - name: "test_orchestrator_initializes_ai_provider_from_config"
+          description: "Should create AI provider instance from config['provider']"
+          expected_failure: "AssertionError - AIProviderFactory.create_provider() not called"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch, MagicMock
+            from pathlib import Path
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_orchestrator_initializes_ai_provider_from_config():
+                """RED: Orchestrator should initialize AI provider from config"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                    mock_provider = Mock()
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    
+                    # EXPECTED: orchestrator should initialize AI provider
+                    # ACTUAL: orchestrator doesn't import or use AIProviderFactory
+                    mock_factory.create_provider.assert_called_once_with('anthropic')
+                    
+                    # This will FAIL because orchestrator is stub
+          requirements:
+            - "Import AIProviderFactory from LAYER-004-01-01-01"
+            - "Call AIProviderFactory.create_provider(config['provider'])"
+            - "Store provider instance in self.ai_provider"
+            - "Support 'anthropic' and 'openai' provider types"
+
+        - name: "test_orchestrator_validates_provider_configuration"
+          description: "Should validate AI provider configuration before use"
+          expected_failure: "AssertionError - provider.validate_configuration() not called"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_orchestrator_validates_provider_configuration():
+                """RED: Orchestrator should validate provider config"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                    mock_provider = Mock()
+                    mock_provider.validate_configuration.return_value = True
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    
+                    # EXPECTED: Should validate provider configuration
+                    # ACTUAL: No validation logic exists
+                    mock_provider.validate_configuration.assert_called_once()
+                    
+                    # This will FAIL
+          requirements:
+            - "Call provider.validate_configuration()"
+            - "Raise ValueError if validation fails"
+            - "Log validation status"
+
+        - name: "test_orchestrator_fails_with_invalid_provider_type"
+          description: "Should raise error for unsupported provider types"
+          expected_failure: "No validation - accepts any provider value"
+          test_code: |
+            import pytest
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_orchestrator_fails_with_invalid_provider_type():
+                """RED: Should reject invalid provider types"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'invalid_provider'
+                }
+                
+                # EXPECTED: Should raise ValueError for unsupported provider
+                # ACTUAL: Config is accepted but provider never created
+                with pytest.raises(ValueError, match="Unsupported provider type"):
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    
+                # This will FAIL - no validation exists
+          requirements:
+            - "Validate provider type in config"
+            - "Raise ValueError with helpful message"
+            - "List supported providers in error message"
+
+    red_phase_ai_generation_tests:
+      requirement_id: "REQ-ORCH-INT-002"
+      requirement_name: "Generate Tests Using AI Provider"
+      class_name: "TestOrchestratorRedPhaseAI"
+      description: "RED phase must use AI provider to generate actual test code"
+      
+      tests:
+        - name: "test_red_phase_calls_ai_provider_for_test_generation"
+          description: "Should call provider.generate_code() with test generation prompt"
+          expected_failure: "AssertionError - generate_code() never called"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch, MagicMock
+            from pathlib import Path
+            import yaml
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_red_phase_calls_ai_provider_for_test_generation():
+                """RED: RED phase should call AI provider to generate tests"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                requirements = {
+                    'acceptance_criteria': [
+                        {
+                            'criterion_id': 'AC-001',
+                            'criterion': 'Test criterion',
+                            'priority': 'high'
+                        }
+                    ]
+                }
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                    mock_provider = Mock()
+                    mock_provider.generate_code.return_value = "def test_example(): pass"
+                    mock_provider.validate_configuration.return_value = True
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    result = orchestrator.execute_red_phase(requirements)
+                    
+                    # EXPECTED: Should call generate_code() with prompt
+                    # ACTUAL: Returns stub data without calling AI
+                    assert mock_provider.generate_code.called, "AI provider should be called for test generation"
+                    
+                    # Verify prompt contains requirements
+                    call_args = mock_provider.generate_code.call_args
+                    assert 'Test criterion' in call_args[0][0], "Prompt should contain acceptance criteria"
+                    
+                    # This will FAIL
+          requirements:
+            - "Build prompt from acceptance criteria"
+            - "Call self.ai_provider.generate_code(prompt)"
+            - "Include test requirements in prompt"
+            - "Return generated test code"
+
+        - name: "test_red_phase_writes_generated_tests_to_files"
+          description: "Should write AI-generated test code to test files"
+          expected_failure: "AssertionError - no files created"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from pathlib import Path
+            import tempfile
+            import shutil
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_red_phase_writes_generated_tests_to_files():
+                """RED: Should write generated tests to actual files"""
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    config = {
+                        'output_base_path': tmpdir,
+                        'provider': 'anthropic'
+                    }
+                    
+                    requirements = {
+                        'acceptance_criteria': [
+                            {'criterion_id': 'AC-001', 'criterion': 'Test'}
+                        ]
+                    }
+                    
+                    with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                        mock_provider = Mock()
+                        mock_provider.generate_code.return_value = "def test_example():\n    assert True"
+                        mock_provider.validate_configuration.return_value = True
+                        mock_factory.create_provider.return_value = mock_provider
+                        
+                        orchestrator = AICodeGeneratorOrchestrator(config=config)
+                        result = orchestrator.execute_red_phase(requirements)
+                        
+                        # EXPECTED: Should create test files
+                        # ACTUAL: No files created, just returns stub list
+                        test_files = list(Path(tmpdir).glob('**/test_*.py'))
+                        assert len(test_files) > 0, "Should create actual test files"
+                        
+                        # Verify file contains generated code
+                        if test_files:
+                            content = test_files[0].read_text()
+                            assert 'def test_example' in content, "File should contain generated test"
+                        
+                        # This will FAIL
+          requirements:
+            - "Create tests/ directory structure"
+            - "Write generated code to test_*.py files"
+            - "Name files based on acceptance criteria"
+            - "Return list of created file paths"
+
+        - name: "test_red_phase_executes_generated_tests_with_pytest"
+          description: "Should run generated tests and verify they fail"
+          expected_failure: "AssertionError - pytest not executed"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch, call
+            from pathlib import Path
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_red_phase_executes_generated_tests_with_pytest():
+                """RED: Should execute generated tests to verify RED phase"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                requirements = {
+                    'acceptance_criteria': [
+                        {'criterion_id': 'AC-001', 'criterion': 'Test'}
+                    ]
+                }
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory, \
+                     patch('subprocess.run') as mock_run:
+                    
+                    mock_provider = Mock()
+                    mock_provider.generate_code.return_value = "def test_example(): assert False"
+                    mock_provider.validate_configuration.return_value = True
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    # Mock pytest execution result (tests should fail in RED)
+                    mock_run.return_value = Mock(returncode=1, stdout=b'1 failed')
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    result = orchestrator.execute_red_phase(requirements)
+                    
+                    # EXPECTED: Should run pytest on generated tests
+                    # ACTUAL: No test execution occurs
+                    assert mock_run.called, "Should execute pytest on generated tests"
+                    
+                    # Verify pytest was called
+                    pytest_calls = [c for c in mock_run.call_args_list if 'pytest' in str(c)]
+                    assert len(pytest_calls) > 0, "Should call pytest"
+                    
+                    # Verify result indicates tests failed (RED phase requirement)
+                    assert result.get('tests_failed', 0) > 0, "RED phase should report failed tests"
+                    
+                    # This will FAIL
+          requirements:
+            - "Execute pytest on generated test files"
+            - "Capture test results"
+            - "Verify tests fail (RED phase requirement)"
+            - "Return count of failed tests"
+
+    green_phase_ai_generation_tests:
+      requirement_id: "REQ-ORCH-INT-003"
+      requirement_name: "Generate Implementation Using AI Provider"
+      class_name: "TestOrchestratorGreenPhaseAI"
+      description: "GREEN phase must use AI provider to generate implementation code"
+      
+      tests:
+        - name: "test_green_phase_calls_ai_provider_for_implementation"
+          description: "Should call provider.generate_code() with implementation prompt"
+          expected_failure: "AssertionError - generate_code() never called for implementation"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_green_phase_calls_ai_provider_for_implementation():
+                """RED: GREEN phase should call AI provider for implementation"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                requirements = {
+                    'acceptance_criteria': [
+                        {'criterion_id': 'AC-001', 'criterion': 'Implement feature X'}
+                    ]
+                }
+                
+                red_results = {
+                    'tests_generated': ['test_feature_x.py'],
+                    'tests_failed': 3
+                }
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                    mock_provider = Mock()
+                    mock_provider.generate_code.return_value = "class FeatureX:\n    pass"
+                    mock_provider.validate_configuration.return_value = True
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    result = orchestrator.execute_green_phase(requirements, red_results)
+                    
+                    # EXPECTED: Should call generate_code() for implementation
+                    # ACTUAL: Returns stub without calling AI
+                    assert mock_provider.generate_code.called, "Should call AI for implementation"
+                    
+                    # Verify prompt includes requirements and failed tests
+                    call_args = mock_provider.generate_code.call_args
+                    prompt = call_args[0][0]
+                    assert 'Implement feature X' in prompt, "Prompt should include requirements"
+                    
+                    # This will FAIL
+          requirements:
+            - "Build implementation prompt from requirements"
+            - "Include failed test information in prompt"
+            - "Call self.ai_provider.generate_code(prompt)"
+            - "Return generated implementation code"
+
+        - name: "test_green_phase_writes_implementation_to_src_files"
+          description: "Should write AI-generated implementation to source files"
+          expected_failure: "AssertionError - no source files created"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from pathlib import Path
+            import tempfile
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_green_phase_writes_implementation_to_src_files():
+                """RED: Should write generated implementation to src/ files"""
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    config = {
+                        'output_base_path': tmpdir,
+                        'provider': 'anthropic'
+                    }
+                    
+                    requirements = {
+                        'acceptance_criteria': [
+                            {'criterion_id': 'AC-001', 'criterion': 'Feature'}
+                        ],
+                        'layer_id': 'LAYER-TEST-01'
+                    }
+                    
+                    red_results = {'tests_failed': 3}
+                    
+                    with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+                        mock_provider = Mock()
+                        mock_provider.generate_code.return_value = "class Feature:\n    def method(self): pass"
+                        mock_provider.validate_configuration.return_value = True
+                        mock_factory.create_provider.return_value = mock_provider
+                        
+                        orchestrator = AICodeGeneratorOrchestrator(config=config)
+                        result = orchestrator.execute_green_phase(requirements, red_results)
+                        
+                        # EXPECTED: Should create src/ files with implementation
+                        # ACTUAL: No files created
+                        src_files = list(Path(tmpdir).glob('**/src/**/*.py'))
+                        assert len(src_files) > 0, "Should create source files in src/ directory"
+                        
+                        # Verify file contains generated implementation
+                        if src_files:
+                            content = src_files[0].read_text()
+                            assert 'class Feature' in content, "File should contain generated implementation"
+                        
+                        # This will FAIL
+          requirements:
+            - "Create src/ directory structure"
+            - "Write generated code to appropriate .py files"
+            - "Follow layer naming conventions"
+            - "Return list of created file paths"
+
+        - name: "test_green_phase_reruns_tests_and_verifies_passing"
+          description: "Should rerun tests after implementation and verify they pass"
+          expected_failure: "AssertionError - tests not re-executed"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_green_phase_reruns_tests_and_verifies_passing():
+                """RED: GREEN phase should rerun tests to verify they pass"""
+                config = {
+                    'output_base_path': '/tmp/test_output',
+                    'provider': 'anthropic'
+                }
+                
+                requirements = {'acceptance_criteria': [{'criterion': 'Test'}]}
+                red_results = {'tests_failed': 3, 'tests_generated': ['test_file.py']}
+                
+                with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory, \
+                     patch('subprocess.run') as mock_run:
+                    
+                    mock_provider = Mock()
+                    mock_provider.generate_code.return_value = "implementation"
+                    mock_provider.validate_configuration.return_value = True
+                    mock_factory.create_provider.return_value = mock_provider
+                    
+                    # Mock pytest execution - tests now pass
+                    mock_run.return_value = Mock(returncode=0, stdout=b'3 passed')
+                    
+                    orchestrator = AICodeGeneratorOrchestrator(config=config)
+                    result = orchestrator.execute_green_phase(requirements, red_results)
+                    
+                    # EXPECTED: Should rerun tests after generating implementation
+                    # ACTUAL: No test re-execution
+                    assert mock_run.called, "Should run pytest after implementation"
+                    
+                    # Verify result shows tests passing
+                    assert result.get('tests_passed', 0) > 0, "Should report passing tests"
+                    assert result.get('tests_passed') == red_results['tests_failed'], \
+                        "All previously failing tests should now pass"
+                    
+                    # This will FAIL
+          requirements:
+            - "Execute pytest after writing implementation"
+            - "Verify all previously failing tests now pass"
+            - "Calculate test coverage"
+            - "Return test execution results"
+
+    verification_phase_ai_tests:
+      requirement_id: "REQ-ORCH-INT-004"
+      requirement_name: "Generate Verification Reports"
+      class_name: "TestOrchestratorVerificationPhase"
+      description: "VERIFICATION phase must generate actual verification reports with evidence"
+      
+      tests:
+        - name: "test_generate_all_reports_creates_yaml_files"
+          description: "Should create YAML verification report files"
+          expected_failure: "AssertionError - no YAML files created"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from pathlib import Path
+            import tempfile
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_generate_all_reports_creates_yaml_files():
+                """RED: Should generate actual verification report files"""
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    config = {
+                        'output_base_path': tmpdir,
+                        'provider': 'anthropic'
+                    }
+                    
+                    phases = {
+                        'RED': {'tests_failed': 3},
+                        'GREEN': {'tests_passed': 3},
+                        'REFACTOR': {'improvements': ['refactor 1']}
+                    }
+                    
+                    requirements = {'acceptance_criteria': [{'criterion': 'Test'}]}
+                    
+                    with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory'):
+                        orchestrator = AICodeGeneratorOrchestrator(config=config)
+                        reports = orchestrator.generate_all_reports(phases, requirements)
+                        
+                        # EXPECTED: Should create YAML report files
+                        # ACTUAL: Returns stub data, no files created
+                        report_dir = Path(tmpdir) / "Requirements Verification"
+                        assert report_dir.exists(), "Should create Requirements Verification directory"
+                        
+                        yaml_files = list(report_dir.glob('*.yaml'))
+                        assert len(yaml_files) > 0, "Should create verification YAML files"
+                        
+                        # Verify expected reports exist
+                        expected_reports = [
+                            'requirements_verification',
+                            'test_pyramid_report',
+                            'traceability_matrix',
+                            'quality_gates_report'
+                        ]
+                        
+                        for report_name in expected_reports:
+                            matching_files = [f for f in yaml_files if report_name in f.name]
+                            assert len(matching_files) > 0, f"Should create {report_name}.yaml"
+                        
+                        # This will FAIL
+          requirements:
+            - "Create 'Requirements Verification' directory"
+            - "Generate requirements_verification.yaml"
+            - "Generate test_pyramid_report.yaml"
+            - "Generate traceability_matrix.yaml"
+            - "Generate quality_gates_report.yaml"
+            - "Include timestamp in filenames"
+
+        - name: "test_verification_reports_contain_actual_evidence"
+          description: "Verification reports should contain real test execution data"
+          expected_failure: "AssertionError - reports contain stub data"
+          test_code: |
+            import pytest
+            from unittest.mock import Mock, patch
+            from pathlib import Path
+            import tempfile
+            import yaml
+            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            def test_verification_reports_contain_actual_evidence():
+                """RED: Reports should contain real evidence, not stubs"""
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    config = {
+                        'output_base_path': tmpdir,
+                        'provider': 'anthropic'
+                    }
+                    
+                    phases = {
+                        'RED': {
+                            'tests_failed': 5,
+                            'tests_generated': ['test_file_1.py', 'test_file_2.py']
+                        },
+                        'GREEN': {
+                            'tests_passed': 5,
+                            'coverage': 0.96,
+                            'implementation_generated': ['src/feature.py']
+                        }
+                    }
+                    
+                    requirements = {
+                        'layer_id': 'LAYER-TEST-01',
+                        'acceptance_criteria': [
+                            {'criterion_id': 'AC-001', 'criterion': 'Feature X'}
+                        ]
+                    }
+                    
+                    with patch('src.layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory'):
+                        orchestrator = AICodeGeneratorOrchestrator(config=config)
+                        reports = orchestrator.generate_all_reports(phases, requirements)
+                        
+                        # Read generated YAML file
+                        report_dir = Path(tmpdir) / "Requirements Verification"
+                        report_file = list(report_dir.glob('requirements_verification*.yaml'))[0]
+                        
+                        with open(report_file) as f:
+                            report_data = yaml.safe_load(f)
+                        
+                        # EXPECTED: Report contains actual data from phases
+                        # ACTUAL: Report contains generic stub data
+                        assert report_data.get('layer_metadata', {}).get('requirement_id') == 'LAYER-TEST-01'
+                        assert report_data.get('test_verification', {}).get('total_tests') == 5
+                        assert 'AC-001' in str(report_data.get('acceptance_criteria_verification', {}))
+                        
+                        # This will FAIL - reports currently return stub data
+          requirements:
+            - "Include actual test counts from phase results"
+            - "Include coverage data from GREEN phase"
+            - "Map acceptance criteria to generated tests"
+            - "Include file paths of generated artifacts"
+            - "Calculate actual test pyramid ratios"
+
+success_criteria:
+  red_phase_success:
+    - "All 10 tests fail with expected errors"
+    - "Tests clearly show integration gaps"
+    - "NotImplementedError or AssertionError for each test"
+    - "Tests validate AI provider integration requirements"
+  
+  test_organization:
+    - "Tests grouped by integration requirement (REQ-ORCH-INT-001 through REQ-ORCH-INT-004)"
+    - "Clear test names indicating what integration is missing"
+    - "Comprehensive mocking to isolate orchestrator behavior"
+  
+  next_steps:
+    - "GREEN Phase: Implement AI provider integration"
+    - "Update orchestrator to import AIProviderFactory"
+    - "Implement real code generation using provider.generate_code()"
+    - "Create actual files instead of returning stub lists"
+    - "Execute pytest and collect real results"
+    - "Generate verification reports with actual evidence"
+
+implementation_requirements:
+  files_to_modify:
+    - path: "src/layer/orchestrator/ai_code_generator_orchestrator.py"
+      changes:
+        - "Import AIProviderFactory from LAYER-004-01-01-01"
+        - "Initialize self.ai_provider in __init__()"
+        - "Update execute_red_phase() to call AI for test generation"
+        - "Update execute_green_phase() to call AI for implementation"
+        - "Add file writing logic for generated code"
+        - "Add pytest execution logic"
+        - "Update generate_all_reports() to create actual YAML files"
+  
+  new_dependencies:
+    - "from src.layer.ai_provider_abstraction import AIProviderFactory"
+    - "import subprocess (for pytest execution)"
+    - "import yaml (for report generation)"
+  
+  expected_behavior_after_green:
+    - "build_feature.py runs successfully"
+    - "AI_GENERATED_FEATURES/<layer_id>/ contains actual code files"
+    - "Requirements Verification/ contains YAML reports"
+    - "Testing Outputs/ contains pytest logs"
+    - "Anthropic API is called with prompts"
+    - "Generated code makes tests pass"
+
+traceability:
+  requirement_to_test_mapping:
+    REQ-ORCH-INT-001:
+      requirement: "Initialize AI Provider from Config"
+      tests:
+        - "test_orchestrator_initializes_ai_provider_from_config"
+        - "test_orchestrator_validates_provider_configuration"
+        - "test_orchestrator_fails_with_invalid_provider_type"
+    
+    REQ-ORCH-INT-002:
+      requirement: "Generate Tests Using AI Provider"
+      tests:
+        - "test_red_phase_calls_ai_provider_for_test_generation"
+        - "test_red_phase_writes_generated_tests_to_files"
+        - "test_red_phase_executes_generated_tests_with_pytest"
+    
+    REQ-ORCH-INT-003:
+      requirement: "Generate Implementation Using AI Provider"
+      tests:
+        - "test_green_phase_calls_ai_provider_for_implementation"
+        - "test_green_phase_writes_implementation_to_src_files"
+        - "test_green_phase_reruns_tests_and_verifies_passing"
+    
+    REQ-ORCH-INT-004:
+      requirement: "Generate Verification Reports"
+      tests:
+        - "test_generate_all_reports_creates_yaml_files"
+        - "test_verification_reports_contain_actual_evidence"
+
+notes:
+  issue_discovered: "2025-10-10 21:46"
+  root_cause: "Orchestrator was TDD'd to pass interface tests, but actual AI integration was never implemented"
+  verification_gap: "Tests verified structure but not actual behavior - classic TDD anti-pattern"
+  fix_approach: "Follow proper TDD: RED (these tests) -> GREEN (implement) -> REFACTOR -> VERIFY"
+  ai_provider_status: "LAYER-004-01-01-01 is COMPLETE and TESTED - ready to use"
+  estimated_fix_time: "2-3 hours to implement GREEN phase"
