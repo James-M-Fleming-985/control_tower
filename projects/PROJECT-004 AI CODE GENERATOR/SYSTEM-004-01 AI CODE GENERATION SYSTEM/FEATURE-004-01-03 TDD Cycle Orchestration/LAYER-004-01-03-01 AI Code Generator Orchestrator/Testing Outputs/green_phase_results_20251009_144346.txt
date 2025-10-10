@@ -1,0 +1,48 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'Linux-6.8.0-1030-azure-x86_64-with-glibc2.31', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'cov': '7.0.0', 'metadata': '3.1.1', 'mock': '3.15.1'}}
+rootdir: /workspaces/control_tower
+configfile: pyproject.toml
+plugins: html-4.1.1, cov-7.0.0, metadata-3.1.1, mock-3.15.1
+collecting ... collected 15 items
+
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_execute_full_tdd_cycle PASSED [  6%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_test_generator PASSED [ 13%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_integration_with_implementation_generator PASSED [ 20%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_verification_report_generation PASSED [ 26%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_integration.py::TestAICodeGeneratorOrchestratorIntegration::test_end_to_end_layer_execution PASSED [ 33%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_orchestrator_initialization PASSED [ 40%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_load_yaml_requirements PASSED [ 46%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_red_phase PASSED [ 53%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_green_phase PASSED [ 60%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_refactor_phase PASSED [ 66%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_execute_verification_phase PASSED [ 73%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_validate_phase_transitions PASSED [ 80%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_collect_evidence_per_phase PASSED [ 86%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_generate_verification_reports PASSED [ 93%]
+tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_handle_phase_failures PASSED [100%]
+
+=============================== warnings summary ===============================
+projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/layer/orchestrator/test_ai_code_generator_orchestrator_unit.py::TestAICodeGeneratorOrchestratorUnit::test_collect_evidence_per_phase
+  /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/src/layer/orchestrator/ai_code_generator_orchestrator.py:225: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    'timestamp': datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.11-final-0 _______________
+
+Name                                                                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------
+src/__init__.py                                                                0      0   100%
+src/layer/__init__.py                                                          0      0   100%
+src/layer/implementation_code_generator/__init__.py                            2      2     0%   3-8
+src/layer/implementation_code_generator/implementation_code_generator.py     140    140     0%   11-507
+src/layer/orchestrator/__init__.py                                             2      0   100%
+src/layer/orchestrator/ai_code_generator_orchestrator.py                      93      8    91%   50, 56, 232, 241-242, 297-301
+src/layer/test_code_generator/__init__.py                                      2      2     0%   3-5
+src/layer/test_code_generator/test_code_generator.py                          11     11     0%   11-68
+--------------------------------------------------------------------------------------------------------
+TOTAL                                                                        250    163    35%
+Coverage HTML written to dir htmlcov
+======================== 15 passed, 1 warning in 0.34s =========================

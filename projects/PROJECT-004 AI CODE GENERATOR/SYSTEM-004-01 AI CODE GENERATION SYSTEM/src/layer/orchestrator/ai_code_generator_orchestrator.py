@@ -7,8 +7,21 @@ automated code generation.
 """
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import yaml
+
+# Constants for phase management
+VALID_PHASES = ['RED', 'GREEN', 'REFACTOR', 'VERIFICATION']
+PHASE_TRANSITIONS = {
+    None: ['RED'],
+    'RED': ['GREEN'],
+    'GREEN': ['REFACTOR'],
+    'REFACTOR': ['VERIFICATION']
+}
+
+# Quality thresholds
+MIN_COVERAGE_THRESHOLD = 0.95
+DEFAULT_MAX_TOKENS = 4000
 
 
 class AICodeGeneratorOrchestrator:
@@ -47,10 +60,19 @@ class AICodeGeneratorOrchestrator:
             Dictionary containing parsed requirements
         """
         if not yaml_path.exists():
-            raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+            raise FileNotFoundError(
+                f"YAML file not found: {yaml_path}\n"
+                f"Please ensure the requirements file exists at the specified path."
+            )
         
         with open(yaml_path, 'r') as f:
             requirements = yaml.safe_load(f)
+        
+        if not requirements:
+            raise ValueError(
+                f"YAML file is empty: {yaml_path}\n"
+                f"Please provide valid requirements with acceptance_criteria."
+            )
         
         if 'acceptance_criteria' not in requirements:
             requirements['acceptance_criteria'] = []
@@ -200,14 +222,7 @@ class AICodeGeneratorOrchestrator:
         Returns:
             True if transition is valid, False otherwise
         """
-        valid_transitions = {
-            None: ['RED'],
-            'RED': ['GREEN'],
-            'GREEN': ['REFACTOR'],
-            'REFACTOR': ['VERIFICATION']
-        }
-        
-        allowed = valid_transitions.get(from_phase, [])
+        allowed = PHASE_TRANSITIONS.get(from_phase, [])
         return to_phase in allowed
     
     def collect_evidence(self, phase_result: Dict[str, Any]) -> Dict[str, Any]:
@@ -222,7 +237,7 @@ class AICodeGeneratorOrchestrator:
         """
         evidence = {
             'phase': phase_result.get('phase'),
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'artifacts': []
         }
         

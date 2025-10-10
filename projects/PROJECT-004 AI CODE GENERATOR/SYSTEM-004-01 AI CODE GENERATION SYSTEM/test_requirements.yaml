@@ -1,0 +1,9 @@
+metadata:
+  requirement_id: LAYER-TEST-002
+  requirement_name: Test Requirements for E2E
+  requirement_type: Layer
+
+acceptance_criteria:
+  - criterion_id: AC-001
+    criterion: Process test requirements
+    priority: critical

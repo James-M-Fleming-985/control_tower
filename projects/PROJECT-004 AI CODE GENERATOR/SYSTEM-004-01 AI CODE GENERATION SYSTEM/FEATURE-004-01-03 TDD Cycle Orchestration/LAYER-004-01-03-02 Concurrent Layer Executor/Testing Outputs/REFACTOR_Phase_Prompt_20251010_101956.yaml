@@ -1,0 +1,416 @@
+---
+# REFACTOR Phase Minimal Enhancement Prompt - Concurrent Layer Executor
+
+metadata:
+  prompt_type: refactor_phase_enhancement
+  feature_id: FEATURE-004-01-03
+  layer_id: LAYER-004-01-03-02
+  feature_name: TDD Cycle Orchestration
+  layer_name: Concurrent Layer Executor
+  system: SYSTEM-004-01 AI CODE GENERATION SYSTEM
+  project: PROJECT-004 AI CODE GENERATOR
+  tdd_phase: REFACTOR
+  created_date: 2025-10-10
+  green_phase_completion: 2025-10-10T10:12:23Z
+  green_phase_report: green_phase_results_20251010_101223.txt
+
+objective:
+  description: Refactor GREEN phase code to improve quality while maintaining 7/7 passing tests
+  focus: Coverage improvement (94% → 95%+), code quality, edge case handling, documentation
+  constraint: MUST maintain 100% test pass rate throughout refactoring
+  critical_note: All source files MUST be relocated to PROJECT-004 structure under /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/
+
+green_phase_status:
+  tests: 7/7 PASSING (100%)
+  unit_tests: 6
+  integration_tests: 1
+  test_pyramid_ratio: "6:1 (exceeds required 2:1)"
+  coverage: 94% (concurrent_layer_executor.py - 67/71 statements)
+  missing_coverage: "Lines 52, 172, 204-211 (edge cases)"
+  execution_time: 12.71 seconds
+  summary: green_phase_results_20251010_101223.txt
+  implementation_file: src/concurrent_layer_executor.py (229 lines, 71 statements)
+  test_files:
+    unit: tests/test_concurrent_layer_executor_unit.py (33 lines, 6 tests)
+    integration: tests/test_concurrent_layer_executor_integration.py (11 lines, 1 test)
+
+critical_file_relocation:
+  warning: "CRITICAL - Files must be moved from repo root to PROJECT structure"
+  current_locations:
+    implementation: /workspaces/control_tower/src/concurrent_layer_executor.py
+    unit_tests: /workspaces/control_tower/tests/test_concurrent_layer_executor_unit.py
+    integration_tests: /workspaces/control_tower/tests/test_concurrent_layer_executor_integration.py
+  
+  required_new_locations:
+    implementation: /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/src/concurrent_layer_executor.py
+    unit_tests: /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/test_concurrent_layer_executor_unit.py
+    integration_tests: /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/test_concurrent_layer_executor_integration.py
+  
+  rationale: |
+    The repo root /src and /tests folders are for the overall control_tower system.
+    PROJECT-004 specific implementations must be isolated within the PROJECT-004
+    directory structure to maintain clean separation of concerns and enable
+    independent project management.
+
+  relocation_steps:
+    step_1: Create PROJECT-004 src and tests directories if not exist
+    step_2: Copy implementation file to PROJECT-004 src folder
+    step_3: Copy test files to PROJECT-004 tests folder
+    step_4: Update import statements in test files to reflect new structure
+    step_5: Verify tests still pass with new locations
+    step_6: Remove files from repo root src/tests after verification
+    step_7: Update all documentation references to new paths
+
+refactor_priorities:
+  p0_file_relocation:
+    priority: CRITICAL - MUST BE DONE FIRST
+    description: Move all implementation and test files to PROJECT-004 structure
+    actions:
+      - Create /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/src/
+      - Create /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/
+      - Move concurrent_layer_executor.py to PROJECT-004 src
+      - Move test files to PROJECT-004 tests
+      - Update import paths in test files
+      - Verify all 7 tests still pass
+      - Document new file locations in reports
+    validation: Run pytest on new test locations and verify 7/7 passing
+
+  p1_coverage_improvement:
+    priority: HIGH
+    description: Achieve 95%+ coverage by testing edge cases
+    missing_lines:
+      - "Line 52: Edge case in execute_layers (empty layer handling)"
+      - "Line 172: Edge case in report_real_time (no progress data)"
+      - "Lines 204-211: Edge cases in report_concurrent (error conditions)"
+    new_tests_needed:
+      - test_execute_empty_layer_list
+      - test_progress_reporter_no_data
+      - test_progress_reporter_error_conditions
+      - test_concurrent_execution_with_failures
+      - test_queue_overflow_handling
+    target: 95%+ coverage (68+/71 statements)
+
+  p2_code_quality:
+    priority: MEDIUM
+    description: Enhance code quality and documentation
+    actions:
+      - Fix PEP8 violations (line length, spacing)
+      - Enhance docstrings with parameter types and examples
+      - Add type hints where missing
+      - Improve error handling with specific exceptions
+      - Add logging for debugging concurrent operations
+      - Simplify complex methods if needed
+
+  p3_edge_case_handling:
+    priority: MEDIUM
+    description: Add robust edge case handling
+    scenarios:
+      - Empty layer list execution
+      - None/invalid layer inputs
+      - Semaphore timeout scenarios
+      - Thread failures during execution
+      - Progress tracking with zero layers
+      - Concurrent access race conditions
+
+  p4_performance_optimization:
+    priority: LOW
+    description: Optional performance improvements
+    considerations:
+      - Profile thread creation overhead
+      - Consider thread pool vs creating threads
+      - Optimize lock contention
+      - Memory usage for large layer counts
+
+execution_steps:
+  step_1: "[CRITICAL] Relocate all files to PROJECT-004 structure"
+  step_2: "[CRITICAL] Update imports and verify 7/7 tests passing"
+  step_3: "Fix PEP8 violations (line length, spacing)"
+  step_4: "Add edge case tests for uncovered lines"
+  step_5: "Enhance docstrings with examples and type information"
+  step_6: "Add input validation and error handling"
+  step_7: "Run full test suite and verify 7+ tests passing"
+  step_8: "Achieve 95%+ coverage on concurrent_layer_executor.py"
+  step_9: "Generate REFACTOR_PHASE_SUMMARY with timestamp"
+  step_10: "Create requirements verification artifacts per YAML spec"
+
+success_criteria:
+  - All files relocated to PROJECT-004 structure (MANDATORY)
+  - 7+ tests passing (100% - original + new edge cases)
+  - 95%+ coverage on concurrent_layer_executor.py
+  - Zero PEP8 violations (currently has line length issues)
+  - All methods have comprehensive docstrings
+  - Graceful handling of edge cases (empty/None inputs)
+  - Thread-safe execution verified
+  - All requirements verification files generated
+
+current_implementation:
+  file: src/concurrent_layer_executor.py (TO BE MOVED)
+  lines: 229
+  statements: 71
+  coverage: 94% (67/71 statements)
+  classes:
+    - ConcurrentLayerExecutor (Lines 13-142)
+    - ProgressReporter (Lines 145-229)
+  
+  concurrent_executor_methods:
+    - __init__ (Lines 21-39) - Initialize semaphore and data structures
+    - execute_layers (Lines 41-71) - Main concurrent execution logic
+    - _execute_single_layer (Lines 73-103) - Execute one layer with semaphore
+    - manage_queue (Lines 105-115) - FIFO queue management
+    - get_progress (Lines 117-127) - Thread-safe progress retrieval
+    - _worker (Lines 129-142) - Worker thread pattern
+  
+  progress_reporter_methods:
+    - __init__ (Lines 152-167) - Initialize reporter
+    - report_real_time (Lines 169-184) - Real-time progress display
+    - report_concurrent (Lines 186-211) - Concurrent execution monitoring
+    - _format_progress (Lines 213-229) - Format progress output
+  
+  dependencies: threading, queue, typing, time
+  thread_safety: Semaphore, Lock, Queue (all thread-safe primitives)
+
+current_tests:
+  unit_test_file: tests/test_concurrent_layer_executor_unit.py (TO BE MOVED)
+  lines: 33
+  test_count: 6
+  tests:
+    - test_concurrent_executor_initialization
+    - test_queue_management_fifo
+    - test_execute_5_layers_concurrently
+    - test_semaphore_limits_concurrent_execution
+    - test_progress_reporter_real_time_updates
+    - test_progress_reporting_concurrent_execution
+  
+  integration_test_file: tests/test_concurrent_layer_executor_integration.py (TO BE MOVED)
+  lines: 11
+  test_count: 1
+  tests:
+    - test_integration_concurrent_execution_and_progress
+
+refactor_approach:
+  file_relocation:
+    priority: P0 - CRITICAL
+    description: Move all files to PROJECT-004 directory structure
+    sequence:
+      1: "Create PROJECT-004 src directory"
+      2: "Create PROJECT-004 tests directory"
+      3: "Copy concurrent_layer_executor.py to PROJECT-004 src"
+      4: "Copy test files to PROJECT-004 tests"
+      5: "Update import statements: from src.concurrent_layer_executor → relative imports or PROJECT-004 path"
+      6: "Add __init__.py files if needed for package structure"
+      7: "Run pytest from PROJECT-004 directory and verify 7/7 passing"
+      8: "Update green_phase_results report with new file paths"
+      9: "Remove original files from repo root src/tests"
+    validation: "pytest --tb=short from PROJECT-004 directory shows 7/7 passing"
+
+  pep8_compliance:
+    priority: P1
+    description: Fix all PEP8 violations
+    violations:
+      - "Line 3: Line too long (81 > 79 characters)"
+      - "Line 14: Expected 2 blank lines, found 1"
+      - "Multiple: missing whitespace after comma"
+      - "Multiple: expected 2 blank lines between functions"
+    actions:
+      - Break long lines at 79 characters
+      - Add proper blank lines between classes/functions
+      - Add whitespace after commas in lists
+      - Run flake8 and fix all reported issues
+
+  coverage_enhancement:
+    priority: P1
+    description: Add tests for uncovered edge cases
+    new_tests:
+      - test_execute_layers_empty_list - Cover line 52
+      - test_execute_layers_single_layer - Boundary test
+      - test_progress_reporter_initial_state - Cover line 172
+      - test_report_concurrent_no_executor - Cover lines 204-211
+      - test_report_concurrent_zero_layers - Edge case
+      - test_thread_safety_concurrent_access - Race condition test
+    expected_coverage: 95%+ (68+/71 statements)
+
+  enhanced_documentation:
+    priority: P2
+    description: Improve docstrings and add usage examples
+    enhancements:
+      - Add Examples section to class docstrings
+      - Document thread-safety guarantees
+      - Add parameter type hints in docstrings
+      - Document return value formats
+      - Add warning about max_concurrent limits
+      - Include usage examples in module docstring
+
+  error_handling:
+    priority: P2
+    description: Add comprehensive error handling
+    validations:
+      - "None input: raise TypeError with descriptive message"
+      - "Empty list: return empty result gracefully"
+      - "Invalid layer object: raise ValueError"
+      - "Thread failures: capture and report in results"
+      - "Semaphore timeout: add optional timeout parameter"
+    new_tests:
+      - test_execute_layers_none_input
+      - test_execute_layers_invalid_layer_type
+      - test_thread_failure_handling
+
+coverage_plan:
+  current: 94% (67/71 statements)
+  target: 95%+
+  uncovered_lines:
+    - line_52: "execute_layers edge case - likely empty list return"
+    - line_172: "report_real_time edge case - initial state handling"
+    - lines_204_211: "report_concurrent edge cases - error conditions"
+  coverage_strategy:
+    - Add test_execute_layers_empty_list to cover line 52
+    - Add test_progress_reporter_initial_state to cover line 172
+    - Add test_report_concurrent_edge_cases to cover lines 204-211
+    - Run pytest with --cov-report=html for detailed analysis
+
+anti_patterns:
+  - "Don't break existing tests - All original 7 tests MUST continue passing"
+  - "Don't over-engineer - Keep threading model simple and proven"
+  - "Don't add external dependencies - Stay within Python stdlib"
+  - "Don't change test file names - Maintain consistency"
+  - "Don't skip file relocation - This is MANDATORY for project organization"
+  - "Don't modify repo root src/tests - Files must move to PROJECT-004"
+
+requirements_verification_outputs:
+  base_path: "LAYER-004-01-03-02 Concurrent Layer Executor/Requirements Verification"
+  files_to_generate:
+    - requirements_verification_template.yaml
+    - execution_evidence.json
+    - traceability_matrix_{timestamp}.yaml
+    - test_pyramid_report_{timestamp}.yaml
+    - quality_gates_report_{timestamp}.yaml
+    - requirements_verification_complete.yaml (final marker file)
+
+validation:
+  test_command: |
+    cd /workspaces/control_tower/projects/PROJECT-004\ AI\ CODE\ GENERATOR/SYSTEM-004-01\ AI\ CODE\ GENERATION\ SYSTEM/
+    pytest tests/test_concurrent_layer_executor_unit.py tests/test_concurrent_layer_executor_integration.py -v
+  
+  coverage_command: |
+    cd /workspaces/control_tower/projects/PROJECT-004\ AI\ CODE\ GENERATOR/SYSTEM-004-01\ AI\ CODE\ GENERATION\ SYSTEM/
+    pytest tests/ --cov=src/concurrent_layer_executor --cov-report=term-missing --cov-report=html
+  
+  style_command: |
+    flake8 projects/PROJECT-004\ AI\ CODE\ GENERATOR/SYSTEM-004-01\ AI\ CODE\ GENERATION\ SYSTEM/src/concurrent_layer_executor.py
+    flake8 projects/PROJECT-004\ AI\ CODE\ GENERATOR/SYSTEM-004-01\ AI\ CODE\ GENERATION\ SYSTEM/tests/test_concurrent_layer_executor_*.py
+
+output_summary:
+  filename: REFACTOR_PHASE_SUMMARY_20251010_HHMMSS.md
+  location: "LAYER-004-01-03-02 Concurrent Layer Executor/Testing Outputs/"
+  includes:
+    - File relocation summary (old paths → new paths)
+    - Test results (pass count, execution time)
+    - Coverage report (percentage, uncovered lines covered)
+    - Improvements made (list of refactorings applied)
+    - PEP8 violations fixed
+    - New tests added
+    - Requirements verification artifacts generated
+    - Metrics (tests added, coverage gained, violations fixed)
+    - Updated file locations in all documentation
+
+acceptance_criteria_verification:
+  AC-001:
+    criterion: "Support concurrent execution of up to 5 layers"
+    status: IMPLEMENTED
+    tests: test_execute_5_layers_concurrently, test_semaphore_limits_concurrent_execution
+    refactor_notes: "Add edge case tests for boundary conditions (0, 1, 5, 6+ layers)"
+  
+  AC-002:
+    criterion: "Display real-time progress for concurrent execution"
+    status: IMPLEMENTED
+    tests: test_progress_reporter_real_time_updates, test_progress_reporting_concurrent_execution
+    refactor_notes: "Add tests for edge cases (no data, zero layers, 100% complete)"
+
+test_pyramid_validation:
+  required_ratio: "2:1 (unit:integration minimum)"
+  current_ratio: "6:1 (exceeds requirement)"
+  after_refactor_target: "8:1 or better (add 2+ unit tests for edge cases)"
+  validation: "Ensure ratio stays ≥ 2:1 after adding new tests"
+
+quality_gates:
+  - gate: "All tests pass"
+    current: "7/7 (100%)"
+    target: "7+/7+ (100%)"
+    status: PASSING
+  
+  - gate: "Test pyramid ratio ≥ 2:1"
+    current: "6:1"
+    target: "≥ 2:1"
+    status: PASSING
+  
+  - gate: "Unit coverage ≥ 95%"
+    current: "94%"
+    target: "≥ 95%"
+    status: NEEDS_IMPROVEMENT
+  
+  - gate: "Zero PEP8 violations"
+    current: "16+ violations"
+    target: "0"
+    status: NEEDS_IMPROVEMENT
+  
+  - gate: "Files in correct project structure"
+    current: "INCORRECT (repo root)"
+    target: "PROJECT-004 structure"
+    status: CRITICAL_ISSUE
+
+refactor_phase_deliverables:
+  1_relocated_files:
+    - /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/src/concurrent_layer_executor.py
+    - /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/test_concurrent_layer_executor_unit.py
+    - /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/test_concurrent_layer_executor_integration.py
+  
+  2_pep8_compliant_code:
+    - Zero flake8 violations
+    - Proper line lengths (≤79 chars)
+    - Correct spacing and blank lines
+  
+  3_enhanced_coverage:
+    - 95%+ coverage on concurrent_layer_executor.py
+    - All edge cases tested
+    - 8+ total tests (7 original + 2+ edge cases)
+  
+  4_verification_artifacts:
+    - requirements_verification_template.yaml
+    - execution_evidence.json
+    - traceability_matrix_YYYYMMDD_HHMMSS.yaml
+    - test_pyramid_report_YYYYMMDD_HHMMSS.yaml
+    - quality_gates_report_YYYYMMDD_HHMMSS.yaml
+    - requirements_verification_complete.yaml
+  
+  5_documentation:
+    - REFACTOR_PHASE_SUMMARY_20251010_HHMMSS.md
+    - Updated green_phase_results with new file paths
+    - Enhanced docstrings with examples
+
+next_actions:
+  immediate:
+    - "[STEP 1] Create PROJECT-004 src and tests directories"
+    - "[STEP 2] Move all files to PROJECT-004 structure"
+    - "[STEP 3] Update imports and verify tests pass"
+  
+  refactoring:
+    - "[STEP 4] Fix all PEP8 violations"
+    - "[STEP 5] Add edge case tests to reach 95%+ coverage"
+    - "[STEP 6] Enhance documentation"
+  
+  finalization:
+    - "[STEP 7] Generate all verification artifacts"
+    - "[STEP 8] Create REFACTOR_PHASE_SUMMARY"
+    - "[STEP 9] Mark layer as COMPLETE"
+
+critical_reminders:
+  - "⚠️  FILES MUST BE IN PROJECT-004 STRUCTURE - NOT REPO ROOT"
+  - "⚠️  All test imports must reference PROJECT-004 paths"
+  - "⚠️  Documentation must reflect new file locations"
+  - "⚠️  Maintain 100% test pass rate throughout refactoring"
+  - "⚠️  Do not skip requirements verification artifact generation"
+
+---
+# Template Updated: 2025-10-10 10:19:56
+# Source: green_phase_results_20251010_101223.txt
+# Layer: LAYER-004-01-03-02 Concurrent Layer Executor
+# Critical Note: FILE RELOCATION TO PROJECT-004 STRUCTURE IS MANDATORY
