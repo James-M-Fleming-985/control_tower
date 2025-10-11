@@ -1,0 +1,736 @@
+---
+# Post-Refactor Layer Testing Approach - AI Code Generator Orchestrator
+
+metadata:
+  prompt_type: "post_refactor_testing"
+  layer_id: "LAYER-004-01-03-01"
+  layer_name: "AI Code Generator Orchestrator"
+  feature_id: "FEATURE-004-01-03"
+  feature_name: "TDD Cycle Orchestration"
+  system_id: "SYSTEM-004-01"
+  system_name: "AI Code Generation System"
+  project_id: "PROJECT-004"
+  project_name: "AI CODE GENERATOR"
+  tdd_phase: "POST-REFACTOR"
+  created_date: "2025-10-11"
+  layer_path: "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/FEATURE-004-01-03 TDD Cycle Orchestration/LAYER-004-01-03-01 AI Code Generator Orchestrator"
+
+testing_strategy:
+  overview: |
+    Comprehensive testing approach for AI Code Generator Orchestrator after REFACTOR phase.
+    Focus on unit, integration, and end-to-end testing with real AI provider integration.
+    ALL TESTS MUST FOLLOW ANTI-PATTERN PROTECTION PRINCIPLES.
+  
+  scope:
+    - Unit tests: Individual methods in isolation (with mocks)
+    - Integration tests: Layer interactions with AI Provider Abstraction
+    - End-to-end tests: Complete TDD cycle workflows (RED → GREEN → REFACTOR)
+  
+  pragmatic_approach: |
+    Small team approach - focus on tests that provide value:
+    - Unit tests for business logic and edge cases
+    - Integration tests for critical dependencies (AI provider)
+    - E2E tests for happy path workflows
+    - Skip tests that don't catch real bugs
+  
+  anti_pattern_protection:
+    pattern_eliminated: "Testing Contracts, Not Implementations"
+    
+    five_protection_mechanisms:
+      mechanism_1:
+        name: "Tests verify actual behavior, not just interfaces"
+        implementation:
+          - "Use assert_called(), assert_called_once() to verify methods executed"
+          - "Check return values match expected behavior, not just types"
+          - "Verify state changes (files created, data modified)"
+        examples:
+          good: "assert mock_provider.generate_code.assert_called_once()"
+          bad: "assert hasattr(orchestrator, 'ai_provider')"
+      
+      mechanism_2:
+        name: "Tests check side effects (files exist, APIs called)"
+        implementation:
+          - "Verify files created on disk: Path.exists(), Path.glob()"
+          - "Verify API calls made: mock.assert_called_with(...)"
+          - "Verify subprocess executed: subprocess.run.assert_called()"
+        examples:
+          good: "assert len(list(test_dir.glob('test_*.py'))) > 0"
+          bad: "assert result['tests_generated']  # just checks key exists"
+      
+      mechanism_3:
+        name: "Tests use mocks to VERIFY calls, not just STUB returns"
+        implementation:
+          - "Always use mock.assert_called() after operation"
+          - "Use mock.assert_called_with() to verify parameters"
+          - "Use mock.call_count to verify number of calls"
+        examples:
+          good: "mock_factory.create.assert_called_once_with('anthropic', config)"
+          bad: "mock_factory.create.return_value = mock_provider  # stub only"
+      
+      mechanism_4:
+        name: "Integration tests run with real dependencies"
+        implementation:
+          - "Use real file system (tempfile.TemporaryDirectory)"
+          - "Use real YAML parsing (yaml.safe_load)"
+          - "Use real Path operations (not mocked)"
+          - "Mock only external services (AI APIs, network calls)"
+        examples:
+          good: "with tempfile.TemporaryDirectory() as tmpdir: ..."
+          bad: "mock_path = Mock()  # mocking file system"
+      
+      mechanism_5:
+        name: "Manual verification confirms system works"
+        implementation:
+          - "Document how to run tests manually"
+          - "Document how to verify file creation"
+          - "Document how to inspect YAML reports"
+          - "Provide example commands for smoke testing"
+        examples:
+          - "ls -la /tmp/test_output/tests/  # verify test files"
+          - "cat requirements_verification.yaml  # verify content"
+          - "pytest -v  # verify tests pass"
+    
+    enforcement:
+      code_review_checklist:
+        - "Does test verify method was called? (mock.assert_called)"
+        - "Does test check file exists on disk? (Path.exists)"
+        - "Does test verify actual content? (file.read_text, yaml.safe_load)"
+        - "Does test use real file system? (tempfile, not mocks)"
+        - "Can I manually verify this behavior? (documented steps)"
+      
+      test_writing_rules:
+        - "Rule 1: Every mock must have an assert_called() verification"
+        - "Rule 2: Every file operation must verify file exists"
+        - "Rule 3: Every YAML report must verify content, not just existence"
+        - "Rule 4: Integration tests use real Path/file operations"
+        - "Rule 5: Document manual verification steps in test docstring"
+
+current_status:
+  refactor_phase:
+    completion_date: "2025-10-11 09:15:30"
+    decision: "Ship as-is (no changes needed)"
+    tests_passing: "11/11 (100%)"
+    coverage: "68% (138/204 statements)"
+    summary: "Testing Outputs/REFACTOR_PHASE_EXECUTION_SUMMARY_20251011_091530.md"
+  
+  green_phase:
+    completion_date: "2025-10-11 09:01:14"
+    tests_passing: "11/11 (100%)"
+    coverage: "68%"
+    summary: "Testing Outputs/GREEN_PHASE_EXECUTION_SUMMARY_20251011_090114.md"
+    implementation: "src/layer/orchestrator/ai_code_generator_orchestrator.py (762 lines)"
+
+  existing_tests:
+    file: "tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py"
+    count: 11
+    type: "Integration tests (mocked AI provider)"
+    anti_pattern_protection: "✅ Behavioral verification verified"
+
+layer_under_test:
+  class: "AICodeGeneratorOrchestrator"
+  file: "src/layer/orchestrator/ai_code_generator_orchestrator.py"
+  lines_of_code: 762
+  
+  dependencies:
+    external:
+      - name: "AIProviderFactory"
+        location: "/workspaces/control_tower/src/layer/ai_provider_abstraction/"
+        type: "External layer (control_tower root)"
+        purpose: "AI provider creation and management"
+      - name: "subprocess"
+        type: "stdlib"
+        purpose: "Execute pytest commands"
+      - name: "yaml"
+        type: "stdlib"
+        purpose: "Generate YAML reports"
+    
+  public_methods:
+    __init__:
+      parameters: "provider_type: str, provider_config: Dict"
+      purpose: "Initialize orchestrator with AI provider"
+      tested: "✅ 3 tests"
+    
+    execute_red_phase:
+      parameters: "requirements: Dict[str, Any]"
+      returns: "Dict[str, Any] (test results)"
+      purpose: "Generate and run failing tests"
+      tested: "✅ 3 tests"
+    
+    execute_green_phase:
+      parameters: "requirements: Dict, red_results: Dict"
+      returns: "Dict[str, Any] (implementation results)"
+      purpose: "Generate implementation and verify tests pass"
+      tested: "✅ 3 tests"
+    
+    execute_refactor_phase:
+      status: "Stub (not implemented)"
+      tested: "❌ No tests"
+    
+    execute_verification_phase:
+      status: "Stub (not implemented)"
+      tested: "❌ No tests"
+    
+    generate_all_reports:
+      parameters: "None"
+      returns: "Dict[str, Any] (report paths)"
+      purpose: "Generate verification YAML reports"
+      tested: "✅ 2 tests"
+  
+  helper_methods:
+    - "_build_test_generation_prompt(requirements) -> str"
+    - "_build_implementation_prompt(requirements, red_results) -> str"
+    - "_extract_coverage_from_output(pytest_output: str) -> float"
+    - "_generate_requirements_verification(...) -> Dict"
+    - "_generate_test_pyramid_report(...) -> Dict"
+    - "_generate_traceability_matrix(...) -> Dict"
+    - "_generate_quality_gates_report(...) -> Dict"
+
+testing_pyramid:
+  unit_tests:
+    target_coverage: "75-80%"
+    focus: "Individual method logic in isolation"
+    approach: "Mock all external dependencies"
+    
+    categories:
+      initialization:
+        tests_needed: 5
+        description: "Test orchestrator initialization and configuration"
+        tests:
+          - "test_init_with_valid_anthropic_config"
+          - "test_init_with_valid_openai_config"
+          - "test_init_with_invalid_provider_type_raises_error"
+          - "test_init_with_missing_config_fields_raises_error"
+          - "test_init_with_none_config_raises_error"
+        priority: "P1 - Critical"
+        status: "✅ 3/5 exist (need 2 more edge cases)"
+      
+      prompt_building:
+        tests_needed: 6
+        description: "Test prompt generation logic"
+        tests:
+          - "test_build_test_generation_prompt_with_valid_requirements"
+          - "test_build_test_generation_prompt_with_minimal_requirements"
+          - "test_build_test_generation_prompt_includes_all_sections"
+          - "test_build_implementation_prompt_with_valid_inputs"
+          - "test_build_implementation_prompt_includes_red_results"
+          - "test_build_implementation_prompt_includes_requirements"
+        priority: "P2 - Important"
+        status: "❌ 0/6 exist (covered by integration tests)"
+      
+      coverage_extraction:
+        tests_needed: 4
+        description: "Test pytest output parsing"
+        tests:
+          - "test_extract_coverage_from_valid_output"
+          - "test_extract_coverage_from_output_without_coverage"
+          - "test_extract_coverage_handles_malformed_output"
+          - "test_extract_coverage_handles_bytes_input"
+        priority: "P3 - Nice to have"
+        status: "❌ 0/4 exist (partially covered by integration)"
+      
+      report_generation:
+        tests_needed: 8
+        description: "Test YAML report generation logic"
+        tests:
+          - "test_generate_requirements_verification_structure"
+          - "test_generate_requirements_verification_with_empty_results"
+          - "test_generate_test_pyramid_report_structure"
+          - "test_generate_test_pyramid_report_calculations"
+          - "test_generate_traceability_matrix_structure"
+          - "test_generate_traceability_matrix_mappings"
+          - "test_generate_quality_gates_report_structure"
+          - "test_generate_quality_gates_report_status_determination"
+        priority: "P2 - Important"
+        status: "✅ 2/8 exist (need more detailed tests)"
+    
+    total_unit_tests_recommended: 23
+    current_unit_tests: 5
+    gap: 18 tests
+  
+  integration_tests:
+    target: "Critical dependency interactions"
+    focus: "AI Provider Abstraction integration"
+    approach: "Mock AI responses, verify real integrations"
+    
+    categories:
+      ai_provider_integration:
+        tests_needed: 6
+        description: "Test AI provider factory and provider interactions"
+        tests:
+          - "test_orchestrator_creates_anthropic_provider"
+          - "test_orchestrator_creates_openai_provider"
+          - "test_red_phase_calls_ai_provider_with_correct_prompt"
+          - "test_green_phase_calls_ai_provider_with_correct_prompt"
+          - "test_ai_provider_failure_handling"
+          - "test_ai_provider_timeout_handling"
+        priority: "P1 - Critical"
+        status: "✅ 4/6 exist (need error handling tests)"
+      
+      file_system_integration:
+        tests_needed: 4
+        description: "Test file creation and management"
+        tests:
+          - "test_red_phase_creates_test_files_on_disk"
+          - "test_green_phase_creates_implementation_files"
+          - "test_generate_reports_creates_yaml_files"
+          - "test_file_permission_error_handling"
+        priority: "P1 - Critical"
+        status: "✅ 3/4 exist (need error handling)"
+      
+      subprocess_integration:
+        tests_needed: 3
+        description: "Test pytest execution"
+        tests:
+          - "test_red_phase_executes_pytest_command"
+          - "test_green_phase_executes_pytest_with_coverage"
+          - "test_pytest_execution_failure_handling"
+        priority: "P1 - Critical"
+        status: "✅ 2/3 exist (need error handling)"
+    
+    total_integration_tests_recommended: 13
+    current_integration_tests: 9
+    gap: 4 tests
+  
+  end_to_end_tests:
+    target: "Complete workflow validation"
+    focus: "Full TDD cycle with real AI provider"
+    approach: "Use real Anthropic API (in test mode)"
+    
+    categories:
+      complete_red_green_cycle:
+        tests_needed: 2
+        description: "Test complete RED → GREEN workflow"
+        tests:
+          - "test_complete_red_green_cycle_with_simple_feature"
+          - "test_complete_red_green_cycle_with_complex_feature"
+        priority: "P1 - Critical"
+        status: "❌ 0/2 exist (new)"
+        setup_requirements:
+          - "Real Anthropic API key (ANTHROPIC_API_KEY env var)"
+          - "Temporary directory for test outputs"
+          - "Simple feature requirements (e.g., calculator)"
+          - "Verify generated tests actually run"
+          - "Verify generated implementation actually works"
+      
+      report_generation_workflow:
+        tests_needed: 1
+        description: "Test full report generation after TDD cycle"
+        tests:
+          - "test_generate_all_reports_after_complete_cycle"
+        priority: "P2 - Important"
+        status: "❌ 0/1 exist (new)"
+      
+      error_recovery_workflow:
+        tests_needed: 2
+        description: "Test error handling in workflows"
+        tests:
+          - "test_recovery_from_ai_failure_in_red_phase"
+          - "test_recovery_from_test_failure_in_green_phase"
+        priority: "P3 - Nice to have"
+        status: "❌ 0/2 exist (new)"
+    
+    total_e2e_tests_recommended: 5
+    current_e2e_tests: 0
+    gap: 5 tests
+
+test_implementation_plan:
+  phase_1_unit_tests:
+    duration: "1-2 hours"
+    priority: "P2 - After integration tests working"
+    approach: "Add unit tests for helper methods"
+    
+    steps:
+      - step: "Create test_orchestrator_unit.py file"
+        tests: "Prompt building tests (6 tests)"
+      - step: "Add coverage extraction tests"
+        tests: "Coverage parsing tests (4 tests)"
+      - step: "Add edge case tests for initialization"
+        tests: "Config validation tests (2 tests)"
+      - step: "Run tests and verify coverage improvement"
+        expected: "75-80% coverage"
+    
+    skip_if_time_constrained:
+      - "Detailed prompt content validation (integration tests cover this)"
+      - "All edge cases for report generation (covered by integration)"
+      - "Boundary value tests that don't catch real bugs"
+  
+  phase_2_integration_tests:
+    duration: "30-45 minutes"
+    priority: "P1 - Do first"
+    approach: "Add error handling tests to existing suite"
+    
+    steps:
+      - step: "Add AI provider error tests"
+        tests: "2 new tests (failure, timeout)"
+        file: "test_orchestrator_ai_provider_integration_RED.py"
+      - step: "Add file system error test"
+        tests: "1 new test (permission error)"
+      - step: "Add subprocess error test"
+        tests: "1 new test (pytest not found)"
+      - step: "Verify all 15 tests pass (11 existing + 4 new)"
+        expected: "15/15 passing"
+    
+    validation:
+      - "All existing 11 tests still pass"
+      - "New tests verify error handling"
+      - "Coverage increase to ~75%"
+  
+  phase_3_e2e_tests:
+    duration: "1-2 hours"
+    priority: "P1 - Critical for production confidence"
+    approach: "Create new E2E test suite with real AI"
+    
+    steps:
+      - step: "Create test_orchestrator_e2e.py file"
+        setup: "Real Anthropic API key, temp directories"
+      - step: "Implement simple feature E2E test"
+        test: "Calculator feature (add, subtract)"
+        validates: "Complete RED → GREEN cycle works"
+      - step: "Implement complex feature E2E test"
+        test: "User authentication feature"
+        validates: "Handles multi-file generation"
+      - step: "Implement report generation E2E test"
+        validates: "All 4 YAML reports created correctly"
+      - step: "Run E2E suite (may take 2-5 minutes)"
+        expected: "3/3 E2E tests passing"
+    
+    skip_error_recovery_tests:
+      reason: "Time-intensive, low ROI for small team"
+      alternative: "Monitor production errors, add tests when needed"
+    
+    prerequisites:
+      - "ANTHROPIC_API_KEY environment variable set"
+      - "pytest-timeout plugin (for long-running tests)"
+      - "Separate pytest marker for E2E tests"
+      - "CI/CD configured to skip E2E on PR (run on merge only)"
+
+execution_approach:
+  recommended_order:
+    1: "Phase 2: Integration tests (30-45 min) - Immediate value"
+    2: "Phase 3: E2E tests (1-2 hours) - Production confidence"
+    3: "Phase 1: Unit tests (1-2 hours) - Coverage improvement"
+  
+  pragmatic_shortcuts:
+    - "Skip unit tests if integration tests provide sufficient coverage"
+    - "Skip error recovery E2E tests (handle in production)"
+    - "Skip boundary value unit tests (not catching real bugs)"
+    - "Skip exhaustive prompt validation (trust AI provider)"
+  
+  total_time_investment:
+    minimum: "30-45 minutes (integration tests only)"
+    recommended: "2-3 hours (integration + E2E)"
+    comprehensive: "4-5 hours (all three phases)"
+    
+  small_team_recommendation: |
+    Start with Phase 2 (integration tests) - 30-45 minutes
+    Add Phase 3 (E2E tests) when deploying - 1-2 hours
+    Add Phase 1 (unit tests) if coverage becomes issue - 1-2 hours
+
+test_file_structure:
+  location: "tests/layer/orchestrator/"
+  
+  files:
+    existing:
+      - name: "test_orchestrator_ai_provider_integration_RED.py"
+        purpose: "Integration tests (mocked AI)"
+        tests: 11
+        keep: true
+    
+    new_integration:
+      - name: "test_orchestrator_ai_provider_integration_RED.py"
+        purpose: "Add 4 error handling tests to existing file"
+        tests: "15 total (11 existing + 4 new)"
+    
+    new_unit:
+      - name: "test_orchestrator_unit.py"
+        purpose: "Unit tests for helper methods"
+        tests: "18-23 tests"
+        optional: "Create if doing Phase 1"
+    
+    new_e2e:
+      - name: "test_orchestrator_e2e.py"
+        purpose: "End-to-end workflow tests with real AI"
+        tests: "3-5 tests"
+        markers: "@pytest.mark.e2e, @pytest.mark.slow"
+
+pytest_configuration:
+  markers:
+    e2e:
+      description: "End-to-end tests requiring real AI provider"
+      skip_on_ci: "Skip on pull requests (too slow)"
+    slow:
+      description: "Tests taking >10 seconds"
+      skip_on_ci: "Skip on pull requests"
+  
+  run_commands:
+    unit_only: "pytest tests/layer/orchestrator/test_orchestrator_unit.py -v"
+    integration_only: "pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py -v"
+    e2e_only: "pytest tests/layer/orchestrator/test_orchestrator_e2e.py -v -m e2e"
+    all_except_e2e: "pytest tests/layer/orchestrator/ -v -m 'not e2e'"
+    everything: "pytest tests/layer/orchestrator/ -v"
+  
+  environment_variables:
+    required_for_e2e:
+      - "ANTHROPIC_API_KEY: Anthropic API key for E2E tests"
+    optional:
+      - "OPENAI_API_KEY: OpenAI API key if testing OpenAI provider"
+      - "E2E_TIMEOUT: Timeout for E2E tests (default 300s)"
+
+success_criteria:
+  after_phase_2_integration:
+    - "✅ 15/15 integration tests passing (11 + 4 new)"
+    - "✅ Error handling verified (AI failures, file errors, subprocess errors)"
+    - "✅ Coverage ~75% (up from 68%)"
+    - "✅ Anti-pattern protection maintained"
+    - "✅ Time spent: <45 minutes"
+  
+  after_phase_3_e2e:
+    - "✅ 3/3 E2E tests passing with real AI"
+    - "✅ Complete RED → GREEN cycle verified"
+    - "✅ Report generation verified"
+    - "✅ Production confidence achieved"
+    - "✅ Time spent: <2 hours additional"
+  
+  after_phase_1_unit:
+    - "✅ 33-38 total tests (15 integration + 18-23 unit)"
+    - "✅ 75-80% coverage"
+    - "✅ Helper methods well-tested"
+    - "✅ Time spent: <2 hours additional"
+
+anti_patterns_to_avoid:
+  testing_for_coverage_numbers:
+    problem: "Writing tests just to hit 95% coverage target"
+    solution: "Write tests that catch real bugs, ignore coverage metrics"
+    
+  over_mocking:
+    problem: "Mocking so much that tests don't verify real behavior"
+    solution: "Use real objects where possible (file system, yaml parsing)"
+    
+  testing_implementation_details:
+    problem: "Tests break when refactoring internal structure"
+    solution: "Test public interfaces and behaviors, not internals"
+    
+  slow_test_suites:
+    problem: "Developers skip running tests because they're too slow"
+    solution: "Keep unit/integration fast (<5s), mark E2E as slow"
+
+examples:
+  integration_test_error_handling:
+    file: "test_orchestrator_ai_provider_integration_RED.py"
+    code: |
+      def test_red_phase_handles_ai_provider_failure(self):
+          """Test RED phase handles AI provider failures gracefully."""
+          with patch('layer.orchestrator.ai_code_generator_orchestrator.AIProviderFactory') as mock_factory:
+              mock_provider = Mock()
+              mock_provider.generate_code.side_effect = RuntimeError("API rate limit exceeded")
+              mock_factory.create.return_value = mock_provider
+              
+              orchestrator = AICodeGeneratorOrchestrator(
+                  provider_type='anthropic',
+                  provider_config={'api_key': 'test_key'}
+              )
+              
+              requirements = {
+                  'feature_name': 'calculator',
+                  'feature_description': 'Simple calculator',
+                  'acceptance_criteria': ['Can add two numbers'],
+                  'output_path': str(self.temp_dir)
+              }
+              
+              with pytest.raises(RuntimeError, match="API rate limit"):
+                  orchestrator.execute_red_phase(requirements)
+  
+  e2e_test_simple_feature:
+    file: "test_orchestrator_e2e.py"
+    code: |
+      import pytest
+      import os
+      from pathlib import Path
+      
+      @pytest.mark.e2e
+      @pytest.mark.slow
+      def test_complete_red_green_cycle_calculator():
+          """E2E test: Complete RED → GREEN cycle for simple calculator."""
+          if not os.getenv('ANTHROPIC_API_KEY'):
+              pytest.skip("ANTHROPIC_API_KEY not set - skipping E2E test")
+          
+          orchestrator = AICodeGeneratorOrchestrator(
+              provider_type='anthropic',
+              provider_config={
+                  'api_key': os.getenv('ANTHROPIC_API_KEY'),
+                  'model': 'claude-3-5-sonnet-20241022'
+              }
+          )
+          
+          # RED phase: Generate failing tests
+          requirements = {
+              'feature_name': 'calculator',
+              'feature_description': 'Calculator with add and subtract operations',
+              'acceptance_criteria': [
+                  'Can add two positive numbers',
+                  'Can subtract two positive numbers'
+              ],
+              'output_path': str(temp_dir)
+          }
+          
+          red_result = orchestrator.execute_red_phase(requirements)
+          
+          # Verify RED phase results
+          assert red_result['phase'] == 'RED'
+          assert len(red_result['tests_generated']) > 0
+          assert red_result['tests_failed'] > 0  # Tests should fail
+          
+          # GREEN phase: Generate implementation
+          green_result = orchestrator.execute_green_phase(requirements, red_result)
+          
+          # Verify GREEN phase results
+          assert green_result['phase'] == 'GREEN'
+          assert len(green_result['files_written']) > 0
+          assert green_result['tests_passed'] > 0  # Tests should now pass
+          assert green_result['coverage'] > 0.0
+          
+          # Verify actual files exist
+          test_files = list(Path(temp_dir).glob('tests/test_*.py'))
+          impl_files = list(Path(temp_dir).glob('src/*.py'))
+          assert len(test_files) > 0
+          assert len(impl_files) > 0
+
+validation_commands:
+  phase_2_integration:
+    command: |
+      cd "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM"
+      pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py -v
+    expected: "15/15 passing"
+  
+  phase_3_e2e:
+    command: |
+      cd "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM"
+      export ANTHROPIC_API_KEY="your-key-here"
+      pytest tests/layer/orchestrator/test_orchestrator_e2e.py -v -m e2e
+    expected: "3/3 passing (may take 2-5 minutes)"
+  
+  all_tests:
+    command: |
+      cd "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM"
+      pytest tests/layer/orchestrator/ -v -m 'not e2e'
+    expected: "33-38 passing (excluding E2E)"
+  
+  anti_pattern_protection_validation:
+    description: "Verify all 5 anti-pattern protection mechanisms"
+    checks:
+      mechanism_1_behavior_verification:
+        command: "grep -r 'assert_called' tests/layer/orchestrator/"
+        expected: "All test files use assert_called() or assert_called_once()"
+        manual: "Review test files to ensure mocks are verified, not just stubbed"
+      
+      mechanism_2_side_effects:
+        command: "grep -r 'Path.*glob\\|Path.*exists\\|file.*read_text' tests/layer/orchestrator/"
+        expected: "Tests verify actual file creation and content"
+        manual: "Check tests verify files exist on disk, not just in return values"
+      
+      mechanism_3_mock_verification:
+        command: "grep -r 'assert_called_with\\|assert_called_once_with' tests/layer/orchestrator/"
+        expected: "Mocks verify call parameters, not just that methods exist"
+        manual: "Ensure every mock has corresponding assertion"
+      
+      mechanism_4_real_dependencies:
+        command: "grep -r 'tempfile\\|TemporaryDirectory' tests/layer/orchestrator/"
+        expected: "Integration tests use real file system via tempfile"
+        manual: "Verify tests use real Path, yaml, file I/O (not mocked)"
+      
+      mechanism_5_manual_verification:
+        test_manual_test_file_creation:
+          steps:
+            - "Run: pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py::TestOrchestratorRedPhaseAI::test_red_phase_writes_generated_tests_to_files -v -s"
+            - "Observe test output showing temp directory path"
+            - "Verify: ls /tmp/pytest-* shows test files actually created"
+        test_manual_yaml_content:
+          steps:
+            - "Run: pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py::TestOrchestratorVerificationPhase::test_verification_reports_contain_actual_evidence -v -s"
+            - "Find YAML files in temp directory"
+            - "Verify: cat requirements_verification.yaml shows actual content"
+        test_manual_ai_call:
+          steps:
+            - "Run integration test with print statements"
+            - "Verify mock.assert_called_once() passes (confirms AI was called)"
+            - "Check mock.call_args to see prompt content"
+
+output_artifacts:
+  test_results_summary:
+    filename: "POST_REFACTOR_TESTING_SUMMARY_YYYYMMDD_HHMMSS.md"
+    location: "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/FEATURE-004-01-03 TDD Cycle Orchestration/LAYER-004-01-03-01 AI Code Generator Orchestrator/Testing Outputs/"
+    includes:
+      - "Executive Summary"
+      - "All test results (unit, integration, E2E)"
+      - "Coverage report with analysis"
+      - "Test execution times"
+      - "Anti-Pattern Protection Verification (all 5 mechanisms)"
+      - "Failures and errors (if any)"
+      - "Manual verification confirmation"
+      - "Recommendations for next steps"
+    
+    required_sections:
+      anti_pattern_verification:
+        section_name: "Anti-Pattern Protection Verification"
+        content:
+          - "Mechanism 1: Behavior Verification - ✅/❌ with examples"
+          - "Mechanism 2: Side Effects Checks - ✅/❌ with examples"
+          - "Mechanism 3: Mock Verification - ✅/❌ with examples"
+          - "Mechanism 4: Real Dependencies - ✅/❌ with examples"
+          - "Mechanism 5: Manual Verification - ✅/❌ with steps performed"
+      
+      test_evidence:
+        section_name: "Test Evidence"
+        content:
+          - "File creation evidence (ls output, file counts)"
+          - "YAML content evidence (actual report content)"
+          - "Mock call evidence (call_args, call_count)"
+          - "Subprocess evidence (command executed)"
+  
+  test_files_location:
+    path: "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/tests/"
+    structure:
+      - "tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py (existing)"
+      - "tests/layer/orchestrator/test_orchestrator_unit.py (new - if created)"
+      - "tests/layer/orchestrator/test_orchestrator_e2e.py (new - if created)"
+
+execution_instructions:
+  step_1_verify_existing_tests:
+    description: "Confirm existing 11 tests still pass with anti-pattern protection"
+    command: "pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py -v"
+    expected: "11/11 passing"
+    verification:
+      - "✅ All tests use mock.assert_called() or similar"
+      - "✅ All tests verify file creation with Path.glob() or Path.exists()"
+      - "✅ All tests use real file system (tempfile.TemporaryDirectory)"
+      - "✅ All YAML tests verify content with yaml.safe_load()"
+  
+  step_2_manual_verification:
+    description: "Manually verify system works as expected"
+    tests_to_run:
+      file_creation_test:
+        command: "pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py::TestOrchestratorRedPhaseAI::test_red_phase_writes_generated_tests_to_files -v -s"
+        manual_check: "Inspect temp directory to confirm test files actually created"
+      
+      yaml_content_test:
+        command: "pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py::TestOrchestratorVerificationPhase::test_verification_reports_contain_actual_evidence -v -s"
+        manual_check: "Open YAML file and verify it contains actual report data"
+      
+      ai_integration_test:
+        command: "pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py::TestOrchestratorRedPhaseAI::test_red_phase_calls_ai_provider_for_test_generation -v -s"
+        manual_check: "Verify mock.assert_called_once() confirms AI provider was actually called"
+  
+  step_3_generate_summary:
+    description: "Generate test summary with timestamp"
+    command: "# Run all tests and capture results"
+    output_file: "POST_REFACTOR_TESTING_SUMMARY_YYYYMMDD_HHMMSS.md"
+    location: "Testing Outputs/"
+
+notes:
+  - "Focus on integration and E2E tests - they provide most value"
+  - "Unit tests are optional if integration tests cover the logic"
+  - "E2E tests require real API key - don't run on every commit"
+  - "Small team: 2-3 hours testing is sufficient for production confidence"
+  - "Don't chase 95% coverage - chase confidence in deployment"
+  - "✅ ANTI-PATTERN PROTECTION IS MANDATORY - all 5 mechanisms must be verified"
+  - "Manual verification step is critical - confirms system actually works"

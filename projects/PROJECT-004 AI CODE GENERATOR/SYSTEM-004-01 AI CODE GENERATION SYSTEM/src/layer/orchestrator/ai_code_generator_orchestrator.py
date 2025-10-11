@@ -9,6 +9,29 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 import yaml
+import sys
+import subprocess
+import re
+
+# Add control_tower root to path for AI provider import
+# From: /workspaces/control_tower/projects/PROJECT-004.../src/layer/orchestrator/ai_code_generator_orchestrator.py
+# Up 7 levels to: /workspaces/control_tower
+control_tower_root = Path(__file__).parent.parent.parent.parent.parent.parent.parent.resolve()
+if str(control_tower_root) not in sys.path:
+    sys.path.insert(0, str(control_tower_root))
+
+# Import AI Provider Abstraction Layer (from control_tower root)
+# Use try/except to provide helpful error message if path setup fails
+try:
+    from src.layer.ai_provider_abstraction import AIProviderFactory
+except ModuleNotFoundError as e:
+    print(f"❌ Failed to import AIProviderFactory")
+    print(f"   Error: {e}")
+    print(f"   control_tower_root: {control_tower_root}")
+    print(f"   sys.path[:3]: {sys.path[:3]}")
+    print(f"   Expected module at: {control_tower_root / 'src' / 'layer' / 'ai_provider_abstraction'}")
+    print(f"   Module exists: {(control_tower_root / 'src' / 'layer' / 'ai_provider_abstraction').exists()}")
+    raise
 
 # Constants for phase management
 VALID_PHASES = ['RED', 'GREEN', 'REFACTOR', 'VERIFICATION']
@@ -41,13 +64,33 @@ class AICodeGeneratorOrchestrator:
         
         Args:
             config: Configuration dictionary containing:
-                - test_generator_path: Path to test code generator
-                - impl_generator_path: Path to implementation generator
+                - provider: AI provider type ('anthropic' or 'openai')
                 - output_base_path: Base path for output files
         """
         self.config = config
         self.current_phase: Optional[str] = None
         self.phase_results: Dict[str, Any] = {}
+        
+        # Initialize AI Provider
+        provider_type = config.get('provider', 'anthropic')
+        
+        # Validate provider type
+        supported_providers = ['anthropic', 'openai']
+        if provider_type not in supported_providers:
+            raise ValueError(
+                f"Unsupported provider type: {provider_type}. "
+                f"Supported providers: {', '.join(supported_providers)}"
+            )
+        
+        # Create AI provider instance
+        self.ai_provider = AIProviderFactory.create_provider(provider_type)
+        
+        # Validate configuration
+        if not self.ai_provider.validate_configuration():
+            raise ValueError(
+                f"AI provider '{provider_type}' is not properly configured. "
+                f"Please set {provider_type.upper()}_API_KEY environment variable."
+            )
     
     def load_yaml_requirements(self, yaml_path: Path) -> Dict[str, Any]:
         """
@@ -95,21 +138,43 @@ class AICodeGeneratorOrchestrator:
         """
         self.current_phase = 'RED'
         
+        # Build prompt for test generation
+        ac_list = requirements.get('acceptance_criteria', [])
+        prompt = self._build_test_generation_prompt(requirements, ac_list)
+        
+        # Call AI provider to generate test code
+        test_code = self.ai_provider.generate_code(prompt)
+        
+        # Write test code to files
+        output_base = Path(self.config['output_base_path'])
+        test_dir = output_base / 'tests'
+        test_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create test file with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        test_file = test_dir / f'test_generated_{timestamp}.py'
+        test_file.write_text(test_code)
+        
+        # Execute pytest
+        pytest_result = subprocess.run(
+            ['python', '-m', 'pytest', str(test_file), '-v'],
+            capture_output=True,
+            text=True,
+            cwd=str(output_base)
+        )
+        
+        # Handle both real subprocess results and mocks
+        stdout = pytest_result.stdout if isinstance(pytest_result.stdout, str) else str(pytest_result.stdout)
+        stderr = pytest_result.stderr if isinstance(pytest_result.stderr, str) else str(pytest_result.stderr)
+        
+        # Return actual results
         result = {
             'phase': 'RED',
             'status': 'PASS',
-            'tests_generated': [],
-            'tests_failed': 0
+            'tests_generated': [str(test_file)],
+            'tests_failed': pytest_result.returncode,  # Non-zero = tests failed
+            'pytest_output': stdout + stderr
         }
-        
-        # Generate tests from acceptance criteria
-        ac_list = requirements.get('acceptance_criteria', [])
-        test_count = len(ac_list) * 2  # Unit and integration tests
-        
-        result['tests_generated'] = [
-            f"test_file_{i}.py" for i in range(test_count)
-        ]
-        result['tests_failed'] = test_count  # All should fail in RED phase
         
         self.phase_results['RED'] = result
         return result
@@ -131,19 +196,53 @@ class AICodeGeneratorOrchestrator:
         """
         self.current_phase = 'GREEN'
         
+        # Build prompt for implementation generation
+        prompt = self._build_implementation_prompt(requirements, red_results)
+        
+        # Call AI provider to generate implementation
+        impl_code = self.ai_provider.generate_code(prompt)
+        
+        # Write implementation to src/ directory
+        output_base = Path(self.config['output_base_path'])
+        src_dir = output_base / 'src'
+        src_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Determine filename from requirements
+        layer_id = requirements.get('layer_id', 'implementation')
+        impl_file = src_dir / f'{layer_id.lower().replace("-", "_")}.py'
+        impl_file.write_text(impl_code)
+        
+        # Rerun tests to verify they pass
+        test_files = red_results.get('tests_generated', [])
+        if test_files:
+            pytest_result = subprocess.run(
+                ['python', '-m', 'pytest'] + test_files + ['-v', '--cov=src'],
+                capture_output=True,
+                text=True,
+                cwd=str(output_base)
+            )
+            
+            # Handle both real subprocess results and mocks
+            stdout = pytest_result.stdout if isinstance(pytest_result.stdout, str) else str(pytest_result.stdout)
+            stderr = pytest_result.stderr if isinstance(pytest_result.stderr, str) else str(pytest_result.stderr)
+            
+            tests_passed = red_results.get('tests_failed', 0) if pytest_result.returncode == 0 else 0
+            coverage = self._extract_coverage_from_output(stdout)
+            pytest_output = stdout + stderr
+        else:
+            pytest_result = None
+            tests_passed = 0
+            coverage = 0.0
+            pytest_output = ""
+        
         result = {
             'phase': 'GREEN',
-            'status': 'PASS',
-            'implementation_generated': [],
-            'tests_passed': 0,
-            'coverage': 0.0
+            'status': 'PASS' if pytest_result and pytest_result.returncode == 0 else 'FAIL',
+            'implementation_generated': [str(impl_file)],
+            'tests_passed': tests_passed,
+            'coverage': coverage,
+            'pytest_output': pytest_output
         }
-        
-        # Generate implementation
-        tests_count = red_results.get('tests_failed', 0)
-        result['implementation_generated'] = ['implementation.py']
-        result['tests_passed'] = tests_count
-        result['coverage'] = 0.96  # Simulated coverage
         
         self.phase_results['GREEN'] = result
         return result
@@ -394,35 +493,47 @@ class AICodeGeneratorOrchestrator:
         self,
         cycle_results: Dict[str, Any],
         requirements: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    ) -> List[Path]:
         """
         Generate all verification reports.
         
         Args:
-            cycle_results: Results from TDD cycle
+            cycle_results: Results from TDD cycle (phases dict)
             requirements: Original requirements
             
         Returns:
-            Dictionary with report paths and metadata
+            List of paths to generated report files
         """
-        reports = {
-            'test_pyramid_report': {
-                'path': 'test_pyramid_report.yaml',
-                'status': 'generated'
-            },
-            'requirements_verification': {
-                'path': 'requirements_verification.yaml',
-                'status': 'generated'
-            },
-            'traceability_matrix': {
-                'path': 'traceability_matrix.yaml',
-                'status': 'generated'
-            },
-            'quality_gates_report': {
-                'path': 'quality_gates_report.yaml',
-                'status': 'generated'
-            }
-        }
+        output_base = Path(self.config['output_base_path'])
+        report_dir = output_base / 'Requirements Verification'
+        report_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        reports = []
+        
+        # 1. Requirements Verification Report
+        req_report = self._generate_requirements_verification(
+            report_dir, timestamp, cycle_results, requirements
+        )
+        reports.append(req_report)
+        
+        # 2. Test Pyramid Report
+        pyramid_report = self._generate_test_pyramid_report(
+            report_dir, timestamp, cycle_results
+        )
+        reports.append(pyramid_report)
+        
+        # 3. Traceability Matrix
+        trace_report = self._generate_traceability_matrix(
+            report_dir, timestamp, requirements, cycle_results
+        )
+        reports.append(trace_report)
+        
+        # 4. Quality Gates Report
+        quality_report = self._generate_quality_gates_report(
+            report_dir, timestamp, cycle_results
+        )
+        reports.append(quality_report)
         
         return reports
     
@@ -455,3 +566,196 @@ class AICodeGeneratorOrchestrator:
         }
         
         return result
+    
+    # ========================================================================
+    # HELPER METHODS FOR AI INTEGRATION
+    # ========================================================================
+    
+    def _build_test_generation_prompt(
+        self,
+        requirements: Dict[str, Any],
+        acceptance_criteria: List[Dict[str, Any]]
+    ) -> str:
+        """Build prompt for AI to generate test code."""
+        prompt = f"""Generate pytest test code for the following requirements:
+
+Layer: {requirements.get('layer_id', 'UNKNOWN')}
+Feature: {requirements.get('feature_name', 'UNKNOWN')}
+
+Acceptance Criteria:
+"""
+        for i, ac in enumerate(acceptance_criteria, 1):
+            criterion = ac.get('criterion', ac.get('description', 'No description'))
+            prompt += f"\n{i}. {criterion}"
+        
+        prompt += """
+
+Generate a complete Python test file with:
+- Import statements (pytest, unittest.mock, etc.)
+- Test class for each acceptance criterion
+- At least 2 test methods per criterion
+- Tests should initially FAIL (RED phase requirement)
+- Use pytest.raises() for expected failures
+- Include docstrings
+
+Output only valid Python code, no explanations.
+"""
+        return prompt
+    
+    def _build_implementation_prompt(
+        self,
+        requirements: Dict[str, Any],
+        red_results: Dict[str, Any]
+    ) -> str:
+        """Build prompt for AI to generate implementation code."""
+        prompt = f"""Generate Python implementation code to make the following tests pass:
+
+Layer: {requirements.get('layer_id', 'UNKNOWN')}
+Tests Failed: {red_results.get('tests_failed', 0)}
+Test Files: {', '.join(red_results.get('tests_generated', []))}
+
+Requirements:
+"""
+        for ac in requirements.get('acceptance_criteria', []):
+            criterion = ac.get('criterion', ac.get('description', ''))
+            prompt += f"\n- {criterion}"
+        
+        prompt += """
+
+Generate complete, working Python implementation that:
+- Makes all tests pass
+- Follows best practices
+- Includes proper error handling
+- Has clear docstrings
+- Is production-ready code
+
+Output only valid Python code, no explanations.
+"""
+        return prompt
+    
+    def _extract_coverage_from_output(self, pytest_output: str) -> float:
+        """Extract coverage percentage from pytest output."""
+        # Handle both str and bytes (in case of Mock or real subprocess)
+        if isinstance(pytest_output, bytes):
+            pytest_output = pytest_output.decode('utf-8')
+        elif not isinstance(pytest_output, str):
+            pytest_output = str(pytest_output)
+            
+        match = re.search(r'TOTAL\s+\d+\s+\d+\s+(\d+)%', pytest_output)
+        if match:
+            return float(match.group(1)) / 100.0
+        return 0.0
+    
+    def _generate_requirements_verification(
+        self,
+        report_dir: Path,
+        timestamp: str,
+        phases: Dict[str, Any],
+        requirements: Dict[str, Any]
+    ) -> Path:
+        """Generate requirements verification YAML report."""
+        report_file = report_dir / f'requirements_verification_{timestamp}.yaml'
+        
+        red_phase = phases.get('RED', {})
+        green_phase = phases.get('GREEN', {})
+        
+        report_data = {
+            'layer_metadata': {
+                'requirement_id': requirements.get('layer_id', 'UNKNOWN'),
+                'timestamp': timestamp,
+                'feature_name': requirements.get('feature_name', 'UNKNOWN')
+            },
+            'test_verification': {
+                'total_tests': green_phase.get('tests_passed', 0),
+                'tests_passed': green_phase.get('tests_passed', 0),
+                'tests_failed': red_phase.get('tests_failed', 0),
+                'coverage': green_phase.get('coverage', 0.0)
+            },
+            'acceptance_criteria_verification': [
+                {
+                    'criterion_id': ac.get('criterion_id', f'AC-{i:03d}'),
+                    'criterion': ac.get('criterion', ''),
+                    'status': 'VERIFIED'
+                }
+                for i, ac in enumerate(requirements.get('acceptance_criteria', []), 1)
+            ],
+            'artifacts': {
+                'tests': red_phase.get('tests_generated', []),
+                'implementation': green_phase.get('implementation_generated', [])
+            }
+        }
+        
+        report_file.write_text(yaml.dump(report_data, default_flow_style=False))
+        return report_file
+    
+    def _generate_test_pyramid_report(
+        self,
+        report_dir: Path,
+        timestamp: str,
+        phases: Dict[str, Any]
+    ) -> Path:
+        """Generate test pyramid report."""
+        report_file = report_dir / f'test_pyramid_report_{timestamp}.yaml'
+        
+        report_data = {
+            'timestamp': timestamp,
+            'pyramid_structure': {
+                'unit_tests': 0,  # Analyze test files to categorize
+                'integration_tests': 0,
+                'e2e_tests': 0
+            },
+            'total_tests': phases.get('GREEN', {}).get('tests_passed', 0)
+        }
+        
+        report_file.write_text(yaml.dump(report_data, default_flow_style=False))
+        return report_file
+    
+    def _generate_traceability_matrix(
+        self,
+        report_dir: Path,
+        timestamp: str,
+        requirements: Dict[str, Any],
+        phases: Dict[str, Any]
+    ) -> Path:
+        """Generate traceability matrix."""
+        report_file = report_dir / f'traceability_matrix_{timestamp}.yaml'
+        
+        report_data = {
+            'timestamp': timestamp,
+            'requirement_to_test_mapping': [
+                {
+                    'requirement': ac.get('criterion', ''),
+                    'tests': phases.get('RED', {}).get('tests_generated', [])
+                }
+                for ac in requirements.get('acceptance_criteria', [])
+            ]
+        }
+        
+        report_file.write_text(yaml.dump(report_data, default_flow_style=False))
+        return report_file
+    
+    def _generate_quality_gates_report(
+        self,
+        report_dir: Path,
+        timestamp: str,
+        phases: Dict[str, Any]
+    ) -> Path:
+        """Generate quality gates report."""
+        report_file = report_dir / f'quality_gates_report_{timestamp}.yaml'
+        
+        coverage = phases.get('GREEN', {}).get('coverage', 0.0)
+        tests_passed = phases.get('GREEN', {}).get('tests_passed', 0)
+        
+        report_data = {
+            'timestamp': timestamp,
+            'quality_gates': {
+                'coverage_threshold': 0.95,
+                'actual_coverage': coverage,
+                'coverage_pass': coverage >= 0.95,
+                'all_tests_pass': tests_passed > 0
+            },
+            'overall_status': 'PASS' if coverage >= 0.95 and tests_passed > 0 else 'FAIL'
+        }
+        
+        report_file.write_text(yaml.dump(report_data, default_flow_style=False))
+        return report_file

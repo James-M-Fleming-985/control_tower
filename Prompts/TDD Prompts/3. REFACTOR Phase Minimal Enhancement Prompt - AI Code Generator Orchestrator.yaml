@@ -1,0 +1,177 @@
+---
+# REFACTOR Phase Minimal Enhancement Prompt - AI Code Generator Orchestrator
+
+metadata:
+  prompt_type: refactor_phase_enhancement
+  feature_id: FEATURE-004-01-03
+  layer_id: LAYER-004-01-03-01
+  feature_name: TDD Cycle Orchestration
+  layer_name: AI Code Generator Orchestrator
+  system: SYSTEM-004-01 AI Code Generation System
+  project: PROJECT-004 AI CODE GENERATOR
+  tdd_phase: REFACTOR
+  created_date: 2025-10-11
+  green_phase_completion: 2025-10-11T09:01:14Z
+
+objective:
+  description: |
+    Minimal enhancements to working GREEN phase code - quick wins only.
+    Focus on obvious improvements that take <30 minutes total.
+  focus: |
+    - Fix any obvious bugs or edge cases
+    - Add minimal docstrings where completely missing
+    - Quick cleanup of any duplicated code
+    - That's it - code is working, don't over-engineer
+  constraint: MUST maintain 100% test pass rate. Don't add complexity for minimal gain.
+
+green_phase_status:
+  tests: 11/11 PASSING (100%)
+  coverage: 68% (204 statements, 138 executed, 66 missed)
+  execution_time: 1.92 seconds
+  summary: Testing Outputs/GREEN_PHASE_EXECUTION_SUMMARY_20251011_090114.md
+  implementation_file: src/layer/orchestrator/ai_code_generator_orchestrator.py (762 lines)
+  test_file: tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py (445 lines)
+
+anti_pattern_protection_status:
+  pattern_eliminated: "Testing Contracts, Not Implementations"
+  verification_methods:
+    - Mock call verification (assert_called, assert_called_once)
+    - File system verification (Path.glob, file.read_text)
+    - Subprocess verification (subprocess.run.assert_called)
+    - YAML content verification (yaml.safe_load)
+  status: ✅ ALL 5 PROTECTION MECHANISMS VERIFIED
+
+refactor_priorities:
+  p1_quick_wins_only:
+    description: Minimal improvements - 20-30 minutes MAX
+    actions:
+      - Add missing docstrings to public methods (if completely absent)
+      - Extract any obvious duplicated code (if 3+ repetitions)
+      - Fix any flake8 violations that are actually problems
+      - Add one-line comments for non-obvious logic
+      - Remove any dead/commented code
+    skip_if_working:
+      - Don't add error handling if tests pass
+      - Don't reorganize if code is readable
+      - Don't optimize if performance is fine
+      - Don't increase coverage just for a number
+    
+refactor_approach:
+  single_pass:
+    duration: 20-30 minutes MAX
+    description: One quick pass to clean up obvious issues
+    steps:
+      - Step 1: Run flake8 - fix only real issues (ignore line length if reasonable)
+      - Step 2: Scan for missing docstrings - add brief ones if totally absent
+      - Step 3: Look for duplicated code blocks - extract if 3+ copies
+      - Step 4: Remove commented-out code
+      - Step 5: Run tests - ensure still passing
+      - Step 6: Done - don't keep iterating
+    verification:
+      - Run: pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py -v
+      - Expected: 11/11 tests still passing
+      - Time spent: <30 minutes
+
+execution_sequence:
+  total_duration: 20-30 minutes
+  approach: Single pass cleanup, then STOP
+  
+  skip_if:
+    - All tests passing (✅ they are)
+    - Code is readable (subjective but probably fine)
+    - No obvious duplications
+    - Performance is acceptable
+  
+  do_only_if:
+    - Obvious flake8 errors
+    - Public methods with NO docstring at all
+    - 3+ identical code blocks
+    - Commented-out code to remove
+
+success_criteria:
+  tests:
+    - ✅ 11/11 tests still passing
+    - ✅ No new test failures
+    - ✅ Anti-pattern protection still works
+  
+  code_quality:
+    - ✅ No major flake8 violations (ignore minor style stuff)
+    - ✅ Public methods have at least minimal docstrings
+    - ✅ No commented-out code
+  
+  time_spent:
+    - ✅ Less than 30 minutes total
+    - ✅ If taking longer, STOP and ship as-is
+
+practical_notes:
+  - Code is working - don't fix what isn't broken
+  - 68% coverage is fine for now - focus on features, not metrics
+  - Long methods are okay if they're clear
+  - Don't add error handling just to add error handling
+  - Don't refactor for "best practices" - refactor for actual pain points
+  - Small team doesn't need enterprise-level code quality
+  - Ship working code > perfect code
+
+code_examples:
+  minimal_docstring_example: |
+    # BEFORE (no docstring):
+    def execute_red_phase(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        # Build prompt
+        prompt = self._build_test_generation_prompt(requirements)
+        
+    # AFTER (minimal docstring):
+    def execute_red_phase(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate and run failing tests. Returns results dict with test status."""
+        prompt = self._build_test_generation_prompt(requirements)
+
+  remove_dead_code_example: |
+    # BEFORE:
+    def some_method(self):
+        result = self.do_work()
+        # old_approach = self.deprecated_method()  # TODO: remove later
+        # print(f"Debug: {result}")  # debugging
+        return result
+        
+    # AFTER:
+    def some_method(self):
+        result = self.do_work()
+        return result
+
+anti_patterns_to_avoid:
+  over_refactoring:
+    description: Don't spend hours refactoring working code for marginal gains
+    prevention:
+      - Set 30-minute timer
+      - If not done by then, stop and ship
+      - Working code > "perfect" code
+    
+  premature_optimization:
+    description: Don't optimize until you have actual performance problems
+    prevention:
+      - If tests pass in <5 seconds, performance is fine
+      - Don't add caching/optimization "just in case"
+      - Measure first, optimize later
+
+validation_commands:
+  run_tests: |
+    pytest tests/layer/orchestrator/test_orchestrator_ai_provider_integration_RED.py -v
+  
+  check_quick_issues: |
+    flake8 src/layer/orchestrator/ai_code_generator_orchestrator.py --select=E9,F63,F7,F82 --show-source
+
+output_summary:
+  filename_format: REFACTOR_PHASE_EXECUTION_SUMMARY_YYYYMMDD_HHMMSS.md
+  location: /workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/FEATURE-004-01-03 TDD Cycle Orchestration/LAYER-004-01-03-01 AI Code Generator Orchestrator/Testing Outputs
+  
+  required_sections:
+    - Executive Summary (2-3 sentences)
+    - Changes Made (bullet list)
+    - Test Results (11/11 passing)
+    - Time Spent (should be <30 min)
+    - Decision: What we DIDN'T refactor and why (working code doesn't need fixing)
+
+notes:
+  - REFACTOR phase for small teams = quick cleanup only
+  - Don't aim for perfection - aim for "good enough and shipping"
+  - If you're spending >30 minutes, you're over-engineering
+  - Code that works and has tests is already better than 90% of codebases
