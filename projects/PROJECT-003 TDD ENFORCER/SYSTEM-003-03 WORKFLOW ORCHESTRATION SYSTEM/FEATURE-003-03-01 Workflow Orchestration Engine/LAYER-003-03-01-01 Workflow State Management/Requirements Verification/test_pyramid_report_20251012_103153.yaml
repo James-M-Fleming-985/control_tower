@@ -1,0 +1,6 @@
+pyramid_structure:
+  e2e_tests: 0
+  integration_tests: 0
+  unit_tests: 0
+timestamp: '20251012_103153'
+total_tests: 0

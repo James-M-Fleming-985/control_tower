@@ -1,0 +1,7 @@
+overall_status: FAIL
+quality_gates:
+  actual_coverage: 0.0
+  all_tests_pass: false
+  coverage_pass: false
+  coverage_threshold: 0.95
+timestamp: '20251012_103153'
