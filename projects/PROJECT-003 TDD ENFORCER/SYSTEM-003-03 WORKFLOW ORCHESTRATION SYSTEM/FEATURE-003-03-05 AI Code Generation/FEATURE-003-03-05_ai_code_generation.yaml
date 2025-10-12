@@ -52,6 +52,57 @@ success_criteria:
   - Can generate code for existing layers successfully
   - Concurrent execution works for multiple layers
 
+integration_test_scenarios:
+  - scenario: "INTEGRATION-001: Prompt Engine to Test Generator"
+    description: "Validate prompt template engine integration with test code generator"
+    test_class: "TestPromptEngineToTestGenerator"
+    tests:
+      - "Test prompt templates generate valid test code"
+      - "Test integration handles multiple acceptance criteria"
+    layers_integrated: [LAYER-003-03-05-02, LAYER-003-03-05-03]
+  - scenario: "INTEGRATION-002: Test Generator to Implementation Generator"
+    description: "Ensure generated tests drive implementation code generation"
+    test_class: "TestTestToImplementationGenerator"
+    tests:
+      - "Test implementation generator passes all generated tests"
+      - "Test refactor suggestions improve code coverage"
+    layers_integrated: [LAYER-003-03-05-03, LAYER-003-03-05-04]
+  - scenario: "INTEGRATION-003: Orchestrator with Concurrent Executor"
+    description: "Validate orchestrator manages concurrent layer execution"
+    test_class: "TestOrchestratorConcurrentExecution"
+    tests:
+      - "Test orchestrator launches concurrent executions"
+      - "Test results aggregated from all layers"
+    layers_integrated: [LAYER-003-03-05-05, LAYER-003-03-05-06]
+  - scenario: "INTEGRATION-004: Full Layer Integration"
+    description: "Run full integration from prompt to code generation"
+    test_class: "TestFullLayerIntegration"
+    tests:
+      - "Test prompt to test to implementation flow"
+      - "Test all layers produce expected outputs"
+    layers_integrated: [LAYER-003-03-05-01, LAYER-003-03-05-02, LAYER-003-03-05-03, LAYER-003-03-05-04, LAYER-003-03-05-05, LAYER-003-03-05-06, LAYER-003-03-05-07]
+
+e2e_test_scenarios:
+  - scenario: "E2E-001: End-to-End Code Generation"
+    description: "Generate code from YAML requirements and validate full workflow"
+    test_class: "TestE2ECodeGeneration"
+    tests:
+      - "Test YAML requirements produce valid test files"
+      - "Test generated implementations pass all tests"
+      - "Test refactor phase improves code quality"
+  - scenario: "E2E-002: Concurrent Multi-Layer Execution"
+    description: "Simulate concurrent execution of multiple layers"
+    test_class: "TestE2EConcurrentExecution"
+    tests:
+      - "Test concurrent execution produces correct results"
+      - "Test orchestrator aggregates results from all layers"
+  - scenario: "E2E-003: Integration with Prerequisites Validation"
+    description: "Validate code generation workflow with prerequisites validation feature"
+    test_class: "TestE2EIntegrationWithPrerequisites"
+    tests:
+      - "Test workflow checks prerequisites before code generation"
+      - "Test error handling for missing prerequisites"
+
 estimated_effort:
   total_hours: 40
   total_days: 5

@@ -55,22 +55,95 @@ acceptance_criteria:
   - criterion: "AC-001: Track current stage and progress percentage"
     status: implemented
     test_file: tests/feature/test_progress_tracking.py
+    unit_tests:
+      - "Test stage progression tracking"
+      - "Test progress percentage calculation"
+      - "Test current stage identification"
     
   - criterion: "AC-002: Provide real-time progress updates (every 10 seconds)"
     status: in_progress
     test_file: tests/feature/test_realtime_updates.py
+    unit_tests:
+      - "Test update interval timing"
+      - "Test update event emission"
+      - "Test update data structure"
     
   - criterion: "AC-003: Generate comprehensive workflow summary report"
     status: in_progress
     test_file: tests/feature/test_report_generation.py
+    unit_tests:
+      - "Test report header generation"
+      - "Test report summary section"
+      - "Test report formatting"
     
   - criterion: "AC-004: Include stage-by-stage results in report"
     status: in_progress
     test_file: tests/feature/test_detailed_results.py
+    unit_tests:
+      - "Test stage results collection"
+      - "Test stage timing data"
+      - "Test stage status aggregation"
     
   - criterion: "AC-005: Track timing metrics and performance"
     status: implemented
     test_file: tests/feature/test_performance_metrics.py
+    unit_tests:
+      - "Test execution time tracking"
+      - "Test stage duration calculation"
+      - "Test performance threshold checking"
+
+integration_test_scenarios:
+  - scenario: "INTEGRATION-001: Progress Tracking with Metrics Collection"
+    description: "Track progress while collecting performance metrics"
+    test_class: "TestProgressAndMetricsIntegration"
+    tests:
+      - "Test progress updates include timing metrics"
+      - "Test metrics updated at each stage transition"
+      - "Test cumulative metrics calculation"
+    layers_integrated: [LAYER-003-03-04-01, LAYER-003-03-04-02]
+    
+  - scenario: "INTEGRATION-002: Metrics Collection with Report Generation"
+    description: "Collect metrics then include in generated report"
+    test_class: "TestMetricsAndReportIntegration"
+    tests:
+      - "Test metrics aggregated for report"
+      - "Test performance section in report"
+      - "Test timing charts data included"
+    layers_integrated: [LAYER-003-03-04-02, LAYER-003-03-04-03]
+    
+  - scenario: "INTEGRATION-003: Complete Monitoring Pipeline"
+    description: "Track progress → collect metrics → generate report"
+    test_class: "TestCompleteMonitoringPipeline"
+    tests:
+      - "Test real-time updates throughout workflow"
+      - "Test metrics collected at all stages"
+      - "Test final report includes all data"
+    layers_integrated: [LAYER-003-03-04-01, LAYER-003-03-04-02, LAYER-003-03-04-03]
+
+e2e_test_scenarios:
+  - scenario: "E2E-001: Complete Workflow Monitoring"
+    description: "Monitor entire workflow from start to completion"
+    test_class: "TestE2ECompleteMonitoring"
+    tests:
+      - "Test monitoring starts with workflow"
+      - "Test updates emitted throughout execution"
+      - "Test final report generated at completion"
+    
+  - scenario: "E2E-002: Real-Time Progress Dashboard"
+    description: "Simulate real-time dashboard updates"
+    test_class: "TestE2ERealtimeDashboard"
+    tests:
+      - "Test progress updates every 10 seconds"
+      - "Test dashboard receives all updates"
+      - "Test updates contain current stage and percentage"
+    
+  - scenario: "E2E-003: Comprehensive Report Generation"
+    description: "Generate full workflow report with all metrics"
+    test_class: "TestE2EReportGeneration"
+    tests:
+      - "Test report includes all 10 stages"
+      - "Test report shows timing for each stage"
+      - "Test report includes quality metrics"
 
 implementations:
   red_phase:

@@ -1,0 +1,175 @@
+matrix_metadata:
+  timestamp: '20251012_205254'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Persist workflow state at each stage completion'
+  description: 'AC-001: Persist workflow state at each stage completion'
+  test_files: &id001
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Enable workflow restart from last successful stage'
+  description: 'AC-002: Enable workflow restart from last successful stage'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Validate state integrity before restoration'
+  description: 'AC-003: Validate state integrity before restoration'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Include workflow state in JSON response to actor'
+  description: 'AC-004: Include workflow state in JSON response to actor'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py
+  lines: 291
+  methods:
+  - name: calculate_checksum
+    lines: 20-27
+  - name: validate_integrity
+    lines: 28-34
+  - name: __init__
+    lines: 38-41
+  - name: _get_state_file_path
+    lines: 42-45
+  - name: persist_state
+    lines: 46-67
+  - name: load_state
+    lines: 68-95
+  - name: delete_state
+    lines: 96-115
+  - name: __init__
+    lines: 119-122
+  - name: start_workflow
+    lines: 123-142
+  - name: complete_stage
+    lines: 143-170
+  - name: restart_workflow
+    lines: 171-195
+  - name: get_workflow_state
+    lines: 196-214
+  - name: get_current_state_json
+    lines: 215-226
+  - name: __init__
+    lines: 230-232
+  - name: process_request
+    lines: 233-243
+  classes:
+  - name: WorkflowState
+    type: class
+    lines: 11-34
+  - name: WorkflowStatePersistence
+    type: class
+    lines: 35-115
+  - name: WorkflowExecutor
+    type: class
+    lines: 116-226
+  - name: WorkflowActor
+    type: class
+    lines: 227-291
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  test_count: 0
+  implementation_files:
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py
+  methods_tested:
+  - calculate_checksum
+  - validate_integrity
+  - __init__
+  - _get_state_file_path
+  - persist_state
+  - load_state
+  - delete_state
+  - __init__
+  - start_workflow
+  - complete_stage
+  - restart_workflow
+  - get_workflow_state
+  - get_current_state_json
+  - __init__
+  - process_request
+  classes_tested:
+  - WorkflowState
+  - WorkflowStatePersistence
+  - WorkflowExecutor
+  - WorkflowActor
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py:20-27
+  method_name: calculate_checksum
+  requirement: AC-001
+  test: test_calculate_checksum
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py:28-34
+  method_name: validate_integrity
+  requirement: AC-001
+  test: test_validate_integrity
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py:38-41
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py:42-45
+  method_name: _get_state_file_path
+  requirement: AC-001
+  test: test__get_state_file_path
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/src/implementation.py:46-67
+  method_name: persist_state
+  requirement: AC-001
+  test: test_persist_state
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-03/tests/test_generated_20251012_205221.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 4
+  requirements_traced: 4
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

@@ -54,22 +54,110 @@ acceptance_criteria:
   - criterion: "AC-001: Validate Python environment and version"
     status: implemented
     test_file: tests/feature/test_python_validation.py
+    unit_tests:
+      - "Test Python version detection"
+      - "Test Python executable path validation"
+      - "Test minimum Python version requirement (3.8+)"
     
   - criterion: "AC-002: Validate pytest and coverage tools available"
     status: implemented
     test_file: tests/feature/test_tool_validation.py
+    unit_tests:
+      - "Test pytest installation check"
+      - "Test coverage tool availability"
+      - "Test YAML parser availability"
     
   - criterion: "AC-003: Validate project structure (src/, tests/ directories)"
     status: implemented
     test_file: tests/feature/test_structure_validation.py
+    unit_tests:
+      - "Test src/ directory detection"
+      - "Test tests/ directory detection"
+      - "Test configuration file detection"
     
   - criterion: "AC-004: Validate requirement templates available"
     status: in_progress
     test_file: tests/feature/test_template_validation.py
+    unit_tests:
+      - "Test requirement template file existence"
+      - "Test template YAML structure validation"
     
   - criterion: "AC-005: Provide clear guidance for missing prerequisites"
     status: in_progress
     test_file: tests/feature/test_error_reporting.py
+    unit_tests:
+      - "Test error message formatting"
+      - "Test installation command generation"
+
+integration_test_scenarios:
+  - scenario: "INTEGRATION-001: Environment and Tool Validation Together"
+    description: "Validate Python environment then check if pytest/coverage are available"
+    test_class: "TestEnvironmentAndToolIntegration"
+    tests:
+      - "Test valid environment with all tools available"
+      - "Test valid environment with missing pytest"
+      - "Test invalid Python version with all tools"
+    layers_integrated: [LAYER-003-03-02-01, LAYER-003-03-02-02]
+    
+  - scenario: "INTEGRATION-002: Tool and Structure Validation Together"
+    description: "Check tools then validate project structure matches requirements"
+    test_class: "TestToolAndStructureIntegration"
+    tests:
+      - "Test all tools available with valid structure"
+      - "Test all tools available with missing src/ directory"
+      - "Test missing tools with valid structure"
+    layers_integrated: [LAYER-003-03-02-02, LAYER-003-03-02-03]
+    
+  - scenario: "INTEGRATION-003: Complete Prerequisites Chain"
+    description: "Run environment → tools → structure validation in sequence"
+    test_class: "TestCompletePrerequisitesChain"
+    tests:
+      - "Test complete chain with all prerequisites met"
+      - "Test chain stops at first failure"
+      - "Test chain reports all failures when configured"
+    layers_integrated: [LAYER-003-03-02-01, LAYER-003-03-02-02, LAYER-003-03-02-03]
+    
+  - scenario: "INTEGRATION-004: Error Reporting Integration"
+    description: "Integrate validation failures with error reporter"
+    test_class: "TestValidationAndErrorReporting"
+    tests:
+      - "Test missing Python generates helpful error"
+      - "Test missing pytest generates installation command"
+      - "Test missing directories generates structure guidance"
+    layers_integrated: [LAYER-003-03-02-01, LAYER-003-03-02-02, LAYER-003-03-02-03]
+
+e2e_test_scenarios:
+  - scenario: "E2E-001: Complete Prerequisites Check on Valid Project"
+    description: "Run full prerequisites check on a correctly configured project"
+    test_class: "TestE2EValidProject"
+    tests:
+      - "Test all prerequisites pass on valid project"
+      - "Test report shows all green checks"
+      - "Test execution completes in < 30 seconds"
+    
+  - scenario: "E2E-002: Prerequisites Check with Missing Python"
+    description: "Simulate missing Python environment and validate error handling"
+    test_class: "TestE2EMissingPython"
+    tests:
+      - "Test detects missing Python"
+      - "Test provides Python installation instructions"
+      - "Test workflow stops gracefully"
+    
+  - scenario: "E2E-003: Prerequisites Check with Missing Tools"
+    description: "Simulate missing pytest/coverage and validate guidance"
+    test_class: "TestE2EMissingTools"
+    tests:
+      - "Test detects missing pytest"
+      - "Test provides pip install command"
+      - "Test detects missing pytest-cov"
+    
+  - scenario: "E2E-004: Prerequisites Check with Invalid Structure"
+    description: "Check project with missing directories"
+    test_class: "TestE2EInvalidStructure"
+    tests:
+      - "Test detects missing src/ directory"
+      - "Test detects missing tests/ directory"
+      - "Test provides structure creation guidance"
 
 implementations:
   red_phase:

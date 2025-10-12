@@ -124,8 +124,16 @@ class AICodeGeneratorOrchestrator:
                 f"Please provide valid requirements with acceptance_criteria."
             )
         
+        # Validate and initialize all test sections
         if 'acceptance_criteria' not in requirements:
             requirements['acceptance_criteria'] = []
+        
+        # Initialize integration and E2E test scenario sections
+        if 'integration_test_scenarios' not in requirements:
+            requirements['integration_test_scenarios'] = []
+        
+        if 'e2e_test_scenarios' not in requirements:
+            requirements['e2e_test_scenarios'] = []
         
         return requirements
     
@@ -145,9 +153,18 @@ class AICodeGeneratorOrchestrator:
         """
         self.current_phase = 'RED'
         
-        # Build prompt for test generation
+        # Extract ALL test definitions from requirements
         ac_list = requirements.get('acceptance_criteria', [])
-        prompt = self._build_test_generation_prompt(requirements, ac_list)
+        integration_scenarios = requirements.get('integration_test_scenarios', [])
+        e2e_scenarios = requirements.get('e2e_test_scenarios', [])
+        
+        # Build comprehensive prompt including all test types
+        prompt = self._build_test_generation_prompt(
+            requirements, 
+            ac_list,
+            integration_scenarios,
+            e2e_scenarios
+        )
         
         # Call AI provider to generate test code
         test_code = self.ai_provider.generate_code(prompt)
@@ -626,31 +643,74 @@ class AICodeGeneratorOrchestrator:
     def _build_test_generation_prompt(
         self,
         requirements: Dict[str, Any],
-        acceptance_criteria: List[Dict[str, Any]]
+        acceptance_criteria: List[Dict[str, Any]],
+        integration_scenarios: List[Dict[str, Any]] = None,
+        e2e_scenarios: List[Dict[str, Any]] = None
     ) -> str:
-        """Build prompt for AI to generate test code."""
+        """Build prompt for AI to generate test code including unit, integration, and E2E tests."""
+        
+        integration_scenarios = integration_scenarios or []
+        e2e_scenarios = e2e_scenarios or []
+        
         prompt = f"""Generate pytest test code for the following requirements:
 
 Layer: {requirements.get('layer_id', 'UNKNOWN')}
 Feature: {requirements.get('feature_name', 'UNKNOWN')}
 
-Acceptance Criteria:
+ACCEPTANCE CRITERIA (UNIT TESTS):
 """
         for i, ac in enumerate(acceptance_criteria, 1):
             criterion = ac.get('criterion', ac.get('description', 'No description'))
             prompt += f"\n{i}. {criterion}"
         
+        # Add integration test scenarios
+        if integration_scenarios:
+            prompt += "\n\nINTEGRATION TEST SCENARIOS:\n"
+            for i, scenario in enumerate(integration_scenarios, 1):
+                prompt += f"\n{i}. Scenario: {scenario.get('scenario', 'UNKNOWN')}"
+                prompt += f"\n   Description: {scenario.get('description', '')}"
+                prompt += f"\n   Test Class: {scenario.get('test_class', 'TestIntegration')}"
+                prompt += f"\n   Tests to implement:"
+                for test in scenario.get('tests', []):
+                    prompt += f"\n      - {test}"
+                if 'layers_integrated' in scenario:
+                    prompt += f"\n   Layers Integrated: {', '.join(scenario['layers_integrated'])}"
+        
+        # Add E2E test scenarios
+        if e2e_scenarios:
+            prompt += "\n\nEND-TO-END TEST SCENARIOS:\n"
+            for i, scenario in enumerate(e2e_scenarios, 1):
+                prompt += f"\n{i}. Scenario: {scenario.get('scenario', 'UNKNOWN')}"
+                prompt += f"\n   Description: {scenario.get('description', '')}"
+                prompt += f"\n   Test Class: {scenario.get('test_class', 'TestE2E')}"
+                prompt += f"\n   Tests to implement:"
+                for test in scenario.get('tests', []):
+                    prompt += f"\n      - {test}"
+        
         prompt += """
 
 Generate a complete Python test file with:
-- Import statements (pytest, unittest.mock, etc.)
-- Test class for each acceptance criterion
-- At least 2 test methods per criterion
+- Import statements (pytest, unittest.mock, sys, os, subprocess, pathlib, etc.)
+- Test class for EACH acceptance criterion (UNIT tests)
+- Test class for EACH integration test scenario (INTEGRATION tests)
+- Test class for EACH E2E test scenario (E2E tests)
+- Each test class MUST have the EXACT name specified above (e.g., TestCompletePrerequisitesChain)
+- Each test method MUST be implemented as specified in the scenario
 - Tests should initially FAIL (RED phase requirement)
-- Use pytest.raises() for expected failures
-- Include docstrings
+- Use pytest.raises() or assert False for expected failures
+- Include docstrings for all classes and methods
+- Mark integration tests with @pytest.mark.integration
+- Mark E2E tests with @pytest.mark.e2e
 
-Output only valid Python code, no explanations.
+CRITICAL REQUIREMENTS:
+1. You MUST create ALL test classes specified above - do not skip any
+2. Each scenario becomes its own dedicated test class
+3. Use the exact test_class names provided in the scenarios
+4. Implement ALL tests listed in each scenario
+5. Integration test classes should test multiple components working together
+6. E2E test classes should test complete workflows from start to finish
+
+Output only valid Python code, no explanations or markdown formatting.
 """
         return prompt
     
@@ -796,7 +856,7 @@ Output only valid Python code, no explanations.
         return analysis
     
     def _categorize_test_classes(self, test_file_path: Path) -> Dict[str, List[str]]:
-        """Categorize test classes by type (unit, integration, e2e)."""
+        """Categorize test classes by type (unit, integration, e2e) using pytest markers and class names."""
         categorized = {
             'unit': [],
             'integration': [],
@@ -808,27 +868,63 @@ Output only valid Python code, no explanations.
         
         try:
             with open(test_file_path, 'r') as f:
-                content = f.read()
+                lines = f.readlines()
             
-            # Find all test class definitions
-            class_pattern = r'^class\s+(Test\w+)'
-            for line in content.split('\n'):
-                match = re.match(class_pattern, line)
-                if match:
-                    class_name = match.group(1)
-                    class_name_lower = class_name.lower()
+            # Process file line by line to detect markers before class definitions
+            i = 0
+            while i < len(lines):
+                line = lines[i].strip()
+                
+                # Check for pytest markers before class definition
+                marker = None
+                if line.startswith('@pytest.mark.'):
+                    if 'integration' in line:
+                        marker = 'integration'
+                    elif 'e2e' in line:
+                        marker = 'e2e'
                     
-                    # Categorize based on class name patterns
-                    if any(pattern in class_name_lower for pattern in ['integration', 'integrationtest']):
-                        categorized['integration'].append(class_name)
-                    elif any(pattern in class_name_lower for pattern in ['e2e', 'endtoend', 'end2end', 'e2etest']):
-                        categorized['e2e'].append(class_name)
-                    else:
-                        # Default to unit tests (including TestAC* pattern)
-                        categorized['unit'].append(class_name)
+                    # Look ahead for class definition
+                    j = i + 1
+                    while j < len(lines):
+                        next_line = lines[j].strip()
+                        if next_line.startswith('class Test'):
+                            # Extract class name
+                            class_match = re.match(r'^class\s+(Test\w+)', next_line)
+                            if class_match:
+                                class_name = class_match.group(1)
+                                if marker:
+                                    categorized[marker].append(class_name)
+                                else:
+                                    categorized['unit'].append(class_name)
+                            break
+                        elif next_line and not next_line.startswith('@'):
+                            # Not a class, stop looking
+                            break
+                        j += 1
+                
+                # Check for class definition without marker (or we already processed it)
+                elif line.startswith('class Test'):
+                    class_match = re.match(r'^class\s+(Test\w+)', line)
+                    if class_match:
+                        class_name = class_match.group(1)
+                        # Only add if not already categorized
+                        if not any(class_name in cat for cat in categorized.values()):
+                            class_name_lower = class_name.lower()
+                            
+                            # Categorize based on class name patterns as fallback
+                            if any(pattern in class_name_lower for pattern in ['integration', 'integrationtest']):
+                                categorized['integration'].append(class_name)
+                            elif any(pattern in class_name_lower for pattern in ['e2e', 'endtoend', 'end2end', 'e2etest']):
+                                categorized['e2e'].append(class_name)
+                            else:
+                                # Default to unit tests (including TestAC* pattern)
+                                categorized['unit'].append(class_name)
+                
+                i += 1
         
         except Exception as e:
-            self.logger.warning(f"Failed to categorize test classes: {e}")
+            # Use a simple print since logger might not be available
+            print(f"Warning: Failed to categorize test classes: {e}")
         
         return categorized
     

@@ -1,0 +1,165 @@
+matrix_metadata:
+  timestamp: '20251012_205042'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Detect mock usage in tests (unless requirement allows)'
+  description: 'AC-001: Detect mock usage in tests (unless requirement allows)'
+  test_files: &id001
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Detect placeholder tests (assert True, pass)'
+  description: 'AC-002: Detect placeholder tests (assert True, pass)'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Detect coverage below threshold violations'
+  description: 'AC-003: Detect coverage below threshold violations'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Detect team size mismatch violations'
+  description: 'AC-004: Detect team size mismatch violations'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-005
+  requirement: 'AC-005: Categorize violations by type and severity'
+  description: 'AC-005: Categorize violations by type and severity'
+  test_files: *id001
+  test_methods:
+  - test_ac_005
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py
+  lines: 253
+  methods:
+  - name: __init__
+    lines: 34-36
+  - name: detect_mock_usage
+    lines: 37-70
+  - name: detect_placeholder_tests
+    lines: 71-95
+  - name: _check_placeholder_function
+    lines: 96-140
+  - name: detect_coverage_violations
+    lines: 141-161
+  - name: detect_team_size_violations
+    lines: 162-191
+  - name: categorize_violations
+    lines: 192-211
+  - name: analyze
+    lines: 212-222
+  classes:
+  - name: ViolationType
+    type: class
+    lines: 9-15
+  - name: Severity
+    type: class
+    lines: 16-23
+  - name: Violation
+    type: class
+    lines: 24-32
+  - name: TestAnalyzer
+    type: class
+    lines: 33-253
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  test_count: 0
+  implementation_files:
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py
+  methods_tested:
+  - __init__
+  - detect_mock_usage
+  - detect_placeholder_tests
+  - _check_placeholder_function
+  - detect_coverage_violations
+  - detect_team_size_violations
+  - categorize_violations
+  - analyze
+  classes_tested:
+  - ViolationType
+  - Severity
+  - Violation
+  - TestAnalyzer
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py:34-36
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py:37-70
+  method_name: detect_mock_usage
+  requirement: AC-001
+  test: test_detect_mock_usage
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py:71-95
+  method_name: detect_placeholder_tests
+  requirement: AC-001
+  test: test_detect_placeholder_tests
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py:96-140
+  method_name: _check_placeholder_function
+  requirement: AC-001
+  test: test__check_placeholder_function
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/src/implementation.py:141-161
+  method_name: detect_coverage_violations
+  requirement: AC-001
+  test: test_detect_coverage_violations
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-01/tests/test_generated_20251012_205010.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 5
+  requirements_traced: 5
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

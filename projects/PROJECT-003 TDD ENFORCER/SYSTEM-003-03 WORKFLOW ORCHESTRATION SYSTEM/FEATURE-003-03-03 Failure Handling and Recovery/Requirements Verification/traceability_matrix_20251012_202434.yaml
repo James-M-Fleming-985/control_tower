@@ -1,0 +1,235 @@
+matrix_metadata:
+  timestamp: '20251012_202434'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Detect all quality gate violations'
+  description: 'AC-001: Detect all quality gate violations'
+  test_files: &id001
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Categorize failures (mock detected, coverage low, etc.)'
+  description: 'AC-002: Categorize failures (mock detected, coverage low, etc.)'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Generate remediation options for actor'
+  description: 'AC-003: Generate remediation options for actor'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Maintain workflow state for restart capability'
+  description: 'AC-004: Maintain workflow state for restart capability'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-005
+  requirement: 'AC-005: Support fix-and-retry workflow'
+  description: 'AC-005: Support fix-and-retry workflow'
+  test_files: *id001
+  test_methods:
+  - test_ac_005
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-006
+  requirement: 'AC-006: Support continue-with-warning option'
+  description: 'AC-006: Support continue-with-warning option'
+  test_files: *id001
+  test_methods:
+  - test_ac_006
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py
+  lines: 326
+  methods:
+  - name: __init__
+    lines: 65-75
+  - name: detect_violations
+    lines: 76-92
+  - name: _categorize_failure
+    lines: 93-103
+  - name: __init__
+    lines: 105-160
+  - name: generate_options
+    lines: 161-190
+  - name: __init__
+    lines: 192-194
+  - name: save_state
+    lines: 195-197
+  - name: load_state
+    lines: 198-200
+  - name: update_state
+    lines: 201-208
+  - name: delete_state
+    lines: 209-213
+  - name: __init__
+    lines: 215-219
+  - name: handle_failure
+    lines: 220-264
+  - name: retry_workflow
+    lines: 265-285
+  - name: continue_with_warning
+    lines: 286-310
+  - name: get_workflow_state
+    lines: 311-321
+  classes:
+  - name: FailureCategory
+    type: class
+    lines: 9-19
+  - name: RemediationAction
+    type: class
+    lines: 20-27
+  - name: WorkflowState
+    type: class
+    lines: 28-36
+  - name: QualityGateViolation
+    type: class
+    lines: 37-45
+  - name: RemediationOption
+    type: class
+    lines: 46-54
+  - name: WorkflowStateData
+    type: class
+    lines: 55-63
+  - name: FailureDetector
+    type: class
+    lines: 64-103
+  - name: RemediationGenerator
+    type: class
+    lines: 104-190
+  - name: WorkflowStateManager
+    type: class
+    lines: 191-213
+  - name: FailureHandler
+    type: class
+    lines: 214-326
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  - AC-006
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  test_count: 0
+  implementation_files:
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/src/implementation.py
+  methods_tested:
+  - __init__
+  - detect_violations
+  - _categorize_failure
+  - __init__
+  - generate_options
+  - __init__
+  - save_state
+  - load_state
+  - update_state
+  - delete_state
+  - __init__
+  - handle_failure
+  - retry_workflow
+  - continue_with_warning
+  - get_workflow_state
+  classes_tested:
+  - FailureCategory
+  - RemediationAction
+  - WorkflowState
+  - QualityGateViolation
+  - RemediationOption
+  - WorkflowStateData
+  - FailureDetector
+  - RemediationGenerator
+  - WorkflowStateManager
+  - FailureHandler
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py:65-75
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py:76-92
+  method_name: detect_violations
+  requirement: AC-001
+  test: test_detect_violations
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py:93-103
+  method_name: _categorize_failure
+  requirement: AC-001
+  test: test__categorize_failure
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py:105-160
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/src/implementation.py:161-190
+  method_name: generate_options
+  requirement: AC-001
+  test: test_generate_options
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/tests/test_generated_20251012_202400.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 6
+  requirements_traced: 6
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

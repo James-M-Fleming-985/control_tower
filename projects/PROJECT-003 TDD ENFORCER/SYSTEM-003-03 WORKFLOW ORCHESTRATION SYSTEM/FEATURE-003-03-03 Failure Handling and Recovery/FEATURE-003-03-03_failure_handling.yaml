@@ -55,26 +55,120 @@ acceptance_criteria:
   - criterion: "AC-001: Detect all quality gate violations"
     status: not_implemented
     test_file: tests/feature/test_violation_detection.py
+    unit_tests:
+      - "Test coverage violation detection"
+      - "Test mock usage violation detection"
+      - "Test test pyramid ratio violation detection"
     
   - criterion: "AC-002: Categorize failures (mock detected, coverage low, etc.)"
     status: not_implemented
     test_file: tests/feature/test_failure_categorization.py
+    unit_tests:
+      - "Test categorize as COVERAGE_LOW"
+      - "Test categorize as MOCK_DETECTED"
+      - "Test categorize as PYRAMID_VIOLATION"
+      - "Test categorize as SYNTAX_ERROR"
     
   - criterion: "AC-003: Generate remediation options for actor"
     status: not_implemented
     test_file: tests/feature/test_remediation_generation.py
+    unit_tests:
+      - "Test generate remediation for coverage failure"
+      - "Test generate remediation for mock usage"
+      - "Test generate remediation for syntax errors"
     
   - criterion: "AC-004: Maintain workflow state for restart capability"
     status: not_implemented
     test_file: tests/feature/test_state_persistence.py
+    unit_tests:
+      - "Test save workflow state to disk"
+      - "Test load workflow state from disk"
+      - "Test state includes completed stages"
     
   - criterion: "AC-005: Support fix-and-retry workflow"
     status: not_implemented
     test_file: tests/feature/test_fix_retry.py
+    unit_tests:
+      - "Test retry from last failed stage"
+      - "Test retry from specific stage"
+      - "Test retry counter increments"
     
   - criterion: "AC-006: Support continue-with-warning option"
     status: not_implemented
     test_file: tests/feature/test_continue_warning.py
+    unit_tests:
+      - "Test continue with warning flag set"
+      - "Test warning logged to report"
+
+integration_test_scenarios:
+  - scenario: "INTEGRATION-001: Violation Detection to Remediation"
+    description: "Detect violation then generate appropriate remediation options"
+    test_class: "TestViolationToRemediation"
+    tests:
+      - "Test coverage violation generates add tests remediation"
+      - "Test mock violation generates remove mocks remediation"
+      - "Test pyramid violation generates rebalance tests remediation"
+    layers_integrated: [LAYER-003-03-03-01, LAYER-003-03-03-02]
+    
+  - scenario: "INTEGRATION-002: Failure Detection with State Persistence"
+    description: "Detect failure and save state for recovery"
+    test_class: "TestFailureAndStatePersistence"
+    tests:
+      - "Test failure saves current stage to state"
+      - "Test failure saves failure category to state"
+      - "Test state can be loaded for retry"
+    layers_integrated: [LAYER-003-03-03-01, LAYER-003-03-03-03]
+    
+  - scenario: "INTEGRATION-003: Remediation with Recovery Manager"
+    description: "Generate remediation options and manage recovery workflow"
+    test_class: "TestRemediationAndRecovery"
+    tests:
+      - "Test remediation options passed to actor"
+      - "Test actor selects fix-and-retry"
+      - "Test workflow restarts from saved state"
+    layers_integrated: [LAYER-003-03-03-02, LAYER-003-03-03-03]
+    
+  - scenario: "INTEGRATION-004: Complete Failure Handling Chain"
+    description: "Run detection → remediation → recovery in sequence"
+    test_class: "TestCompleteFailureHandlingChain"
+    tests:
+      - "Test complete chain with coverage failure"
+      - "Test complete chain with mock failure"
+      - "Test multiple retries tracked correctly"
+    layers_integrated: [LAYER-003-03-03-01, LAYER-003-03-03-02, LAYER-003-03-03-03]
+
+e2e_test_scenarios:
+  - scenario: "E2E-001: Coverage Failure and Successful Retry"
+    description: "Simulate coverage failure, actor adds tests, retry succeeds"
+    test_class: "TestE2ECoverageFailureRetry"
+    tests:
+      - "Test workflow fails with coverage violation"
+      - "Test remediation suggests adding tests"
+      - "Test retry after tests added succeeds"
+    
+  - scenario: "E2E-002: Mock Detection and Refactor Workflow"
+    description: "Detect mock usage, actor removes mocks, retry workflow"
+    test_class: "TestE2EMockDetectionRefactor"
+    tests:
+      - "Test workflow detects mock usage"
+      - "Test remediation suggests removing mocks"
+      - "Test retry after refactor succeeds"
+    
+  - scenario: "E2E-003: Multi-Stage Failure Recovery"
+    description: "Multiple failures across different stages"
+    test_class: "TestE2EMultiStageFailure"
+    tests:
+      - "Test failure at stage 3 saves state"
+      - "Test failure at stage 7 after retry saves state"
+      - "Test complete recovery after multiple fixes"
+    
+  - scenario: "E2E-004: Continue-With-Warning Workflow"
+    description: "Actor chooses to continue despite warnings"
+    test_class: "TestE2EContinueWithWarning"
+    tests:
+      - "Test coverage low triggers warning option"
+      - "Test actor selects continue-with-warning"
+      - "Test workflow completes with warning logged"
 
 implementations:
   red_phase:
@@ -136,7 +230,7 @@ layers:
   
   - layer_id: LAYER-003-03-03-03
     name: Recovery State Manager
-    requirement_file: LAYER-003-03-03-03_recovery_state.yaml
+    requirement_file: LAYER-003-03-03-03_recovery_state_manager.yaml
     status: not_started
 
 success_criteria:

@@ -1,0 +1,177 @@
+matrix_metadata:
+  timestamp: '20251012_205215'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Generate fix-and-retry options for violations'
+  description: 'AC-001: Generate fix-and-retry options for violations'
+  test_files: &id001
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Generate continue-with-warning options where appropriate'
+  description: 'AC-002: Generate continue-with-warning options where appropriate'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Provide specific guidance for each violation type'
+  description: 'AC-003: Provide specific guidance for each violation type'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Format options for actor presentation to user'
+  description: 'AC-004: Format options for actor presentation to user'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py
+  lines: 362
+  methods:
+  - name: to_dict
+    lines: 24-37
+  - name: __init__
+    lines: 41-54
+  - name: generate_options
+    lines: 55-73
+  - name: format_for_actor
+    lines: 74-89
+  - name: _handle_budget_exceeded
+    lines: 90-115
+  - name: _handle_unauthorized_access
+    lines: 116-139
+  - name: _handle_rate_limit_exceeded
+    lines: 140-163
+  - name: _handle_invalid_input
+    lines: 164-178
+  - name: _handle_resource_not_found
+    lines: 179-202
+  - name: _handle_timeout
+    lines: 203-226
+  - name: _handle_data_validation_error
+    lines: 227-241
+  - name: _handle_permission_denied
+    lines: 242-265
+  - name: _handle_quota_exceeded
+    lines: 266-289
+  - name: _handle_configuration_error
+    lines: 290-304
+  - name: _handle_generic_violation
+    lines: 305-329
+  - name: generate_remediation_options
+    lines: 330-345
+  - name: format_remediation_options_for_actor
+    lines: 346-356
+  classes:
+  - name: OptionType
+    type: class
+    lines: 8-14
+  - name: RemediationOption
+    type: class
+    lines: 15-37
+  - name: ViolationRemediationGenerator
+    type: class
+    lines: 38-362
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  test_count: 0
+  implementation_files:
+  - /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py
+  methods_tested:
+  - to_dict
+  - __init__
+  - generate_options
+  - format_for_actor
+  - _handle_budget_exceeded
+  - _handle_unauthorized_access
+  - _handle_rate_limit_exceeded
+  - _handle_invalid_input
+  - _handle_resource_not_found
+  - _handle_timeout
+  - _handle_data_validation_error
+  - _handle_permission_denied
+  - _handle_quota_exceeded
+  - _handle_configuration_error
+  - _handle_generic_violation
+  - generate_remediation_options
+  - format_remediation_options_for_actor
+  classes_tested:
+  - OptionType
+  - RemediationOption
+  - ViolationRemediationGenerator
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py:24-37
+  method_name: to_dict
+  requirement: AC-001
+  test: test_to_dict
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py:41-54
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py:55-73
+  method_name: generate_options
+  requirement: AC-001
+  test: test_generate_options
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py:74-89
+  method_name: format_for_actor
+  requirement: AC-001
+  test: test_format_for_actor
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  verified: true
+- implementation_location: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/src/implementation.py:90-115
+  method_name: _handle_budget_exceeded
+  requirement: AC-001
+  test: test__handle_budget_exceeded
+  test_file: /workspaces/control_tower/AI_GENERATED_FEATURES/LAYER-003-03-03-02/tests/test_generated_20251012_205124.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 4
+  requirements_traced: 4
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

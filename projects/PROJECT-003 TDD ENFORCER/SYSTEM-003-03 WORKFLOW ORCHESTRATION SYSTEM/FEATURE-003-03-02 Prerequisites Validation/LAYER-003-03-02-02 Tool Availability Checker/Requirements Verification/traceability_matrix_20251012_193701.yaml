@@ -1,0 +1,177 @@
+matrix_metadata:
+  timestamp: '20251012_193701'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Validate pytest available and correct version'
+  description: 'AC-001: Validate pytest available and correct version'
+  test_files: &id001
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-02
+    Prerequisites Validation/LAYER-003-03-02-02 Tool Availability Checker/tests/test_generated_20251012_193644.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Validate coverage tool available'
+  description: 'AC-002: Validate coverage tool available'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Check for YAML parser availability'
+  description: 'AC-003: Check for YAML parser availability'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Provide installation commands for missing tools'
+  description: 'AC-004: Provide installation commands for missing tools'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/src/implementation.py
+  lines: 178
+  methods:
+  - name: __init__
+    lines: 10-16
+  - name: check_pytest
+    lines: 17-35
+  - name: check_coverage
+    lines: 36-49
+  - name: check_yaml_parser
+    lines: 50-63
+  - name: check_all_tools
+    lines: 64-95
+  - name: get_missing_tools
+    lines: 96-111
+  - name: get_installation_commands
+    lines: 112-127
+  - name: _compare_versions
+    lines: 128-157
+  - name: normalize
+    lines: 139-157
+  - name: check_tool_availability
+    lines: 158-168
+  - name: get_installation_commands
+    lines: 169-179
+  classes:
+  - name: ToolAvailabilityChecker
+    type: class
+    lines: 7-178
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  test_count: 0
+  implementation_files:
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-02
+    Prerequisites Validation/LAYER-003-03-02-02 Tool Availability Checker/src/implementation.py
+  methods_tested:
+  - __init__
+  - check_pytest
+  - check_coverage
+  - check_yaml_parser
+  - check_all_tools
+  - get_missing_tools
+  - get_installation_commands
+  - _compare_versions
+  - normalize
+  - check_tool_availability
+  - get_installation_commands
+  classes_tested:
+  - ToolAvailabilityChecker
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02
+    Tool Availability Checker/src/implementation.py:10-16
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02
+    Tool Availability Checker/src/implementation.py:17-35
+  method_name: check_pytest
+  requirement: AC-001
+  test: test_check_pytest
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02
+    Tool Availability Checker/src/implementation.py:36-49
+  method_name: check_coverage
+  requirement: AC-001
+  test: test_check_coverage
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02
+    Tool Availability Checker/src/implementation.py:50-63
+  method_name: check_yaml_parser
+  requirement: AC-001
+  test: test_check_yaml_parser
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02
+    Tool Availability Checker/src/implementation.py:64-95
+  method_name: check_all_tools
+  requirement: AC-001
+  test: test_check_all_tools
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-02 Prerequisites Validation/LAYER-003-03-02-02 Tool Availability
+    Checker/tests/test_generated_20251012_193644.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 4
+  requirements_traced: 4
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

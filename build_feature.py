@@ -6,10 +6,26 @@ Single command to build complete features layer by layer
 
 import argparse
 import sys
+import os
 from pathlib import Path
 from datetime import datetime
 import yaml
 import json
+
+# Clean API key (remove whitespace/newlines)
+if 'ANTHROPIC_API_KEY' in os.environ:
+    os.environ['ANTHROPIC_API_KEY'] = os.environ['ANTHROPIC_API_KEY'].strip()
+if 'OPENAI_API_KEY' in os.environ:
+    os.environ['OPENAI_API_KEY'] = os.environ['OPENAI_API_KEY'].strip()
+
+# Add necessary paths BEFORE importing orchestrator
+control_tower_root = Path(__file__).parent.resolve()
+project_004_src = control_tower_root / "projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/src"
+
+if str(control_tower_root) not in sys.path:
+    sys.path.insert(0, str(control_tower_root))
+if str(project_004_src) not in sys.path:
+    sys.path.insert(0, str(project_004_src))
 
 
 class FeatureBuilder:
@@ -81,17 +97,15 @@ class FeatureBuilder:
         layer_spec = self.find_layer_spec(layer_info)
         self.print_step("✓", f"Layer spec: {layer_spec}")
         
-        # Prepare output directory for this layer
-        layer_output = self.output_dir / layer_info['layer_id']
-        layer_output.mkdir(parents=True, exist_ok=True)
+        # Use the layer's actual directory (where the YAML file is located)
+        # This ensures artifacts are saved directly in the correct layer folder
+        layer_output = layer_spec.parent
         
         self.print_step("✓", f"Output directory: {layer_output}")
         
-        # Import and use the AI Code Generator
-        sys.path.insert(0, str(Path("/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM")))
-        
+        # Import orchestrator (paths already set at module level)
         try:
-            from src.layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            from layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
             
             self.print_step("🤖", "Initializing AI Code Generator...")
             

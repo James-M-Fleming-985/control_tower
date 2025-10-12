@@ -1,0 +1,43 @@
+
+======================================================================
+LAYER TEST REPORT: LAYER-003-03-02-02
+======================================================================
+Layer: Tool Availability Checker
+Feature: FEATURE-003-03-02
+Status: implemented
+Progress: 95%
+Generated: 2025-10-12 19:56:32
+
+TEST RESULTS SUMMARY
+----------------------------------------------------------------------
+Unit Tests:
+  Status: FAILED
+  Tests Run: 0 (required: 10)
+  Passed: 0
+  Failed: 0
+  Coverage: 0.3% (required: 90.0%)
+
+ACCEPTANCE CRITERIA VERIFICATION
+----------------------------------------------------------------------
+❌ AC-001
+   Status: implemented
+   Test File: tests/layer/test_pytest_validation.py
+   Test Exists: False
+
+❌ AC-002
+   Status: implemented
+   Test File: tests/layer/test_coverage_validation.py
+   Test Exists: False
+
+❌ AC-003
+   Status: implemented
+   Test File: tests/layer/test_yaml_parser.py
+   Test Exists: False
+
+⚠️ AC-004
+   Status: in_progress
+   Test File: tests/layer/test_installation_guidance.py
+   Test Exists: False
+
+Overall Compliance: 75.0%
+======================================================================
