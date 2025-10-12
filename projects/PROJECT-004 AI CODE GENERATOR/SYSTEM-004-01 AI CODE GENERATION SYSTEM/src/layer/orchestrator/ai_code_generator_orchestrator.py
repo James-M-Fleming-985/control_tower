@@ -795,6 +795,43 @@ Output only valid Python code, no explanations.
         
         return analysis
     
+    def _categorize_test_classes(self, test_file_path: Path) -> Dict[str, List[str]]:
+        """Categorize test classes by type (unit, integration, e2e)."""
+        categorized = {
+            'unit': [],
+            'integration': [],
+            'e2e': []
+        }
+        
+        if not test_file_path.exists():
+            return categorized
+        
+        try:
+            with open(test_file_path, 'r') as f:
+                content = f.read()
+            
+            # Find all test class definitions
+            class_pattern = r'^class\s+(Test\w+)'
+            for line in content.split('\n'):
+                match = re.match(class_pattern, line)
+                if match:
+                    class_name = match.group(1)
+                    class_name_lower = class_name.lower()
+                    
+                    # Categorize based on class name patterns
+                    if any(pattern in class_name_lower for pattern in ['integration', 'integrationtest']):
+                        categorized['integration'].append(class_name)
+                    elif any(pattern in class_name_lower for pattern in ['e2e', 'endtoend', 'end2end', 'e2etest']):
+                        categorized['e2e'].append(class_name)
+                    else:
+                        # Default to unit tests (including TestAC* pattern)
+                        categorized['unit'].append(class_name)
+        
+        except Exception as e:
+            self.logger.warning(f"Failed to categorize test classes: {e}")
+        
+        return categorized
+    
     def _generate_requirements_verification(
         self,
         report_dir: Path,
@@ -1031,10 +1068,26 @@ Output only valid Python code, no explanations.
         tests_passed = green_phase.get('tests_passed', 0)
         coverage = green_phase.get('coverage', 0.0)
         
-        # Analyze test distribution (simple heuristic: most are unit tests)
-        unit_tests = max(1, int(tests_passed * 0.70))
-        integration_tests = max(0, int(tests_passed * 0.25))
-        e2e_tests = max(0, tests_passed - unit_tests - integration_tests)
+        # Get actual test categorization from test files
+        test_files = self._red_phase_results.get('test_files', [])
+        unit_tests = 0
+        integration_tests = 0
+        e2e_tests = 0
+        
+        for test_file_path_str in test_files:
+            test_file_path = Path(test_file_path_str)
+            categorized = self._categorize_test_classes(test_file_path)
+            unit_tests += len(categorized['unit'])
+            integration_tests += len(categorized['integration'])
+            e2e_tests += len(categorized['e2e'])
+        
+        # If no tests categorized (file doesn't exist yet), use simple heuristic
+        if unit_tests == 0 and integration_tests == 0 and e2e_tests == 0:
+            unit_tests = max(1, int(tests_passed * 0.70))
+            integration_tests = max(0, int(tests_passed * 0.25))
+            e2e_tests = max(0, tests_passed - unit_tests - integration_tests)
+        
+        total_categorized = unit_tests + integration_tests + e2e_tests
         
         report_data = {
             '# ====================================================================': None,
@@ -1059,22 +1112,22 @@ Output only valid Python code, no explanations.
             
             'test_pyramid_validation': {
                 'recommended_ratio': '70:20:10 (Unit:Integration:E2E)',
-                'actual_ratio': f'{int(unit_tests/max(1,tests_passed)*100)}:{int(integration_tests/max(1,tests_passed)*100)}:{int(e2e_tests/max(1,tests_passed)*100)}',
+                'actual_ratio': f'{int(unit_tests/max(1,total_categorized)*100)}:{int(integration_tests/max(1,total_categorized)*100)}:{int(e2e_tests/max(1,total_categorized)*100)}',
                 'compliance_status': 'PASS',
                 'pyramid_structure': {
                     'unit_tests': {
                         'count': unit_tests,
-                        'percentage': f'{unit_tests/max(1,tests_passed)*100:.1f}%',
+                        'percentage': f'{unit_tests/max(1,total_categorized)*100:.1f}%',
                         'description': 'Fast, isolated tests for individual components'
                     },
                     'integration_tests': {
                         'count': integration_tests,
-                        'percentage': f'{integration_tests/max(1,tests_passed)*100:.1f}%',
+                        'percentage': f'{integration_tests/max(1,total_categorized)*100:.1f}%',
                         'description': 'Tests for component interactions'
                     },
                     'e2e_tests': {
                         'count': e2e_tests,
-                        'percentage': f'{e2e_tests/max(1,tests_passed)*100:.1f}%',
+                        'percentage': f'{e2e_tests/max(1,total_categorized)*100:.1f}%',
                         'description': 'End-to-end workflow tests'
                     }
                 },
