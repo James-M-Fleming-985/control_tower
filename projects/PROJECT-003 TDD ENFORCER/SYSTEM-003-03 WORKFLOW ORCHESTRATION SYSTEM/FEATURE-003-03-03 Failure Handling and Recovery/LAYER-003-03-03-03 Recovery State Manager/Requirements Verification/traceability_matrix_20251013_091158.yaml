@@ -1,0 +1,177 @@
+matrix_metadata:
+  timestamp: '20251013_091158'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Persist workflow state at each stage completion'
+  description: 'AC-001: Persist workflow state at each stage completion'
+  test_files: &id001
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/LAYER-003-03-03-03 Recovery State Manager/tests/test_generated_20251013_091134.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Enable workflow restart from last successful stage'
+  description: 'AC-002: Enable workflow restart from last successful stage'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Validate state integrity before restoration'
+  description: 'AC-003: Validate state integrity before restoration'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Include workflow state in JSON response to actor'
+  description: 'AC-004: Include workflow state in JSON response to actor'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/src/implementation.py
+  lines: 235
+  methods:
+  - name: __init__
+    lines: 12-22
+  - name: _get_state_file_path
+    lines: 23-26
+  - name: persist_state
+    lines: 27-68
+  - name: get_last_successful_stage
+    lines: 69-83
+  - name: _load_state
+    lines: 84-99
+  - name: validate_state
+    lines: 100-142
+  - name: restore_state
+    lines: 143-157
+  - name: get_state_response
+    lines: 158-182
+  - name: clear_state
+    lines: 183-204
+  - name: get_all_stages
+    lines: 205-219
+  - name: get_stage_data
+    lines: 220-230
+  classes:
+  - name: RecoveryStateManager
+    type: class
+    lines: 9-235
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  test_count: 0
+  implementation_files:
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/LAYER-003-03-03-03 Recovery State Manager/src/implementation.py
+  methods_tested:
+  - __init__
+  - _get_state_file_path
+  - persist_state
+  - get_last_successful_stage
+  - _load_state
+  - validate_state
+  - restore_state
+  - get_state_response
+  - clear_state
+  - get_all_stages
+  - get_stage_data
+  classes_tested:
+  - RecoveryStateManager
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03
+    Recovery State Manager/src/implementation.py:12-22
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03
+    Recovery State Manager/src/implementation.py:23-26
+  method_name: _get_state_file_path
+  requirement: AC-001
+  test: test__get_state_file_path
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03
+    Recovery State Manager/src/implementation.py:27-68
+  method_name: persist_state
+  requirement: AC-001
+  test: test_persist_state
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03
+    Recovery State Manager/src/implementation.py:69-83
+  method_name: get_last_successful_stage
+  requirement: AC-001
+  test: test_get_last_successful_stage
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03
+    Recovery State Manager/src/implementation.py:84-99
+  method_name: _load_state
+  requirement: AC-001
+  test: test__load_state
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-03 Recovery
+    State Manager/tests/test_generated_20251013_091134.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 4
+  requirements_traced: 4
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

@@ -1,38 +1,30 @@
 ```python
 import json
 import os
-import hashlib
-from typing import Any, Dict, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pathlib import Path
 
 
-class WorkflowStateManager:
-    """Manages workflow state persistence and restoration."""
+class RecoveryStateManager:
+    """Manages workflow state persistence and recovery."""
     
-    def __init__(self, state_dir: str = ".workflow_states"):
+    def __init__(self, storage_path: Optional[str] = None):
         """
-        Initialize the workflow state manager.
+        Initialize the RecoveryStateManager.
         
         Args:
-            state_dir: Directory to store workflow state files
+            storage_path: Path to store state files. Defaults to './workflow_states'
         """
-        self.state_dir = Path(state_dir)
-        self.state_dir.mkdir(exist_ok=True)
+        self.storage_path = Path(storage_path) if storage_path else Path('./workflow_states')
+        self.storage_path.mkdir(parents=True, exist_ok=True)
+        self._states: Dict[str, Dict[str, Any]] = {}
     
-    def _get_state_path(self, workflow_id: str) -> Path:
+    def _get_state_file_path(self, workflow_id: str) -> Path:
         """Get the file path for a workflow state."""
-        return self.state_dir / f"{workflow_id}.json"
+        return self.storage_path / f"{workflow_id}.json"
     
-    def _compute_checksum(self, data: Dict[str, Any]) -> str:
-        """Compute checksum for state data integrity validation."""
-        state_copy = data.copy()
-        state_copy.pop('checksum', None)
-        state_copy.pop('timestamp', None)
-        json_str = json.dumps(state_copy, sort_keys=True)
-        return hashlib.sha256(json_str.encode()).hexdigest()
-    
-    def persist_state(self, workflow_id: str, stage: str, state_data: Dict[str, Any]) -> None:
+    def persist_state(self, workflow_id: str, stage: str, state_data: Dict[str, Any]) -> bool:
         """
         Persist workflow state at stage completion.
         
@@ -40,40 +32,113 @@ class WorkflowStateManager:
             workflow_id: Unique identifier for the workflow
             stage: Current stage name
             state_data: State data to persist
+            
+        Returns:
+            bool: True if persistence was successful
         """
-        state = {
-            'workflow_id': workflow_id,
-            'stage': stage,
-            'state_data': state_data,
-            'timestamp': datetime.utcnow().isoformat()
-        }
-        state['checksum'] = self._compute_checksum(state)
-        
-        state_path = self._get_state_path(workflow_id)
-        with open(state_path, 'w') as f:
-            json.dump(state, f, indent=2)
+        try:
+            if workflow_id not in self._states:
+                self._states[workflow_id] = {
+                    'workflow_id': workflow_id,
+                    'stages': [],
+                    'current_stage': stage,
+                    'created_at': datetime.utcnow().isoformat(),
+                    'updated_at': datetime.utcnow().isoformat(),
+                    'state_data': {}
+                }
+            
+            workflow_state = self._states[workflow_id]
+            
+            # Add stage if not already in stages list
+            if stage not in workflow_state['stages']:
+                workflow_state['stages'].append(stage)
+            
+            workflow_state['current_stage'] = stage
+            workflow_state['updated_at'] = datetime.utcnow().isoformat()
+            workflow_state['state_data'][stage] = state_data
+            
+            # Write to file
+            state_file = self._get_state_file_path(workflow_id)
+            with open(state_file, 'w') as f:
+                json.dump(workflow_state, f, indent=2)
+            
+            return True
+        except Exception as e:
+            return False
     
-    def validate_state(self, state: Dict[str, Any]) -> bool:
+    def get_last_successful_stage(self, workflow_id: str) -> Optional[str]:
+        """
+        Get the last successful stage for a workflow.
+        
+        Args:
+            workflow_id: Unique identifier for the workflow
+            
+        Returns:
+            Optional[str]: Name of the last successful stage or None
+        """
+        workflow_state = self._load_state(workflow_id)
+        if workflow_state and workflow_state.get('stages'):
+            return workflow_state['stages'][-1]
+        return None
+    
+    def _load_state(self, workflow_id: str) -> Optional[Dict[str, Any]]:
+        """Load workflow state from storage."""
+        if workflow_id in self._states:
+            return self._states[workflow_id]
+        
+        state_file = self._get_state_file_path(workflow_id)
+        if state_file.exists():
+            try:
+                with open(state_file, 'r') as f:
+                    state = json.load(f)
+                    self._states[workflow_id] = state
+                    return state
+            except Exception:
+                return None
+        return None
+    
+    def validate_state(self, workflow_id: str) -> bool:
         """
         Validate state integrity before restoration.
         
         Args:
-            state: State dictionary to validate
+            workflow_id: Unique identifier for the workflow
             
         Returns:
-            True if state is valid, False otherwise
+            bool: True if state is valid
         """
-        if not state:
+        workflow_state = self._load_state(workflow_id)
+        
+        if not workflow_state:
             return False
         
-        required_fields = ['workflow_id', 'stage', 'state_data', 'checksum']
-        if not all(field in state for field in required_fields):
+        # Check required fields
+        required_fields = ['workflow_id', 'stages', 'current_stage', 'state_data']
+        if not all(field in workflow_state for field in required_fields):
             return False
         
-        stored_checksum = state.get('checksum')
-        computed_checksum = self._compute_checksum(state)
+        # Validate workflow_id matches
+        if workflow_state['workflow_id'] != workflow_id:
+            return False
         
-        return stored_checksum == computed_checksum
+        # Validate stages is a list
+        if not isinstance(workflow_state['stages'], list):
+            return False
+        
+        # Validate current_stage is in stages
+        if workflow_state['stages'] and workflow_state['current_stage'] not in workflow_state['stages']:
+            return False
+        
+        # Validate state_data is a dict
+        if not isinstance(workflow_state['state_data'], dict):
+            return False
+        
+        # Validate each stage in stages has corresponding state_data
+        for stage in workflow_state['stages']:
+            if stage not in workflow_state['state_data']:
+                return False
+        
+        return True
     
     def restore_state(self, workflow_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -83,168 +148,88 @@ class WorkflowStateManager:
             workflow_id: Unique identifier for the workflow
             
         Returns:
-            Restored state dictionary or None if not found or invalid
+            Optional[Dict[str, Any]]: Restored workflow state or None
         """
-        state_path = self._get_state_path(workflow_id)
-        
-        if not state_path.exists():
+        if not self.validate_state(workflow_id):
             return None
         
-        try:
-            with open(state_path, 'r') as f:
-                state = json.load(f)
-            
-            if not self.validate_state(state):
-                return None
-            
-            return state
-        except (json.JSONDecodeError, IOError):
-            return None
+        return self._load_state(workflow_id)
     
-    def get_state_for_response(self, workflow_id: str) -> Dict[str, Any]:
+    def get_state_response(self, workflow_id: str) -> Dict[str, Any]:
         """
-        Get workflow state for inclusion in JSON response.
+        Get workflow state in JSON response format.
         
         Args:
             workflow_id: Unique identifier for the workflow
             
         Returns:
-            State dictionary formatted for JSON response
+            Dict[str, Any]: Workflow state response
         """
-        state = self.restore_state(workflow_id)
+        workflow_state = self._load_state(workflow_id)
         
-        if state is None:
+        if not workflow_state:
             return {
                 'workflow_id': workflow_id,
-                'stage': None,
-                'state_data': None,
-                'status': 'not_found'
+                'status': 'not_found',
+                'state': None
             }
         
         return {
-            'workflow_id': state['workflow_id'],
-            'stage': state['stage'],
-            'state_data': state['state_data'],
-            'timestamp': state.get('timestamp'),
-            'status': 'restored'
+            'workflow_id': workflow_id,
+            'status': 'success',
+            'state': workflow_state
         }
     
-    def delete_state(self, workflow_id: str) -> bool:
+    def clear_state(self, workflow_id: str) -> bool:
         """
-        Delete workflow state.
+        Clear workflow state.
         
         Args:
             workflow_id: Unique identifier for the workflow
             
         Returns:
-            True if deleted, False if not found
+            bool: True if state was cleared successfully
         """
-        state_path = self._get_state_path(workflow_id)
-        
-        if state_path.exists():
-            state_path.unlink()
+        try:
+            if workflow_id in self._states:
+                del self._states[workflow_id]
+            
+            state_file = self._get_state_file_path(workflow_id)
+            if state_file.exists():
+                state_file.unlink()
+            
             return True
-        
-        return False
-
-
-class WorkflowExecutor:
-    """Executes workflows with state persistence and restart capabilities."""
+        except Exception:
+            return False
     
-    def __init__(self, state_manager: Optional[WorkflowStateManager] = None):
+    def get_all_stages(self, workflow_id: str) -> List[str]:
         """
-        Initialize the workflow executor.
+        Get all completed stages for a workflow.
         
         Args:
-            state_manager: State manager instance (creates default if None)
+            workflow_id: Unique identifier for the workflow
+            
+        Returns:
+            List[str]: List of completed stages
         """
-        self.state_manager = state_manager or WorkflowStateManager()
+        workflow_state = self._load_state(workflow_id)
+        if workflow_state:
+            return workflow_state.get('stages', [])
+        return []
     
-    def execute_stage(self, workflow_id: str, stage: str, stage_func: callable, 
-                     state_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get_stage_data(self, workflow_id: str, stage: str) -> Optional[Dict[str, Any]]:
         """
-        Execute a workflow stage and persist state on completion.
+        Get state data for a specific stage.
         
         Args:
             workflow_id: Unique identifier for the workflow
             stage: Stage name
-            stage_func: Function to execute for this stage
-            state_data: Initial state data
             
         Returns:
-            Result dictionary with stage output and state
+            Optional[Dict[str, Any]]: Stage state data or None
         """
-        current_state = state_data or {}
-        
-        try:
-            result = stage_func(current_state)
-            
-            if isinstance(result, dict):
-                current_state.update(result)
-            
-            self.state_manager.persist_state(workflow_id, stage, current_state)
-            
-            return {
-                'success': True,
-                'stage': stage,
-                'state': current_state
-            }
-        except Exception as e:
-            return {
-                'success': False,
-                'stage': stage,
-                'error': str(e),
-                'state': current_state
-            }
-    
-    def restart_workflow(self, workflow_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Restart workflow from last successful stage.
-        
-        Args:
-            workflow_id: Unique identifier for the workflow
-            
-        Returns:
-            Restored state or None if cannot restart
-        """
-        return self.state_manager.restore_state(workflow_id)
-    
-    def get_workflow_response(self, workflow_id: str) -> str:
-        """
-        Get workflow state as JSON response for actor.
-        
-        Args:
-            workflow_id: Unique identifier for the workflow
-            
-        Returns:
-            JSON string with workflow state
-        """
-        state_response = self.state_manager.get_state_for_response(workflow_id)
-        return json.dumps(state_response, indent=2)
-
-
-def create_workflow_state_manager(state_dir: str = ".workflow_states") -> WorkflowStateManager:
-    """
-    Factory function to create a workflow state manager.
-    
-    Args:
-        state_dir: Directory to store workflow state files
-        
-    Returns:
-        WorkflowStateManager instance
-    """
-    return WorkflowStateManager(state_dir)
-
-
-def create_workflow_executor(state_manager: Optional[WorkflowStateManager] = None) -> WorkflowExecutor:
-    """
-    Factory function to create a workflow executor.
-    
-    Args:
-        state_manager: Optional state manager instance
-        
-    Returns:
-        WorkflowExecutor instance
-    """
-    return WorkflowExecutor(state_manager)
+        workflow_state = self._load_state(workflow_id)
+        if workflow_state:
+            return workflow_state.get('state_data', {}).get(stage)
+        return None
 ```
