@@ -1,0 +1,186 @@
+matrix_metadata:
+  timestamp: '20251013_090423'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: 'AC-001: Generate fix-and-retry options for violations'
+  description: 'AC-001: Generate fix-and-retry options for violations'
+  test_files: &id001
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/LAYER-003-03-03-02 Remediation Generator/tests/test_generated_20251013_090346.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: 'AC-002: Generate continue-with-warning options where appropriate'
+  description: 'AC-002: Generate continue-with-warning options where appropriate'
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: 'AC-003: Provide specific guidance for each violation type'
+  description: 'AC-003: Provide specific guidance for each violation type'
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: 'AC-004: Format options for actor presentation to user'
+  description: 'AC-004: Format options for actor presentation to user'
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/src/implementation.py
+  lines: 340
+  methods:
+  - name: to_dict
+    lines: 26-36
+  - name: __init__
+    lines: 53-56
+  - name: _build_remediation_strategies
+    lines: 57-67
+  - name: generate_options
+    lines: 200-223
+  - name: _get_generic_options
+    lines: 224-240
+  - name: _customize_options
+    lines: 241-269
+  - name: format_for_actor
+    lines: 270-288
+  - name: get_fix_and_retry_options
+    lines: 289-302
+  - name: get_continue_with_warning_options
+    lines: 303-316
+  - name: get_guidance
+    lines: 317-327
+  classes:
+  - name: RemediationType
+    type: class
+    lines: 9-17
+  - name: RemediationOption
+    type: class
+    lines: 18-36
+  - name: ViolationType
+    type: class
+    lines: 37-49
+  - name: RemediationGenerator
+    type: class
+    lines: 50-340
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  test_count: 0
+  implementation_files:
+  - projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION SYSTEM/FEATURE-003-03-03
+    Failure Handling and Recovery/LAYER-003-03-03-02 Remediation Generator/src/implementation.py
+  methods_tested:
+  - to_dict
+  - __init__
+  - _build_remediation_strategies
+  - generate_options
+  - _get_generic_options
+  - _customize_options
+  - format_for_actor
+  - get_fix_and_retry_options
+  - get_continue_with_warning_options
+  - get_guidance
+  classes_tested:
+  - RemediationType
+  - RemediationOption
+  - ViolationType
+  - RemediationGenerator
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02
+    Remediation Generator/src/implementation.py:26-36
+  method_name: to_dict
+  requirement: AC-001
+  test: test_to_dict
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02
+    Remediation Generator/src/implementation.py:53-56
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02
+    Remediation Generator/src/implementation.py:57-67
+  method_name: _build_remediation_strategies
+  requirement: AC-001
+  test: test__build_remediation_strategies
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02
+    Remediation Generator/src/implementation.py:200-223
+  method_name: generate_options
+  requirement: AC-001
+  test: test_generate_options
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  verified: true
+- implementation_location: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW
+    ORCHESTRATION SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02
+    Remediation Generator/src/implementation.py:224-240
+  method_name: _get_generic_options
+  requirement: AC-001
+  test: test__get_generic_options
+  test_file: projects/PROJECT-003 TDD ENFORCER/SYSTEM-003-03 WORKFLOW ORCHESTRATION
+    SYSTEM/FEATURE-003-03-03 Failure Handling and Recovery/LAYER-003-03-03-02 Remediation
+    Generator/tests/test_generated_20251013_090346.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 4
+  requirements_traced: 4
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%
