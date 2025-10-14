@@ -99,20 +99,59 @@ class FeatureBuilder:
         return feature_id, feature_name
         
     def find_layer_spec(self, layer_info: dict) -> Path:
-        """Find layer specification file."""
+        """Find layer specification file with flexible directory pattern matching."""
         layer_file = layer_info.get('requirement_file')
         if not layer_file:
             raise ValueError(f"No requirement file specified for {layer_info['layer_id']}")
             
-        # Search in same directory as feature spec
-        # Directory structure: LAYER-XXX-XX-XX-XX LayerName/LAYER-XXX-XX-XX-XX_layer_name.yaml
-        layer_dir = f"{layer_info['layer_id']} {layer_info['name']}"
-        layer_path = self.feature_path.parent / layer_dir / layer_file
+        layer_id = layer_info['layer_id']
+        layer_name = layer_info.get('name', '')
+        feature_dir = self.feature_path.parent
         
-        if not layer_path.exists():
-            raise FileNotFoundError(f"Layer spec not found: {layer_path}")
-            
-        return layer_path
+        # Try multiple directory patterns to support different repos
+        # Pattern 1: LAYER-ID LayerName (control_tower pattern with space)
+        # Pattern 2: LAYER-ID_LayerName (professional_excellence pattern with underscore)
+        # Pattern 3: LAYER-ID (just the ID, if name is empty or matches directory)
+        # Pattern 4: Exact match from layer_id (if it contains full dir name)
+        
+        patterns_to_try = []
+        
+        # If layer_id already contains separator (underscore or full name), use it directly
+        if '_' in layer_id or not layer_name:
+            patterns_to_try.append(layer_id)
+        
+        # Try with space separator (original control_tower pattern)
+        if layer_name:
+            patterns_to_try.append(f"{layer_id} {layer_name}")
+        
+        # Try with underscore separator (professional_excellence pattern)
+        if layer_name:
+            patterns_to_try.append(f"{layer_id}_{layer_name}")
+        
+        # Try just the layer_id
+        patterns_to_try.append(layer_id)
+        
+        # Try to find the directory
+        for pattern in patterns_to_try:
+            layer_path = feature_dir / pattern / layer_file
+            if layer_path.exists():
+                return layer_path
+        
+        # If not found, try scanning the directory for any match containing layer_id
+        try:
+            for item in feature_dir.iterdir():
+                if item.is_dir() and layer_id in item.name:
+                    layer_path = item / layer_file
+                    if layer_path.exists():
+                        return layer_path
+        except Exception:
+            pass
+        
+        # Generate helpful error message with attempted patterns
+        error_msg = f"Layer spec not found. Tried patterns:\n"
+        for pattern in patterns_to_try:
+            error_msg += f"  - {feature_dir / pattern / layer_file}\n"
+        raise FileNotFoundError(error_msg)
         
     def build_layer(self, layer_info: dict, layer_number: int, total_layers: int) -> bool:
         """Build a single layer using AI Code Generator."""
