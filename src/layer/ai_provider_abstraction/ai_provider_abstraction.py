@@ -133,14 +133,14 @@ class AnthropicProvider(AIProviderInterface):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "claude-sonnet-4-5"
+        model: str = "claude-opus-4-20250514"
     ):
         """
         Initialize Anthropic provider.
         
         Args:
             api_key: Anthropic API key (defaults to ANTHROPIC_API_KEY env var)
-            model: Model to use (default: claude-sonnet-4-5)
+            model: Model to use (default: claude-opus-4-20250514 - Highest quality, best reasoning)
         """
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         self.model = model
