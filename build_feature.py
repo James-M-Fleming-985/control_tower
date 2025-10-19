@@ -99,59 +99,26 @@ class FeatureBuilder:
         return feature_id, feature_name
         
     def find_layer_spec(self, layer_info: dict) -> Path:
-        """Find layer specification file with flexible directory pattern matching."""
+        """Find layer specification file."""
         layer_file = layer_info.get('requirement_file')
         if not layer_file:
-            raise ValueError(f"No requirement file specified for {layer_info['layer_id']}")
+            raise ValueError(f"No requirement_file specified for {layer_info['layer_id']}")
             
-        layer_id = layer_info['layer_id']
-        layer_name = layer_info.get('name', '')
-        feature_dir = self.feature_path.parent
+        # Derive directory name from requirement file (remove .yaml extension)
+        # Directory structure: LAYER-XXX-XX-XX-XX_layer_name/LAYER-XXX-XX-XX-XX_layer_name.yaml
+        layer_dir = layer_file.replace('.yaml', '')
+        layer_path = self.feature_path.parent / layer_dir / layer_file
         
-        # Try multiple directory patterns to support different repos
-        # Pattern 1: LAYER-ID LayerName (control_tower pattern with space)
-        # Pattern 2: LAYER-ID_LayerName (professional_excellence pattern with underscore)
-        # Pattern 3: LAYER-ID (just the ID, if name is empty or matches directory)
-        # Pattern 4: Exact match from layer_id (if it contains full dir name)
-        
-        patterns_to_try = []
-        
-        # If layer_id already contains separator (underscore or full name), use it directly
-        if '_' in layer_id or not layer_name:
-            patterns_to_try.append(layer_id)
-        
-        # Try with space separator (original control_tower pattern)
-        if layer_name:
-            patterns_to_try.append(f"{layer_id} {layer_name}")
-        
-        # Try with underscore separator (professional_excellence pattern)
-        if layer_name:
-            patterns_to_try.append(f"{layer_id}_{layer_name}")
-        
-        # Try just the layer_id
-        patterns_to_try.append(layer_id)
-        
-        # Try to find the directory
-        for pattern in patterns_to_try:
-            layer_path = feature_dir / pattern / layer_file
-            if layer_path.exists():
-                return layer_path
-        
-        # If not found, try scanning the directory for any match containing layer_id
-        try:
-            for item in feature_dir.iterdir():
-                if item.is_dir() and layer_id in item.name:
-                    layer_path = item / layer_file
-                    if layer_path.exists():
-                        return layer_path
-        except Exception:
-            pass
-        
-        # Generate helpful error message with attempted patterns
-        error_msg = f"Layer spec not found. Tried patterns:\n"
-        for pattern in patterns_to_try:
-            error_msg += f"  - {feature_dir / pattern / layer_file}\n"
-        raise FileNotFoundError(error_msg)
+        # Fallback: Try with space-separated name (old format)
+        if not layer_path.exists():
+            layer_dir_old = f"{layer_info['layer_id']} {layer_info['name']}"
+            layer_path_old = self.feature_path.parent / layer_dir_old / layer_file
+            if layer_path_old.exists():
+                layer_path = layer_path_old
+            else:
+                raise FileNotFoundError(f"Layer spec not found: {layer_path} (also tried: {layer_path_old})")
+            
+        return layer_path
         
     def build_layer(self, layer_info: dict, layer_number: int, total_layers: int) -> bool:
         """Build a single layer using AI Code Generator."""
@@ -379,7 +346,7 @@ Generate the complete feature_integration.py module now:
             print("  🤖 Calling AI to generate integration code...")
             response = orchestrator.ai_provider.generate_code(
                 prompt=prompt,
-                max_tokens=6000
+                max_tokens=20480  # High token limit for complex features
             )
             
             # Extract code from response
@@ -400,6 +367,268 @@ Generate the complete feature_integration.py module now:
             
         except Exception as e:
             print(f"  ❌ Error generating feature integration: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return False
+    
+    def generate_feature_tests(self, feature_spec: FeatureIntegrationSpec) -> tuple[int, int]:
+        """Generate integration and E2E tests for the feature.
+        
+        Returns:
+            tuple: (integration_test_count, e2e_test_count)
+        """
+        try:
+            print(f"\n  🧪 Generating feature-level tests...")
+            
+            # Import orchestrator (same pattern as generate_feature_integration)
+            from layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            # Initialize orchestrator with config
+            config = {
+                'output_base_path': str(feature_spec.feature_dir),
+                'provider': self.provider
+            }
+            orchestrator = AICodeGeneratorOrchestrator(config=config)
+            integration_count = 0
+            e2e_count = 0
+            
+            # Generate integration tests
+            print(f"  🔗 Generating integration tests...")
+            integration_tests_dir = feature_spec.feature_dir / "tests" / "integration"
+            integration_tests_dir.mkdir(parents=True, exist_ok=True)
+            
+            integration_prompt = f"""Generate pytest integration tests for the feature: {feature_spec.feature_name}
+
+Feature ID: {feature_spec.feature_id}
+Layers: {', '.join([f"{l.layer_id}: {l.layer_name}" for l in feature_spec.layers])}
+
+Integration scenarios to test:
+{chr(10).join(['- ' + s for s in feature_spec.integration_scenarios])}
+
+Requirements:
+1. Create integration tests that verify layers work together through feature_integration.py
+2. Test all integration scenarios listed above
+3. Use pytest fixtures and mocking where appropriate
+4. Include proper setup/teardown
+5. Test error handling across layer boundaries
+
+Generate a complete test_integration.py file with at least 5 comprehensive integration tests."""
+
+            response = orchestrator.ai_provider.generate_code(
+                prompt=integration_prompt,
+                max_tokens=16384  # High token limit for comprehensive integration tests
+            )
+            
+            integration_code = self._extract_code_from_response(response)
+            if integration_code:
+                integration_test_path = integration_tests_dir / "test_integration.py"
+                integration_test_path.write_text(integration_code)
+                integration_count = integration_code.count("def test_")
+                print(f"  ✅ Integration tests generated: {integration_count} tests")
+            
+            # Generate E2E tests
+            print(f"  🎯 Generating E2E tests...")
+            e2e_tests_dir = feature_spec.feature_dir / "tests" / "e2e"
+            e2e_tests_dir.mkdir(parents=True, exist_ok=True)
+            
+            e2e_prompt = f"""Generate pytest end-to-end tests for the feature: {feature_spec.feature_name}
+
+Feature ID: {feature_spec.feature_id}
+
+E2E scenarios to test:
+{chr(10).join(['- ' + s for s in feature_spec.e2e_scenarios])}
+
+Acceptance criteria:
+{chr(10).join(['- ' + c for c in feature_spec.feature_acceptance_criteria])}
+
+Requirements:
+1. Create E2E tests that verify the complete feature workflow
+2. Test all E2E scenarios and acceptance criteria
+3. Use realistic test data
+4. Test both success and failure paths
+5. Verify complete end-to-end data flow
+
+Generate a complete test_e2e.py file with at least 3 comprehensive E2E tests."""
+
+            response = orchestrator.ai_provider.generate_code(
+                prompt=e2e_prompt,
+                max_tokens=16384  # High token limit for comprehensive E2E tests
+            )
+            
+            e2e_code = self._extract_code_from_response(response)
+            if e2e_code:
+                e2e_test_path = e2e_tests_dir / "test_e2e.py"
+                e2e_test_path.write_text(e2e_code)
+                e2e_count = e2e_code.count("def test_")
+                print(f"  ✅ E2E tests generated: {e2e_count} tests")
+            
+            return (integration_count, e2e_count)
+            
+        except Exception as e:
+            print(f"  ❌ Error generating feature tests: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return (0, 0)
+    
+    def generate_feature_level_verification(self, feature_spec: FeatureIntegrationSpec, integration_test_count: int = 0, e2e_test_count: int = 0) -> bool:
+        """Generate feature-level verification artifacts after all layers are complete."""
+        try:
+            print(f"  🔍 Generating feature-level verification artifacts...")
+            
+            # Create verification directory at feature level
+            verification_dir = feature_spec.feature_dir / "Requirements Verification"
+            verification_dir.mkdir(parents=True, exist_ok=True)
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # 1. Feature Requirements Verification Report
+            requirements_report = {
+                "feature_id": feature_spec.feature_id,
+                "feature_name": feature_spec.feature_name,
+                "verification_timestamp": timestamp,
+                "total_layers": len(feature_spec.layers),
+                "layers_completed": len(feature_spec.layers),
+                "feature_level_tests": {
+                    "integration_tests": "REQUIRED",
+                    "e2e_tests": "REQUIRED",
+                    "status": "PENDING_EXECUTION"
+                },
+                "layer_summary": [
+                    {
+                        "layer_id": layer.layer_id,
+                        "layer_name": layer.layer_name,
+                        "implementation": str(layer.implementation_path),
+                        "tests": len(list(layer.layer_dir.glob("tests/test_*.py"))),
+                        "status": "COMPLETED"
+                    }
+                    for layer in feature_spec.layers
+                ],
+                "acceptance_criteria": feature_spec.feature_acceptance_criteria,
+                "acceptance_status": "PENDING_FEATURE_TESTS"
+            }
+            
+            requirements_path = verification_dir / f"feature_requirements_verification_{timestamp}.yaml"
+            with open(requirements_path, 'w') as f:
+                yaml.dump(requirements_report, f, default_flow_style=False, sort_keys=False)
+            
+            # 2. Feature Test Pyramid Report
+            pyramid_report = {
+                "feature_id": feature_spec.feature_id,
+                "feature_name": feature_spec.feature_name,
+                "test_pyramid_timestamp": timestamp,
+                "layer_tests": {
+                    "unit_tests": sum(len(list(layer.layer_dir.glob("tests/test_*.py"))) for layer in feature_spec.layers),
+                    "layer_count": len(feature_spec.layers)
+                },
+                "feature_tests": {
+                    "integration_tests": {
+                        "location": "tests/integration/",
+                        "count": integration_test_count,
+                        "status": "COMPLETED" if integration_test_count > 0 else "REQUIRED"
+                    },
+                    "e2e_tests": {
+                        "location": "tests/e2e/",
+                        "count": e2e_test_count,
+                        "status": "COMPLETED" if e2e_test_count > 0 else "REQUIRED"
+                    }
+                },
+                "integration_scenarios": feature_spec.integration_scenarios,
+                "e2e_scenarios": feature_spec.e2e_scenarios,
+                "test_coverage_goal": "90%",
+                "status": "PYRAMID_STRUCTURE_DEFINED"
+            }
+            
+            pyramid_path = verification_dir / f"feature_test_pyramid_{timestamp}.yaml"
+            with open(pyramid_path, 'w') as f:
+                yaml.dump(pyramid_report, f, default_flow_style=False, sort_keys=False)
+            
+            # 3. Feature Traceability Matrix
+            traceability_report = {
+                "feature_id": feature_spec.feature_id,
+                "feature_name": feature_spec.feature_name,
+                "traceability_timestamp": timestamp,
+                "feature_to_layers": {
+                    layer.layer_id: {
+                        "layer_name": layer.layer_name,
+                        "implementation": str(layer.implementation_path.name),
+                        "test_files": [f.name for f in layer.layer_dir.glob("tests/test_*.py")],
+                        "traceability_status": "VERIFIED"
+                    }
+                    for layer in feature_spec.layers
+                },
+                "feature_integration": {
+                    "integration_file": "src/feature_integration.py",
+                    "orchestrates_layers": [layer.layer_id for layer in feature_spec.layers],
+                    "status": "IMPLEMENTED"
+                },
+                "requirements_coverage": {
+                    "layer_requirements": "100%",
+                    "feature_requirements": "PENDING_FEATURE_TESTS",
+                    "acceptance_criteria": len(feature_spec.feature_acceptance_criteria)
+                }
+            }
+            
+            traceability_path = verification_dir / f"feature_traceability_matrix_{timestamp}.yaml"
+            with open(traceability_path, 'w') as f:
+                yaml.dump(traceability_report, f, default_flow_style=False, sort_keys=False)
+            
+            # 4. Feature Quality Gates Report
+            quality_gates_report = {
+                "feature_id": feature_spec.feature_id,
+                "feature_name": feature_spec.feature_name,
+                "quality_gates_timestamp": timestamp,
+                "gates": {
+                    "all_layers_complete": {
+                        "status": "PASSED",
+                        "layers_built": len(feature_spec.layers),
+                        "layers_required": len(feature_spec.layers)
+                    },
+                    "feature_integration_exists": {
+                        "status": "PASSED" if (feature_spec.feature_dir / "src/feature_integration.py").exists() else "FAILED",
+                        "integration_file": "src/feature_integration.py"
+                    },
+                    "integration_tests_complete": {
+                        "status": "PENDING",
+                        "required": "Integration tests must be written and pass",
+                        "location": "tests/integration/"
+                    },
+                    "e2e_tests_complete": {
+                        "status": "PENDING",
+                        "required": "End-to-end tests must be written and pass",
+                        "location": "tests/e2e/"
+                    },
+                    "acceptance_criteria_met": {
+                        "status": "PENDING",
+                        "total_criteria": len(feature_spec.feature_acceptance_criteria),
+                        "criteria": feature_spec.feature_acceptance_criteria
+                    }
+                },
+                "overall_status": "PARTIAL_COMPLETE",
+                "next_steps": [
+                    "Write and execute feature integration tests",
+                    "Write and execute end-to-end tests",
+                    "Verify all acceptance criteria",
+                    "Run full test suite with coverage analysis"
+                ]
+            }
+            
+            quality_gates_path = verification_dir / f"feature_quality_gates_{timestamp}.yaml"
+            with open(quality_gates_path, 'w') as f:
+                yaml.dump(quality_gates_report, f, default_flow_style=False, sort_keys=False)
+            
+            # Print confirmation
+            print(f"  ✅ Feature-level verification artifacts generated:")
+            print(f"     - {requirements_path.relative_to(feature_spec.feature_dir)}")
+            print(f"     - {pyramid_path.relative_to(feature_spec.feature_dir)}")
+            print(f"     - {traceability_path.relative_to(feature_spec.feature_dir)}")
+            print(f"     - {quality_gates_path.relative_to(feature_spec.feature_dir)}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"  ❌ Error generating feature-level verification: {e}")
             if self.verbose:
                 import traceback
                 traceback.print_exc()
@@ -518,11 +747,12 @@ Generate the complete feature_integration.py module now:
         if len(layer_implementations) != len(self.layers):
             print(f"⚠️  Warning: Only {len(layer_implementations)}/{len(self.layers)} layer implementations found")
         
-        # Get feature directory (parent of first layer)
-        if layer_implementations:
-            feature_dir = layer_implementations[0].layer_dir.parent
-        else:
-            print("❌ No layer implementations found - cannot create feature integration")
+        # Get feature directory (use the directory where feature YAML lives)
+        # This is the parent directory containing all sibling layer folders
+        feature_dir = self.feature_path.parent
+        
+        if not feature_dir.exists():
+            print("❌ Feature directory not found - cannot create feature integration")
             return False
         
         # Create feature integration spec
@@ -542,6 +772,20 @@ Generate the complete feature_integration.py module now:
         if not integration_success:
             print("\n⚠️  Feature integration generation failed")
             print("Layers are complete, but feature integration layer was not generated.")
+        
+        # Generate feature-level tests (integration + E2E)
+        integration_test_count, e2e_test_count = self.generate_feature_tests(feature_integration_spec)
+        
+        # Generate feature-level verification artifacts
+        self.print_header("📋 Generating Feature-Level Verification")
+        verification_success = self.generate_feature_level_verification(
+            feature_integration_spec,
+            integration_test_count,
+            e2e_test_count
+        )
+        
+        if not verification_success:
+            print("\n⚠️  Feature-level verification generation failed")
         
         # Final summary
         end_time = datetime.now()

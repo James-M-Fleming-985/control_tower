@@ -441,7 +441,7 @@ NO verbose docstrings. NO comments. Just working code.
             }
             self.print_step("✓", f"Loaded {len(feature_specs)} feature specs")
             
-            backend_dir = spec.system_dir.parent / "src" / "backend"
+            backend_dir = spec.system_dir / "src" / "backend"
             backend_dir.mkdir(parents=True, exist_ok=True)
             
             # Get ordered phase list
@@ -523,13 +523,13 @@ NO verbose docstrings. NO comments. Just working code.
             
             if not result or 'files' not in result:
                 self.print_step("⚠️", "Fallback to basic generation")
-                backend_dir = spec.system_dir.parent / "src" / "backend" / "app"
+                backend_dir = spec.system_dir / "src" / "backend" / "app"
                 backend_dir.mkdir(parents=True, exist_ok=True)
                 (backend_dir / "main.py").write_text(response, encoding='utf-8')
                 self.print_step("✓", "Created basic app/main.py")
                 return True
             
-            backend_dir = spec.system_dir.parent / "src" / "backend"
+            backend_dir = spec.system_dir / "src" / "backend"
             files_created = 0
             
             for file_spec in result['files']:
@@ -548,6 +548,41 @@ NO verbose docstrings. NO comments. Just working code.
                 import traceback
                 traceback.print_exc()
             return False
+    
+    def generate_system_verification(self, spec: SystemIntegrationSpec):
+        """
+        Generate system-level verification artifacts (test pyramid + traceability matrix).
+        Closes the loop by aggregating layer-level verification data.
+        """
+        try:
+            self.print_header("📊 System-Level Verification")
+            self.print_step("🔍", "Collecting layer verification artifacts...")
+            
+            from system_verification_generator import SystemVerificationGenerator
+            
+            generator = SystemVerificationGenerator(
+                system_dir=spec.system_dir,
+                system_id=spec.system_id,
+                system_name=spec.system_name
+            )
+            
+            # Collect all layer verifications
+            count = generator.collect_layer_verifications()
+            
+            if count == 0:
+                self.print_step("⚠️", "No layer verifications found - skipping system verification")
+                return
+            
+            # Generate and save artifacts
+            pyramid_path, matrix_path = generator.save_verification_artifacts()
+            
+            self.print_step("✅", f"System verification complete: {count} layers analyzed")
+            
+        except Exception as e:
+            self.print_step("⚠️", f"System verification error (non-fatal): {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
     
     def build_system(self):
         """Execute system build."""
@@ -584,6 +619,9 @@ NO verbose docstrings. NO comments. Just working code.
             
             if not self.generate_system_integration(spec):
                 return False
+            
+            # Generate system-level verification artifacts (closes the loop!)
+            self.generate_system_verification(spec)
             
             duration = (datetime.now() - start_time).total_seconds() / 60
             

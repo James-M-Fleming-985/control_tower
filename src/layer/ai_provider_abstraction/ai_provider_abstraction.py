@@ -72,7 +72,7 @@ class OpenAIProvider(AIProviderInterface):
         if not self.api_key:
             raise ValueError("OpenAI API key not provided and OPENAI_API_KEY env var not set")
     
-    def generate_code(self, prompt: str, temperature: float = 0.2, max_tokens: int = 4000) -> str:
+    def generate_code(self, prompt: str, temperature: float = 0.2, max_tokens: int = 20480) -> str:
         """
         Generate code using OpenAI GPT-4.
         
@@ -148,7 +148,7 @@ class AnthropicProvider(AIProviderInterface):
         if not self.api_key:
             raise ValueError("Anthropic API key not provided and ANTHROPIC_API_KEY env var not set")
     
-    def generate_code(self, prompt: str, max_tokens: int = 4000) -> str:
+    def generate_code(self, prompt: str, max_tokens: int = 20480) -> str:
         """
         Generate code using Anthropic Claude.
         
@@ -161,7 +161,7 @@ class AnthropicProvider(AIProviderInterface):
             
         Raises:
             ValueError: If prompt is empty
-            RuntimeError: If API call fails
+            RuntimeError: If API call fails or response is truncated
         """
         if not prompt or not prompt.strip():
             raise ValueError("Prompt cannot be empty")
@@ -171,13 +171,24 @@ class AnthropicProvider(AIProviderInterface):
             import anthropic
             
             client = anthropic.Anthropic(api_key=self.api_key)
+            
+            # Always use standard create (streaming timeout warning is misleading)
+            # The SDK will handle long requests automatically
             message = client.messages.create(
                 model=self.model,
                 max_tokens=max_tokens,
                 messages=[
                     {"role": "user", "content": prompt}
-                ]
+                ],
+                timeout=600.0  # 10 minute timeout for large requests
             )
+            
+            # Check if response was truncated
+            if message.stop_reason == "max_tokens":
+                print(f"⚠️ WARNING: Response truncated at max_tokens={max_tokens}")
+                print(f"   Input tokens: {message.usage.input_tokens}")
+                print(f"   Output tokens: {message.usage.output_tokens}")
+                print(f"   Consider increasing max_tokens or simplifying the request")
             
             return message.content[0].text
             

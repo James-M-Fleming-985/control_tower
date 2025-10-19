@@ -44,7 +44,7 @@ PHASE_TRANSITIONS = {
 
 # Quality thresholds
 MIN_COVERAGE_THRESHOLD = 0.95
-DEFAULT_MAX_TOKENS = 4000
+DEFAULT_MAX_TOKENS = 20480  # Increased for complex features like CA-002
 
 
 class AICodeGeneratorOrchestrator:
