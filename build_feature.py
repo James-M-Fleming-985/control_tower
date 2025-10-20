@@ -30,6 +30,92 @@ if str(project_004_src) not in sys.path:
     sys.path.insert(0, str(project_004_src))
 
 
+def extract_class_methods(python_file_path: Path) -> Dict[str, List[str]]:
+    """
+    Extract public methods from classes in a Python file.
+    
+    Returns dict of {class_name: [method_names]} with only public methods (no _private).
+    This ensures feature_integration calls actual methods that exist.
+    
+    Args:
+        python_file_path: Path to the Python implementation file
+        
+    Returns:
+        Dictionary mapping class names to lists of public method names
+    """
+    methods_by_class = {}
+    
+    try:
+        code = python_file_path.read_text()
+        lines = code.split('\n')
+        
+        current_class = None
+        indent_level = 0
+        
+        for line in lines:
+            stripped = line.lstrip()
+            
+            # Detect class definition
+            if stripped.startswith('class '):
+                class_name = stripped.split('class ')[1].split('(')[0].split(':')[0].strip()
+                current_class = class_name
+                methods_by_class[class_name] = []
+                indent_level = len(line) - len(stripped)
+            
+            # Detect method definition (must be inside a class)
+            elif current_class and stripped.startswith('def '):
+                line_indent = len(line) - len(stripped)
+                # Method should be one indent level deeper than class
+                if line_indent > indent_level:
+                    method_name = stripped.split('def ')[1].split('(')[0].strip()
+                    # Only include public methods (exclude __init__, _private, etc.)
+                    if not method_name.startswith('_'):
+                        methods_by_class[current_class].append(method_name)
+        
+        # Remove classes with no public methods
+        methods_by_class = {k: v for k, v in methods_by_class.items() if v}
+        
+    except Exception as e:
+        print(f"Warning: Could not extract methods from {python_file_path}: {e}")
+    
+    return methods_by_class
+
+
+def standardize_layer_folder_name(layer_id: str, layer_name: str) -> str:
+    """
+    Convert layer ID and name to standardized folder naming convention.
+    
+    This is the SINGLE SOURCE OF TRUTH for layer folder naming.
+    All layer folders MUST follow this format for Python import compatibility.
+    
+    Rules:
+    - Replace all hyphens in layer_id with underscores
+    - Replace all spaces and hyphens in layer_name with underscores
+    - Format: {layer_id_underscores}_{layer_name_underscores}
+    
+    Args:
+        layer_id: Layer identifier (e.g., "LAYER-003-001-001")
+        layer_name: Human-readable layer name (e.g., "YAML XML Reader")
+        
+    Returns:
+        Standardized folder name (e.g., "LAYER_003_001_001_YAML_XML_Reader")
+        
+    Examples:
+        >>> standardize_layer_folder_name("LAYER-003-001-001", "YAML XML Reader")
+        'LAYER_003_001_001_YAML_XML_Reader'
+        
+        >>> standardize_layer_folder_name("LAYER-001-002-003", "Data-Model Validator")
+        'LAYER_001_002_003_Data_Model_Validator'
+    """
+    # Replace hyphens with underscores in ID
+    clean_id = layer_id.replace('-', '_')
+    
+    # Replace spaces and hyphens with underscores in name
+    clean_name = layer_name.replace(' ', '_').replace('-', '_')
+    
+    return f"{clean_id}_{clean_name}"
+
+
 @dataclass
 class LayerInfo:
     """Information about a built layer."""
@@ -50,6 +136,186 @@ class FeatureIntegrationSpec:
     integration_scenarios: List[Dict[str, Any]]
     e2e_scenarios: List[Dict[str, Any]]
     feature_acceptance_criteria: List[Dict[str, Any]]
+
+
+def initialize_layer_structure(feature_path: Path, provider: str = "anthropic", 
+                               verbose: bool = False) -> bool:
+    """
+    Initialize layer folder structure and generate layer YAML files.
+    
+    This pre-processing step:
+    1. Reads FEATURE_REQUIREMENTS.yaml to get layer definitions
+    2. Creates standardized layer folders (LAYER_XXX_YYY_Name_With_Underscores)
+    3. Uses AI to derive detailed layer requirements from feature requirements
+    4. Populates LAYER_REQUIREMENTS_TEMPLATE.yaml with derived content
+    5. Writes layer YAML files to respective folders
+    6. Creates src/ and tests/ subdirectories
+    
+    Args:
+        feature_path: Path to FEATURE_REQUIREMENTS.yaml
+        provider: AI provider ("anthropic" or "openai")
+        verbose: Show detailed output
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Load feature requirements
+        with open(feature_path, 'r', encoding='utf-8') as f:
+            feature_spec = yaml.safe_load(f)
+        
+        feature_id = feature_spec['metadata']['feature_id']
+        feature_name = feature_spec['metadata']['feature_name']
+        print(f"✓ Loaded feature: {feature_id} - {feature_name}")
+        
+        # Get layers from feature spec
+        layers = feature_spec.get('layers', [])
+        if not layers:
+            print(f"❌ No layers defined in feature specification")
+            return False
+        
+        print(f"✓ Found {len(layers)} layers to initialize\n")
+        
+        # Load layer template
+        template_path = Path(__file__).parent / "templates" / "LAYER_REQUIREMENTS_TEMPLATE.yaml"
+        with open(template_path, 'r', encoding='utf-8') as f:
+            layer_template = f.read()
+        
+        print(f"✓ Loaded layer template: {template_path}\n")
+        
+        # Initialize AI provider
+        from layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+        config = {'provider': provider}
+        orchestrator = AICodeGeneratorOrchestrator(config=config)
+        
+        # Process each layer
+        feature_dir = feature_path.parent
+        for i, layer in enumerate(layers, 1):
+            layer_id = layer['layer_id']
+            layer_name = layer['name']
+            
+            print(f"{'='*80}")
+            print(f"  Layer {i}/{len(layers)}: {layer_name}")
+            print(f"{'='*80}\n")
+            
+            # Create standardized folder name
+            folder_name = standardize_layer_folder_name(layer_id, layer_name)
+            layer_folder = feature_dir / folder_name
+            
+            print(f"📁 Creating folder: {folder_name}")
+            layer_folder.mkdir(exist_ok=True)
+            
+            # Create subdirectories
+            (layer_folder / "src").mkdir(exist_ok=True)
+            (layer_folder / "tests").mkdir(exist_ok=True)
+            print(f"   ✓ Created: {folder_name}/src/")
+            print(f"   ✓ Created: {folder_name}/tests/\n")
+            
+            # Derive layer requirements using AI
+            print(f"🤖 Deriving layer requirements from feature requirements...")
+            derived_yaml = derive_layer_requirements_with_ai(
+                feature_spec=feature_spec,
+                layer_info=layer,
+                layer_template=layer_template,
+                folder_name=folder_name,
+                orchestrator=orchestrator,
+                verbose=verbose
+            )
+            
+            # Write layer YAML file
+            yaml_filename = f"{folder_name}.yaml"
+            yaml_path = layer_folder / yaml_filename
+            with open(yaml_path, 'w', encoding='utf-8') as f:
+                f.write(derived_yaml)
+            
+            print(f"   ✓ Generated: {yaml_filename}")
+            print(f"   ✓ Layer initialized successfully\n")
+        
+        print(f"\n{'='*80}")
+        print(f"  ✅ All {len(layers)} layers initialized successfully!")
+        print(f"{'='*80}\n")
+        print(f"Next steps:")
+        print(f"  1. Review generated layer YAML files")
+        print(f"  2. Adjust requirements if needed")
+        print(f"  3. Run: python build_feature.py {feature_path}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"\n❌ Error initializing layer structure: {e}")
+        if verbose:
+            import traceback
+            traceback.print_exc()
+        return False
+
+
+def derive_layer_requirements_with_ai(feature_spec: Dict, layer_info: Dict,
+                                     layer_template: str, folder_name: str,
+                                     orchestrator, verbose: bool) -> str:
+    """
+    Use AI to derive detailed layer requirements from feature requirements.
+    
+    This is Task 5 - AI prompt for layer requirement derivation.
+    """
+    # TODO: Implement AI prompt - This will be Task 5
+    # For now, return template with basic population
+    
+    # Extract key info
+    feature_id = feature_spec['metadata']['feature_id']
+    feature_name = feature_spec['metadata']['feature_name']
+    layer_id = layer_info['layer_id']
+    layer_name = layer_info['name']
+    
+    # Get feature requirements for context
+    feature_reqs = feature_spec.get('requirements', {})
+    
+    # Build AI prompt
+    prompt = f"""Generate a complete layer requirements YAML file following this template structure:
+
+{layer_template}
+
+Context:
+- Feature ID: {feature_id}
+- Feature Name: {feature_name}
+- Layer ID: {layer_id}
+- Layer Name: {layer_name}
+- Layer Folder (CRITICAL - MUST match exactly): {folder_name}
+
+Feature Requirements to Derive From:
+{yaml.dump(feature_reqs, default_flow_style=False)}
+
+Instructions:
+1. Replace ALL [PLACEHOLDER] values with specific, detailed content
+2. In metadata section, set layer_folder to exactly: "{folder_name}"
+3. Analyze feature requirements and decompose into layer-specific requirements
+4. Map each feature requirement to specific layer requirements in traceability.derived_from_feature_requirements
+5. Define clear interfaces (classes, methods, inputs, outputs)
+6. Specify technical implementation details appropriate for this layer
+7. Include comprehensive acceptance criteria
+8. Return ONLY the populated YAML, no explanations
+
+Generate the complete layer requirements YAML now:"""
+    
+    # Call AI
+    if verbose:
+        print(f"   📝 Prompt length: {len(prompt)} chars")
+    
+    response = orchestrator.ai_provider.generate_code(
+        prompt=prompt,
+        max_tokens=4096
+    )
+    
+    # Extract YAML from response
+    if "```yaml" in response:
+        start = response.find("```yaml") + 7
+        end = response.rfind("```")
+        response = response[start:end].strip()
+    elif "```" in response:
+        start = response.find("```") + 3
+        end = response.rfind("```")
+        response = response[start:end].strip()
+    
+    return response
 
 
 class FeatureBuilder:
@@ -99,25 +365,44 @@ class FeatureBuilder:
         return feature_id, feature_name
         
     def find_layer_spec(self, layer_info: dict) -> Path:
-        """Find layer specification file."""
+        """
+        Find layer specification file using standardized naming convention.
+        
+        Enforces LAYER_{id_underscores}_{name_underscores} folder structure.
+        Supports legacy layer_directory field as fallback.
+        """
         layer_file = layer_info.get('requirement_file')
         if not layer_file:
             raise ValueError(f"No requirement_file specified for {layer_info['layer_id']}")
-            
-        # Derive directory name from requirement file (remove .yaml extension)
-        # Directory structure: LAYER-XXX-XX-XX-XX_layer_name/LAYER-XXX-XX-XX-XX_layer_name.yaml
-        layer_dir = layer_file.replace('.yaml', '')
-        layer_path = self.feature_path.parent / layer_dir / layer_file
         
-        # Fallback: Try with space-separated name (old format)
+        layer_id = layer_info['layer_id']
+        layer_name = layer_info['name']
+        
+        # Priority 1: Check if layer_directory field is specified (legacy support)
+        if 'layer_directory' in layer_info:
+            layer_dir = layer_info['layer_directory']
+            layer_path = self.feature_path.parent / layer_dir / layer_file
+            if layer_path.exists():
+                return layer_path
+        
+        # Priority 2: Use standardized naming convention (SINGLE SOURCE OF TRUTH)
+        standardized_folder = standardize_layer_folder_name(layer_id, layer_name)
+        layer_path = self.feature_path.parent / standardized_folder / layer_file
+        
         if not layer_path.exists():
-            layer_dir_old = f"{layer_info['layer_id']} {layer_info['name']}"
-            layer_path_old = self.feature_path.parent / layer_dir_old / layer_file
-            if layer_path_old.exists():
-                layer_path = layer_path_old
-            else:
-                raise FileNotFoundError(f"Layer spec not found: {layer_path} (also tried: {layer_path_old})")
-            
+            # Provide helpful error message with correct naming
+            raise FileNotFoundError(
+                f"\nLayer specification not found: {layer_path}\n\n"
+                f"Expected folder structure:\n"
+                f"  {standardized_folder}/\n"
+                f"  └── {layer_file}\n\n"
+                f"IMPORTANT: Layer folders MUST use underscores (not spaces/hyphens)\n"
+                f"  Correct:   {standardized_folder}\n"
+                f"  Incorrect: {layer_id} {layer_name}\n\n"
+                f"To initialize layer structure:\n"
+                f"  python build_feature.py --init-layers {self.feature_path}\n"
+            )
+        
         return layer_path
         
     def build_layer(self, layer_info: dict, layer_number: int, total_layers: int) -> bool:
@@ -209,23 +494,28 @@ class FeatureBuilder:
     def _build_feature_integration_prompt(self, spec: FeatureIntegrationSpec) -> str:
         """Build AI prompt for feature integration code generation."""
         
-        # Format layer implementations
+        # Format layer implementations with ACTUAL METHOD SIGNATURES
         layer_descriptions = []
         for layer in spec.layers:
-            layer_code = layer.implementation_path.read_text()
+            # Extract actual classes and methods from implementation
+            methods_by_class = extract_class_methods(layer.implementation_path)
             
-            # Extract classes from implementation (simple parse)
-            classes = []
-            for line in layer_code.split('\n'):
-                if line.startswith('class '):
-                    class_name = line.split('class ')[1].split('(')[0].split(':')[0].strip()
-                    classes.append(class_name)
+            # Format class and method information
+            class_info = []
+            for class_name, methods in methods_by_class.items():
+                method_list = '\n    - '.join(methods) if methods else 'No public methods'
+                class_info.append(f"""
+  Class: {class_name}
+  Public Methods:
+    - {method_list}""")
             
             layer_descriptions.append(f"""
 Layer: {layer.layer_name} ({layer.layer_id})
 Location: {layer.implementation_path}
-Classes: {', '.join(classes)}
+{''.join(class_info)}
 Purpose: {layer.requirements.get('description', 'N/A')}
+
+CRITICAL: Only call methods that exist above. Do NOT invent method names.
 """)
         
         # Format integration scenarios
@@ -284,10 +574,23 @@ REQUIREMENTS:
    - Comprehensive docstrings
    - Clean, readable code structure
 
+===== CRITICAL METHOD USAGE RULES =====
+- ONLY call methods that are listed above in "Public Methods" for each layer
+- DO NOT invent or assume method names (e.g., prepare_data, validate)
+- Use EXACT method names from the layer implementations
+- If you need functionality, use the methods that ACTUALLY EXIST
+- Cross-reference: Layer class methods are listed above - use those EXACT names
+===== END CRITICAL RULES =====
+
 Generate ONLY the Python code for the feature integration module.
 Use relative imports to access layer implementations.
 
-Example import structure:
+CRITICAL IMPORT REQUIREMENTS:
+- Layer folders use UNDERSCORES (not spaces or hyphens): LAYER_XXX_YYY_ZZZ_Name_With_Underscores
+- Import format MUST match folder names exactly
+- Use standardized layer folder names in import statements
+
+Example import structure for layers with standardized naming:
 ```python
 from pathlib import Path
 import sys
@@ -295,13 +598,27 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from {spec.layers[0].layer_id.replace(' ', '_').replace('-', '_').lower()}.src.implementation import ClassName
+# Import from standardized layer folders (underscores only)
+# Example layer folders: LAYER_003_001_001_YAML_XML_Reader, LAYER_003_001_002_Data_Validator
+from LAYER_XXX_YYY_ZZZ_Layer_Name.src.implementation import ClassName1, ClassName2
+from LAYER_XXX_YYY_ZZZ_Another_Layer.src.implementation import AnotherClass
 ```
+
+For the actual layers in this feature, use these folder names:
+{self._generate_layer_import_examples(spec.layers)}
 
 Generate the complete feature_integration.py module now:
 """
         
         return prompt
+    
+    def _generate_layer_import_examples(self, layers: List[LayerInfo]) -> str:
+        """Generate correct import examples using standardized layer folder names."""
+        examples = []
+        for layer in layers:
+            folder_name = standardize_layer_folder_name(layer.layer_id, layer.layer_name)
+            examples.append(f"# from {folder_name}.src.implementation import ...")
+        return "\n".join(examples)
     
     def _extract_code_from_response(self, response: str) -> str:
         """Extract Python code from AI response."""
@@ -849,7 +1166,27 @@ Examples:
         help="Show detailed output and stack traces"
     )
     
+    parser.add_argument(
+        "--init-layers",
+        action="store_true",
+        help="Initialize layer folder structure and generate layer YAML files from feature requirements (run before building)"
+    )
+    
     args = parser.parse_args()
+    
+    # Initialize layer structure if requested
+    if args.init_layers:
+        from pathlib import Path
+        feature_path = Path(args.feature)
+        print(f"\n{'='*80}")
+        print("  🏗️  LAYER STRUCTURE INITIALIZATION")
+        print(f"{'='*80}\n")
+        success = initialize_layer_structure(
+            feature_path=feature_path,
+            provider=args.provider,
+            verbose=args.verbose
+        )
+        sys.exit(0 if success else 1)
     
     # Build the feature
     builder = FeatureBuilder(

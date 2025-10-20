@@ -1,0 +1,365 @@
+#!/usr/bin/env python3
+"""
+AI Code Generator - System Builder  
+Single command to build complete systems by integrating features
+Following exact pattern from build_feature.py
+"""
+
+import argparse
+import sys
+import os
+from pathlib import Path
+from datetime import datetime
+import yaml
+import json
+from dataclasses import dataclass
+from typing import List, Dict, Any
+
+# Clean API key
+if 'ANTHROPIC_API_KEY' in os.environ:
+    os.environ['ANTHROPIC_API_KEY'] = os.environ['ANTHROPIC_API_KEY'].strip()
+if 'OPENAI_API_KEY' in os.environ:
+    os.environ['OPENAI_API_KEY'] = os.environ['OPENAI_API_KEY'].strip()
+
+# Add paths
+control_tower_root = Path(__file__).parent.resolve()
+project_004_src = control_tower_root / "projects" / "PROJECT-004 AI CODE GENERATOR" / "SYSTEM-004-01 AI CODE GENERATION SYSTEM" / "src"
+
+if str(control_tower_root) not in sys.path:
+    sys.path.insert(0, str(control_tower_root))
+if str(project_004_src) not in sys.path:
+    sys.path.insert(0, str(project_004_src))
+
+
+@dataclass
+class FeatureInfo:
+    """Information about a built feature."""
+    feature_id: str
+    feature_name: str
+    feature_dir: Path
+    integration_path: Path
+    requirements: Dict[str, Any]
+
+
+@dataclass
+class SystemIntegrationSpec:
+    """Specification for system integration layer generation."""
+    system_id: str
+    system_name: str
+    system_dir: Path
+    features: List[FeatureInfo]
+    acceptance_criteria: List[Dict[str, Any]]
+    tech_stack: Dict[str, Any]
+    deployment_config: Dict[str, Any]
+
+
+class SystemBuilder:
+    """Build complete systems from YAML specifications using AI."""
+    
+    def __init__(self, system_path: str, provider: str = "anthropic", verbose: bool = False):
+        """Initialize system builder."""
+        self.system_path = Path(system_path)
+        self.provider = provider
+        self.verbose = verbose
+        
+        if not self.system_path.exists():
+            raise FileNotFoundError(f"System spec not found: {system_path}")
+    
+    def print_header(self, title: str):
+        """Print section header."""
+        print("\n" + "=" * 80)
+        print(f"  {title}")
+        print("=" * 80 + "\n")
+    
+    def print_step(self, icon: str, message: str):
+        """Print step message."""
+        print(f"{icon} {message}")
+    
+    def load_system_spec(self):
+        """Load system specification."""
+        self.print_header("Loading System Specification")
+        
+        with open(self.system_path, 'r', encoding='utf-8') as f:
+            self.system_spec = yaml.safe_load(f)
+        
+        system_name = self.system_spec['metadata']['system_name']
+        system_id = self.system_spec['metadata']['system_id']
+        
+        self.print_step("✓", f"System: {system_name}")
+        self.print_step("✓", f"System ID: {system_id}")
+        
+        self.features = self.system_spec.get('features', [])
+        self.print_step("✓", f"Features: {len(self.features)}")
+        
+        return system_id, system_name
+    
+    def find_feature_directories(self) -> List[FeatureInfo]:
+        """Find feature integration files."""
+        self.print_header("Discovering Features")
+        
+        system_dir = self.system_path.parent
+        feature_infos = []
+        
+        for feature_spec in self.features:
+            feature_id = feature_spec['feature_id']
+            feature_dirs = list(system_dir.glob(f"{feature_id}*"))
+            
+            if not feature_dirs:
+                self.print_step("⚠️", f"Not found: {feature_id}")
+                continue
+            
+            feature_dir = feature_dirs[0]
+            integration_path = feature_dir / "src" / "feature_integration.py"
+            
+            if integration_path.exists():
+                self.print_step("✓", f"Found: {feature_dir.name}")
+                
+                # Load feature YAML
+                feature_yaml = feature_dir / f"{feature_dir.name}.yaml"
+                requirements = {}
+                if feature_yaml.exists():
+                    with open(feature_yaml, 'r', encoding='utf-8') as f:
+                        requirements = yaml.safe_load(f)
+                
+                feature_infos.append(FeatureInfo(
+                    feature_id=feature_id,
+                    feature_name=feature_spec['feature_name'],
+                    feature_dir=feature_dir,
+                    integration_path=integration_path,
+                    requirements=requirements
+                ))
+            else:
+                self.print_step("⚠️", f"No integration: {feature_dir.name}")
+        
+        self.print_step("✓", f"Found {len(feature_infos)} features")
+        return feature_infos
+    
+    def _collect_feature_implementations(self, features: List[FeatureInfo]) -> List[FeatureInfo]:
+        """Collect feature implementation details."""
+        self.print_header("Collecting Feature Implementations")
+        
+        enriched = []
+        for feature in features:
+            self.print_step("📖", f"Reading {feature.feature_name}...")
+            
+            # Read feature code
+            code = feature.integration_path.read_text(encoding='utf-8')
+            
+            # Extract classes
+            classes = []
+            for line in code.split('\n'):
+                if line.strip().startswith('class '):
+                    cls = line.split('class ')[1].split('(')[0].split(':')[0].strip()
+                    classes.append(cls)
+            
+            feature.classes = classes
+            self.print_step("  ", f"Classes: {', '.join(classes) if classes else 'N/A'}")
+            enriched.append(feature)
+        
+        self.print_step("✓", f"Collected {len(enriched)} implementations")
+        return enriched
+    
+    def _build_system_integration_prompt(self, spec: SystemIntegrationSpec) -> str:
+        """Build comprehensive AI prompt for system integration."""
+        
+        # Feature summary (concise)
+        feat_list = []
+        for f in spec.features:
+            classes = getattr(f, 'classes', [])
+            feat_list.append(f"{f.feature_id}: {f.feature_name} ({len(classes)} classes)")
+        
+        # Build MINIMAL prompt for 8K token limit - request compact code
+        prompt = f"""Create minimal FastAPI backend for {spec.system_name}
+
+{len(spec.features)} features: {', '.join(f.feature_id for f in spec.features[:3])}{'...' if len(spec.features) > 3 else ''}
+
+CRITICAL: MINIMAL code. No docstrings. Type hints only. Max 10 files.
+
+Return JSON format:
+{{"files": [{{"path": "requirements.txt", "content": "fastapi==0.104.1\\n..."}}, ...]}}
+
+Files needed:
+1. requirements.txt (minimal deps: fastapi, uvicorn, pydantic)
+2. .env.example (feature flags)
+3. app/__init__.py (empty)
+4. app/config.py (BaseSettings with feature flags)
+5. app/main.py (FastAPI app + CORS + all routers + exception handlers)
+6. app/models.py (ALL models in ONE file: Enum, BaseModel classes)
+7. app/exceptions.py (custom exceptions)
+8. app/health.py (health endpoints)
+9. app/features.py (ALL feature routers in ONE file with feature flag checks)
+
+Each router: 2-3 endpoints, in-memory list/dict storage, minimal logic.
+NO verbose docstrings. NO comments. Just working code.
+"""
+        return prompt
+    
+    def _extract_json_from_response(self, response: str) -> Dict:
+        """Extract JSON from AI response with better error handling."""
+        # Handle markdown code blocks
+        if "```json" in response:
+            start = response.find("```json\n")
+            if start != -1:
+                start += len("```json\n")
+                # Look for closing ``` 
+                end = response.rfind("\n```")
+                if end == -1:
+                    # No closing marker - response was likely truncated
+                    self.print_step("⚠️", "Response appears truncated (no closing ```)")
+                    # Try to find the last complete object
+                    end = response.rfind("}")
+                    if end != -1:
+                        end += 1  # Include the closing brace
+                else:
+                    # Use the position before the closing marker
+                    pass
+                
+                if end > start:
+                    json_str = response[start:end].strip()
+                    try:
+                        return json.loads(json_str)
+                    except json.JSONDecodeError as e:
+                        self.print_step("❌", f"JSON parse error at position {e.pos}: {e.msg}")
+                        return None
+        
+        # Try parsing entire response as JSON
+        try:
+            return json.loads(response.strip())
+        except json.JSONDecodeError:
+            pass
+        
+        return None
+    
+    def generate_system_integration(self, spec: SystemIntegrationSpec) -> bool:
+        """Generate system integration using AI."""
+        try:
+            self.print_header("Generating System Integration")
+            self.print_step("🤖", "Calling AI Code Generator...")
+            
+            prompt = self._build_system_integration_prompt(spec)
+            
+            from layer.orchestrator.ai_code_generator_orchestrator import AICodeGeneratorOrchestrator
+            
+            config = {'output_base_path': str(spec.system_dir), 'provider': self.provider}
+            orchestrator = AICodeGeneratorOrchestrator(config=config)
+            
+            # Claude Sonnet 4 max output is 8192 tokens
+            # For comprehensive backend, we need concise but complete code
+            response = orchestrator.ai_provider.generate_code(
+                prompt=prompt,
+                max_tokens=8192
+            )
+            
+            # Log response stats for debugging
+            if self.verbose:
+                self.print_step("ℹ️", f"Response length: {len(response)} characters")
+                if "```json" in response:
+                    has_closing = "\n```" in response[response.find("```json")+7:]
+                    self.print_step("ℹ️", f"JSON block: {'complete' if has_closing else 'TRUNCATED'}")
+            
+            result = self._extract_json_from_response(response)
+            
+            if not result or 'files' not in result:
+                self.print_step("⚠️", "Fallback to basic generation")
+                # Basic fallback - save raw response
+                backend_dir = spec.system_dir.parent / "src" / "backend" / "app"
+                backend_dir.mkdir(parents=True, exist_ok=True)
+                (backend_dir / "main.py").write_text(response, encoding='utf-8')
+                self.print_step("✓", "Created basic app/main.py")
+                return True
+            
+            # Create files from JSON
+            backend_dir = spec.system_dir.parent / "src" / "backend"
+            files_created = 0
+            
+            for file_spec in result['files']:
+                file_path = backend_dir / file_spec['path']
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+                file_path.write_text(file_spec['content'], encoding='utf-8')
+                files_created += 1
+                self.print_step("✓", f"Created: {file_spec['path']}")
+            
+            self.print_step("✅", f"Generated {files_created} files")
+            return True
+            
+        except Exception as e:
+            self.print_step("❌", f"Error: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return False
+    
+    def build_system(self):
+        """Execute system build."""
+        start_time = datetime.now()
+        
+        try:
+            self.print_header("🚀 AI System Builder")
+            
+            system_id, system_name = self.load_system_spec()
+            
+            if self.provider == "anthropic" and not os.getenv("ANTHROPIC_API_KEY"):
+                self.print_step("❌", "ANTHROPIC_API_KEY not set!")
+                return False
+            
+            self.print_step("✓", f"AI Provider: {self.provider.upper()}")
+            
+            feature_infos = self.find_feature_directories()
+            
+            if not feature_infos:
+                self.print_step("❌", "No features found")
+                return False
+            
+            enriched = self._collect_feature_implementations(feature_infos)
+            
+            spec = SystemIntegrationSpec(
+                system_id=system_id,
+                system_name=system_name,
+                system_dir=self.system_path.parent,
+                features=enriched,
+                acceptance_criteria=self.system_spec.get('acceptance_criteria', []),
+                tech_stack=self.system_spec.get('technology_stack', {}),
+                deployment_config=self.system_spec.get('deployment', {})
+            )
+            
+            if not self.generate_system_integration(spec):
+                return False
+            
+            duration = (datetime.now() - start_time).total_seconds() / 60
+            
+            self.print_header("✅ BUILD SUCCESSFUL")
+            self.print_step("🎉", f"System '{system_name}' complete!")
+            self.print_step("⏱️", f"Duration: {duration:.1f} minutes")
+            
+            return True
+            
+        except Exception as e:
+            self.print_header("❌ BUILD FAILED")
+            self.print_step("💥", f"Error: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return False
+
+
+def main():
+    """Main entry point."""
+    parser = argparse.ArgumentParser(description="Build systems using AI")
+    parser.add_argument("system", help="Path to system YAML")
+    parser.add_argument("--provider", choices=["openai", "anthropic"], default="anthropic")
+    parser.add_argument("--verbose", action="store_true")
+    
+    args = parser.parse_args()
+    
+    builder = SystemBuilder(
+        system_path=args.system,
+        provider=args.provider,
+        verbose=args.verbose
+    )
+    
+    success = builder.build_system()
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()

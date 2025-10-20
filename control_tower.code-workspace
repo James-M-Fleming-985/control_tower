@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "control_tower",
+      "path": "."
+    },
+    {
+      "name": "business_ventures",
+      "path": "../business_ventures"
+    },
+    {
+      "name": "life_quality",
+      "path": "../life_quality"
+    }
+  ],
+  "settings": {
+    "files.autoSave": "afterDelay",
+    "editor.minimap.enabled": true,
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}

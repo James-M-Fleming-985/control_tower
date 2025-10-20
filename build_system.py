@@ -53,6 +53,185 @@ class SystemIntegrationSpec:
     deployment_config: Dict[str, Any]
 
 
+class SystemArchitecture:
+    """Base class for system architecture strategies."""
+    
+    def __init__(self, system_spec: Dict[str, Any], system_dir: Path):
+        """Initialize architecture strategy."""
+        self.system_spec = system_spec
+        self.system_dir = system_dir
+    
+    def build_prompt(self, spec: SystemIntegrationSpec) -> str:
+        """Build AI prompt for code generation."""
+        raise NotImplementedError
+    
+    def get_file_structure(self) -> str:
+        """Get base directory path for this architecture."""
+        raise NotImplementedError
+    
+    def get_dependencies(self) -> List[str]:
+        """Get dependencies list for requirements.txt."""
+        raise NotImplementedError
+
+
+class FastAPIArchitecture(SystemArchitecture):
+    """FastAPI REST API architecture strategy."""
+    
+    def build_prompt(self, spec: SystemIntegrationSpec) -> str:
+        """Build FastAPI-specific prompt."""
+        feat_list = []
+        for f in spec.features:
+            classes = getattr(f, 'classes', [])
+            feat_list.append(
+                f"{f.feature_id}: {f.feature_name} ({len(classes)} classes)"
+            )
+            
+            # Add method signatures for each feature class
+            if hasattr(f, 'methods_by_class'):
+                for cls, methods in f.methods_by_class.items():
+                    feat_list.append(f"  Class: {cls}")
+                    feat_list.append("  Public Methods:")
+                    for method in methods:
+                        feat_list.append(f"    - {method}")
+                    feat_list.append("  CRITICAL: Only call methods that exist above.")
+        
+        deps = ', '.join(self.get_dependencies()[:5])
+        prompt = f"""Create minimal FastAPI backend for {spec.system_name}
+
+{len(spec.features)} features: {', '.join(f.feature_id for f in spec.features[:3])}{'...' if len(spec.features) > 3 else ''}
+
+CRITICAL: MINIMAL code. No docstrings. Type hints only. Max 10 files.
+
+===== CRITICAL METHOD USAGE RULES =====
+- ONLY call methods that are listed above in "Public Methods" for each feature
+- DO NOT invent or assume method names on FeatureOrchestrator classes
+- Use EXACT method names from the feature implementations
+- If you need functionality, use the methods that ACTUALLY EXIST in the classes
+- Cross-reference: Feature class methods are listed above - use those EXACT names
+===== END CRITICAL RULES =====
+
+Return JSON format:
+{{"files": [{{"path": "requirements.txt", "content": "fastapi==0.104.1\\n..."}}, ...]}}
+
+Files needed:
+1. requirements.txt (deps: {deps})
+2. .env.example (feature flags)
+3. app/__init__.py (empty)
+4. app/config.py (BaseSettings with feature flags)
+5. app/main.py (FastAPI app + CORS + all routers + exception handlers)
+6. app/models.py (ALL models in ONE file: Enum, BaseModel classes)
+7. app/exceptions.py (custom exceptions)
+8. app/health.py (health endpoints)
+9. app/features.py (ALL feature routers in ONE file with feature flag checks)
+
+Each router: 2-3 endpoints, in-memory list/dict storage, minimal logic.
+NO verbose docstrings. NO comments. Just working code.
+"""
+        return prompt
+    
+    def get_file_structure(self) -> str:
+        """Get FastAPI file structure."""
+        return "src/backend"
+    
+    def get_dependencies(self) -> List[str]:
+        """Get FastAPI dependencies."""
+        return ["fastapi==0.104.1", "uvicorn==0.24.0", "pydantic==2.5.0"]
+
+
+class DesktopCLIArchitecture(SystemArchitecture):
+    """Desktop CLI application architecture strategy."""
+    
+    def build_prompt(self, spec: SystemIntegrationSpec) -> str:
+        """Build CLI-specific prompt for feature integration."""
+        feature_list = []
+        for f in spec.features:
+            feature_list.append(f"- {f.feature_id}: {f.feature_name}")
+            
+            # Add method signatures for each feature class
+            if hasattr(f, 'methods_by_class'):
+                for cls, methods in f.methods_by_class.items():
+                    feature_list.append(f"  Class: {cls}")
+                    feature_list.append(f"  Public Methods:")
+                    for method in methods:
+                        feature_list.append(f"    - {method}")
+                    feature_list.append(f"  CRITICAL: Only call methods that exist above.")
+        
+        prompt = f"""Create Python CLI application for {spec.system_name}
+
+This is a DESKTOP APPLICATION (CLI), not a web service.
+
+Features to integrate ({len(spec.features)} total):
+{chr(10).join(feature_list)}
+
+CRITICAL REQUIREMENTS:
+1. Import FeatureOrchestrator from each feature using importlib.util
+2. Create CLI entry point script (generate_report.py) with argparse
+3. Chain feature orchestrators to process data end-to-end
+4. Generate OUTPUT FILES (PowerPoint, reports), NOT HTTP responses
+5. No FastAPI, no routers, no REST endpoints
+
+===== CRITICAL METHOD USAGE RULES =====
+- ONLY call methods that are listed above in "Public Methods" for each feature
+- DO NOT invent or assume method names on FeatureOrchestrator classes
+- Use EXACT method names from the feature implementations
+- If you need functionality, use the methods that ACTUALLY EXIST in the classes
+- Cross-reference: Feature class methods are listed above - use those EXACT names
+===== END CRITICAL RULES =====
+
+Return JSON format:
+{{"files": [{{"path": "generate_report.py", "content": "..."}}]}}
+
+Files needed:
+1. requirements.txt - {', '.join(self.get_dependencies()[:5])}
+2. generate_report.py - Main CLI entry point with:
+   - argparse for command-line arguments
+   - Dynamic feature imports using importlib.util.spec_from_file_location
+   - Feature orchestrator chaining (data flows through features)
+   - Error handling and logging
+   - File output generation
+3. src/models.py - Pydantic data models (if needed)
+4. src/utils.py - Helper functions (path handling, logging)
+5. config/settings.yaml - Configuration file
+
+Example import pattern:
+```python
+import importlib.util
+from pathlib import Path
+
+def load_feature(feature_name):
+    path = Path(__file__).parent / feature_name / "src" / "feature_integration.py"
+    spec = importlib.util.spec_from_file_location(f"{{feature_name}}.integration", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.FeatureOrchestrator
+```
+
+NO FastAPI code. NO web server. CLI application only.
+"""
+        return prompt
+    
+    def get_file_structure(self) -> str:
+        """Get CLI file structure."""
+        # CLI apps generate files at root level
+        return "."
+    
+    def get_dependencies(self) -> List[str]:
+        """Get CLI dependencies."""
+        code_gen = self.system_spec.get('code_generation', {})
+        deps = code_gen.get('dependencies', {})
+        return deps.get('libraries', [])
+
+
+def select_architecture(deployment_model: str, system_spec: Dict, 
+                       system_dir: Path) -> SystemArchitecture:
+    """Factory method to select appropriate architecture strategy."""
+    if 'CLI' in deployment_model or 'Desktop Application' in deployment_model:
+        return DesktopCLIArchitecture(system_spec, system_dir)
+    else:
+        # Default to FastAPI for backward compatibility
+        return FastAPIArchitecture(system_spec, system_dir)
+
+
 class SystemBuilder:
     """Build complete systems from YAML specifications using AI."""
     
@@ -92,6 +271,13 @@ class SystemBuilder:
         
         self.features = self.system_spec.get('features', [])
         self.print_step("✓", f"Features: {len(self.features)}")
+        
+        # Load deployment model and execution mode
+        system_overview = self.system_spec.get('system_overview', {})
+        self.deployment_model = system_overview.get('deployment_model', 'Web Service')
+        self.execution_mode = system_overview.get('execution_mode', 'API Service')
+        self.print_step("✓", f"Deployment Model: {self.deployment_model}")
+        self.print_step("✓", f"Execution Mode: {self.execution_mode}")
         
         # Load phases if available
         self.phases = self.system_spec.get('code_generation', {}).get('phases', {})
@@ -318,7 +504,7 @@ Return JSON with 'files' array containing path and content for each file.
         return feature_infos
     
     def _collect_feature_implementations(self, features: List[FeatureInfo]) -> List[FeatureInfo]:
-        """Collect feature implementation details."""
+        """Collect feature implementation details with method signatures."""
         self.print_header("Collecting Feature Implementations")
         
         enriched = []
@@ -328,54 +514,49 @@ Return JSON with 'files' array containing path and content for each file.
             # Read feature code
             code = feature.integration_path.read_text(encoding='utf-8')
             
-            # Extract classes
+            # Extract classes with their public methods
             classes = []
+            methods_by_class = {}
+            current_class = None
+            indent_level = 0
+            
             for line in code.split('\n'):
-                if line.strip().startswith('class '):
-                    cls = line.split('class ')[1].split('(')[0].split(':')[0].strip()
+                stripped = line.lstrip()
+                
+                # Detect class definition
+                if stripped.startswith('class '):
+                    cls = stripped.split('class ')[1].split('(')[0].split(':')[0].strip()
+                    current_class = cls
                     classes.append(cls)
+                    methods_by_class[cls] = []
+                    indent_level = len(line) - len(stripped)
+                
+                # Detect method definition (must be inside a class)
+                elif current_class and stripped.startswith('def '):
+                    line_indent = len(line) - len(stripped)
+                    if line_indent > indent_level:
+                        method_name = stripped.split('def ')[1].split('(')[0].strip()
+                        # Only include public methods
+                        if not method_name.startswith('_'):
+                            methods_by_class[current_class].append(method_name)
             
             feature.classes = classes
-            self.print_step("  ", f"Classes: {', '.join(classes) if classes else 'N/A'}")
+            feature.methods_by_class = methods_by_class
+            
+            # Show summary
+            for cls in classes:
+                methods = methods_by_class.get(cls, [])
+                self.print_step("  ", f"Class: {cls} - Methods: {', '.join(methods[:3])}{'...' if len(methods) > 3 else ''}")
+            
             enriched.append(feature)
         
         self.print_step("✓", f"Collected {len(enriched)} implementations")
         return enriched
     
     def _build_system_integration_prompt(self, spec: SystemIntegrationSpec) -> str:
-        """Build comprehensive AI prompt for system integration."""
-        
-        # Feature summary (concise)
-        feat_list = []
-        for f in spec.features:
-            classes = getattr(f, 'classes', [])
-            feat_list.append(f"{f.feature_id}: {f.feature_name} ({len(classes)} classes)")
-        
-        # Build MINIMAL prompt for 8K token limit - request compact code
-        prompt = f"""Create minimal FastAPI backend for {spec.system_name}
-
-{len(spec.features)} features: {', '.join(f.feature_id for f in spec.features[:3])}{'...' if len(spec.features) > 3 else ''}
-
-CRITICAL: MINIMAL code. No docstrings. Type hints only. Max 10 files.
-
-Return JSON format:
-{{"files": [{{"path": "requirements.txt", "content": "fastapi==0.104.1\\n..."}}, ...]}}
-
-Files needed:
-1. requirements.txt (minimal deps: fastapi, uvicorn, pydantic)
-2. .env.example (feature flags)
-3. app/__init__.py (empty)
-4. app/config.py (BaseSettings with feature flags)
-5. app/main.py (FastAPI app + CORS + all routers + exception handlers)
-6. app/models.py (ALL models in ONE file: Enum, BaseModel classes)
-7. app/exceptions.py (custom exceptions)
-8. app/health.py (health endpoints)
-9. app/features.py (ALL feature routers in ONE file with feature flag checks)
-
-Each router: 2-3 endpoints, in-memory list/dict storage, minimal logic.
-NO verbose docstrings. NO comments. Just working code.
-"""
-        return prompt
+        """Build AI prompt using architecture strategy."""
+        # Delegate to architecture strategy
+        return self.architecture.build_prompt(spec)
     
     def _extract_json_from_response(self, response: str) -> Dict:
         """Extract JSON from AI response with better error handling."""
@@ -441,7 +622,8 @@ NO verbose docstrings. NO comments. Just working code.
             }
             self.print_step("✓", f"Loaded {len(feature_specs)} feature specs")
             
-            backend_dir = spec.system_dir / "src" / "backend"
+            # Get base directory from architecture strategy
+            backend_dir = spec.system_dir / self.architecture.get_file_structure()
             backend_dir.mkdir(parents=True, exist_ok=True)
             
             # Get ordered phase list
@@ -523,13 +705,14 @@ NO verbose docstrings. NO comments. Just working code.
             
             if not result or 'files' not in result:
                 self.print_step("⚠️", "Fallback to basic generation")
-                backend_dir = spec.system_dir / "src" / "backend" / "app"
+                backend_dir = spec.system_dir / self.architecture.get_file_structure()
                 backend_dir.mkdir(parents=True, exist_ok=True)
-                (backend_dir / "main.py").write_text(response, encoding='utf-8')
-                self.print_step("✓", "Created basic app/main.py")
+                main_file = "main.py" if isinstance(self.architecture, FastAPIArchitecture) else "generate_report.py"
+                (backend_dir / main_file).write_text(response, encoding='utf-8')
+                self.print_step("✓", f"Created basic {main_file}")
                 return True
             
-            backend_dir = spec.system_dir / "src" / "backend"
+            backend_dir = spec.system_dir / self.architecture.get_file_structure()
             files_created = 0
             
             for file_spec in result['files']:
@@ -616,6 +799,14 @@ NO verbose docstrings. NO comments. Just working code.
                 tech_stack=self.system_spec.get('technology_stack', {}),
                 deployment_config=self.system_spec.get('deployment', {})
             )
+            
+            # Select architecture strategy based on deployment model
+            self.architecture = select_architecture(
+                self.deployment_model,
+                self.system_spec,
+                spec.system_dir
+            )
+            self.print_step("✓", f"Architecture: {self.architecture.__class__.__name__}")
             
             if not self.generate_system_integration(spec):
                 return False

@@ -1,24 +1,40 @@
-# SYSTEM-CA-006: Feedback Collection & Iteration Orchestrator
-# ============================================================
+# ====================================================================================
+# SYSTEM REQUIREMENTS TEMPLATE
+# ====================================================================================
+# SYSTEM-XXX: [System Name]
+# ====================================================================================
+# This template defines system-level requirements that are decomposed into features.
+# ALL features in this system must follow the naming conventions and response
+# structures defined here to ensure consistency and integration compatibility.
+# ====================================================================================
 
 metadata:
-  system_id: SYSTEM-CA-006
-  system_name: Feedback Collection & Iteration Orchestrator
-  parent_project: PROJECT-CAUSAL_AFFECT
-  created_date: 2025-10-13
-  status: planned
-  priority: critical
+  system_id: SYSTEM-XXX-XXX
+  system_name: "[System Name]"
+  parent_project: PROJECT-XXX
+  created_date: YYYY-MM-DD
+  status: "[planned|active|deprecated]"
+  priority: "[critical|high|medium|low]"
   
   purpose: |
-    Automated feedback collection using analytics providers (Google Analytics,
-    Mixpanel, Amplitude). Tracks engagement across MVPs, prioritizes high-performers,
-    archives non-performers. Operates with <5 minute latency.
+    [Detailed description of what this system does and why it exists.
+    Explain the business problem it solves and how it fits into the parent project.]
   
   business_value: |
-    - Identifies successful MVPs for further investment
-    - Eliminates wasted resources on non-performers
-    - Provides data-driven iteration priorities
-    - Enables portfolio-level optimization
+    - [Business benefit 1]
+    - [Business benefit 2]
+    - [Business benefit 3]
+  
+  traceability:
+    parent_project_requirements:
+      - "PRJ-REQ-XXX: [Brief description of traced project requirement]"
+      - "PRJ-REQ-YYY: [Brief description of traced project requirement]"
+    
+    project_requirements_file: "../PROJECT-XXX.yaml"
+    
+    derivation_rationale: |
+      [Explain how this system was derived from parent project requirements.
+      Show the logical connection between project goals and system implementation.]
 
 deployment:
   platform: Railway
@@ -40,9 +56,268 @@ deployment:
     health_check: "/"
     restart_policy: ON_FAILURE
 
+# ====================================================================================
+# SHARED INTERFACES - CRITICAL FOR FEATURE CONSISTENCY
+# ====================================================================================
+# ALL features in this system MUST use these standardized interfaces.
+# This ensures consistent communication between features and system orchestrators.
+# Choose the appropriate response_structure based on your deployment_model.
+# ====================================================================================
+
+shared_interfaces:
+  # ---------------------------------------------------------------------------------
+  # FOR CLI/DESKTOP APPLICATIONS
+  # ---------------------------------------------------------------------------------
+  # Use this structure when deployment_model is "Desktop CLI" or similar
+  # ---------------------------------------------------------------------------------
+  cli_response_structure:
+    standard: "FeatureResponse with ResponseStatus enum"
+    deployment_models:
+      - "Desktop CLI"
+      - "Command Line Tool"
+      - "Batch Processing"
+    
+    required_fields:
+      - name: "status"
+        type: "ResponseStatus (enum: SUCCESS, ERROR, WARNING, INFO)"
+        description: "Outcome of the operation"
+        required: true
+      
+      - name: "data"
+        type: "Optional[Any]"
+        description: "Successful result payload (None if error)"
+        required: true
+      
+      - name: "errors"
+        type: "List[str]"
+        description: "List of error messages (empty if no errors)"
+        required: true
+      
+      - name: "warnings"
+        type: "List[str]"
+        description: "List of warning messages (empty if no warnings)"
+        required: true
+    
+    implementation_example: |
+      ```python
+      from enum import Enum
+      from dataclasses import dataclass, field
+      from typing import Optional, Any, List
+      
+      class ResponseStatus(Enum):
+          SUCCESS = "success"
+          ERROR = "error"
+          WARNING = "warning"
+          INFO = "info"
+      
+      @dataclass
+      class FeatureResponse:
+          status: ResponseStatus
+          data: Optional[Any] = None
+          errors: List[str] = field(default_factory=list)
+          warnings: List[str] = field(default_factory=list)
+      ```
+    
+    usage_note: |
+      CLI orchestrators depend on this exact structure to:
+      1. Check operation success: response.status == ResponseStatus.SUCCESS
+      2. Extract result data: response.data
+      3. Display errors: response.errors
+      4. Show warnings: response.warnings
+      
+      CRITICAL: All features must use identical ResponseStatus enum and FeatureResponse.
+      Import from shared module or duplicate EXACTLY in each feature.
+  
+  # ---------------------------------------------------------------------------------
+  # FOR API/WEB APPLICATIONS
+  # ---------------------------------------------------------------------------------
+  # Use this structure when deployment_model is "FastAPI Backend" or similar
+  # ---------------------------------------------------------------------------------
+  api_response_structure:
+    standard: "Pydantic BaseModel with HTTP semantics"
+    deployment_models:
+      - "FastAPI Backend"
+      - "REST API"
+      - "Web Service"
+    
+    required_fields:
+      - name: "success"
+        type: "bool"
+        description: "Whether operation succeeded (true/false)"
+        required: true
+      
+      - name: "data"
+        type: "Optional[Any]"
+        description: "Successful result payload (None if error)"
+        required: true
+      
+      - name: "error"
+        type: "Optional[str]"
+        description: "Error message if failed (None if success)"
+        required: true
+      
+      - name: "metadata"
+        type: "Optional[Dict[str, Any]]"
+        description: "Additional context (timestamps, trace IDs, pagination)"
+        required: true
+    
+    http_status_mapping:
+      - "200 OK: Success with data (success=true)"
+      - "201 Created: Resource created successfully (success=true)"
+      - "400 Bad Request: Validation error (success=false, error=message)"
+      - "404 Not Found: Resource not found (success=false, error=message)"
+      - "500 Internal Server Error: Server error (success=false, error=message)"
+    
+    implementation_example: |
+      ```python
+      from pydantic import BaseModel, Field
+      from typing import Optional, Any, Dict
+      from datetime import datetime
+      
+      class FeatureResponse(BaseModel):
+          success: bool
+          data: Optional[Any] = None
+          error: Optional[str] = None
+          metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
+          
+          class Config:
+              json_encoders = {
+                  datetime: lambda v: v.isoformat()
+              }
+      ```
+    
+    usage_note: |
+      API routers depend on this exact structure to:
+      1. Map to HTTP status codes
+      2. Return consistent JSON responses
+      3. Support error handling middleware
+      4. Enable request tracing
+      
+      CRITICAL: All features must use identical FeatureResponse structure.
+      Define once in app/schemas/response.py and import everywhere.
+  
+  # ---------------------------------------------------------------------------------
+  # ENFORCEMENT RULES
+  # ---------------------------------------------------------------------------------
+  enforcement:
+    rule_01: "ALL features in this system MUST use the same response structure"
+    rule_02: "Choose cli_response_structure OR api_response_structure (not both)"
+    rule_03: "Response structure choice is determined by deployment.service_type"
+    rule_04: "build_feature.py will include response structure in ALL AI prompts"
+    rule_05: "Integration tests must verify response structure consistency"
+    
+    rationale: |
+      Lesson learned from SYSTEM-003: Features with different response structures
+      cause integration failures in orchestrators (e.g., generate_report.py).
+      
+      Heterogeneous responses require brittle workarounds like:
+      - Type detection with hasattr() checks
+      - Multiple code paths for success checking
+      - Complex error handling logic
+      
+      Standardized responses enable:
+      - Simple, reliable orchestration code
+      - Consistent error handling
+      - Better testability
+      - Easier maintenance
+
+# ====================================================================================
+# NAMING CONVENTIONS - CRITICAL FOR BUILD AUTOMATION
+# ====================================================================================
+# These conventions are ENFORCED by build_feature.py and REQUIRED for Python imports.
+# The --init-layers flag uses these rules to auto-generate folder structures.
+# ====================================================================================
+
+naming_conventions:
+  # ---------------------------------------------------------------------------------
+  # FOLDER AND FILE NAMING RULES
+  # ---------------------------------------------------------------------------------
+  rules:
+    system_folder:
+      format: "SYSTEM-{SYSTEM_ID}_{system_name_with_underscores}"
+      example: "SYSTEM-003_ZnNi_Report_Generation"
+      rationale: "Python import compatibility, clear identification"
+    
+    feature_folder:
+      format: "FEATURE-{SYSTEM_ID}-{FEATURE_NUM}_{feature_name_with_underscores}"
+      example: "FEATURE-003-001_Data_Reader_Parser"
+      rationale: "Unique identification, sortable, Python import compatible"
+    
+    layer_folder:
+      format: "LAYER_{layer_id_underscores}_{layer_name_with_underscores}"
+      example: "LAYER_003_001_001_YAML_XML_Reader"
+      conversion: "LAYER-003-001-001 + 'YAML XML Reader' → LAYER_003_001_001_YAML_XML_Reader"
+      rationale: "Python cannot import modules with hyphens or spaces"
+      critical_note: |
+        This is the PRIMARY LESSON from SYSTEM-003 migration:
+        - Layer folders MUST use underscores (not spaces or hyphens)
+        - Layer IDs: Convert hyphens to underscores (LAYER-003-001-001 → LAYER_003_001_001)
+        - Layer Names: Convert spaces to underscores (YAML XML Reader → YAML_XML_Reader)
+        - build_feature.py enforces this via standardize_layer_folder_name()
+        - No fallback logic exists - violations cause import errors
+    
+    yaml_files:
+      system_file: "SYSTEM-{SYSTEM_ID}.yaml"
+      feature_file: "FEATURE-{SYSTEM_ID}-{FEATURE_NUM}.yaml"
+      layer_file: "REQ-{SYSTEM_ID}-{FEATURE_NUM}-{LAYER_NUM}.yaml"
+      location: "Always at the root of the corresponding folder"
+  
+  # ---------------------------------------------------------------------------------
+  # AUTOMATED FOLDER CREATION
+  # ---------------------------------------------------------------------------------
+  automation:
+    init_layers_command: |
+      python build_feature.py --init-layers FEATURE_REQUIREMENTS.yaml
+    
+    what_it_does:
+      - "Reads feature YAML to get layer specifications"
+      - "Creates standardized layer folders using standardize_layer_folder_name()"
+      - "Creates src/ and tests/ subdirectories"
+      - "Calls AI to derive layer requirements from feature requirements"
+      - "Writes populated layer YAML files with full traceability"
+    
+    traceability_chain:
+      - "Project requirements → System requirements (manual)"
+      - "System requirements → Feature requirements (manual)"
+      - "Feature requirements → Layer requirements (automated via --init-layers)"
+    
+    benefits:
+      - "Prevents naming mismatches from day one"
+      - "Ensures Python import compatibility"
+      - "Maintains complete requirements traceability"
+      - "Eliminates manual folder creation errors"
+      - "No migration scripts needed for new projects"
+  
+  # ---------------------------------------------------------------------------------
+  # FOLDER STRUCTURE WITH TRACEABILITY
+  # ---------------------------------------------------------------------------------
+  structure_example: |
+    PROJECT-003_Report_Generator/
+    └── SYSTEM-003_ZnNi_Report_Generation/
+        ├── SYSTEM-003.yaml                          # System requirements (traces to PROJECT)
+        ├── FEATURE-003-001_Data_Reader_Parser/
+        │   ├── FEATURE-003-001.yaml                 # Feature requirements (traces to SYSTEM)
+        │   ├── LAYER_003_001_001_YAML_XML_Reader/
+        │   │   ├── REQ-003-001-001.yaml             # Layer requirements (traces to FEATURE)
+        │   │   ├── src/
+        │   │   │   └── implementation.py
+        │   │   └── tests/
+        │   │       └── test_implementation.py
+        │   ├── LAYER_003_001_002_Data_Model_Validator/
+        │   │   ├── REQ-003-001-002.yaml
+        │   │   ├── src/
+        │   │   └── tests/
+        │   └── LAYER_003_001_003_Schema_Compliance_Checker/
+        │       ├── REQ-003-001-003.yaml
+        │       ├── src/
+        │       └── tests/
+        └── FEATURE-003-002_Risk_Aggregator/
+            ├── FEATURE-003-002.yaml
+            └── [layers following same pattern]
+
 code_generation:
-  repository_root: "/workspaces/business_ventures/Causal_affect"
-  system_folder: "SYSTEM-CA-006_feedback_iteration"
+  repository_root: "/workspaces/[repository_name]"
+  system_folder: "SYSTEM-XXX-XXX_system_name"
   
   folder_structure:
     requirements:
@@ -72,8 +347,13 @@ code_generation:
         - "SYSTEM-CA-006_feedback_iteration/FEATURE-CA-006-01_analytics_integration/LAYER-CA-006-01-01_google_analytics_client/LAYER-CA-006-01-01_google_analytics_client.yaml"
     
     source_backend:
-      base_path: "src/feedback_iteration/backend"
-      description: "FastAPI backend implementation with hybrid architecture"
+      base_path: "SYSTEM-{SYSTEM_ID}_{system_name}/src/backend"
+      description: |
+        FastAPI backend implementation with hybrid architecture.
+        NOTE: All generated files will be saved INSIDE the SYSTEM folder at:
+        {repository_root}/{system_folder}/src/backend/app/
+        
+        Example for CA-001: /workspaces/business_ventures/Causal_affect/SYSTEM-CA-001_data_ingestion_processing/src/backend/app/
       entry_point: "app/main.py"
       structure:
         app:
@@ -195,13 +475,21 @@ code_generation:
         - "analytics-setup.md  # Analytics provider configuration"
   
   phases:
-    description: "Multi-phase generation strategy to comply with Claude API 8K token output limit"
+    description: "Multi-phase generation strategy optimized for Claude Opus 4 with higher token limits and granular phases"
+    ai_model: "claude-opus-4"  # Options: claude-opus-4, claude-sonnet-3.5, gpt-4
     total_phases: 10
     estimated_total_time: "60-75 minutes"
     
+    # BEST PRACTICES:
+    # - Use 20480 tokens for phases with 3-6 files
+    # - Use 16384 tokens for simple phases with 1-2 files
+    # - Split large features into multiple sub-phases (e.g., phase_03a, phase_03b, phase_03c)
+    # - Keep 3-4 files per phase maximum for best results
+    # - Use granular phases (25-30 total) rather than monolithic (10 total)
+    
     phase_01_system_infrastructure:
       name: "System Infrastructure"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "5 minutes"
       dependencies: []
       files:
@@ -225,7 +513,7 @@ code_generation:
     
     phase_02_system_api_routers:
       name: "System API Routers (Thin Wrappers)"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "6 minutes"
       dependencies: ["phase_01_system_infrastructure"]
       files:
@@ -242,7 +530,7 @@ code_generation:
     
     phase_03_feature_01_analytics:
       name: "FEATURE-01: Analytics Integration"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "10 minutes"
       dependencies: ["phase_01_system_infrastructure"]
       feature_id: "FEATURE-CA-006-01"
@@ -264,7 +552,7 @@ code_generation:
     
     phase_04_feature_02_engagement:
       name: "FEATURE-02: Engagement Tracking"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "10 minutes"
       dependencies: ["phase_01_system_infrastructure"]
       feature_id: "FEATURE-CA-006-02"
@@ -289,7 +577,7 @@ code_generation:
     
     phase_05_feature_03_revenue:
       name: "FEATURE-03: Revenue Tracking"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "10 minutes"
       dependencies: ["phase_01_system_infrastructure"]
       feature_id: "FEATURE-CA-006-03"
@@ -312,7 +600,7 @@ code_generation:
     
     phase_06_feature_04_prioritization:
       name: "FEATURE-04: Prioritization Engine"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "12 minutes"
       dependencies: ["phase_04_feature_02_engagement", "phase_05_feature_03_revenue"]
       feature_id: "FEATURE-CA-006-04"
@@ -335,7 +623,7 @@ code_generation:
     
     phase_07_feature_05_iteration:
       name: "FEATURE-05: Automated Iteration"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "10 minutes"
       dependencies: ["phase_06_feature_04_prioritization"]
       feature_id: "FEATURE-CA-006-05"
@@ -358,7 +646,7 @@ code_generation:
     
     phase_08_feature_06_dashboard:
       name: "FEATURE-06: Dashboard Visualization"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "10 minutes"
       dependencies: ["phase_04_feature_02_engagement", "phase_05_feature_03_revenue", "phase_06_feature_04_prioritization"]
       feature_id: "FEATURE-CA-006-06"
@@ -381,7 +669,7 @@ code_generation:
     
     phase_09_tests:
       name: "Unit & Integration Tests"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "12 minutes"
       dependencies: ["phase_03_feature_01_analytics", "phase_04_feature_02_engagement", "phase_05_feature_03_revenue", "phase_06_feature_04_prioritization", "phase_07_feature_05_iteration", "phase_08_feature_06_dashboard"]
       files:
@@ -406,7 +694,7 @@ code_generation:
     
     phase_10_devops:
       name: "DevOps & Configuration"
-      max_tokens: 8192
+      max_tokens: 20480
       estimated_time: "6 minutes"
       dependencies: ["phase_01_system_infrastructure"]
       files:

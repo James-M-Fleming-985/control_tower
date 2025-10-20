@@ -1,0 +1,527 @@
+metadata:
+  document_type: "System Build Tool Requirements Specification"
+  requirement_id: "TOOL-SYSTEM-BUILD-001"
+  requirement_name: "AI-Powered System Builder"
+  created_date: "2025-10-15"
+  status: "DRAFT - PENDING REVIEW"
+  priority: "HIGH"
+  owner: "AI Code Generator Team"
+
+purpose:
+  description: |
+    Create build_system.py that integrates multiple FEATURES into a complete deployable SYSTEM.
+    Must follow the EXACT same pattern as build_feature.py (which integrates LAYERS into FEATURES).
+    This ensures architectural consistency and enables system-level testing and verification.
+  
+  why_needed: |
+    - User needs reusable tool for future system builds
+    - Must follow AI Code Generator pattern (not templates)
+    - System level testing and verification required
+    - Consistent with existing build_feature.py architecture
+
+reference_implementation:
+  source_file: "build_feature.py"
+  location: "/workspaces/control_tower/build_feature.py"
+  total_lines: 623
+  pattern_to_replicate: "EXACT structure with feature-level substitutions"
+
+architecture_mapping:
+  build_feature_operates_on:
+    input: "FEATURE-XX.yaml (Feature specification)"
+    discovers: "LAYER-XX directories with implementation.py files"
+    collects: "Layer implementations and requirements"
+    generates: "feature_integration.py (integrates all layers)"
+    output_location: "FEATURE-XX/src/feature_integration.py"
+  
+  build_system_must_operate_on:
+    input: "SYSTEM-XX.yaml (System specification)"
+    discovers: "FEATURE-XX directories with feature_integration.py files"
+    collects: "Feature integrations and requirements"
+    generates: "Complete backend system (FastAPI app integrating all features)"
+    output_location: "SYSTEM-XX/src/backend/* (multiple files)"
+
+required_dataclasses:
+  - name: "FeatureInfo"
+    description: "Information about a built feature (replaces LayerInfo)"
+    required_fields:
+      - feature_id: "str"
+      - feature_name: "str"
+      - feature_dir: "Path"
+      - integration_path: "Path (path to feature_integration.py)"
+      - requirements: "Dict[str, Any] (from FEATURE-XX.yaml)"
+  
+  - name: "SystemIntegrationSpec"
+    description: "Specification for system integration generation (replaces FeatureIntegrationSpec)"
+    required_fields:
+      - system_id: "str"
+      - system_name: "str"
+      - system_dir: "Path"
+      - features: "List[FeatureInfo]"
+      - acceptance_criteria: "List[Dict[str, Any]]"
+      - tech_stack: "Dict[str, Any]"
+      - deployment_config: "Dict[str, Any]"
+
+required_class_structure:
+  class_name: "SystemBuilder"
+  description: "Build complete systems from YAML specifications using AI (mirrors FeatureBuilder)"
+  
+  required_methods:
+    initialization:
+      - method: "__init__(system_path, provider='anthropic', verbose=False)"
+        maps_to: "FeatureBuilder.__init__"
+        purpose: "Initialize with system YAML path, AI provider, verbosity"
+      
+      - method: "print_header(title)"
+        maps_to: "Same in FeatureBuilder"
+        purpose: "Print formatted section headers"
+      
+      - method: "print_step(icon, message)"
+        maps_to: "Same in FeatureBuilder"
+        purpose: "Print step-by-step progress"
+    
+    specification_loading:
+      - method: "load_system_spec()"
+        maps_to: "FeatureBuilder.load_feature_spec()"
+        purpose: "Load and parse SYSTEM-XX.yaml"
+        returns: "Tuple[system_id, system_name]"
+        must_extract:
+          - "metadata.system_id"
+          - "metadata.system_name"
+          - "features[] list"
+          - "acceptance_criteria[]"
+          - "technology_stack{}"
+    
+    feature_discovery:
+      - method: "find_feature_directories() -> List[FeatureInfo]"
+        maps_to: "FeatureBuilder.find_layer_directories()"
+        purpose: "Find all FEATURE-XX directories with feature_integration.py"
+        logic: |
+          For each feature in system_spec.features:
+            - Search for FEATURE-{feature_id}* directories
+            - Look for src/feature_integration.py
+            - Load FEATURE-XX.yaml for requirements
+            - Create FeatureInfo objects
+        returns: "List of FeatureInfo with all found features"
+    
+    implementation_collection:
+      - method: "_collect_feature_implementations(features: List[FeatureInfo]) -> List[FeatureInfo]"
+        maps_to: "FeatureBuilder._collect_layer_implementations()"
+        purpose: "Read feature_integration.py files, extract classes and functions"
+        must_do:
+          - "Read feature_integration.py content"
+          - "Parse to extract main classes (simple text parsing)"
+          - "Load feature YAML requirements"
+          - "Return enriched FeatureInfo list"
+        critical: "This provides context for AI prompt"
+    
+    ai_prompt_building:
+      - method: "_build_system_integration_prompt(spec: SystemIntegrationSpec) -> str"
+        maps_to: "FeatureBuilder._build_feature_integration_prompt()"
+        purpose: "Build comprehensive AI prompt for system integration code generation"
+        must_include:
+          system_context:
+            - "System name and ID"
+            - "System description"
+            - "Technology stack details"
+          
+          feature_descriptions:
+            - "For each feature:"
+            - "  - Feature name and ID"
+            - "  - Location of feature_integration.py"
+            - "  - Main classes extracted from feature code"
+            - "  - Feature purpose/description"
+            - "  - Feature requirements summary"
+          
+          acceptance_criteria:
+            - "List all AC-SYS-XXX criteria from system YAML"
+            - "Priority levels"
+            - "Verification methods"
+          
+          integration_requirements:
+            - "Create FastAPI application (app/main.py)"
+            - "Configure CORS middleware"
+            - "Include all feature routers with proper prefixes"
+            - "Health check and system info endpoints"
+            - "Create Pydantic Settings config (app/config.py)"
+            - "Create database layer (app/db/)"
+            - "Create API routers (app/api/v1/) - one per feature"
+            - "Create models (app/models/)"
+            - "Create services (app/services/)"
+            - "Generate requirements.txt with all dependencies"
+            - "Generate .env.example with environment variables"
+            - "Generate docker-compose.dev.yml for local development"
+          
+          implementation_guidelines:
+            - "Import pattern from feature_integration.py files"
+            - "Use dependency injection"
+            - "Error handling patterns"
+            - "Async/await for I/O operations"
+            - "Type hints and Pydantic validation"
+            - "Testing support structure"
+          
+          output_format:
+            description: "Request JSON structure with multiple files"
+            format: |
+              {
+                "files": [
+                  {
+                    "path": "app/main.py",
+                    "content": "... complete FastAPI application ..."
+                  },
+                  {
+                    "path": "app/config.py",
+                    "content": "... Pydantic Settings configuration ..."
+                  },
+                  {
+                    "path": "app/api/v1/feature_name.py",
+                    "content": "... Router for feature ..."
+                  },
+                  ... all other files ...
+                ],
+                "summary": {
+                  "total_files": 15,
+                  "lines_of_code": 2500,
+                  "features_integrated": 5,
+                  "api_endpoints": 20
+                }
+              }
+        
+        returns: "Comprehensive prompt string (similar length to build_feature.py prompt)"
+        critical: "This is the MOST IMPORTANT method - quality of generated code depends on this"
+    
+    code_extraction:
+      - method: "_extract_json_from_response(response: str) -> Dict"
+        maps_to: "FeatureBuilder._extract_code_from_response() but for JSON"
+        purpose: "Parse AI response to extract JSON structure with files"
+        logic: |
+          1. Try to find ```json ... ``` blocks
+          2. Try to parse entire response as JSON
+          3. Try to find JSON object boundaries { ... }
+          4. Return parsed Dict or None
+        returns: "Dict with 'files' and 'summary' keys, or None"
+    
+    ai_generation:
+      - method: "generate_system_integration(spec: SystemIntegrationSpec) -> bool"
+        maps_to: "FeatureBuilder.generate_feature_integration()"
+        purpose: "Call AI Code Generator to generate complete backend system"
+        steps:
+          - "Build comprehensive prompt using _build_system_integration_prompt()"
+          - "Import AICodeGeneratorOrchestrator"
+          - "Initialize orchestrator with config"
+          - "Call orchestrator.ai_provider.generate_code(prompt, max_tokens=16000)"
+          - "Extract JSON structure from response"
+          - "For each file in response['files']:"
+          - "  - Create directory structure"
+          - "  - Write file content"
+          - "  - Log progress"
+          - "Display summary statistics"
+        returns: "True if successful, False otherwise"
+        critical: "Must use AI Code Generator, not templates!"
+    
+    verification:
+      - method: "run_system_verification(spec: SystemIntegrationSpec) -> Dict[str, Any]"
+        maps_to: "NEW - not in build_feature.py but required per user"
+        purpose: "Run system-level testing and verification"
+        must_verify:
+          structure_checks:
+            - "Backend directory exists"
+            - "app/main.py exists and valid Python"
+            - "All routers exist"
+            - "requirements.txt exists"
+            - "docker-compose.dev.yml exists"
+          
+          syntax_validation:
+            - "Compile all Python files"
+            - "Check for syntax errors"
+            - "Validate imports can be resolved"
+          
+          acceptance_criteria_validation:
+            - "For each AC-SYS-XXX criterion:"
+            - "  - Mark as pending_verification"
+            - "  - Log criterion ID and description"
+            - "  - Provide verification checklist"
+          
+          integration_tests:
+            - "Attempt to import main FastAPI app"
+            - "Verify all routers are included"
+            - "Check health endpoint is defined"
+        
+        returns: |
+          {
+            'structure_check': bool,
+            'syntax_check': bool,
+            'import_check': bool,
+            'acceptance_criteria': [
+              {'id': 'AC-SYS-006-01', 'status': 'pending_verification', ...},
+              ...
+            ],
+            'test_results': {...}
+          }
+    
+    reporting:
+      - method: "generate_verification_report(spec: SystemIntegrationSpec, verification: Dict) -> bool"
+        maps_to: "NEW - enhanced version of build_feature.py summary"
+        purpose: "Generate comprehensive markdown report"
+        output_file: "SYSTEM-XX/SYSTEM_INTEGRATION_REPORT.md"
+        must_include:
+          - "System overview (ID, name, features integrated)"
+          - "Build tool information (build_system.py, AI provider)"
+          - "List of integrated features with status"
+          - "Generated components checklist"
+          - "Backend structure verification results"
+          - "Acceptance criteria verification status"
+          - "Next steps (how to start backend, run tests, verify AC)"
+          - "Technical debt / TODOs"
+        returns: "True if report created successfully"
+    
+    orchestration:
+      - method: "build_system() -> bool"
+        maps_to: "FeatureBuilder.build_feature()"
+        purpose: "Main orchestration method - runs entire build process"
+        workflow:
+          - "Print header with tool info"
+          - "Load system specification"
+          - "Check API key is set"
+          - "Find all feature directories"
+          - "Collect feature implementations"
+          - "Generate system integration using AI"
+          - "Run system verification"
+          - "Generate verification report"
+          - "Print final summary with duration, statistics"
+        returns: "True if build successful, False otherwise"
+      
+      - method: "run() -> bool"
+        maps_to: "FeatureBuilder.run()"
+        purpose: "Entry point with exception handling"
+        returns: "Result from build_system()"
+
+required_cli_interface:
+  main_function:
+    description: "argparse-based CLI matching build_feature.py"
+    arguments:
+      - name: "system"
+        required: true
+        help: "Path to system YAML specification file"
+      
+      - name: "--provider"
+        choices: ["openai", "anthropic"]
+        default: "anthropic"
+        help: "AI provider to use (default: anthropic/claude-sonnet-4.5)"
+      
+      - name: "--verbose"
+        action: "store_true"
+        help: "Show detailed output and stack traces"
+    
+    examples:
+      - "python build_system.py 'path/to/SYSTEM-CA-006.yaml'"
+      - "python build_system.py --provider openai 'path/to/SYSTEM-XX.yaml'"
+      - "python build_system.py --verbose 'path/to/SYSTEM-XX.yaml'"
+
+generated_output_structure:
+  backend_directory: "SYSTEM-XX/src/backend/"
+  required_files:
+    application:
+      - path: "app/__init__.py"
+        purpose: "Package initialization"
+      
+      - path: "app/main.py"
+        purpose: "FastAPI application with lifespan, CORS, routers"
+        must_include:
+          - "Import all feature routers"
+          - "Include routers with /api/v1/feature_name prefixes"
+          - "Health check endpoint"
+          - "System info endpoint"
+          - "Exception handlers"
+      
+      - path: "app/config.py"
+        purpose: "Pydantic Settings configuration"
+        must_include:
+          - "APP_NAME, ENVIRONMENT, DEBUG settings"
+          - "CORS_ORIGINS list"
+          - "DATABASE_URL"
+          - "HOST, PORT"
+          - "Feature-specific settings"
+    
+    routers:
+      - path: "app/api/__init__.py"
+      - path: "app/api/v1/__init__.py"
+      - path: "app/api/v1/{feature_name}.py"
+        count: "One per feature"
+        must_include:
+          - "APIRouter instance"
+          - "Import from feature_integration.py"
+          - "Dependency injection for feature classes"
+          - "RESTful endpoints"
+          - "Request/response models"
+    
+    database:
+      - path: "app/db/__init__.py"
+      - path: "app/db/session.py"
+        purpose: "Database session management"
+      - path: "app/db/base.py"
+        purpose: "SQLAlchemy Base and metadata"
+    
+    models:
+      - path: "app/models/__init__.py"
+      - path: "app/models/schemas.py"
+        purpose: "Pydantic schemas for requests/responses"
+      - path: "app/models/database.py"
+        purpose: "SQLAlchemy ORM models"
+    
+    services:
+      - path: "app/services/__init__.py"
+      - path: "app/services/{feature_name}_service.py"
+        count: "One per feature"
+        purpose: "Business logic wrapping feature integrations"
+    
+    deployment:
+      - path: "requirements.txt"
+        must_include:
+          - "fastapi>=0.104.0"
+          - "uvicorn[standard]>=0.24.0"
+          - "pydantic>=2.5.0"
+          - "pydantic-settings>=2.1.0"
+          - "sqlalchemy>=2.0.0"
+          - "asyncpg>=0.29.0"
+          - "python-dotenv>=1.0.0"
+          - "pytest>=7.4.0"
+          - "pytest-asyncio>=0.21.0"
+      
+      - path: ".env.example"
+        must_include:
+          - "All environment variables with descriptions"
+          - "Sensible defaults for development"
+      
+      - path: "docker-compose.dev.yml"
+        must_include:
+          - "Backend service with hot reload"
+          - "PostgreSQL service"
+          - "Redis service (if needed)"
+          - "Networks and volumes"
+    
+    testing:
+      - path: "tests/__init__.py"
+      - path: "tests/conftest.py"
+        purpose: "Pytest fixtures"
+      - path: "tests/test_health.py"
+        purpose: "Health endpoint tests"
+
+verification_checklist:
+  before_generation:
+    - "System YAML exists and is valid"
+    - "All feature_integration.py files found"
+    - "AI API key is set"
+  
+  after_generation:
+    - "All required files created"
+    - "No syntax errors in generated code"
+    - "Imports are resolvable"
+    - "main.py can be imported"
+    - "requirements.txt has all dependencies"
+  
+  system_level_tests:
+    - "FastAPI app initializes"
+    - "All routers are included"
+    - "Health endpoint responds"
+    - "OpenAPI docs accessible"
+    - "CORS configured correctly"
+  
+  acceptance_criteria:
+    description: "Validate all AC-SYS-XXX criteria from system YAML"
+    method: "Manual verification checklist in report"
+
+implementation_constraints:
+  must_follow:
+    - "EXACT same code structure as build_feature.py (623 lines → ~650 lines for system)"
+    - "Use AI Code Generator (AICodeGeneratorOrchestrator.ai_provider.generate_code)"
+    - "NO hardcoded templates or f-string generation"
+    - "Same print_header/print_step formatting"
+    - "Same error handling patterns"
+    - "Same dataclass structure"
+  
+  must_not:
+    - "Use template-based code generation"
+    - "Skip verification steps"
+    - "Generate only partial files"
+    - "Simplify the prompt"
+    - "Remove any methods from the pattern"
+
+success_criteria:
+  tool_quality:
+    - "Follows build_feature.py pattern exactly"
+    - "Generates complete backend system (10-15 files)"
+    - "All Python files are syntactically valid"
+    - "System can be started with uvicorn"
+  
+  reusability:
+    - "Can build any SYSTEM-XX.yaml"
+    - "Consistent output structure"
+    - "Comprehensive verification reporting"
+  
+  user_satisfaction:
+    - "User can run one command to build entire system"
+    - "System level testing included"
+    - "Acceptance criteria verification included"
+    - "Ready for future system builds"
+
+cleanup_required:
+  before_implementation:
+    - action: "Delete current simplified build_system.py"
+      path: "/workspaces/control_tower/build_system.py"
+      reason: "Does not follow requirements"
+    
+    - action: "Delete manually created files"
+      paths:
+        - "/workspaces/business_ventures/Causal_affect/SYSTEM-CA-006_feedback_iteration/src/backend/app/__init__.py"
+        - "/workspaces/business_ventures/Causal_affect/SYSTEM-CA-006_feedback_iteration/src/backend/app/config.py"
+        - "/workspaces/business_ventures/Causal_affect/SYSTEM-CA-006_feedback_iteration/src/backend/app/database.py"
+      reason: "Manually created, need AI-generated versions"
+    
+    - action: "Keep AI-generated main.py for reference"
+      path: "/workspaces/business_ventures/Causal_affect/SYSTEM-CA-006_feedback_iteration/src/backend/app/main.py"
+      reason: "Shows AI can generate good code, but incomplete because prompt was weak"
+
+review_checklist:
+  user_must_verify:
+    - "[ ] All required methods are listed"
+    - "[ ] Mapping from build_feature.py is clear"
+    - "[ ] Prompt building requirements are comprehensive"
+    - "[ ] JSON response parsing is specified"
+    - "[ ] System verification includes testing"
+    - "[ ] Acceptance criteria validation is included"
+    - "[ ] Output structure matches needs"
+    - "[ ] Cleanup steps are correct"
+  
+  questions_for_user:
+    - "Is the FeatureInfo dataclass complete?"
+    - "Is the _build_system_integration_prompt specification detailed enough?"
+    - "Should verification include actual pytest execution or just validation?"
+    - "Any additional files needed in generated output?"
+    - "Any missing verification steps?"
+
+next_steps:
+  after_approval:
+    - "1. Execute cleanup (delete simplified files)"
+    - "2. Create proper build_system.py following this spec exactly"
+    - "3. Test on SYSTEM-CA-006.yaml"
+    - "4. Verify complete backend generation (10-15 files)"
+    - "5. Start backend and verify it works"
+    - "6. Generate verification report"
+
+notes:
+  critical_learning: |
+    User explicitly stated: "I am going to need the system_build.py for future builds"
+    This means the tool MUST be:
+    - Reusable and robust
+    - Follow proven patterns (build_feature.py)
+    - Include comprehensive testing/verification
+    - NOT a quick hack or simplified version
+  
+  architecture_principle: |
+    The AI Code Generator architecture has hierarchy:
+    LAYERS → FEATURES → SYSTEMS → PROJECTS
+    
+    build_layer.py: Generates individual layer implementations
+    build_feature.py: Integrates layers into features ✅ EXISTS
+    build_system.py: Integrates features into systems ❌ NEEDED
+    build_project.py: Integrates systems into projects ⏳ FUTURE
