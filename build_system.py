@@ -145,7 +145,15 @@ class DesktopCLIArchitecture(SystemArchitecture):
         """Build CLI-specific prompt for feature integration."""
         feature_list = []
         for f in spec.features:
+            folder_name = f.feature_dir.name
             feature_list.append(f"- {f.feature_id}: {f.feature_name}")
+            feature_list.append(f"  Folder: {folder_name}")
+            
+            # Add FeatureConfig fields if available
+            if hasattr(f, 'config_fields') and f.config_fields:
+                feature_list.append(f"  FeatureConfig Fields:")
+                for field in f.config_fields:
+                    feature_list.append(f"    - {field}")
             
             # Add method signatures for each feature class
             if hasattr(f, 'methods_by_class'):
@@ -193,18 +201,50 @@ Files needed:
 4. src/utils.py - Helper functions (path handling, logging)
 5. config/settings.yaml - Configuration file
 
-Example import pattern:
+CRITICAL: config/settings.yaml must use the EXACT "FeatureConfig Fields" listed above.
+Do NOT invent new field names. Use the field names from each feature's FeatureConfig dataclass.
+
+Example config/settings.yaml structure:
+```yaml
+# Feature configurations - use EXACT field names from FeatureConfig
+data_reader:
+  schema_path: null
+  strict_validation: true
+  file_type: null
+  # ... use actual FeatureConfig fields listed above
+
+risk_aggregator:
+  # ... use actual FeatureConfig fields listed above
+```
+
+Example import and instantiation pattern:
 ```python
 import importlib.util
 from pathlib import Path
 
-def load_feature(feature_name):
-    path = Path(__file__).parent / feature_name / "src" / "feature_integration.py"
-    spec = importlib.util.spec_from_file_location(f"{{feature_name}}.integration", path)
+def load_feature_orchestrator(feature_folder_name):
+    # Load the feature module
+    path = Path(__file__).parent / feature_folder_name / "src" / "feature_integration.py"
+    spec = importlib.util.spec_from_file_location(f"{{feature_folder_name}}.integration", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.FeatureOrchestrator
+    return module
+
+# When loading features with config:
+for feature_key, folder_name in FEATURE_FOLDERS.items():
+    module = load_feature_orchestrator(folder_name)
+    feature_config_dict = config.get(feature_key, {{}})
+    
+    # FeatureConfig is a @dataclass - instantiate with **kwargs
+    if feature_config_dict and hasattr(module, 'FeatureConfig'):
+        feature_config = module.FeatureConfig(**feature_config_dict)
+        orchestrator = module.FeatureOrchestrator(feature_config)
+    else:
+        orchestrator = module.FeatureOrchestrator()
 ```
+
+CRITICAL: Use the "Folder" name listed above for each feature when constructing paths.
+The folder name includes BOTH the feature ID AND name (e.g., "FEATURE-003-001_Data_Reader_Parser").
 
 NO FastAPI code. NO web server. CLI application only.
 """
@@ -514,11 +554,13 @@ Return JSON with 'files' array containing path and content for each file.
             # Read feature code
             code = feature.integration_path.read_text(encoding='utf-8')
             
-            # Extract classes with their public methods
+            # Extract classes with their public methods and FeatureConfig fields
             classes = []
             methods_by_class = {}
+            config_fields = []
             current_class = None
             indent_level = 0
+            in_feature_config = False
             
             for line in code.split('\n'):
                 stripped = line.lstrip()
@@ -530,6 +572,14 @@ Return JSON with 'files' array containing path and content for each file.
                     classes.append(cls)
                     methods_by_class[cls] = []
                     indent_level = len(line) - len(stripped)
+                    in_feature_config = (cls == 'FeatureConfig')
+                
+                # Extract FeatureConfig field names (dataclass fields)
+                elif in_feature_config and ':' in stripped and '=' in stripped:
+                    # Look for pattern: field_name: Type = default
+                    field_line = stripped.split(':')[0].strip()
+                    if field_line and not field_line.startswith(('"""', '#', 'def', 'class')):
+                        config_fields.append(field_line)
                 
                 # Detect method definition (must be inside a class)
                 elif current_class and stripped.startswith('def '):
@@ -539,9 +589,11 @@ Return JSON with 'files' array containing path and content for each file.
                         # Only include public methods
                         if not method_name.startswith('_'):
                             methods_by_class[current_class].append(method_name)
+                    in_feature_config = False  # Left FeatureConfig class
             
             feature.classes = classes
             feature.methods_by_class = methods_by_class
+            feature.config_fields = config_fields
             
             # Show summary
             for cls in classes:

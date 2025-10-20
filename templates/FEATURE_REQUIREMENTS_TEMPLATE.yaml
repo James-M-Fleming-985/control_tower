@@ -14,6 +14,8 @@
 metadata:
   requirement_id: "FEATURE-XXX-XXX"
   requirement_name: "[Feature Name]"
+  feature_id: "FEATURE-XXX-XXX"  # Required by build_feature.py
+  feature_name: "[Feature Name]"  # Required by build_feature.py
   feature_code: "[SHORT_CODE]"
   version: "1.0.0"
   status: "Active"
