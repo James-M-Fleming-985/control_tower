@@ -30,6 +30,80 @@ if str(project_004_src) not in sys.path:
     sys.path.insert(0, str(project_004_src))
 
 
+def extract_code_constraints(requirements: Dict) -> Dict:
+    """
+    Extract code_generation_constraints from layer requirements YAML.
+    Returns empty dict if not present - backwards compatible.
+    """
+    return requirements.get('code_generation_constraints', {})
+
+
+def extract_feature_constraints(requirements: Dict) -> Dict:
+    """
+    Extract feature_integration_constraints from feature requirements YAML.
+    Returns empty dict if not present - backwards compatible.
+    """
+    return requirements.get('feature_integration_constraints', {})
+
+
+def format_constraints(constraints: Dict) -> str:
+    """
+    Format constraints dictionary into readable prompt text.
+    Returns empty string if no constraints - backwards compatible.
+    """
+    if not constraints:
+        return ""
+    
+    sections = []
+    for section, rules in constraints.items():
+        # Format section header (convert snake_case to TITLE CASE)
+        section_title = section.upper().replace('_', ' ')
+        sections.append(f"\n{section_title}:")
+        
+        # Add each rule with bullet point
+        if isinstance(rules, list):
+            for rule in rules:
+                sections.append(f"  - {rule}")
+        elif isinstance(rules, dict):
+            # Handle nested structure
+            for key, value in rules.items():
+                sections.append(f"  {key}: {value}")
+    
+    return "\n".join(sections)
+
+
+def clean_generated_code(code: str) -> str:
+    """
+    Remove common AI output formatting issues.
+    Safe for all architectures - just fixes obvious problems.
+    
+    Fixes:
+    - Markdown code fences (```python ... ```)
+    - Extra leading/trailing whitespace
+    """
+    if not code:
+        return code
+    
+    # Strip markdown fences
+    lines = code.split('\n')
+    
+    # Remove first line if it's a code fence
+    if lines and lines[0].strip().startswith('```'):
+        lines = lines[1:]
+    
+    # Remove last line if it's a code fence
+    if lines and lines[-1].strip() == '```':
+        lines = lines[:-1]
+    
+    # Rejoin and normalize whitespace
+    cleaned = '\n'.join(lines)
+    
+    # Remove excessive leading/trailing whitespace but preserve structure
+    cleaned = cleaned.strip() + '\n'  # Ensure single trailing newline
+    
+    return cleaned
+
+
 def extract_class_methods(python_file_path: Path) -> Dict[str, List[str]]:
     """
     Extract public methods from classes in a Python file.
@@ -107,11 +181,17 @@ def standardize_layer_folder_name(layer_id: str, layer_name: str) -> str:
         >>> standardize_layer_folder_name("LAYER-001-002-003", "Data-Model Validator")
         'LAYER_001_002_003_Data_Model_Validator'
     """
+    import re
+    
     # Replace hyphens with underscores in ID
     clean_id = layer_id.replace('-', '_')
     
-    # Replace spaces and hyphens with underscores in name
+    # Replace spaces and hyphens with underscores in name, remove other special chars
     clean_name = layer_name.replace(' ', '_').replace('-', '_')
+    
+    # Remove or replace other special characters that are invalid in Python identifiers
+    # Keep only alphanumeric and underscores
+    clean_name = re.sub(r'[^a-zA-Z0-9_]', '', clean_name)
     
     return f"{clean_id}_{clean_name}"
 
@@ -309,11 +389,23 @@ Generate the complete layer requirements YAML now:"""
     if "```yaml" in response:
         start = response.find("```yaml") + 7
         end = response.rfind("```")
-        response = response[start:end].strip()
+        if end > start:  # Found closing marker
+            response = response[start:end].strip()
+        else:  # No closing marker (truncated), take everything after opening
+            response = response[start:].strip()
     elif "```" in response:
         start = response.find("```") + 3
         end = response.rfind("```")
-        response = response[start:end].strip()
+        if end > start:  # Found closing marker
+            response = response[start:end].strip()
+        else:  # No closing marker (truncated), take everything after opening
+            response = response[start:].strip()
+    
+    # If response is still empty or too short, there's a problem
+    if not response or len(response) < 100:
+        if verbose:
+            print(f"   ⚠️  WARNING: Extracted YAML is too short ({len(response)} chars)")
+            print(f"   Raw response length: {len(response)} chars")
     
     return response
 
@@ -610,6 +702,31 @@ For the actual layers in this feature, use these folder names:
 Generate the complete feature_integration.py module now:
 """
         
+        # Phase 2: Inject feature integration constraints if present
+        feature_reqs = spec.layers[0].requirements if spec.layers else {}
+        
+        # Try to get constraints from feature-level requirements
+        # (assuming feature metadata is passed through spec somehow)
+        # For now, check if any layer has feature_integration_constraints
+        constraints = {}
+        for layer in spec.layers:
+            if 'feature_integration_constraints' in layer.requirements:
+                constraints = extract_feature_constraints(layer.requirements)
+                break
+        
+        if constraints:
+            prompt += f"""
+
+═══════════════════════════════════════════
+CRITICAL CODE GENERATION CONSTRAINTS
+═══════════════════════════════════════════
+{format_constraints(constraints)}
+
+YOU MUST FOLLOW THESE CONSTRAINTS EXACTLY.
+DO NOT DEVIATE FROM THESE RULES.
+═══════════════════════════════════════════
+"""
+        
         return prompt
     
     def _generate_layer_import_examples(self, layers: List[LayerInfo]) -> str:
@@ -672,6 +789,9 @@ Generate the complete feature_integration.py module now:
             if not code:
                 print("  ❌ Failed to extract code from AI response")
                 return False
+            
+            # Phase 4: Auto-fix common AI output issues (safe for all architectures)
+            code = clean_generated_code(code)
             
             # Save to feature directory
             output_path = spec.feature_dir / "src" / "feature_integration.py"

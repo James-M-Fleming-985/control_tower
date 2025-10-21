@@ -31,6 +31,72 @@ if str(project_004_src) not in sys.path:
     sys.path.insert(0, str(project_004_src))
 
 
+def extract_system_constraints(requirements: Dict) -> Dict:
+    """
+    Extract system_integration_constraints from system requirements YAML.
+    Returns empty dict if not present - backwards compatible.
+    """
+    return requirements.get('system_integration_constraints', {})
+
+
+def format_constraints(constraints: Dict) -> str:
+    """
+    Format constraints dictionary into readable prompt text.
+    Returns empty string if no constraints - backwards compatible.
+    """
+    if not constraints:
+        return ""
+    
+    sections = []
+    for section, rules in constraints.items():
+        # Format section header (convert snake_case to TITLE CASE)
+        section_title = section.upper().replace('_', ' ')
+        sections.append(f"\n{section_title}:")
+        
+        # Add each rule with bullet point
+        if isinstance(rules, list):
+            for rule in rules:
+                sections.append(f"  - {rule}")
+        elif isinstance(rules, dict):
+            # Handle nested structure
+            for key, value in rules.items():
+                sections.append(f"  {key}: {value}")
+    
+    return "\n".join(sections)
+
+
+def clean_generated_code(code: str) -> str:
+    """
+    Remove common AI output formatting issues.
+    Safe for all architectures - just fixes obvious problems.
+    
+    Fixes:
+    - Markdown code fences (```python ... ```)
+    - Extra leading/trailing whitespace
+    """
+    if not code:
+        return code
+    
+    # Strip markdown fences
+    lines = code.split('\n')
+    
+    # Remove first line if it's a code fence
+    if lines and lines[0].strip().startswith('```'):
+        lines = lines[1:]
+    
+    # Remove last line if it's a code fence
+    if lines and lines[-1].strip() == '```':
+        lines = lines[:-1]
+    
+    # Rejoin and normalize whitespace
+    cleaned = '\n'.join(lines)
+    
+    # Remove excessive leading/trailing whitespace but preserve structure
+    cleaned = cleaned.strip() + '\n'  # Ensure single trailing newline
+    
+    return cleaned
+
+
 @dataclass
 class FeatureInfo:
     """Information about a built feature."""
@@ -127,6 +193,23 @@ Files needed:
 Each router: 2-3 endpoints, in-memory list/dict storage, minimal logic.
 NO verbose docstrings. NO comments. Just working code.
 """
+        
+        # Phase 2: Inject system integration constraints if present
+        constraints = extract_system_constraints(spec.system_requirements)
+        
+        if constraints:
+            prompt += f"""
+
+═══════════════════════════════════════════
+CRITICAL CODE GENERATION CONSTRAINTS
+═══════════════════════════════════════════
+{format_constraints(constraints)}
+
+YOU MUST FOLLOW THESE CONSTRAINTS EXACTLY.
+DO NOT DEVIATE FROM THESE RULES.
+═══════════════════════════════════════════
+"""
+        
         return prompt
     
     def get_file_structure(self) -> str:
@@ -248,6 +331,23 @@ The folder name includes BOTH the feature ID AND name (e.g., "FEATURE-003-001_Da
 
 NO FastAPI code. NO web server. CLI application only.
 """
+        
+        # Phase 2: Inject system integration constraints if present
+        constraints = extract_system_constraints(spec.system_requirements)
+        
+        if constraints:
+            prompt += f"""
+
+═══════════════════════════════════════════
+CRITICAL CODE GENERATION CONSTRAINTS
+═══════════════════════════════════════════
+{format_constraints(constraints)}
+
+YOU MUST FOLLOW THESE CONSTRAINTS EXACTLY.
+DO NOT DEVIATE FROM THESE RULES.
+═══════════════════════════════════════════
+"""
+        
         return prompt
     
     def get_file_structure(self) -> str:
@@ -465,7 +565,13 @@ Return JSON with 'files' array containing path and content for each file.
         for file_spec in result['files']:
             file_path = backend_dir / file_spec['path']
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(file_spec['content'], encoding='utf-8')
+            
+            # Phase 4: Auto-fix common AI output issues for Python files
+            content = file_spec['content']
+            if file_path.suffix == '.py':
+                content = clean_generated_code(content)
+            
+            file_path.write_text(content, encoding='utf-8')
             files_created.append(file_spec['path'])
             self.print_step("✓", f"Created: {file_spec['path']}")
         
@@ -760,7 +866,11 @@ Return JSON with 'files' array containing path and content for each file.
                 backend_dir = spec.system_dir / self.architecture.get_file_structure()
                 backend_dir.mkdir(parents=True, exist_ok=True)
                 main_file = "main.py" if isinstance(self.architecture, FastAPIArchitecture) else "generate_report.py"
-                (backend_dir / main_file).write_text(response, encoding='utf-8')
+                
+                # Phase 4: Auto-fix common AI output issues
+                content = clean_generated_code(response)
+                
+                (backend_dir / main_file).write_text(content, encoding='utf-8')
                 self.print_step("✓", f"Created basic {main_file}")
                 return True
             
@@ -770,7 +880,13 @@ Return JSON with 'files' array containing path and content for each file.
             for file_spec in result['files']:
                 file_path = backend_dir / file_spec['path']
                 file_path.parent.mkdir(parents=True, exist_ok=True)
-                file_path.write_text(file_spec['content'], encoding='utf-8')
+                
+                # Phase 4: Auto-fix common AI output issues for Python files
+                content = file_spec['content']
+                if file_path.suffix == '.py':
+                    content = clean_generated_code(content)
+                
+                file_path.write_text(content, encoding='utf-8')
                 files_created += 1
                 self.print_step("✓", f"Created: {file_spec['path']}")
             
