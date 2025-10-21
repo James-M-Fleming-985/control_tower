@@ -357,5 +357,59 @@ feature_level_verification:
       required: true
 
 # ====================================================================================
+# FEATURE INTEGRATION CODE CONSTRAINTS - For feature_integration.py generation
+# ====================================================================================
+# These constraints apply when AI generates the feature_integration.py file that
+# orchestrates all layers. Critical for preventing method name mismatches.
+# ====================================================================================
+feature_integration_constraints:
+  
+  # Output Format Rules
+  output_format:
+    - "Return ONLY raw Python code for feature_integration.py"
+    - "NO markdown code fences (```python or ```)"
+    - "File must start with import statements"
+    - "File must be directly executable Python"
+  
+  # Layer Method Usage - CRITICAL: Prevents calling non-existent methods
+  layer_api_usage:
+    - "ONLY call methods that exist in the actual layer implementations"
+    - "Layer method names will be provided in: 'Available Layer Methods' section"
+    - "DO NOT invent method names like validate_strict, process_all, etc."
+    - "DO NOT create variations of listed methods"
+    - "Use EXACT method names from layer implementations"
+    - "If unsure, refer back to Available Layer Methods list"
+  
+  # Config Field Usage - CRITICAL: Prevents config instantiation errors
+  config_field_usage:
+    - "FeatureConfig dataclass fields will be listed in generation prompt"
+    - "ONLY use field names from the provided FeatureConfig field list"
+    - "DO NOT invent new config fields"
+    - "Field names must match EXACTLY (case-sensitive)"
+    - "settings.yaml must use same field names as FeatureConfig dataclass"
+  
+  # Standard Class Names - Ensures consistency across features
+  naming_conventions:
+    - "Main orchestrator class MUST be named: FeatureOrchestrator"
+    - "Config class MUST be named: FeatureConfig (using @dataclass)"
+    - "Response class MUST be named: FeatureResponse"
+    - "Status enum SHOULD be named: ResponseStatus"
+  
+  # Import Requirements
+  import_completeness:
+    - "Import ALL layer implementation modules"
+    - "Import ALL types used in type hints (Tuple, Dict, List, Optional, Any, Union)"
+    - "Import dataclasses decorator: from dataclasses import dataclass"
+    - "Import Enum if using response status enums"
+  
+  # Code Quality
+  quality_requirements:
+    - "Complete implementation - NO stub methods"
+    - "Proper error handling with try/except where appropriate"
+    - "Return FeatureResponse objects with proper status and data"
+    - "Initialize all layers in __init__ method"
+    - "NO placeholder TODOs or FIXME comments"
+
+# ====================================================================================
 # END OF FEATURE REQUIREMENTS INDEX
 # ====================================================================================

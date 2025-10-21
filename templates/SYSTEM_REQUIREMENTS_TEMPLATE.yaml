@@ -1622,3 +1622,84 @@ risks:
   - risk: "Dashboard may become overwhelming with many MVPs"
     mitigation: "Filtering, search, grouping, summary views"
     severity: low
+
+# ====================================================================================
+# SYSTEM INTEGRATION CODE CONSTRAINTS - For generate_*.py and settings.yaml
+# ====================================================================================
+# These constraints apply when AI generates system integration code that loads and
+# orchestrates all features. Critical for CLI/Desktop applications.
+# ====================================================================================
+system_integration_constraints:
+  
+  # Output Format Rules
+  output_format:
+    - "Return ONLY raw Python code - NO markdown code fences"
+    - "generate_*.py must be directly executable"
+    - "settings.yaml must be valid YAML (no code fences)"
+  
+  # Feature Loading - CRITICAL for CLI architectures
+  feature_loading:
+    - "Use importlib for dynamic feature module loading"
+    - "Feature folder names will be provided - use EXACT names for imports"
+    - "Handle import errors gracefully with try/except"
+    - "Log successful and failed feature loads"
+  
+  # Config Instantiation - CRITICAL: Prevents 'unexpected keyword argument' errors
+  config_instantiation:
+    - "FeatureConfig field names will be provided for each feature"
+    - "settings.yaml MUST use EXACT field names from each FeatureConfig dataclass"
+    - "For @dataclass configs: use Config(**config_dict) with ** unpacking"
+    - "For Pydantic configs: can use Config(**config_dict) OR Config.parse_obj(config_dict)"
+    - "DO NOT invent config field names - use provided list ONLY"
+  
+  # Architecture-Specific Patterns
+  architecture_patterns:
+    cli_desktop:
+      - "Use @dataclass for FeatureConfig (requires **kwargs unpacking)"
+      - "Load settings from YAML file"
+      - "Manual feature instantiation with importlib"
+      - "Config validation happens at feature __init__"
+    
+    fastapi_web:
+      - "Use Pydantic BaseSettings for configs (auto-validates)"
+      - "Can load from .env or settings files"
+      - "Dependency injection for feature loading"
+      - "Config validation automatic at instantiation"
+  
+  # Response Handling - Prevents API invention
+  response_handling:
+    - "FeatureResponse has: status, data, errors, warnings, metadata"
+    - "ResponseStatus is an Enum with values: SUCCESS, ERROR, WARNING, PARTIAL_SUCCESS"
+    - "Check status with: response.status == ResponseStatus.SUCCESS"
+    - "DO NOT call response.status.is_success() - method doesn't exist"
+    - "DO NOT access response.status.message - use response.status.value"
+  
+  # Import Requirements
+  import_completeness:
+    - "Import: import importlib.util for dynamic loading"
+    - "Import: from pathlib import Path"
+    - "Import: from typing import Dict, Any, Optional"
+    - "Import: import yaml or from ruamel.yaml import YAML"
+    - "Import: import logging for logging setup"
+  
+  # Error Handling
+  error_handling:
+    - "Wrap feature loading in try/except to handle missing features"
+    - "Log errors but continue loading other features"
+    - "Provide clear error messages with feature names"
+    - "Exit gracefully if critical features fail to load"
+  
+  # Configuration File Structure
+  settings_yaml_structure:
+    - "One section per feature using feature short names"
+    - "Each section contains FeatureConfig fields for that feature"
+    - "Global settings in top-level 'global' or 'system' section"
+    - "Use exact field names from FeatureConfig dataclasses"
+    - "Example:"
+    - |
+        data_reader:
+          input_file: "data.yaml"
+          validate_schema: true
+        risk_aggregator:
+          risk_file_paths: ["risks.json"]
+          severity_threshold: "medium"

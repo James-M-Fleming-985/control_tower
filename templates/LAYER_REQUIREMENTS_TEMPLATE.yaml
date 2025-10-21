@@ -291,6 +291,61 @@ deployment:
     result = reader.[method_name](param)
 
 # ================================================================================
+# CODE GENERATION CONSTRAINTS - CRITICAL for AI Code Generation Quality
+# ================================================================================
+# These constraints MUST be followed when AI generates implementation code
+# Violations will cause runtime errors and integration failures
+# ================================================================================
+code_generation_constraints:
+  
+  # Output Format Rules - Prevents markdown wrapping
+  output_format:
+    - "Return ONLY raw Python code - NO explanations or commentary"
+    - "NO markdown code fences (```python or ```)"
+    - "First line MUST be valid Python (import statement, class definition, or function)"
+    - "Last line MUST be valid Python code (NOT a closing markdown fence)"
+    - "File must be directly executable without any preprocessing"
+  
+  # API Usage Rules - Prevents method invention
+  api_usage:
+    - "ONLY call methods that are explicitly defined in this layer's interface"
+    - "DO NOT invent method variations, aliases, or similar names"
+    - "Use EXACT method names as specified in requirements"
+    - "If a method is not listed in the interface, DO NOT create or call it"
+    - "Method signatures must match exactly (parameter names, types, return types)"
+  
+  # Import Completeness Rules - Prevents missing imports
+  import_completeness:
+    - "Import ALL types used in type hints (Dict, List, Optional, Tuple, Any, Union, etc.)"
+    - "Import ALL third-party libraries before use"
+    - "Import ALL standard library modules before use"
+    - "Verify all imported names are actually used in the code"
+    - "Remove unused imports to maintain clean code"
+  
+  # Naming Convention Rules - Ensures consistency
+  naming_conventions:
+    - "Primary class name MUST match the layer name or be clearly related"
+    - "Use descriptive, unambiguous names for methods and variables"
+    - "Follow PEP 8 naming conventions (snake_case for functions, PascalCase for classes)"
+    - "Avoid generic names like 'process', 'handle', 'do' without context"
+  
+  # Code Quality Rules - Prevents stub/placeholder code
+  quality_requirements:
+    - "NO stub implementations (pass statements without logic)"
+    - "NO placeholder comments like TODO, FIXME, NOT IMPLEMENTED"
+    - "NO fake/mock data unless explicitly required for testing"
+    - "ALL methods must have complete, working implementations"
+    - "Code must be production-ready, not a prototype"
+  
+  # Validation Requirements - Ensures code correctness
+  validation_requirements:
+    - "Code MUST be syntactically valid Python 3.10+"
+    - "All referenced attributes MUST exist on their objects"
+    - "All method calls MUST match actual method signatures"
+    - "Type hints must be accurate and complete"
+    - "Code must pass basic static analysis (no obvious errors)"
+
+# ================================================================================
 # NOTES - Additional context, gotchas, or important information
 # ================================================================================
 notes: |
