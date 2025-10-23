@@ -117,6 +117,7 @@ class SystemIntegrationSpec:
     acceptance_criteria: List[Dict[str, Any]]
     tech_stack: Dict[str, Any]
     deployment_config: Dict[str, Any]
+    system_requirements: Dict[str, Any]  # Full system requirements for constraint extraction
 
 
 class SystemArchitecture:
@@ -965,7 +966,8 @@ Return JSON with 'files' array containing path and content for each file.
                 features=enriched,
                 acceptance_criteria=self.system_spec.get('acceptance_criteria', []),
                 tech_stack=self.system_spec.get('technology_stack', {}),
-                deployment_config=self.system_spec.get('deployment', {})
+                deployment_config=self.system_spec.get('deployment', {}),
+                system_requirements=self.system_spec  # Pass full spec for constraints
             )
             
             # Select architecture strategy based on deployment model
