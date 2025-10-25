@@ -12,10 +12,18 @@ load_dotenv()
 
 app = FastAPI(title="Anonymous Feedback Collector API")
 
-# CORS configuration
+# CORS configuration - allow frontend domains
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    os.getenv("FRONTEND_URL", ""),  # Production frontend URL
+]
+# Filter out empty strings
+allowed_origins = [origin for origin in allowed_origins if origin]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
