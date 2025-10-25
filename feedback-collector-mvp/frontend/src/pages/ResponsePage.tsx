@@ -116,40 +116,9 @@ const ResponsePage: React.FC = () => {
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
             margin: 0,
-            letterSpacing: '-0.02em',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0'
+            letterSpacing: '-0.02em'
           }}>
-            Feedback
-            <span style={{ 
-              position: 'relative',
-              display: 'inline-flex',
-              alignItems: 'center',
-              marginLeft: '0.1em'
-            }}>
-              36
-              <span style={{
-                display: 'inline-block',
-                width: '0.55em',
-                height: '0.55em',
-                border: '0.08em solid currentColor',
-                borderRadius: '50%',
-                position: 'relative',
-                marginLeft: '-0.05em'
-              }}>
-                <span style={{
-                  position: 'absolute',
-                  top: '-0.12em',
-                  right: '-0.12em',
-                  width: '0.2em',
-                  height: '0.2em',
-                  borderTop: '0.08em solid currentColor',
-                  borderRight: '0.08em solid currentColor',
-                  transform: 'rotate(45deg)'
-                }}></span>
-              </span>
-            </span>
+            Feedback360°
           </h1>
         </div>
       </header>

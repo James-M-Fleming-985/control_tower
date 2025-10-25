@@ -1,0 +1,10 @@
+api_key: abc123def456ghi789jkl
+app_name: My SaaS App
+environment: production
+enable_debug: false
+track_sessions: true
+save_events: true
+output_dir: src/analytics
+generated_at: '2025-10-24T18:04:08.087858'
+requirement: FitTrack Calculator landing page with hero section and calculator features
+  grid

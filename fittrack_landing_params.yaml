@@ -1,0 +1,21 @@
+component_name: "FitTrackLanding"
+brand_name: "FitTrack Calculator"
+hero_title: "Calculate Your Perfect Macro Split in 30 Seconds"
+hero_subtitle: "Science-based calculators for macros, TDEE, sleep, and hydration. Get personalized recommendations to reach your fitness goals."
+cta_text: "Try Free Calculator"
+cta_secondary_text: "Learn More"
+include_email_capture: false
+
+features:
+  - title: "Macro Calculator"
+    description: "Personalized macronutrient recommendations based on your goals, activity level, and body composition."
+    icon: "⚡"
+  - title: "TDEE Calculator"
+    description: "Calculate your Total Daily Energy Expenditure to understand your calorie needs."
+    icon: "🔥"
+  - title: "Sleep Calculator"
+    description: "Optimize your sleep duration and quality for better recovery and performance."
+    icon: "😴"
+  - title: "Hydration Calculator"
+    description: "Daily water intake recommendations based on your weight, activity, and climate."
+    icon: "💧"

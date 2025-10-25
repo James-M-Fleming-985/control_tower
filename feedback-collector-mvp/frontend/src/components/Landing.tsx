@@ -1,12 +1,221 @@
 import React from 'react';
 import Hero from './Hero';
 import Features from './Features';
+import { trackCheckoutStarted } from '../analytics/events';
 
 const Landing: React.FC = () => {
   return (
     <div style={{ minHeight: '100vh' }}>
       <Hero />
       <Features />
+      
+      {/* Pricing Section */}
+      <section style={{
+        padding: '5rem 2rem',
+        backgroundColor: '#f9fafb'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              color: '#111827',
+              marginBottom: '1rem'
+            }}>
+              Simple, Transparent Pricing
+            </h2>
+            <p style={{
+              fontSize: '1.2rem',
+              color: '#6b7280'
+            }}>
+              Start free, upgrade when you're ready
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '2rem',
+            maxWidth: '900px',
+            margin: '0 auto'
+          }}>
+            {/* Free Tier */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '2px solid #e5e7eb',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#111827',
+                marginBottom: '0.5rem'
+              }}>
+                Free
+              </h3>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <span style={{
+                  fontSize: '3rem',
+                  fontWeight: 'bold',
+                  color: '#111827'
+                }}>
+                  £0
+                </span>
+                <span style={{ color: '#6b7280' }}>/month</span>
+              </div>
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                marginBottom: '2rem'
+              }}>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 3 requests per month</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Up to 5 recipients each</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 100% anonymous responses</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Email notifications</li>
+              </ul>
+              <a href="/request" style={{
+                display: 'block',
+                textAlign: 'center',
+                padding: '0.75rem',
+                backgroundColor: '#f3f4f6',
+                color: '#111827',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: '600',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+              >
+                Get Started Free
+              </a>
+            </div>
+
+            {/* Pro Tier - Featured */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '3px solid #3b82f6',
+              boxShadow: '0 4px 12px rgba(59,130,246,0.2)',
+              position: 'relative'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '-12px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                color: 'white',
+                padding: '0.25rem 1rem',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
+                fontWeight: 'bold'
+              }}>
+                MOST POPULAR
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#111827',
+                marginBottom: '0.5rem'
+              }}>
+                Pro
+              </h3>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <span style={{
+                  fontSize: '3rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  £9.99
+                </span>
+                <span style={{ color: '#6b7280' }}>/month</span>
+              </div>
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                marginBottom: '2rem'
+              }}>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> requests</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> recipients</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Custom prompts & questions</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Dashboard with analytics</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Export to PDF/CSV</li>
+                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Priority support</li>
+              </ul>
+              <button
+                onClick={async () => {
+                  trackCheckoutStarted('pro');
+                  
+                  try {
+                    const response = await fetch('/api/stripe/create-checkout-session', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        customer_email: '', // Will be collected in Stripe Checkout
+                      }),
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Failed to create checkout session');
+                    }
+                    
+                    const { checkout_url } = await response.json();
+                    window.location.href = checkout_url;
+                  } catch (error) {
+                    console.error('Checkout error:', error);
+                    alert('Unable to start checkout. Please try again.');
+                  }
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'center',
+                  padding: '0.75rem',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                  color: 'white',
+                  borderRadius: '8px',
+                  border: 'none',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59,130,246,0.4)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(59,130,246,0.3)';
+                }}
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+
+          <div style={{
+            textAlign: 'center',
+            marginTop: '3rem',
+            color: '#6b7280',
+            fontSize: '0.95rem'
+          }}>
+            <p>All plans include 100% anonymous responses and secure data handling. Cancel anytime.</p>
+          </div>
+        </div>
+      </section>
       
       {/* CTA Section with Gradient */}
       <section style={{

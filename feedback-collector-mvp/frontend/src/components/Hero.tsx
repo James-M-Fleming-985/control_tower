@@ -27,40 +27,9 @@ export const Hero: React.FC = () => {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               letterSpacing: '-0.02em',
-              marginBottom: '0',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0'
+              marginBottom: '0'
             }}>
-              Feedback
-              <span style={{ 
-                position: 'relative',
-                display: 'inline-flex',
-                alignItems: 'center',
-                marginLeft: '0.1em'
-              }}>
-                36
-                <span style={{
-                  display: 'inline-block',
-                  width: '0.6em',
-                  height: '0.6em',
-                  border: '0.08em solid currentColor',
-                  borderRadius: '50%',
-                  position: 'relative',
-                  marginLeft: '-0.05em'
-                }}>
-                  <span style={{
-                    position: 'absolute',
-                    top: '-0.15em',
-                    right: '-0.15em',
-                    width: '0.25em',
-                    height: '0.25em',
-                    borderTop: '0.08em solid currentColor',
-                    borderRight: '0.08em solid currentColor',
-                    transform: 'rotate(45deg)'
-                  }}></span>
-                </span>
-              </span>
+              Feedback360°
             </h1>
           </div>
 

@@ -1,0 +1,10 @@
+project_token: abc123def456ghi789
+app_name: My SaaS App
+environment: production
+enable_debug: false
+track_pageviews: true
+persistence_type: localStorage
+output_dir: src/analytics
+generated_at: '2025-10-24T18:04:08.078331'
+requirement: FitTrack Calculator landing page with hero section and calculator features
+  grid
