@@ -16,7 +16,7 @@ app = FastAPI(title="Anonymous Feedback Collector API")
 allowed_origins = [
     "http://localhost:3000",
     "http://localhost:5173",
-    "https://feedback360-production.vercel.app",
+    "https://frontend-b24kitgwi-james-flemings-projects.vercel.app",
     "https://*.vercel.app",  # Allow Vercel preview deployments
     os.getenv("FRONTEND_URL", ""),  # Additional frontend URL from env
 ]

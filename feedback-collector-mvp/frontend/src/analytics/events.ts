@@ -1,11 +1,6 @@
 // Analytics event tracking
 // Integrate with Mixpanel, GA4, and Amplitude
 
-interface AnalyticsEvent {
-  event: string;
-  properties?: Record<string, any>;
-}
-
 class Analytics {
   // Track event to all analytics providers
   track(event: string, properties?: Record<string, any>) {
