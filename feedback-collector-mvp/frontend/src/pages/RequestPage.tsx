@@ -53,13 +53,33 @@ const RequestPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // TODO: API call to create feedback request and send emails
-      console.log('Sending feedback request:', { context, mode, emails, customMessage });
-      alert('Success! Invitations sent to ' + emails.length + ' recipient(s)');
+      const response = await fetch('/api/feedback/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipient_emails: emails,
+          context: context,
+          mode: mode,
+          custom_message: customMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send feedback requests');
+      }
+
+      const data = await response.json();
+      console.log('Feedback request created:', data);
+      
+      alert(`Success! Feedback invitations sent to ${emails.length} recipient(s)`);
+      
       // Reset form
       setEmails([]);
       setCustomMessage('');
     } catch (error) {
+      console.error('Error sending feedback request:', error);
       alert('Failed to send invitations. Please try again.');
     } finally {
       setIsSubmitting(false);

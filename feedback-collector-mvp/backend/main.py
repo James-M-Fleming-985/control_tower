@@ -6,6 +6,7 @@ from typing import List, Optional
 import os
 from dotenv import load_dotenv
 from app.routers.stripe_router import router as stripe_router
+from app.routers.feedback_router import router as feedback_router
 
 # Load environment variables
 load_dotenv()
@@ -33,6 +34,9 @@ app.add_middleware(
 
 # Stripe routes (checkout, webhook, portal)
 app.include_router(stripe_router, prefix="/api/stripe")
+
+# Feedback routes (requests, responses)
+app.include_router(feedback_router, prefix="/api/feedback")
 
 # In-memory storage (replace with database in production)
 feedback_storage: List[dict] = []
