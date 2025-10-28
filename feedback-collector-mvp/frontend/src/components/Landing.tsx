@@ -3,80 +3,127 @@ import Hero from './Hero';
 import Features from './Features';
 import { trackCheckoutStarted } from '../analytics/events';
 import { apiUrl } from '../config/api';
+import { designSystem } from '../design/system';
 
 const Landing: React.FC = () => {
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div style={{ 
+      minHeight: '100vh',
+      backgroundColor: designSystem.colors.gray[50]
+    }}>
       <Hero />
       <Features />
       
       {/* Pricing Section */}
       <section style={{
-        padding: '5rem 2rem',
-        backgroundColor: '#f9fafb'
+        padding: '6rem 2rem',
+        backgroundColor: 'white'
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '1rem'
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: designSystem.typography.fontWeight.bold,
+              color: designSystem.colors.gray[900],
+              marginBottom: '1rem',
+              fontFamily: designSystem.typography.fontFamily.display.join(', ')
             }}>
-              Simple, Transparent Pricing
+              Choose Your{' '}
+              <span style={{
+                background: `linear-gradient(135deg, ${designSystem.colors.primary[600]} 0%, ${designSystem.colors.secondary[600]} 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Growth Plan
+              </span>
             </h2>
             <p style={{
-              fontSize: '1.2rem',
-              color: '#6b7280'
+              fontSize: designSystem.typography.fontSize.xl,
+              color: designSystem.colors.gray[600],
+              maxWidth: '36rem',
+              margin: '0 auto'
             }}>
-              Start free, upgrade when you're ready
+              Flexible pricing that scales with your feedback collection needs
             </p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '2rem',
-            maxWidth: '900px',
-            margin: '0 auto'
+            maxWidth: '1200px',
+            margin: '0 auto',
+            alignItems: 'stretch'
           }}>
-            {/* Free Tier */}
+            {/* Free Tier - Prompt Responses */}
             <div style={{
               backgroundColor: 'white',
               padding: '2rem',
               borderRadius: '12px',
-              border: '2px solid #e5e7eb',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              border: `2px solid ${designSystem.colors.gray[200]}`,
+              transition: 'all 0.2s ease',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
             }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#111827',
-                marginBottom: '0.5rem'
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem'
               }}>
-                Free
-              </h3>
-              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  backgroundColor: designSystem.colors.gray[100],
+                  borderRadius: designSystem.borderRadius.lg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '1.25rem' }}>🎯</span>
+                </div>
+                <h3 style={{
+                  fontSize: designSystem.typography.fontSize['2xl'],
+                  fontWeight: designSystem.typography.fontWeight.bold,
+                  color: designSystem.colors.gray[900],
+                  margin: 0
+                }}>
+                  Starter
+                </h3>
+              </div>
+              <div style={{ marginBottom: '2rem' }}>
                 <span style={{
-                  fontSize: '3rem',
-                  fontWeight: 'bold',
-                  color: '#111827'
+                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                  fontWeight: designSystem.typography.fontWeight.bold,
+                  color: designSystem.colors.gray[900]
                 }}>
                   £0
                 </span>
-                <span style={{ color: '#6b7280' }}>/month</span>
+                <span style={{ 
+                  color: designSystem.colors.gray[600],
+                  fontSize: designSystem.typography.fontSize.lg
+                }}>
+                  /month
+                </span>
               </div>
-              <ul style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: 0,
-                marginBottom: '2rem'
-              }}>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 3 requests per month</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Up to 5 recipients each</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 100% anonymous responses</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Email notifications</li>
-              </ul>
+              <div style={{ flex: 1 }}>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  marginBottom: '2rem'
+                }}>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 3 feedback requests per month</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Up to 5 recipients each</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Prompt-based responses</strong></li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Selected answer options</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Basic analytics</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Email notifications</li>
+                </ul>
+              </div>
               <a href="/request" style={{
                 display: 'block',
                 textAlign: 'center',
@@ -86,7 +133,8 @@ const Landing: React.FC = () => {
                 borderRadius: '8px',
                 textDecoration: 'none',
                 fontWeight: '600',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
+                marginTop: 'auto'
               }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
@@ -95,14 +143,145 @@ const Landing: React.FC = () => {
               </a>
             </div>
 
-            {/* Pro Tier - Featured */}
+            {/* Growth Tier - Limited Free Text */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: `2px solid ${designSystem.colors.secondary[300]}`,
+              transition: 'all 0.2s ease',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  background: `linear-gradient(135deg, ${designSystem.colors.secondary[400]} 0%, ${designSystem.colors.secondary[600]} 100%)`,
+                  borderRadius: designSystem.borderRadius.lg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '1.25rem', color: 'white' }}>📈</span>
+                </div>
+                <h3 style={{
+                  fontSize: designSystem.typography.fontSize['2xl'],
+                  fontWeight: designSystem.typography.fontWeight.bold,
+                  color: designSystem.colors.gray[900],
+                  margin: 0
+                }}>
+                  Growth
+                </h3>
+              </div>
+              <div style={{ marginBottom: '2rem' }}>
+                <span style={{
+                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                  fontWeight: designSystem.typography.fontWeight.bold,
+                  background: `linear-gradient(135deg, ${designSystem.colors.secondary[600]} 0%, ${designSystem.colors.secondary[400]} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  £4.99
+                </span>
+                <span style={{ 
+                  color: designSystem.colors.gray[600],
+                  fontSize: designSystem.typography.fontSize.lg
+                }}>
+                  /month
+                </span>
+              </div>
+              <div style={{ flex: 1 }}>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  marginBottom: '2rem'
+                }}>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ 15 feedback requests per month</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Up to 25 recipients each</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Limited free-text responses</strong></li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Custom question templates</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Enhanced analytics</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ PDF export</li>
+                </ul>
+              </div>
+              <button
+                onClick={async () => {
+                  trackCheckoutStarted('growth');
+                  
+                  try {
+                    const response = await fetch(apiUrl('/api/stripe/create-checkout-session'), {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        tier: 'growth',
+                        customer_email: ''
+                      }),
+                    });
+                    
+                    if (!response.ok) {
+                      const errorText = await response.text();
+                      throw new Error(`Failed to create checkout session: ${errorText}`);
+                    }
+                    
+                    const { checkout_url } = await response.json();
+                    window.location.href = checkout_url;
+                  } catch (error) {
+                    console.error('Checkout error:', error);
+                    alert('Unable to start checkout. Please try again.');
+                  }
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'center',
+                  padding: '0.75rem',
+                  background: `linear-gradient(135deg, ${designSystem.colors.secondary[500]} 0%, ${designSystem.colors.secondary[600]} 100%)`,
+                  color: 'white',
+                  borderRadius: '8px',
+                  border: 'none',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(6,182,212,0.3)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  marginTop: 'auto'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(6,182,212,0.4)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(6,182,212,0.3)';
+                }}
+              >
+                Choose Growth
+              </button>
+            </div>
+
+            {/* Pro Tier - Unlimited Free Text - Featured */}
             <div style={{
               backgroundColor: 'white',
               padding: '2rem',
               borderRadius: '12px',
               border: '3px solid #3b82f6',
               boxShadow: '0 4px 12px rgba(59,130,246,0.2)',
-              position: 'relative'
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
             }}>
               <div style={{
                 position: 'absolute',
@@ -118,18 +297,36 @@ const Landing: React.FC = () => {
               }}>
                 MOST POPULAR
               </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#111827',
-                marginBottom: '0.5rem'
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1rem'
               }}>
-                Pro
-              </h3>
-              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+                  borderRadius: designSystem.borderRadius.lg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '1.25rem', color: 'white' }}>🚀</span>
+                </div>
+                <h3 style={{
+                  fontSize: designSystem.typography.fontSize['2xl'],
+                  fontWeight: designSystem.typography.fontWeight.bold,
+                  color: designSystem.colors.gray[900],
+                  margin: 0
+                }}>
+                  Pro
+                </h3>
+              </div>
+              <div style={{ marginBottom: '2rem' }}>
                 <span style={{
-                  fontSize: '3rem',
-                  fontWeight: 'bold',
+                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                  fontWeight: designSystem.typography.fontWeight.bold,
                   background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -137,21 +334,29 @@ const Landing: React.FC = () => {
                 }}>
                   £9.99
                 </span>
-                <span style={{ color: '#6b7280' }}>/month</span>
+                <span style={{ 
+                  color: designSystem.colors.gray[600],
+                  fontSize: designSystem.typography.fontSize.lg
+                }}>
+                  /month
+                </span>
               </div>
-              <ul style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: 0,
-                marginBottom: '2rem'
-              }}>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> requests</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> recipients</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Custom prompts & questions</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Dashboard with analytics</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Export to PDF/CSV</li>
-                <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Priority support</li>
-              </ul>
+              <div style={{ flex: 1 }}>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  marginBottom: '2rem'
+                }}>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> feedback requests</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited</strong> recipients</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ <strong>Unlimited free-text responses</strong></li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Complete insight into actual feedback</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Advanced analytics & insights</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Export to PDF/CSV/Excel</li>
+                  <li style={{ padding: '0.5rem 0', color: '#4b5563' }}>✓ Priority support</li>
+                </ul>
+              </div>
               <button
                 onClick={async () => {
                   trackCheckoutStarted('pro');
@@ -163,12 +368,14 @@ const Landing: React.FC = () => {
                         'Content-Type': 'application/json',
                       },
                       body: JSON.stringify({
-                        customer_email: '', // Will be collected in Stripe Checkout
+                        tier: 'pro',
+                        customer_email: ''
                       }),
                     });
                     
                     if (!response.ok) {
-                      throw new Error('Failed to create checkout session');
+                      const errorText = await response.text();
+                      throw new Error(`Failed to create checkout session: ${errorText}`);
                     }
                     
                     const { checkout_url } = await response.json();
@@ -191,7 +398,8 @@ const Landing: React.FC = () => {
                   fontSize: '1rem',
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  marginTop: 'auto'
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
