@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from './Hero';
 import Features from './Features';
 import { trackCheckoutStarted } from '../analytics/events';
+import { apiUrl } from '../config/api';
 
 const Landing: React.FC = () => {
   return (
@@ -156,7 +157,7 @@ const Landing: React.FC = () => {
                   trackCheckoutStarted('pro');
                   
                   try {
-                    const response = await fetch('/api/stripe/create-checkout-session', {
+                    const response = await fetch(apiUrl('/api/stripe/create-checkout-session'), {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

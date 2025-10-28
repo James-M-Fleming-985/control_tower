@@ -5,13 +5,17 @@ from datetime import datetime, timedelta
 from aiosmtplib import SMTP
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 class EmailService:
     """Service for sending feedback request emails"""
     
     def __init__(self):
         self.smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
-        self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        self.smtp_port = int(os.getenv("SMTP_PORT", "465"))
         self.smtp_user = os.getenv("SMTP_USER", "")
         self.smtp_password = os.getenv("SMTP_PASSWORD", "")
         self.from_email = os.getenv("FROM_EMAIL", self.smtp_user)
@@ -122,8 +126,7 @@ Feedback360° - 100% Anonymous Feedback
         
         # Send email
         try:
-            async with SMTP(hostname=self.smtp_host, port=self.smtp_port) as smtp:
-                await smtp.starttls()
+            async with SMTP(hostname=self.smtp_host, port=self.smtp_port, use_tls=True) as smtp:
                 await smtp.login(self.smtp_user, self.smtp_password)
                 await smtp.send_message(msg)
             print(f"✅ Email sent to {recipient_email}")

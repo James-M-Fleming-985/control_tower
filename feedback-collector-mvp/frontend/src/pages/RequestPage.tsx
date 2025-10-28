@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../config/api';
 
 /**
  * RequestPage - Where users request feedback from others
@@ -53,7 +54,7 @@ const RequestPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/feedback/request', {
+      const response = await fetch(apiUrl('/api/feedback/requests'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

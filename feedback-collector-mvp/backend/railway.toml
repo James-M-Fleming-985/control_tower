@@ -1,0 +1,29 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+
+[[services]]
+name = "feedback360-backend"
+
+[services.source]
+repo = "James-M-Fleming-985/control_tower"
+rootDirectory = "feedback-collector-mvp/backend"
+
+[services.variables]
+# Gmail SMTP Configuration
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "465"
+SMTP_USER = "flemingjames298@gmail.com"
+SMTP_PASSWORD = "bcii exkf cftf stqi"
+FROM_EMAIL = "flemingjames298@gmail.com"
+FROM_NAME = "Feedback360"
+FRONTEND_URL = "${{feedback360-frontend.RAILWAY_PUBLIC_DOMAIN}}"
+
+# Stripe Configuration (from existing .env)
+STRIPE_SECRET_KEY = "sk_test_51QGjZdGt9vZpMqGgabcdef1234567890"
+PRICE_ID_PRO = "price_1QGjZdGt9vZpMqGgabcdef"
+STRIPE_WEBHOOK_SECRET = "whsec_abcdef1234567890"
+STRIPE_SUCCESS_URL = "${{feedback360-frontend.RAILWAY_PUBLIC_DOMAIN}}/success"
+STRIPE_CANCEL_URL = "${{feedback360-frontend.RAILWAY_PUBLIC_DOMAIN}}/pricing"
