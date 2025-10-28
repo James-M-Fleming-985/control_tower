@@ -1,0 +1,40 @@
+NADCAP 2026 Action Plan - Instructions
+
+HOW TO USE THIS WORKBOOK:
+
+Action Plan Sheet:
+• Column E: Assign team member (Josh Kenny, Matthew White, Dean Wilkins, Mike Warriner)
+• Column F: Due dates (already set, starting Oct 29, 2025)  
+• Column G: Status - Click for dropdown: Unstarted → With PE → In Review → Approved → Released → Blocked
+• Column B: Action descriptions (auto-update when Gap Analysis changes)
+
+Gap Analysis Sheet:
+• Column J: Primary Evidence Doc Ref (feeds to Action Plan automatically)
+• Column K: Primary Evidence Title (feeds to Action Plan automatically)
+• WARNING: Changes here automatically update Action Plan descriptions
+
+Team Summary & Status Summary:
+• Track progress automatically when you update Status in Column G
+• Shows workload distribution and completion percentages
+
+WORKFLOW:
+1. Start with "Unstarted" items assigned to you
+2. Progress through: Unstarted → With PE → In Review → Approved → Released  
+3. Use "Blocked" for items needing external input
+4. All formulas are live - changes update automatically
+5. Complete all 192 actions = 100% NADCAP compliance
+
+CRITICAL PE NOTIFICATION:
+When Professional Excellence team completes work:
+• Update Column G to "In Review"
+• Email James Fleming: james.fleming.ext@safrangroup.com  
+• Subject: "NADCAP Action [ACTION-ID] Ready for Review"
+• Content: Brief summary of work + key findings
+
+TIMELINE:
+• Project starts: October 29, 2025
+• Final completion: February 28, 2026
+• Actions distributed across 122 days (Oct 29 - Feb 28)
+
+This simplified action plan covers ALL NADCAP requirements. 
+Completing every item ensures full compliance.

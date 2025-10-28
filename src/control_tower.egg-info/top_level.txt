@@ -1,9 +1,10 @@
 __init__
 business_logic
+concurrent_layer_executor
 data_access
 integration
-projects
+layer
 requirements_parser
-shared
 tools
+ui
 user_interface
