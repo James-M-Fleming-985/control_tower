@@ -12,6 +12,9 @@ class StripeService:
     
     def __init__(self):
         self.api_key = os.getenv("STRIPE_SECRET_KEY")
+        if not self.api_key or self.api_key.startswith("sk_test_51QGjZdGt9vZpMqGgabcdef"):
+            print("⚠️  WARNING: Using placeholder Stripe API key. Please set STRIPE_SECRET_KEY in .env")
+            print("   Get your keys from: https://dashboard.stripe.com/test/apikeys")
         stripe.api_key = self.api_key
     
     def create_checkout_session(

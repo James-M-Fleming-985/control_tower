@@ -12,19 +12,48 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 @router.post("/create-checkout-session")
 async def create_checkout_session(request: Request):
-    data = await request.json()
-    email = data.get("customer_email")
-
     try:
+        data = await request.json()
+        email = data.get("customer_email")
+        tier = data.get("tier", "pro")  # Default to pro
+        
+        # Get price ID based on tier
+        if tier == "pro":
+            price_id = os.getenv("PRICE_ID_PRO")
+        elif tier == "growth":
+            price_id = os.getenv("PRICE_ID_GROWTH")
+        else:
+            # Default to pro if tier not recognized
+            price_id = os.getenv("PRICE_ID_PRO")
+
+        if not price_id or price_id.startswith("price_placeholder"):
+            # For development, create a test message instead of failing
+            if os.getenv("RAILWAY_ENVIRONMENT") == "production":
+                msg = f"Price ID not configured for tier: {tier}"
+                raise HTTPException(status_code=400, detail=msg)
+            else:
+                # For local development, return a placeholder response
+                return {
+                    "checkout_url": "https://stripe.com/test",
+                    "session_id": "test_session",
+                    "message": "Stripe not configured - test response"
+                }
+
         session = stripe_service.create_checkout_session(
-            price_id=os.getenv("PRICE_ID_PRO"),
+            price_id=price_id,
             success_url=os.getenv("STRIPE_SUCCESS_URL", "http://localhost:3000/success") + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=os.getenv("STRIPE_CANCEL_URL", "http://localhost:3000/pricing"),
+            cancel_url=os.getenv("STRIPE_CANCEL_URL", "http://localhost:3000"),
             customer_email=email
         )
+        
+        # Return the format expected by frontend
         return {"checkout_url": session.url, "session_id": session.id}
+        
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Stripe checkout error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create checkout session: {str(e)}")
 
 @router.post("/create-portal-session")
 async def create_portal_session(request: Request):
