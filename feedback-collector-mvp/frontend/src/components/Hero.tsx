@@ -17,11 +17,11 @@ export const Hero: React.FC = () => {
   return (
     <section className="relative overflow-hidden" style={{ 
       background: 'linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #faf5ff 100%)',
-      minHeight: '90vh',
+      minHeight: '85vh',
       display: 'flex',
       alignItems: 'center',
-      paddingTop: '2rem',
-      paddingBottom: '2rem'
+      paddingTop: '3rem',
+      paddingBottom: '4rem'
     }}>
       {/* Background Pattern */}
       <div style={{
@@ -35,58 +35,9 @@ export const Hero: React.FC = () => {
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Brand Logo - Professional & Modern */}
-          <div className="mb-8">
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginBottom: '1rem'
-            }}>
-              {/* Icon */}
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                background: `linear-gradient(135deg, ${designSystem.colors.primary[500]} 0%, ${designSystem.colors.secondary[500]} 100%)`,
-                borderRadius: designSystem.borderRadius.lg,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: designSystem.shadows.lg
-              }}>
-                <span style={{ fontSize: '1.5rem', color: 'white' }}>💬</span>
-              </div>
-              
-              {/* Brand Name */}
-              <h1 style={{ 
-                fontSize: '3rem',
-                fontWeight: designSystem.typography.fontWeight.bold,
-                background: `linear-gradient(135deg, ${designSystem.colors.primary[600]} 0%, ${designSystem.colors.secondary[600]} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                letterSpacing: '-0.02em',
-                margin: 0,
-                fontFamily: designSystem.typography.fontFamily.display.join(', ')
-              }}>
-                Feedback360
-              </h1>
-            </div>
-            
-            {/* Tagline */}
-            <p style={{
-              fontSize: designSystem.typography.fontSize.lg,
-              color: designSystem.colors.gray[600],
-              fontWeight: designSystem.typography.fontWeight.medium,
-              marginTop: '0.5rem'
-            }}>
-              Professional. Anonymous. Insightful.
-            </p>
-          </div>
-
           {/* Main Headline */}
           <h2 style={{
-            fontSize: 'clamp(2.25rem, 5vw, 3.75rem)',
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
             lineHeight: '1.1',
             marginBottom: '1.5rem',
             color: designSystem.colors.gray[900],
@@ -178,11 +129,11 @@ export const Hero: React.FC = () => {
           {/* Trust Indicators */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '2rem',
-            maxWidth: '720px',
+            maxWidth: '900px',
             margin: '0 auto',
-            padding: '2rem',
+            padding: '2.5rem 2rem',
             backgroundColor: 'white',
             borderRadius: designSystem.borderRadius.xl,
             border: `1px solid ${designSystem.colors.gray[200]}`,
@@ -193,17 +144,17 @@ export const Hero: React.FC = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.5rem' 
+              gap: '0.75rem' 
             }}>
               <div style={{
-                width: '3rem',
-                height: '3rem',
+                width: '3.5rem',
+                height: '3.5rem',
                 backgroundColor: designSystem.colors.primary[50],
                 borderRadius: designSystem.borderRadius.full,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.25rem'
+                fontSize: '1.5rem'
               }}>🔒</div>
               <div>
                 <h4 style={{ 
@@ -215,7 +166,7 @@ export const Hero: React.FC = () => {
                   100% Anonymous
                 </h4>
                 <p style={{ 
-                  margin: 0, 
+                  margin: '0.25rem 0 0 0', 
                   fontSize: designSystem.typography.fontSize.sm,
                   color: designSystem.colors.gray[600]
                 }}>
@@ -229,17 +180,17 @@ export const Hero: React.FC = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.5rem' 
+              gap: '0.75rem' 
             }}>
               <div style={{
-                width: '3rem',
-                height: '3rem',
+                width: '3.5rem',
+                height: '3.5rem',
                 backgroundColor: designSystem.colors.secondary[50],
                 borderRadius: designSystem.borderRadius.full,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.25rem'
+                fontSize: '1.5rem'
               }}>⚡</div>
               <div>
                 <h4 style={{ 
@@ -251,7 +202,7 @@ export const Hero: React.FC = () => {
                   2-Minute Setup
                 </h4>
                 <p style={{ 
-                  margin: 0, 
+                  margin: '0.25rem 0 0 0', 
                   fontSize: designSystem.typography.fontSize.sm,
                   color: designSystem.colors.gray[600]
                 }}>
@@ -265,17 +216,17 @@ export const Hero: React.FC = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.5rem' 
+              gap: '0.75rem' 
             }}>
               <div style={{
-                width: '3rem',
-                height: '3rem',
+                width: '3.5rem',
+                height: '3.5rem',
                 backgroundColor: designSystem.colors.success + '20',
                 borderRadius: designSystem.borderRadius.full,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.25rem'
+                fontSize: '1.5rem'
               }}>📊</div>
               <div>
                 <h4 style={{ 
@@ -287,7 +238,7 @@ export const Hero: React.FC = () => {
                   Actionable Insights
                 </h4>
                 <p style={{ 
-                  margin: 0, 
+                  margin: '0.25rem 0 0 0', 
                   fontSize: designSystem.typography.fontSize.sm,
                   color: designSystem.colors.gray[600]
                 }}>

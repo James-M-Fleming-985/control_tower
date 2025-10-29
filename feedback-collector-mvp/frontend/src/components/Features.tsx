@@ -26,7 +26,7 @@ const Features: React.FC = () => {
   ];
 
   return (
-    <section className="features-section" style={{
+    <section id="features" className="features-section" style={{
       padding: '5rem 2rem',
       backgroundColor: '#f9fafb'
     }}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Navbar from './Navbar';
 import Hero from './Hero';
 import Features from './Features';
 import { trackCheckoutStarted } from '../analytics/events';
@@ -11,11 +12,12 @@ const Landing: React.FC = () => {
       minHeight: '100vh',
       backgroundColor: designSystem.colors.gray[50]
     }}>
+      <Navbar />
       <Hero />
       <Features />
       
       {/* Pricing Section */}
-      <section style={{
+      <section id="pricing" style={{
         padding: '6rem 2rem',
         backgroundColor: 'white'
       }}>
