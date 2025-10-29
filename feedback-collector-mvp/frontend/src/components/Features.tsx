@@ -30,9 +30,9 @@ const Features: React.FC = () => {
       padding: '5rem 0',
       backgroundColor: '#f9fafb'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'left', padding: '0 2rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center', padding: '0 2rem' }}>
         <h2 style={{
-          textAlign: 'left',
+          textAlign: 'center',
           fontSize: '2.5rem',
           marginBottom: '1rem',
           color: '#111827',
@@ -41,11 +41,12 @@ const Features: React.FC = () => {
           Why Feedback360?
         </h2>
         <p style={{
-          textAlign: 'left',
+          textAlign: 'center',
           fontSize: '1.1rem',
           color: '#6b7280',
           marginBottom: '3.5rem',
-          maxWidth: '600px'
+          maxWidth: '600px',
+          margin: '0 auto 3.5rem'
         }}>
           Get the honest insights you need to grow, without the awkwardness
         </p>
