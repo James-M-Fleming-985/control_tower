@@ -27,10 +27,10 @@ const Features: React.FC = () => {
 
   return (
     <section id="features" className="features-section" style={{
-      padding: '5rem 2rem',
+      padding: '5rem 0',
       backgroundColor: '#f9fafb'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'left' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'left', padding: '0 2rem' }}>
         <h2 style={{
           textAlign: 'left',
           fontSize: '2.5rem',

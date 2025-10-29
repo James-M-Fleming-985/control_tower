@@ -18,10 +18,10 @@ const Landing: React.FC = () => {
       
       {/* Pricing Section */}
       <section id="pricing" style={{
-        padding: '6rem 2rem',
+        padding: '6rem 0',
         backgroundColor: 'white'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <h2 style={{
               fontSize: 'clamp(2rem, 4vw, 3rem)',

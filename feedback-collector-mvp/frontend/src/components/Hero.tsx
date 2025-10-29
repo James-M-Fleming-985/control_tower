@@ -33,16 +33,17 @@ export const Hero: React.FC = () => {
         zIndex: 0
       }} />
       
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 relative z-10" style={{ maxWidth: '1200px' }}>
-        <div className="mx-auto text-center" style={{ maxWidth: '100%' }}>
+      <div className="relative z-10" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
+        <div className="text-center" style={{ maxWidth: '100%' }}>
           {/* Main Headline */}
           <h2 style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontSize: 'clamp(2rem, 4vw, 3.5rem)',
             lineHeight: '1.1',
             marginBottom: '1.5rem',
             color: designSystem.colors.gray[900],
             fontWeight: designSystem.typography.fontWeight.bold,
-            fontFamily: designSystem.typography.fontFamily.display.join(', ')
+            fontFamily: designSystem.typography.fontFamily.display.join(', '),
+            whiteSpace: 'nowrap'
           }}>
             Transform Your Growth with{' '}
             <span style={{
