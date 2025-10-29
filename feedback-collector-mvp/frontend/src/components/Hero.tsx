@@ -34,7 +34,7 @@ export const Hero: React.FC = () => {
       }} />
       
       <div className="relative z-10" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
-        <div style={{ maxWidth: '100%', textAlign: 'left' }}>
+        <div style={{ maxWidth: '100%', textAlign: 'center' }}>
           {/* Main Headline */}
           <h2 style={{
             fontSize: 'clamp(2rem, 4vw, 3.5rem)',
@@ -62,7 +62,8 @@ export const Hero: React.FC = () => {
             lineHeight: '1.6',
             color: designSystem.colors.gray[600],
             marginBottom: '3rem',
-            maxWidth: '800px'
+            maxWidth: '800px',
+            margin: '0 auto 3rem auto'
           }}>
             Collect honest, actionable feedback from colleagues, clients, and teams. 
             Our enterprise-grade platform ensures complete anonymity while delivering 
@@ -74,7 +75,7 @@ export const Hero: React.FC = () => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             gap: '1rem',
             marginBottom: '4rem',
             flexWrap: 'wrap'
