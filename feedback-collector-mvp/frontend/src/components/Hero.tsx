@@ -33,8 +33,8 @@ export const Hero: React.FC = () => {
         zIndex: 0
       }} />
       
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="mx-auto max-w-4xl text-center">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 relative z-10" style={{ maxWidth: '1200px' }}>
+        <div className="mx-auto text-center" style={{ maxWidth: '100%' }}>
           {/* Main Headline */}
           <h2 style={{
             fontSize: 'clamp(2.5rem, 5vw, 4rem)',
@@ -61,7 +61,7 @@ export const Hero: React.FC = () => {
             lineHeight: '1.6',
             color: designSystem.colors.gray[600],
             marginBottom: '3rem',
-            maxWidth: '42rem',
+            maxWidth: '800px',
             margin: '0 auto 3rem auto'
           }}>
             Collect honest, actionable feedback from colleagues, clients, and teams. 
@@ -132,7 +132,7 @@ export const Hero: React.FC = () => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             gap: '2rem',
-            maxWidth: '1100px',
+            maxWidth: '100%',
             margin: '0 auto',
             padding: '2.5rem 2rem',
             backgroundColor: 'white',
