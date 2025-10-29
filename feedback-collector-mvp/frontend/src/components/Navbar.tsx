@@ -17,9 +17,8 @@ export const Navbar: React.FC = () => {
       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
     }}>
       <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '1rem 1.5rem',
+        maxWidth: '100%',
+        padding: '1rem 2rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'

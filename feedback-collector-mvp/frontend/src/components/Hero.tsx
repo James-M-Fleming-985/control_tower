@@ -128,23 +128,27 @@ export const Hero: React.FC = () => {
 
           {/* Trust Indicators */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
             gap: '2rem',
-            maxWidth: '900px',
+            maxWidth: '1100px',
             margin: '0 auto',
             padding: '2.5rem 2rem',
             backgroundColor: 'white',
             borderRadius: designSystem.borderRadius.xl,
             border: `1px solid ${designSystem.colors.gray[200]}`,
-            boxShadow: designSystem.shadows.md
+            boxShadow: designSystem.shadows.md,
+            flexWrap: 'nowrap'
           }}>
             <div style={{ 
               textAlign: 'center',
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.75rem' 
+              gap: '0.75rem',
+              flex: '1 1 0',
+              minWidth: 0
             }}>
               <div style={{
                 width: '3.5rem',
@@ -180,7 +184,9 @@ export const Hero: React.FC = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.75rem' 
+              gap: '0.75rem',
+              flex: '1 1 0',
+              minWidth: 0
             }}>
               <div style={{
                 width: '3.5rem',
@@ -216,7 +222,9 @@ export const Hero: React.FC = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: 'center', 
-              gap: '0.75rem' 
+              gap: '0.75rem',
+              flex: '1 1 0',
+              minWidth: 0
             }}>
               <div style={{
                 width: '3.5rem',
