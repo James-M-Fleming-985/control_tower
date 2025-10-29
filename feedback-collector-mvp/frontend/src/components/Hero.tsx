@@ -38,12 +38,12 @@ export const Hero: React.FC = () => {
           {/* Main Headline */}
           <h2 style={{
             fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-            lineHeight: '1.1',
+            lineHeight: '1.2',
             marginBottom: '1.5rem',
             color: designSystem.colors.gray[900],
             fontWeight: designSystem.typography.fontWeight.bold,
             fontFamily: designSystem.typography.fontFamily.display.join(', '),
-            whiteSpace: 'nowrap'
+            textAlign: 'center'
           }}>
             Transform Your Growth with{' '}
             <span style={{
