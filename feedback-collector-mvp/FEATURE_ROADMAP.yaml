@@ -1,0 +1,87 @@
+---
+# Feedback360 Feature Roadmap
+# This file tracks planned features and enhancements for the Feedback360 platform
+
+version: 1.0
+last_updated: 2025-10-30
+
+features:
+  pending:
+    - id: FEAT-001
+      name: Mobile App Version
+      description: Native mobile applications for iOS and Android platforms
+      priority: high
+      status: planned
+      details:
+        - iOS app (Swift/SwiftUI)
+        - Android app (Kotlin/Jetpack Compose)
+        - Push notifications for new feedback
+        - Offline mode support
+        - Biometric authentication
+      estimated_effort: large
+      dependencies: []
+      
+    - id: FEAT-002
+      name: Facebook/Instagram Integration
+      description: Social media integration to send feedback requests to friends
+      priority: high
+      status: planned
+      details:
+        - Facebook friend selector
+        - Instagram follower integration
+        - Share feedback request links via DM
+        - Social login (Facebook/Instagram OAuth)
+        - Privacy controls for social connections
+      estimated_effort: medium
+      dependencies: []
+      technical_notes:
+        - Requires Facebook Graph API integration
+        - Instagram Basic Display API or Graph API
+        - Handle OAuth 2.0 authentication flow
+      
+    - id: FEAT-003
+      name: Profanity Filter & Grammar Suggestions
+      description: Predictive text that suggests alternative grammar for inappropriate language
+      priority: medium
+      status: planned
+      details:
+        - Real-time profanity detection
+        - Suggest alternative wording for swear words
+        - Tone analyzer (aggressive vs constructive)
+        - Grammar and spelling suggestions
+        - Customizable filter sensitivity levels
+      estimated_effort: medium
+      dependencies: []
+      technical_notes:
+        - Consider using NLP libraries (spaCy, NLTK)
+        - OpenAI API for grammar suggestions
+        - Build custom profanity word list
+        - Implement client-side and server-side filtering
+
+  completed:
+    - id: FEAT-000
+      name: Core Feedback Collection System
+      description: Anonymous feedback submission and collection
+      priority: critical
+      status: completed
+      completion_date: 2025-10-29
+      
+    - id: FEAT-000-A
+      name: Stripe Payment Integration
+      description: Three-tier pricing with Stripe checkout (Starter/Growth/Pro)
+      priority: critical
+      status: completed
+      completion_date: 2025-10-29
+      
+    - id: FEAT-000-B
+      name: Email Notifications
+      description: Gmail SMTP integration for feedback notifications
+      priority: high
+      status: completed
+      completion_date: 2025-10-29
+
+notes: |
+  Add new features to the 'pending' section with unique IDs.
+  Move features to 'completed' when they are deployed to production.
+  Update priorities as needed: critical, high, medium, low
+  Estimated effort: small, medium, large, x-large

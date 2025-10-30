@@ -1,12 +1,12 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Optional
 import os
 from dotenv import load_dotenv
 from app.routers.stripe_router import router as stripe_router
 from app.routers.feedback_router import router as feedback_router
+from app.routers.usage_router import router as usage_router
+from app.routers.goals_router import router as goals_router
 
 # Load environment variables
 load_dotenv()
@@ -38,79 +38,31 @@ app.include_router(stripe_router, prefix="/api/stripe")
 # Feedback routes (requests, responses)
 app.include_router(feedback_router, prefix="/api/feedback")
 
-# In-memory storage (replace with database in production)
-feedback_storage: List[dict] = []
+# Usage tracking routes
+app.include_router(usage_router, prefix="/api/usage")
 
-class FeedbackCreate(BaseModel):
-    content: str
-    category: Optional[str] = "general"
+# Goals routes
+app.include_router(goals_router, prefix="/api/goals")
 
-class FeedbackResponse(BaseModel):
-    id: int
-    content: str
-    category: str
-    created_at: datetime
-    status: str = "received"
 
 @app.get("/")
 async def root():
     return {
-        "message": "Anonymous Feedback Collector API",
-        "version": "1.0.0",
+        "message": "Feedback360 - Anonymous Feedback Collector API",
+        "version": "2.0.0",
+        "status": "running",
         "endpoints": {
-            "/api/feedback": "POST - Submit feedback",
-            "/api/feedback": "GET - List all feedback (admin)",
+            "/api/feedback/requests": "POST - Create feedback request",
+            "/api/feedback/responses": "POST - Submit feedback response",
+            "/api/stripe/*": "Stripe payment endpoints",
             "/health": "GET - Health check"
         }
     }
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow()}
-
-@app.post("/api/feedback", response_model=FeedbackResponse)
-async def create_feedback(feedback: FeedbackCreate):
-    """Submit anonymous feedback"""
-    if not feedback.content.strip():
-        raise HTTPException(status_code=400, detail="Feedback content cannot be empty")
-    
-    if len(feedback.content) > 5000:
-        raise HTTPException(status_code=400, detail="Feedback content too long (max 5000 characters)")
-    
-    new_feedback = {
-        "id": len(feedback_storage) + 1,
-        "content": feedback.content.strip(),
-        "category": feedback.category or "general",
-        "created_at": datetime.utcnow(),
-        "status": "received"
-    }
-    
-    feedback_storage.append(new_feedback)
-    
-    # TODO: Send email notification here
-    # send_email_notification(new_feedback)
-    
-    return FeedbackResponse(**new_feedback)
-
-@app.get("/api/feedback", response_model=List[FeedbackResponse])
-async def list_feedback(skip: int = 0, limit: int = 100):
-    """List all feedback (for admin view)"""
-    return [FeedbackResponse(**fb) for fb in feedback_storage[skip:skip + limit]]
-
-@app.get("/api/stats")
-async def get_stats():
-    """Get feedback statistics"""
-    total = len(feedback_storage)
-    by_category = {}
-    for fb in feedback_storage:
-        category = fb.get("category", "general")
-        by_category[category] = by_category.get(category, 0) + 1
-    
-    return {
-        "total_feedback": total,
-        "by_category": by_category,
-        "last_feedback": feedback_storage[-1] if feedback_storage else None
-    }
 
 if __name__ == "__main__":
     import uvicorn
