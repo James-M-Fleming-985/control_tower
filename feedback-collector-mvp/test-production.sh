@@ -7,7 +7,8 @@ echo "╚═══════════════════════�
 echo ""
 
 BACKEND_URL="https://energetic-purpose-production.up.railway.app"
-FRONTEND_URL="https://frontend-b24kitgwi-james-flemings-projects.vercel.app"
+FRONTEND_URL="https://frontend-mg5iy6wr3-james-flemings-projects.vercel.app"
+FRONTEND_LOCAL="http://localhost:3000"
 
 # Test 1: Backend Health
 echo "📡 Test 1: Backend Health Check"
@@ -53,14 +54,15 @@ echo ""
 echo "🔌 Test 4: API Endpoints"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Test feedback endpoint
-FEEDBACK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BACKEND_URL/feedback" \
+# Test feedback request endpoint
+FEEDBACK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BACKEND_URL/api/feedback/requests" \
   -H "Content-Type: application/json" \
-  -d '{"content": "Test feedback", "category": "general"}')
+  -d '{"user_id": 1, "recipient_emails": ["test@example.com"], "context": "professional", "mode": "freetext", "custom_message": "Test"}')
 if [ "$FEEDBACK_STATUS" = "200" ] || [ "$FEEDBACK_STATUS" = "201" ]; then
-    echo "✅ Feedback API endpoint working (HTTP $FEEDBACK_STATUS)"
+    echo "✅ Feedback Request API endpoint working (HTTP $FEEDBACK_STATUS)"
 else
-    echo "⚠️  Feedback API endpoint status: HTTP $FEEDBACK_STATUS"
+    echo "⚠️  Feedback Request API endpoint status: HTTP $FEEDBACK_STATUS"
+    echo "    (Note: 400 with usage limit error is expected for free tier)"
 fi
 
 # Test Stripe checkout endpoint (should fail without valid Stripe key)
