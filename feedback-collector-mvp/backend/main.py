@@ -49,8 +49,9 @@ app.include_router(goals_router, prefix="/api/goals")
 async def root():
     return {
         "message": "Feedback360 - Anonymous Feedback Collector API",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "status": "running",
+        "deployed_at": "2025-10-30T11:10:00Z",
         "endpoints": {
             "/api/feedback/requests": "POST - Create feedback request",
             "/api/feedback/responses": "POST - Submit feedback response",
