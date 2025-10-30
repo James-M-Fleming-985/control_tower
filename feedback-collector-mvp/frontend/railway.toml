@@ -2,7 +2,8 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "npm run dev -- --host 0.0.0.0 --port $PORT"
+buildCommand = "npm install && npm run build"
+startCommand = "npx serve dist -s -p $PORT"
 
 [[services]]
 name = "feedback360-frontend"
@@ -12,5 +13,5 @@ repo = "James-M-Fleming-985/control_tower"
 rootDirectory = "feedback-collector-mvp/frontend"
 
 [services.variables]
+VITE_API_URL = "https://energetic-purpose-production.up.railway.app"
 NODE_ENV = "production"
-VITE_API_URL = "${{feedback360-backend.RAILWAY_PUBLIC_DOMAIN}}"
