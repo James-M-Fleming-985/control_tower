@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiUrl } from '../config/api';
+import { trackEvent, trackPageView } from '../analytics';
 
 /**
  * RequestPage - Where users request feedback from others
@@ -12,6 +13,11 @@ const RequestPage: React.FC = () => {
   const [emailInput, setEmailInput] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Track page view on mount
+  useEffect(() => {
+    trackPageView('/request', 'Request Feedback');
+  }, []);
 
   const getObjectivePrompts = () => {
     if (context === 'professional') {
@@ -53,6 +59,15 @@ const RequestPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    
+    // Track feedback request creation attempt
+    trackEvent('feedback_request_submitted', {
+      context: context,
+      mode: mode,
+      recipient_count: emails.length,
+      has_custom_message: customMessage.length > 0
+    });
+
     try {
       const response = await fetch(apiUrl('/api/feedback/requests'), {
         method: 'POST',
@@ -60,6 +75,7 @@ const RequestPage: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          user_id: 1, // Default user for MVP
           recipient_emails: emails,
           context: context,
           mode: mode,
@@ -67,21 +83,80 @@ const RequestPage: React.FC = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send feedback requests');
+      const data = await response.json();
+      
+      // Check if the request failed due to usage limits
+      if (data.success === false) {
+        const errorMsg = data.error || 'Failed to send feedback requests';
+        const upgradeInfo = data.upgrade_info;
+        
+        if (upgradeInfo) {
+          alert(
+            `${errorMsg}\n\n` +
+            `💡 Upgrade to ${upgradeInfo.recommended_tier} to:\n` +
+            upgradeInfo.benefits.map((b: string) => `  • ${b}`).join('\n')
+          );
+        } else {
+          alert(errorMsg);
+        }
+        
+        trackEvent('feedback_request_failed', {
+          context: context,
+          mode: mode,
+          recipient_count: emails.length,
+          error: errorMsg,
+          reason: 'usage_limit'
+        });
+        return;
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send feedback requests');
+      }
       console.log('Feedback request created:', data);
       
-      alert(`Success! Feedback invitations sent to ${emails.length} recipient(s)`);
+      // Track successful request creation
+      trackEvent('feedback_request_created', {
+        context: context,
+        mode: mode,
+        recipient_count: emails.length,
+        request_id: data.id
+      });
+      
+      alert(
+        `✅ Success!\n\n` +
+        `Feedback invitations sent to ${emails.length} recipient(s).\n\n` +
+        `They'll receive an email with a private link to provide anonymous feedback.`
+      );
       
       // Reset form
       setEmails([]);
       setCustomMessage('');
     } catch (error) {
       console.error('Error sending feedback request:', error);
-      alert('Failed to send invitations. Please try again.');
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // Track failure
+      trackEvent('feedback_request_failed', {
+        context: context,
+        mode: mode,
+        recipient_count: emails.length,
+        error: errorMessage
+      });
+      
+      // Better error message for users
+      let userMessage = '❌ Failed to send invitations.\n\n';
+      
+      if (errorMessage.includes('fetch')) {
+        userMessage += 'The server may be offline. Please contact support or try again later.';
+      } else if (errorMessage.includes('network')) {
+        userMessage += 'Network error. Please check your internet connection and try again.';
+      } else {
+        userMessage += `Error: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`;
+      }
+      
+      alert(userMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -165,7 +240,10 @@ const RequestPage: React.FC = () => {
               }}>
                 <button
                   type="button"
-                  onClick={() => setContext('professional')}
+                  onClick={() => {
+                    setContext('professional');
+                    trackEvent('context_changed', { context: 'professional' });
+                  }}
                   style={{
                     flex: 1,
                     padding: '0.75rem',
@@ -183,7 +261,10 @@ const RequestPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setContext('personal')}
+                  onClick={() => {
+                    setContext('personal');
+                    trackEvent('context_changed', { context: 'personal' });
+                  }}
                   style={{
                     flex: 1,
                     padding: '0.75rem',
@@ -222,7 +303,10 @@ const RequestPage: React.FC = () => {
               }}>
                 <button
                   type="button"
-                  onClick={() => setMode('freetext')}
+                  onClick={() => {
+                    setMode('freetext');
+                    trackEvent('mode_changed', { mode: 'freetext' });
+                  }}
                   style={{
                     flex: 1,
                     padding: '0.75rem',
@@ -240,7 +324,10 @@ const RequestPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMode('objective')}
+                  onClick={() => {
+                    setMode('objective');
+                    trackEvent('mode_changed', { mode: 'objective' });
+                  }}
                   style={{
                     flex: 1,
                     padding: '0.75rem',
