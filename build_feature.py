@@ -413,11 +413,13 @@ Generate the complete layer requirements YAML now:"""
 class FeatureBuilder:
     """Build complete features from YAML specifications using AI."""
     
-    def __init__(self, feature_path: str, provider: str = "anthropic", verbose: bool = False):
+    def __init__(self, feature_path: str, provider: str = "anthropic", 
+                 verbose: bool = False, skip_layer_generation: bool = False):
         """Initialize feature builder."""
         self.feature_path = Path(feature_path)
         self.provider = provider
         self.verbose = verbose
+        self.skip_layer_generation = skip_layer_generation
         self.output_dir = Path("/workspaces/control_tower/AI_GENERATED_FEATURES")
         
         # Validate feature spec exists
@@ -1292,6 +1294,12 @@ Examples:
         help="Initialize layer folder structure and generate layer YAML files from feature requirements (run before building)"
     )
     
+    parser.add_argument(
+        "--skip-layer-generation",
+        action="store_true",
+        help="Skip automatic layer requirement generation - expect manually created layer requirements"
+    )
+    
     args = parser.parse_args()
     
     # Initialize layer structure if requested
@@ -1312,7 +1320,8 @@ Examples:
     builder = FeatureBuilder(
         feature_path=args.feature,
         provider=args.provider,
-        verbose=args.verbose
+        verbose=args.verbose,
+        skip_layer_generation=args.skip_layer_generation
     )
     
     success = builder.run()
