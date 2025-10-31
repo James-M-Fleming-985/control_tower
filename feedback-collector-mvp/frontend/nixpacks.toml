@@ -8,4 +8,4 @@ cmds = ["npm install", "npm install -g serve"]
 cmds = ["npm run build"]
 
 [start]
-cmd = "serve dist -s -l tcp://0.0.0.0:$PORT"
+cmd = "HOST=0.0.0.0 serve dist -s -p $PORT"
