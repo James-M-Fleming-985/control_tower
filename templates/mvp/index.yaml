@@ -79,3 +79,59 @@ templates:
     status: approved
     description: Amplitude behavioral analytics with events, user properties, and revenue tracking
     cost_estimate_tokens: 450
+
+  # Causal Affect Templates (Added 2025-10-31)
+  - id: tpl-correlation-analysis
+    name: Statistical Correlation Analysis Engine
+    path: backend/tpl-correlation-analysis
+    layer_type: api
+    frameworks: [fastapi, numpy, scipy, pandas, statsmodels]
+    tags: [correlation, statistics, data-analysis, timeseries, scientific-computing]
+    version: 1.0.0
+    status: approved
+    description: Complete correlation analysis engine with Pearson, Spearman, Kendall, partial and lagged correlations
+    cost_estimate_tokens: 1200
+
+  - id: tpl-drift-analysis
+    name: Temporal Drift Analysis System
+    path: backend/tpl-drift-analysis
+    layer_type: api
+    frameworks: [fastapi, numpy, scipy, scikit-learn, pandas]
+    tags: [drift-detection, temporal-analysis, stability, changepoint, forecasting]
+    version: 1.0.0
+    status: approved
+    description: Multi-timeframe drift detection with stability scoring and exploitation window calculations
+    cost_estimate_tokens: 1000
+
+  - id: tpl-correlation-heatmap
+    name: Interactive Correlation Heatmap
+    path: frontend/tpl-correlation-heatmap
+    layer_type: ui
+    frameworks: [react, typescript, d3, tailwindcss]
+    tags: [visualization, heatmap, correlation, interactive, data-viz]
+    version: 1.0.0
+    status: approved
+    description: Interactive correlation matrix heatmap with real-time updates, zoom, and drill-down
+    cost_estimate_tokens: 800
+
+  - id: tpl-analysis-popup
+    name: Intelligent Analysis Pop-out
+    path: frontend/tpl-analysis-popup
+    layer_type: ui
+    frameworks: [react, typescript, recharts, tailwindcss]
+    tags: [modal, analysis, causality, explanation, ai-insights]
+    version: 1.0.0
+    status: approved
+    description: Interactive modal with causality analysis, drift timeline, and AI-generated explanations
+    cost_estimate_tokens: 900
+
+  - id: tpl-mvp-opportunity-scorer
+    name: MVP Opportunity Assessment
+    path: backend/tpl-mvp-opportunity-scorer
+    layer_type: api
+    frameworks: [fastapi, numpy, pandas, scikit-learn]
+    tags: [scoring, opportunity-assessment, business-logic, ranking, recommendations]
+    version: 1.0.0
+    status: approved
+    description: Business opportunity scoring with risk assessment and recommendation generation
+    cost_estimate_tokens: 700

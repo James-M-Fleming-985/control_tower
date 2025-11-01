@@ -1,0 +1,290 @@
+# ====================================================================================
+# CAUSAL AFFECT - IMPLEMENTATION GOALS PLAN
+# ====================================================================================
+# Date: 2025-10-31
+# Priority: Critical - Daily Target Goals
+# ====================================================================================
+
+metadata:
+  project_name: "Causal Affect - Core Analysis Features"
+  target_date: "2025-10-31"
+  priority: "CRITICAL"
+  owner: "James-M-Fleming-985"
+  status: "ACTIVE"
+  
+  purpose: |
+    Implementation plan for three core causal affect features: correlation matrix with live data,
+    drift analysis for relationship time frames, and analysis pop-out for relationship explanations.
+    These features enable identification of exploitable market relationships and their temporal stability.
+
+# ====================================================================================
+# GOAL 1: CORRELATION MATRIX WITH LIVE DATA
+# ====================================================================================
+
+goal_1_correlation_matrix:
+  title: "Interactive Correlation Matrix with Live Data Integration"
+  priority: "MUST HAVE"
+  estimated_effort: "2-3 days"
+  
+  business_value:
+    - "Visual identification of strong correlations in real-time market data"
+    - "Interactive exploration of variable relationships"
+    - "Foundation for MVP opportunity identification"
+    - "Data-driven decision making for correlation exploitation"
+  
+  technical_requirements:
+    backend:
+      - "Correlation calculation engine (Pearson, Spearman, Kendall)"
+      - "REST API endpoints to serve correlation data from CA-001 TimescaleDB"
+      - "Real-time data processing pipeline"
+      - "Caching layer for performance optimization"
+    
+    frontend:
+      - "Interactive heatmap component using D3.js + React"
+      - "Responsive correlation matrix visualization"
+      - "Hover tooltips with correlation values and significance"
+      - "Color-coded correlation strength indicators"
+    
+    integration:
+      - "CA-001 → CA-002 data pipeline connection"
+      - "Live data streaming from external APIs (15-20 sources)"
+      - "Real-time correlation updates"
+      - "Error handling for data quality issues"
+  
+  acceptance_criteria:
+    - "Heatmap displays correlation matrix for all variable pairs"
+    - "Live data updates reflected in real-time (< 5 second delay)"
+    - "Interactive features: zoom, filter, hover details"
+    - "Performance: < 2 seconds load time for 100x100 correlation matrix"
+    - "Mobile-responsive design"
+  
+  dependencies:
+    - "CA-001 data ingestion system (BUILT ✅)"
+    - "CA-002 correlation analysis YAML specs (READY ✅)"
+    - "Build system to generate implementation (AVAILABLE ✅)"
+
+# ====================================================================================
+# GOAL 2: DRIFT ANALYSIS (RELATIONSHIP TIME FRAMES)
+# ====================================================================================
+
+goal_2_drift_analysis:
+  title: "Temporal Drift Analysis for Relationship Stability"
+  priority: "MUST HAVE"
+  estimated_effort: "3-4 days"
+  
+  business_value:
+    - "Identify exploitable time windows for correlations"
+    - "Understand relationship stability patterns (1 week vs 6 months)"
+    - "Quantify MVP opportunity duration and urgency"
+    - "Predict when relationships will break down"
+  
+  key_insight: |
+    "How long will this correlation be exploitable?" - If a strong relationship 
+    exists for only 1 month vs 6 months, this dramatically changes MVP viability
+    and investment strategy.
+  
+  technical_requirements:
+    drift_detection_engine:
+      - "Statistical tests for relationship stability over time"
+      - "Rolling correlation windows (1 week, 1 month, 3 month, 6 month)"
+      - "Change point detection algorithms"
+      - "Volatility analysis and trend identification"
+    
+    time_window_analysis:
+      - "Multi-timeframe correlation tracking"
+      - "Stability scoring algorithm"
+      - "Breakpoint identification and prediction"
+      - "Seasonal pattern recognition"
+    
+    temporal_profiling:
+      - "Relationship lifecycle modeling"
+      - "Decay rate calculations"
+      - "Strength persistence analysis"
+      - "Future stability forecasting"
+  
+  output_metrics:
+    - "Relationship half-life (time until 50% strength loss)"
+    - "Stability score (0-100, higher = more persistent)"
+    - "Exploitation window (recommended timeframe for MVPs)"
+    - "Risk assessment (probability of relationship breakdown)"
+  
+  acceptance_criteria:
+    - "Drift detection identifies relationship changes within 1 week"
+    - "Multi-timeframe analysis shows correlation evolution"
+    - "Stability scoring accurately predicts relationship persistence"
+    - "Exploitation window recommendations with confidence intervals"
+    - "Historical pattern recognition for similar relationships"
+  
+  dependencies:
+    - "Goal 1: Correlation matrix implementation (PREREQUISITE)"
+    - "CA-003 drift forecasting system (NEEDS BUILDING)"
+    - "Historical data spanning multiple time periods"
+
+# ====================================================================================
+# GOAL 3: ANALYSIS POP-OUT (ROOT CAUSE EXPLANATIONS)
+# ====================================================================================
+
+goal_3_analysis_popup:
+  title: "Intelligent Analysis Pop-out with Relationship Explanations"
+  priority: "MUST HAVE"
+  estimated_effort: "2-3 days"
+  
+  business_value:
+    - "Understand WHY correlations exist (not just that they do)"
+    - "Identify root causes and driving factors"
+    - "Communicate findings to stakeholders effectively"
+    - "Validate correlation legitimacy vs spurious relationships"
+  
+  technical_requirements:
+    causality_testing:
+      - "Granger causality tests for directional relationships"
+      - "VAR models for multivariate analysis"
+      - "DAG inference for causal structure mapping"
+      - "Transfer entropy for information flow quantification"
+    
+    explanation_engine:
+      - "AI-powered correlation analysis and interpretation"
+      - "Business context integration"
+      - "Root cause hypothesis generation"
+      - "Statistical significance validation"
+    
+    interactive_modal:
+      - "Pop-up interface triggered by correlation cell clicks"
+      - "Tabbed sections: Overview, Causality, Drift Timeline, Recommendations"
+      - "Interactive charts showing relationship evolution"
+      - "Downloadable analysis reports"
+  
+  explanation_components:
+    overview_section:
+      - "Correlation strength and statistical significance"
+      - "Relationship type (linear, monotonic, etc.)"
+      - "Data quality and sample size information"
+    
+    causality_section:
+      - "Directional causality test results"
+      - "Causal pathway visualization"
+      - "Confounding variable identification"
+    
+    drift_timeline:
+      - "Historical relationship strength over time"
+      - "Identified breakpoints and regime changes"
+      - "Future stability predictions"
+    
+    recommendations:
+      - "MVP opportunity assessment"
+      - "Recommended exploitation strategy"
+      - "Risk mitigation suggestions"
+  
+  acceptance_criteria:
+    - "Pop-out loads in < 1 second when correlation cell clicked"
+    - "Causality tests execute and display results clearly"
+    - "Drift timeline shows relationship evolution graphically"
+    - "Recommendations are actionable and business-focused"
+    - "Export functionality for analysis reports"
+  
+  dependencies:
+    - "Goal 1: Correlation matrix (PREREQUISITE)"
+    - "Goal 2: Drift analysis (PREREQUISITE)"
+    - "CA-002 causality testing components (NEEDS BUILDING)"
+
+# ====================================================================================
+# IMPLEMENTATION STRATEGY
+# ====================================================================================
+
+implementation_order:
+  day_1_2:
+    focus: "Goal 1 - Correlation Matrix Foundation"
+    tasks:
+      - "Build CA-002 correlation calculation engine"
+      - "Create REST API endpoints for correlation data"
+      - "Implement basic React heatmap component"
+      - "Connect CA-001 data pipeline"
+  
+  day_3_4:
+    focus: "Goal 2 - Drift Analysis Integration"
+    tasks:
+      - "Build CA-003 drift detection system"
+      - "Implement multi-timeframe correlation tracking"
+      - "Add stability scoring algorithms"
+      - "Integrate drift data into correlation matrix"
+  
+  day_5_6:
+    focus: "Goal 3 - Analysis Pop-out Development"
+    tasks:
+      - "Build causality testing engine"
+      - "Create interactive modal component"
+      - "Implement explanation generation"
+      - "Add report export functionality"
+  
+  day_7:
+    focus: "Integration Testing & Refinement"
+    tasks:
+      - "End-to-end testing with live data"
+      - "Performance optimization"
+      - "User interface polish"
+      - "Documentation completion"
+
+critical_dependencies:
+  data_pipeline: "CA-001 → CA-002 → CA-003 data flow must work"
+  live_data: "Active external API data ingestion required"
+  build_system: "Use existing YAML specs with build_system.py"
+
+success_metrics:
+  correlation_matrix: "Interactive heatmap with live data updates < 2s load time"
+  drift_analysis: "Accurate relationship stability predictions with confidence intervals"
+  analysis_popup: "Comprehensive explanations with causality validation"
+  mvp_assessment: "Clear recommendations for correlation exploitation opportunities"
+
+# ====================================================================================
+# SCAFFOLDING PATTERNS TO ADD
+# ====================================================================================
+
+new_scaffolding_patterns:
+  correlation_analysis_template:
+    description: "Template for statistical correlation analysis systems"
+    components:
+      - "Correlation calculation engines (multiple algorithms)"
+      - "Interactive heatmap visualization components"
+      - "Real-time data pipeline integration"
+      - "Performance optimization patterns"
+  
+  drift_analysis_template:
+    description: "Template for temporal relationship stability analysis"
+    components:
+      - "Multi-timeframe correlation tracking"
+      - "Stability scoring algorithms"
+      - "Change point detection"
+      - "Exploitation window calculations"
+  
+  analysis_popup_template:
+    description: "Template for intelligent data analysis explanations"
+    components:
+      - "Causality testing integration"
+      - "AI-powered explanation generation"
+      - "Interactive modal interfaces"
+      - "Report export functionality"
+  
+  mvp_opportunity_template:
+    description: "Template for business opportunity assessment systems"
+    components:
+      - "Opportunity scoring algorithms"
+      - "Risk assessment frameworks"
+      - "Recommendation generation"
+      - "Stakeholder communication tools"
+
+# ====================================================================================
+# TOTAL EFFORT ESTIMATE
+# ====================================================================================
+
+total_effort:
+  estimated_time: "1 week (7 days) of focused development"
+  complexity: "Medium-High (statistical analysis + real-time data + AI integration)"
+  risk_level: "Medium (dependencies on data quality and external APIs)"
+  
+  success_probability: "High (all YAML specifications ready, build system available)"
+  
+  critical_success_factors:
+    - "Stable CA-001 data ingestion"
+    - "Quality external API data sources"
+    - "Effective use of existing build system"
+    - "Focus on core functionality before optimization"

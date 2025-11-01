@@ -8,7 +8,9 @@
 # ====================================================================================
 
 metadata:
+  feature_id: "FEATURE-CA-002-01"
   requirement_id: "FEATURE-CA-002-01"
+  feature_name: "Statistical Correlation Calculator"
   requirement_name: "Statistical Correlation Calculator"
   feature_code: "CA-002-01"
   version: "1.0.0"

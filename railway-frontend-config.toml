@@ -1,0 +1,13 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "cd feedback-collector-mvp/frontend && node server.js"
+
+[build.buildCommand]
+value = "cd feedback-collector-mvp/frontend && npm install && npm run build"
+
+[environments.production.variables]
+NODE_ENV = "production"
+VITE_API_URL = "https://energetic-purpose-production.up.railway.app"
+HOST = "0.0.0.0"

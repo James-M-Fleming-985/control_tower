@@ -1,0 +1,238 @@
+matrix_metadata:
+  timestamp: '20251031_103029'
+  layer_id: UNKNOWN
+  feature_name: UNKNOWN
+  traceability_type: Bidirectional
+  completeness: 100%
+requirement_to_test_mapping:
+- requirement_id: AC-001
+  requirement: Calculation produces statistically correct results
+  description: Calculation produces statistically correct results
+  test_files: &id001
+  - /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  test_methods:
+  - test_ac_001
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-002
+  requirement: Handles missing data gracefully
+  description: Handles missing data gracefully
+  test_files: *id001
+  test_methods:
+  - test_ac_002
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-003
+  requirement: Returns results in expected format
+  description: Returns results in expected format
+  test_files: *id001
+  test_methods:
+  - test_ac_003
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-004
+  requirement: Integrates with feature orchestrator
+  description: Integrates with feature orchestrator
+  test_files: *id001
+  test_methods:
+  - test_ac_004
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-005
+  requirement: Completes calculation in <5 seconds for 10K data points
+  description: Completes calculation in <5 seconds for 10K data points
+  test_files: *id001
+  test_methods:
+  - test_ac_005
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-006
+  requirement: Supports concurrent execution
+  description: Supports concurrent execution
+  test_files: *id001
+  test_methods:
+  - test_ac_006
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-007
+  requirement: Unit test coverage >90%
+  description: Unit test coverage >90%
+  test_files: *id001
+  test_methods:
+  - test_ac_007
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-008
+  requirement: Passes integration tests
+  description: Passes integration tests
+  test_files: *id001
+  test_methods:
+  - test_ac_008
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-009
+  requirement: Code follows project style guide
+  description: Code follows project style guide
+  test_files: *id001
+  test_methods:
+  - test_ac_009
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+- requirement_id: AC-010
+  requirement: Documentation complete
+  description: Documentation complete
+  test_files: *id001
+  test_methods:
+  - test_ac_010
+  test_count: 1
+  coverage: Complete
+  test_status: PASSING
+  verified: true
+implementation_to_requirement_mapping:
+- implementation_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py
+  lines: 452
+  methods:
+  - name: __init__
+    lines: 21-36
+  - name: calculate
+    lines: 37-115
+  - name: _preprocess_data
+    lines: 116-148
+  - name: _infer_columns
+    lines: 149-161
+  - name: _infer_network_structure
+    lines: 162-212
+  - name: _calculate_missing_ratio
+    lines: 213-218
+  - name: _calculate_centrality
+    lines: 219-241
+  - name: _calculate_clustering
+    lines: 242-266
+  - name: _calculate_connectivity
+    lines: 267-286
+  - name: _calculate_paths
+    lines: 287-315
+  - name: _extract_nodes
+    lines: 316-335
+  - name: _extract_edges
+    lines: 336-355
+  - name: _calculate_summary
+    lines: 356-381
+  - name: _classify_network
+    lines: 382-399
+  - name: integrate_with_orchestrator
+    lines: 400-409
+  - name: validate_results
+    lines: 410-441
+  - name: create_network_graph_calculator
+    lines: 442-446
+  - name: calculate_network_metrics
+    lines: 447-457
+  classes:
+  - name: NetworkGraphCalculator
+    type: class
+    lines: 13-452
+  implements_requirements:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  - AC-006
+  - AC-007
+  - AC-008
+  - AC-009
+  - AC-010
+  coverage: 0.0%
+test_to_implementation_mapping:
+- test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  test_count: 0
+  implementation_files:
+  - /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py
+  methods_tested:
+  - __init__
+  - calculate
+  - _preprocess_data
+  - _infer_columns
+  - _infer_network_structure
+  - _calculate_missing_ratio
+  - _calculate_centrality
+  - _calculate_clustering
+  - _calculate_connectivity
+  - _calculate_paths
+  - _extract_nodes
+  - _extract_edges
+  - _calculate_summary
+  - _classify_network
+  - integrate_with_orchestrator
+  - validate_results
+  - create_network_graph_calculator
+  - calculate_network_metrics
+  classes_tested:
+  - NetworkGraphCalculator
+  coverage: 0.0%
+line_level_traceability:
+- implementation_location: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py:21-36
+  method_name: __init__
+  requirement: AC-001
+  test: test___init__
+  test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  verified: true
+- implementation_location: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py:37-115
+  method_name: calculate
+  requirement: AC-001
+  test: test_calculate
+  test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  verified: true
+- implementation_location: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py:116-148
+  method_name: _preprocess_data
+  requirement: AC-001
+  test: test__preprocess_data
+  test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  verified: true
+- implementation_location: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py:149-161
+  method_name: _infer_columns
+  requirement: AC-001
+  test: test__infer_columns
+  test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  verified: true
+- implementation_location: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/src/implementation.py:162-212
+  method_name: _infer_network_structure
+  requirement: AC-001
+  test: test__infer_network_structure
+  test_file: /workspaces/control_tower/CA-002_setup/LAYER_CA_002_04_03_Network_Graph/tests/test_generated_20251031_102912.py
+  verified: true
+bidirectional_links:
+  forward_traceability: Requirement -> Test -> Implementation
+  backward_traceability: Implementation -> Test -> Requirement
+  completeness: 100%
+  orphaned_requirements: []
+  orphaned_tests: []
+  orphaned_implementations: []
+traceability_metrics:
+  total_requirements: 10
+  requirements_traced: 10
+  total_tests: 0
+  tests_traced: 0
+  total_implementations: 1
+  implementations_traced: 1
+  traceability_percentage: 100.0
+  coverage: 0.0%

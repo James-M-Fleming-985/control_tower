@@ -165,7 +165,8 @@ class UsageTrackingService:
                     )
                 }
 
-        elif mode == FeedbackMode.PROMPTED:
+        elif mode == FeedbackMode.PROMPTED or mode == FeedbackMode.OBJECTIVE:
+            # OBJECTIVE mode uses the same limits as PROMPTED
             can_create = can_create_prompted_request(
                 user.subscription_tier,
                 user.monthly_prompted_requests
@@ -173,10 +174,14 @@ class UsageTrackingService:
 
             if not can_create:
                 limit = limits["prompted_requests_per_month"]
+                mode_label = (
+                    "objective" if mode == FeedbackMode.OBJECTIVE
+                    else "prompted"
+                )
                 return {
                     "allowed": False,
                     "reason": f"You've reached your monthly limit of"
-                    f" {limit} prompted requests.",
+                    f" {limit} {mode_label} requests.",
                     "current_usage": user.monthly_prompted_requests,
                     "limit": limit,
                     "upgrade_info": get_upgrade_recommendation(
@@ -206,7 +211,8 @@ class UsageTrackingService:
 
         if mode == FeedbackMode.FREETEXT:
             user.monthly_freetext_requests += 1
-        elif mode == FeedbackMode.PROMPTED:
+        elif mode == FeedbackMode.PROMPTED or mode == FeedbackMode.OBJECTIVE:
+            # OBJECTIVE mode uses the same counter as PROMPTED
             user.monthly_prompted_requests += 1
 
         self.db.commit()

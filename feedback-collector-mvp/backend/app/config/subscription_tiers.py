@@ -49,18 +49,18 @@ TIER_FEATURES = {
         "name": "Free",
         "tagline": "Perfect for trying out feedback",
         "features": [
-            "Prompted feedback only",
-            "Up to 3 feedback requests per month",
+            "2 free-text feedback requests per month",
+            "5 objective/prompted feedback requests per month",
             "Basic feedback templates",
             "Email notifications",
-            "7-day feedback history"
+            "30-day feedback history"
         ],
         "limits": {
-            "freetext_requests_per_month": 0,
-            "prompted_requests_per_month": 3,
-            "total_requests_per_month": 3,
-            "recipients_per_request": 3,
-            "feedback_history_days": 7,
+            "freetext_requests_per_month": 2,
+            "prompted_requests_per_month": 5,
+            "total_requests_per_month": 5,
+            "recipients_per_request": 5,
+            "feedback_history_days": 30,
             "goal_tracking": False,
             "analytics_access": False,
             "priority_support": False,

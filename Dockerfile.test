@@ -1,0 +1,12 @@
+# Simple test Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Create a simple test file
+RUN echo '{"name": "test", "version": "1.0.0", "scripts": {"start": "node server.js"}}' > package.json
+RUN echo 'const http = require("http"); http.createServer((req, res) => { res.writeHead(200, {"Content-Type": "text/html"}); res.end("Hello Railway!"); }).listen(process.env.PORT || 3000, () => console.log("Server running"));' > server.js
+
+EXPOSE $PORT
+
+CMD ["npm", "start"]

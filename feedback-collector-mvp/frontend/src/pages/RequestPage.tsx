@@ -86,18 +86,18 @@ const RequestPage: React.FC = () => {
       const data = await response.json();
       
       // Check if the request failed due to usage limits
-      if (data.success === false) {
-        const errorMsg = data.error || 'Failed to send feedback requests';
+      if (data.success === false || !response.ok) {
+        const errorMsg = data.reason || data.error || 'Failed to send feedback requests';
         const upgradeInfo = data.upgrade_info;
         
         if (upgradeInfo) {
           alert(
-            `${errorMsg}\n\n` +
+            `⚠️ ${errorMsg}\n\n` +
             `💡 Upgrade to ${upgradeInfo.recommended_tier} to:\n` +
             upgradeInfo.benefits.map((b: string) => `  • ${b}`).join('\n')
           );
         } else {
-          alert(errorMsg);
+          alert(`⚠️ ${errorMsg}`);
         }
         
         trackEvent('feedback_request_failed', {
@@ -105,13 +105,11 @@ const RequestPage: React.FC = () => {
           mode: mode,
           recipient_count: emails.length,
           error: errorMsg,
-          reason: 'usage_limit'
+          reason: data.reason ? 'usage_limit' : 'request_error'
         });
+        
+        setIsSubmitting(false);
         return;
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send feedback requests');
       }
       console.log('Feedback request created:', data);
       

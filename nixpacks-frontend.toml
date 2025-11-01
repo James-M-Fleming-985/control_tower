@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "npm"]
+nixOverlays = ["https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz"]
+
+[phases.build]
+dependsOn = ["setup"]
+cmds = [
+  "cd feedback-collector-mvp/frontend",
+  "npm ci --prefer-offline --no-audit",
+  "npm run build"
+]
+
+[start]
+cmd = "cd feedback-collector-mvp/frontend && npx serve dist -s -p $PORT"
