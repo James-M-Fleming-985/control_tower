@@ -47,10 +47,10 @@ class EmailService:
         
         # Context-specific greeting
         context_text = {
-            "professional": "your professional work",
-            "personal": "your relationship with them",
+            "professional": "their professional work",
+            "personal": "their relationship with you",
             "growth": "their personal growth journey"
-        }.get(context, "you")
+        }.get(context, "them")
         
         # Email body
         text_content = f"""
