@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
-Simple Layer Builder - Actually generates code using Claude API
+Layer Builder - Generate single layer implementation using AI
 
-This is a working implementation that uses the real AI provider layer.
+Generates code for a single layer with proper directory structure:
+  layer_folder/
+  ├── src/
+  │   └── implementation.py
+  └── tests/
+      └── test_generated_YYYYMMDD_HHMMSS.py
+
+Matches the structure created by build_feature.py for consistency.
 """
 import sys
 import os
@@ -130,9 +137,15 @@ def build_layer(layer_yaml_path: str, output_dir: str, provider_type: str = 'ant
     
     print(f"✓ AI provider ready")
     
-    # Create output directory
+    # Create output directory structure (matching build_feature.py)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Create src and tests subdirectories
+    src_dir = output_path / "src"
+    tests_dir = output_path / "tests"
+    src_dir.mkdir(exist_ok=True)
+    tests_dir.mkdir(exist_ok=True)
     
     # RED PHASE: Generate tests
     print(f"\n{'='*80}")
@@ -142,7 +155,10 @@ def build_layer(layer_yaml_path: str, output_dir: str, provider_type: str = 'ant
     print("🤖 Calling AI to generate tests...")
     test_code = generate_tests_from_requirements(provider, requirements)
     
-    test_file = output_path / f"test_{layer_id.lower().replace('-', '_')}.py"
+    # Save test file in tests/ subdirectory with timestamp (matching build_feature.py)
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    test_file = tests_dir / f"test_generated_{timestamp}.py"
     with open(test_file, 'w') as f:
         f.write(test_code)
     
@@ -157,7 +173,8 @@ def build_layer(layer_yaml_path: str, output_dir: str, provider_type: str = 'ant
     print("🤖 Calling AI to generate implementation...")
     impl_code = generate_implementation_from_requirements(provider, requirements, test_code)
     
-    impl_file = output_path / f"{layer_id.lower().replace('-', '_')}.py"
+    # Save implementation in src/implementation.py (matching build_feature.py)
+    impl_file = src_dir / "implementation.py"
     with open(impl_file, 'w') as f:
         f.write(impl_code)
     
@@ -176,9 +193,9 @@ def build_layer(layer_yaml_path: str, output_dir: str, provider_type: str = 'ant
         'layer_id': layer_id,
         'layer_name': layer_name,
         'files_generated': {
-            'tests': str(test_file),
-            'implementation': str(impl_file),
-            'requirements': str(req_file)
+            'tests': str(test_file.relative_to(output_path)),
+            'implementation': str(impl_file.relative_to(output_path)),
+            'requirements': str(req_file.relative_to(output_path))
         },
         'metrics': {
             'test_code_size': len(test_code),
@@ -192,23 +209,33 @@ def build_layer(layer_yaml_path: str, output_dir: str, provider_type: str = 'ant
         yaml.dump(summary, f, default_flow_style=False)
     
     print(f"\n{'='*80}")
-    print(f"✅ LAYER BUILD COMPLETE!")
+    print("✅ LAYER BUILD COMPLETE!")
     print(f"{'='*80}\n")
     print(f"Output directory: {output_path}")
-    print(f"Files generated: {len(summary['files_generated'])}")
-    print(f"\nNext steps:")
+    print("Files generated:")
+    print(f"  - {impl_file.relative_to(output_path.parent)}")
+    print(f"  - {test_file.relative_to(output_path.parent)}")
+    print("\nStructure:")
+    print(f"  {output_path.name}/")
+    print("  ├── src/")
+    print("  │   └── implementation.py")
+    print("  └── tests/")
+    print(f"      └── test_generated_{timestamp}.py")
+    print("\nNext steps:")
     print(f"1. Review generated code in {output_path}")
     print(f"2. Run tests: pytest {test_file}")
-    print(f"3. Refactor and improve code quality")
+    print("3. Integrate with feature using build_feature.py")
     
     return summary
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Usage: python simple_layer_builder.py <layer_yaml_path> [output_dir] [provider]")
+        print("Usage: python build_layer.py "
+              "<layer_yaml_path> [output_dir] [provider]")
         print("\nExample:")
-        print('  python simple_layer_builder.py "projects/.../LAYER-003-03-01-01_workflow_state_management.yaml"')
+        print('  python build_layer.py '
+              '"LAYER_001/LAYER_001.yaml" LAYER_001 anthropic')
         sys.exit(1)
     
     layer_yaml = sys.argv[1]

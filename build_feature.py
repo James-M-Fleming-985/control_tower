@@ -281,15 +281,30 @@ def initialize_layer_structure(feature_path: Path, provider: str = "anthropic",
             # Create standardized folder name
             folder_name = standardize_layer_folder_name(layer_id, layer_name)
             layer_folder = feature_dir / folder_name
+            yaml_filename = f"{folder_name}.yaml"
+            yaml_path = layer_folder / yaml_filename
             
-            print(f"📁 Creating folder: {folder_name}")
-            layer_folder.mkdir(exist_ok=True)
+            # Check if YAML already exists (skip entire initialization if so)
+            if yaml_path.exists():
+                print(f"✓ Layer already initialized: {yaml_filename} exists (skipping)")
+                print(f"   Folder: {folder_name}/")
+                print(f"   YAML: {yaml_filename}\n")
+                continue
             
-            # Create subdirectories
-            (layer_folder / "src").mkdir(exist_ok=True)
-            (layer_folder / "tests").mkdir(exist_ok=True)
-            print(f"   ✓ Created: {folder_name}/src/")
-            print(f"   ✓ Created: {folder_name}/tests/\n")
+            # Check if folder already exists
+            if layer_folder.exists():
+                print(f"📁 Folder already exists: {folder_name} (skipping creation)")
+            else:
+                print(f"📁 Creating folder: {folder_name}")
+                layer_folder.mkdir(exist_ok=True)
+                
+                # Create subdirectories
+                (layer_folder / "src").mkdir(exist_ok=True)
+                (layer_folder / "tests").mkdir(exist_ok=True)
+                print(f"   ✓ Created: {folder_name}/src/")
+                print(f"   ✓ Created: {folder_name}/tests/")
+            
+            print()  # Empty line for readability
             
             # Derive layer requirements using AI
             print(f"🤖 Deriving layer requirements from feature requirements...")
@@ -303,8 +318,6 @@ def initialize_layer_structure(feature_path: Path, provider: str = "anthropic",
             )
             
             # Write layer YAML file
-            yaml_filename = f"{folder_name}.yaml"
-            yaml_path = layer_folder / yaml_filename
             with open(yaml_path, 'w', encoding='utf-8') as f:
                 f.write(derived_yaml)
             
@@ -382,7 +395,7 @@ Generate the complete layer requirements YAML now:"""
     
     response = orchestrator.ai_provider.generate_code(
         prompt=prompt,
-        max_tokens=4096
+        max_tokens=16384  # Increased for comprehensive layer requirements
     )
     
     # Extract YAML from response
