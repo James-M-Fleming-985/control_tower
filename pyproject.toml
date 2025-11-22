@@ -48,6 +48,7 @@ python_functions = ["test_*"]
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",
+    "e2e: End-to-end tests",
     "review_needed: Tests that need context review (might be EVIDENCE not ACTOR)", 
     "performance: Performance tests",
     "security: Security tests",
