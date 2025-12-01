@@ -1,0 +1,237 @@
+ai_instructions:
+  file_structure: "src/\n  transform_models.py      # All models in one file (they're\
+    \ related)\n  __init__.py              # Export public API\n"
+  implementation_notes: '- Use Pydantic v2 syntax (BaseModel, Field, model_validator)
+
+    - All validators should use @field_validator or @model_validator decorators
+
+    - Provide clear error messages for validation failures
+
+    - Include docstrings for all classes and methods
+
+    - Add type hints for all function signatures
+
+    - Implement __repr__ methods for debugging
+
+    - Include JSON serialization examples in docstrings
+
+    '
+  testing_notes: '- Test valid transformations serialize/deserialize correctly
+
+    - Test invalid values raise ValidationError
+
+    - Test is_identity() method
+
+    - Test edge cases (scale=0.1, scale=5.0, etc.)
+
+    - Test crop bounds validation
+
+    '
+expected_outputs:
+- description: Pydantic models for image transformations
+  file: src/transform_models.py
+  lines: ~150-200 lines
+- description: Public API exports
+  file: src/__init__.py
+  lines: ~10 lines
+- description: Unit tests for models
+  file: tests/test_transform_models.py
+  lines: ~200-300 lines
+interfaces:
+  dependencies:
+  - pydantic>=2.0.0
+  - typing (Optional, Dict, Any)
+  public_api:
+  - Position model with x, y fields
+  - CropBounds model with x, y, width, height fields
+  - ImageTransform model with scale, position, crop fields
+  - SlideTransformConfig model linking view to transform
+layer_id: LAYER-PHASE2-001
+layer_name: Transform Models
+models:
+  CropBounds:
+    description: Rectangular crop area definition
+    example: 'CropBounds(x=100, y=50, width=1600, height=900)  # Crop center portion
+
+      '
+    fields:
+    - constraints: x >= 0
+      default: 0
+      description: Crop start X coordinate
+      name: x
+      type: int
+    - constraints: y >= 0
+      default: 0
+      description: Crop start Y coordinate
+      name: y
+      type: int
+    - constraints: width > 0
+      description: Crop width in pixels
+      name: width
+      type: int
+    - constraints: height > 0
+      description: Crop height in pixels
+      name: height
+      type: int
+    validators:
+    - Width and height must be positive
+    - Crop area must fit within source image bounds
+  ImageTransform:
+    description: Complete transformation specification for an image
+    example: "ImageTransform(\n    scale=0.8,\n    position=Position(x=100, y=50),\n\
+      \    crop=CropBounds(x=0, y=0, width=1600, height=900),\n    maintain_aspect_ratio=True\n\
+      )\n"
+    fields:
+    - constraints: 0.1 <= scale <= 5.0
+      default: 1.0
+      description: Scale factor (1.0 = original size)
+      name: scale
+      type: float
+    - default: Position(x=0, y=0)
+      description: Image position on slide
+      name: position
+      type: Position
+    - default: null
+      description: Crop bounds (null = no crop)
+      name: crop
+      type: Optional[CropBounds]
+    - default: true
+      description: Lock aspect ratio during resize
+      name: maintain_aspect_ratio
+      type: bool
+    methods:
+    - description: Returns True if no transformation applied (scale=1.0, position=0,0,
+        crop=null)
+      name: is_identity
+      returns: bool
+    - description: Serialize to JSON-compatible dict
+      name: to_dict
+      returns: dict
+    - args: 'data: dict'
+      description: Deserialize from dict
+      name: from_dict
+      returns: ImageTransform
+  Position:
+    description: 2D coordinate position in pixels
+    example: 'Position(x=160, y=90)  # Center of 1920x1080 canvas
+
+      '
+    fields:
+    - constraints: x >= 0
+      default: 0
+      description: Horizontal position from left edge
+      name: x
+      type: int
+    - constraints: y >= 0
+      default: 0
+      description: Vertical position from top edge
+      name: y
+      type: int
+  SlideTransformConfig:
+    description: Links a dashboard view to its transformation settings
+    example: "SlideTransformConfig(\n    view_path=\"/dashboard/gantt\",\n    transform=ImageTransform(scale=0.8,\
+      \ position=Position(x=100, y=50)),\n    viewport_width=1920,\n    viewport_height=1080\n\
+      )\n"
+    fields:
+    - description: Dashboard view URL (e.g., '/dashboard/gantt')
+      example: /dashboard/risks
+      name: view_path
+      type: str
+    - default: ImageTransform()
+      description: Transformation to apply
+      name: transform
+      type: ImageTransform
+    - default: 1920
+      description: Screenshot capture width
+      name: viewport_width
+      type: int
+    - default: 1080
+      description: Screenshot capture height
+      name: viewport_height
+      type: int
+overview:
+  purpose: 'Provide type-safe data structures for storing and validating image transformations
+
+    (resize, position, crop) that users apply in the canvas editor.
+
+    '
+  responsibility: Define Pydantic models for image transformation configuration
+  why_separate_layer: 'Models are the foundation - they define the contract between
+    frontend and backend.
+
+    Other layers depend on these models for type safety and validation.
+
+    '
+parent_feature: FEATURE-WEB-006-PHASE-2
+requirements:
+  functional:
+  - acceptance: Position(x=100, y=50) validates and serializes to JSON
+    description: Position model stores X/Y coordinates
+    req_id: REQ-PHASE2-001-F1
+  - acceptance: CropBounds validates crop area within image bounds
+    description: CropBounds model stores crop rectangle (x, y, width, height)
+    req_id: REQ-PHASE2-001-F2
+  - acceptance: ImageTransform serializes to/from JSON for API transmission
+    description: ImageTransform model combines scale, position, and crop
+    req_id: REQ-PHASE2-001-F3
+  - acceptance: SlideTransformConfig stores view + transforms for PowerPoint generation
+    description: SlideTransformConfig links view path to its transformations
+    req_id: REQ-PHASE2-001-F4
+  technical:
+  - description: All models use Pydantic BaseModel
+    rationale: FastAPI integration, automatic validation, JSON serialization
+    req_id: REQ-PHASE2-001-T1
+  - description: Coordinates use integers (pixels)
+    rationale: Canvas and image coordinates are pixel-based
+    req_id: REQ-PHASE2-001-T2
+  - description: Scale uses float (0.1 to 5.0 range)
+    rationale: Allow 10% to 500% sizing, prevent extreme values
+    req_id: REQ-PHASE2-001-T3
+  - description: Models provide default values
+    rationale: No transform = original image (scale=1.0, position=0,0, crop=null)
+    req_id: REQ-PHASE2-001-T4
+status: Ready for AI Generation
+usage_examples:
+  example_1_no_transform:
+    code: "from transform_models import SlideTransformConfig, ImageTransform\n\nconfig\
+      \ = SlideTransformConfig(\n    view_path=\"/dashboard/gantt\",\n    transform=ImageTransform()\
+      \  # Identity transform\n)\n\nassert config.transform.is_identity() == True\n"
+    description: Default transform (no changes)
+  example_2_resize_only:
+    code: "transform = ImageTransform(scale=0.8)\n\nconfig = SlideTransformConfig(\n\
+      \    view_path=\"/dashboard/risks\",\n    transform=transform\n)\n"
+    description: Resize image to 80%
+  example_3_full_transform:
+    code: "from transform_models import ImageTransform, Position, CropBounds\n\ntransform\
+      \ = ImageTransform(\n    scale=0.8,\n    position=Position(x=100, y=50),\n \
+      \   crop=CropBounds(x=200, y=100, width=1400, height=800)\n)\n\nconfig = SlideTransformConfig(\n\
+      \    view_path=\"/dashboard/milestones\",\n    transform=transform\n)\n\n# Serialize\
+      \ for API\njson_data = config.model_dump()\n"
+    description: Resize, reposition, and crop
+  example_4_from_frontend:
+    code: "json_from_frontend = {\n    \"view_path\": \"/dashboard/gantt\",\n    \"\
+      transform\": {\n        \"scale\": 0.9,\n        \"position\": {\"x\": 50, \"\
+      y\": 25},\n        \"crop\": {\"x\": 0, \"y\": 0, \"width\": 1920, \"height\"\
+      : 1080},\n        \"maintain_aspect_ratio\": True\n    },\n    \"viewport_width\"\
+      : 1920,\n    \"viewport_height\": 1080\n}\n\nconfig = SlideTransformConfig(**json_from_frontend)\n\
+      \n# Use in PowerPoint generation\nif not config.transform.is_identity():\n \
+      \   # Apply transformations\n    pass\n"
+    description: Deserialize from frontend JSON
+validation:
+  CropBounds:
+  - x >= 0
+  - y >= 0
+  - width > 0 (positive)
+  - height > 0 (positive)
+  - x + width <= source_image_width (when source known)
+  - y + height <= source_image_height (when source known)
+  ImageTransform:
+  - 0.1 <= scale <= 5.0 (10% to 500%)
+  - maintain_aspect_ratio is boolean
+  Position:
+  - x >= 0 (non-negative)
+  - y >= 0 (non-negative)
+  SlideTransformConfig:
+  - view_path is non-empty string
+  - viewport_width > 0
+  - viewport_height > 0

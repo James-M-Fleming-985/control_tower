@@ -235,11 +235,13 @@ if __name__ == '__main__':
               "<layer_yaml_path> [output_dir] [provider]")
         print("\nExample:")
         print('  python build_layer.py '
-              '"LAYER_001/LAYER_001.yaml" LAYER_001 anthropic')
+              '"LAYER_001/LAYER_001.yaml" . anthropic')
         sys.exit(1)
     
     layer_yaml = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else "AI_GENERATED_CODE"
+    # Default to current directory (.) to match build_feature.py structure
+    # Creates src/ and tests/ at layer root, not in AI_GENERATED_CODE/
+    output_dir = sys.argv[2] if len(sys.argv) > 2 else "."
     provider = sys.argv[3] if len(sys.argv) > 3 else "anthropic"
     
     try:

@@ -78,30 +78,105 @@ def clean_generated_code(code: str) -> str:
     Safe for all architectures - just fixes obvious problems.
     
     Fixes:
-    - Markdown code fences (```python ... ```)
+    - Markdown code fences (```python ... ```, ```typescript, etc.)
+    - Leading explanatory text before code
+    - Trailing explanatory text after code
     - Extra leading/trailing whitespace
     """
     if not code:
         return code
     
-    # Strip markdown fences
+    # Strip markdown fences (more comprehensive)
     lines = code.split('\n')
     
-    # Remove first line if it's a code fence
+    # Remove leading fence and language identifier
     if lines and lines[0].strip().startswith('```'):
         lines = lines[1:]
     
-    # Remove last line if it's a code fence
-    if lines and lines[-1].strip() == '```':
+    # Remove trailing fence
+    if lines and lines[-1].strip().startswith('```'):
         lines = lines[:-1]
     
-    # Rejoin and normalize whitespace
-    cleaned = '\n'.join(lines)
+    # Remove any remaining closing fence markers
+    cleaned_lines = []
+    for line in lines:
+        # Skip lines that are just fence markers
+        fence_markers = ['```', '```python', '```typescript',
+                        '```javascript', '```yaml']
+        if line.strip() in fence_markers:
+            continue
+        cleaned_lines.append(line)
+    
+    # Rejoin
+    cleaned = '\n'.join(cleaned_lines)
     
     # Remove excessive leading/trailing whitespace but preserve structure
     cleaned = cleaned.strip() + '\n'  # Ensure single trailing newline
     
     return cleaned
+
+
+def check_code_truncation(code: str,
+                          file_type: str = "python") -> tuple[bool, str]:
+    """
+    Detect if generated code appears to be truncated.
+    
+    Returns:
+        (is_truncated, warning_message)
+    """
+    if not code:
+        return False, ""
+    
+    lines = code.strip().split('\n')
+    if not lines:
+        return False, ""
+    
+    last_line = lines[-1].strip()
+    
+    # Common truncation indicators
+    truncation_indicators = [
+        "# TODO",
+        "# Implementation",
+        "# ... rest of",
+        "# Additional",
+        "pass  # TODO",
+        "...",
+        "# (continued)",
+        "# More code here",
+    ]
+    
+    for indicator in truncation_indicators:
+        if indicator.lower() in last_line.lower():
+            msg = (f"⚠️  Code may be truncated "
+                   f"(ends with: '{last_line}')")
+            return True, msg
+    
+    # Check for incomplete syntax (Python-specific)
+    if file_type == "python":
+        # Last line should not end with : (incomplete block)
+        if last_line.endswith(':'):
+            msg = "⚠️  Code appears incomplete (ends with ':')"
+            return True, msg
+        
+        # Should not end with open parenthesis/bracket
+        if last_line.rstrip().endswith(('(', '[', '{')):
+            msg = "⚠️  Code appears incomplete (unclosed bracket)"
+            return True, msg
+    
+    # Check if code is suspiciously short for certain file types
+    min_expected_lines = {
+        "python": 10,
+        "typescript": 10,
+        "yaml": 5
+    }
+    
+    if file_type in min_expected_lines:
+        if len(lines) < min_expected_lines[file_type]:
+            msg = (f"⚠️  File is suspiciously short "
+                   f"({len(lines)} lines)")
+            return True, msg
+    
+    return False, ""
 
 
 def extract_class_methods(python_file_path: Path) -> Dict[str, List[str]]:
@@ -807,6 +882,13 @@ DO NOT DEVIATE FROM THESE RULES.
             
             # Phase 4: Auto-fix common AI output issues (safe for all architectures)
             code = clean_generated_code(code)
+            
+            # Phase 5: Check for truncation
+            is_truncated, warning_msg = check_code_truncation(code, "python")
+            if is_truncated:
+                print(f"  {warning_msg}")
+                print("  ⚠️  Consider reducing max_tokens or "
+                      "breaking into smaller files")
             
             # Save to feature directory
             output_path = spec.feature_dir / "src" / "feature_integration.py"

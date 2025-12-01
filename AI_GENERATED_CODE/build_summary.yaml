@@ -1,0 +1,10 @@
+files_generated:
+  implementation: src/implementation.py
+  requirements: requirements.yaml
+  tests: tests/test_generated_20251121_161029.py
+layer_id: UNKNOWN
+layer_name: Unknown
+metrics:
+  impl_code_size: 9621
+  test_code_size: 15046
+  test_function_count: 21
