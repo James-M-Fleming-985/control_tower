@@ -16,6 +16,8 @@
   "settings": {
     "files.autoSave": "afterDelay",
     "editor.minimap.enabled": true,
-    "terminal.integrated.defaultProfile.linux": "bash"
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "makefile.configureOnOpen": false,
+    "git.ignoreLimitWarning": true
   }
 }

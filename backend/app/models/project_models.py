@@ -96,8 +96,8 @@ class ProjectTask(Base):
     due_date = Column(DateTime(timezone=True), nullable=True)
     completed_at = Column(DateTime(timezone=True), nullable=True)
     position = Column(Integer, nullable=False, default=0)  # For ordering within project
-    estimated_hours = Column(Integer, nullable=True)  # Estimated hours to complete
-    actual_hours = Column(Integer, nullable=True)  # Actual hours spent
+    estimated_hours = Column(Integer, nullable=True)  # Estimated minutes to complete (keeping column name for compatibility)
+    actual_hours = Column(Integer, nullable=True)  # Actual minutes spent (keeping column name for compatibility)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

@@ -244,9 +244,17 @@ class AICodeGeneratorOrchestrator:
         src_dir = output_base / 'src'
         src_dir.mkdir(parents=True, exist_ok=True)
         
-        # Determine filename from requirements
+        # Determine filename and extension from requirements
+        tech_constraints = requirements.get('technical_constraints', {})
+        output_file_type = tech_constraints.get('output_file_type', '.py')
         layer_id = requirements.get('layer_id', 'implementation')
-        impl_file = src_dir / f'{layer_id.lower().replace("-", "_")}.py'
+        
+        # Use implementation.{ext} pattern for frontend, layer_id.{ext} for backend
+        if output_file_type in ['.tsx', '.jsx', '.ts', '.js']:
+            impl_file = src_dir / f'implementation{output_file_type}'
+        else:
+            impl_file = src_dir / f'{layer_id.lower().replace("-", "_")}{output_file_type}'
+        
         impl_file.write_text(impl_code)
         
         # Rerun tests to verify they pass
@@ -687,7 +695,30 @@ ACCEPTANCE CRITERIA (UNIT TESTS):
                 for test in scenario.get('tests', []):
                     prompt += f"\n      - {test}"
         
-        prompt += """
+        # Get technical constraints for language/framework
+        tech_constraints = requirements.get('technical_constraints', {})
+        language = tech_constraints.get('language', 'Python')
+        framework = tech_constraints.get('framework', '')
+        
+        # Build language-specific instructions
+        if language == 'TypeScript' and 'React' in framework:
+            test_instructions = f"""
+
+Generate complete {language} test files using {framework}:
+- Import statements (React Testing Library, Jest, etc.)
+- Test suites for EACH acceptance criterion
+- Test suites for EACH integration test scenario
+- Test suites for EACH E2E test scenario
+- Each test suite MUST have the EXACT name specified above
+- Each test method MUST be implemented as specified
+- Tests should initially FAIL (RED phase requirement)
+- Use expect().toThrow() or expect(false).toBe(true) for expected failures
+- Include JSDoc comments for all test suites
+
+Output only valid {language} code with {framework}, no explanations or markdown formatting.
+"""
+        else:
+            test_instructions = """
 
 Generate a complete Python test file with:
 - Import statements (pytest, unittest.mock, sys, os, subprocess, pathlib, etc.)
@@ -712,6 +743,8 @@ CRITICAL REQUIREMENTS:
 
 Output only valid Python code, no explanations or markdown formatting.
 """
+        
+        prompt += test_instructions
         return prompt
     
     def _build_implementation_prompt(
@@ -720,11 +753,22 @@ Output only valid Python code, no explanations or markdown formatting.
         red_results: Dict[str, Any]
     ) -> str:
         """Build prompt for AI to generate implementation code."""
-        prompt = f"""Generate Python implementation code to make the following tests pass:
+        # Get technical constraints for language/framework
+        tech_constraints = requirements.get('technical_constraints', {})
+        language = tech_constraints.get('language', 'Python')
+        framework = tech_constraints.get('framework', '')
+        output_file_type = tech_constraints.get('output_file_type', '.py')
+        
+        prompt = f"""Generate {language} implementation code to make the following tests pass:
 
 Layer: {requirements.get('layer_id', 'UNKNOWN')}
 Tests Failed: {red_results.get('tests_failed', 0)}
 Test Files: {', '.join(red_results.get('tests_generated', []))}
+
+Technical Constraints:
+- Language: {language}
+- Framework: {framework if framework else 'None'}
+- Output File Type: {output_file_type}
 
 Requirements:
 """
@@ -732,7 +776,23 @@ Requirements:
             criterion = ac.get('criterion', ac.get('description', ''))
             prompt += f"\n- {criterion}"
         
-        prompt += """
+        # Build language-specific instructions
+        if language == 'TypeScript' and 'React' in framework:
+            impl_instructions = f"""
+
+Generate complete, working {language} + {framework} implementation that:
+- Makes all tests pass
+- Uses React 18+ features (hooks, functional components)
+- Follows React best practices and conventions
+- Includes proper TypeScript type definitions
+- Has JSDoc comments for all components and functions
+- Is production-ready code
+- Exports component as default export
+
+Output only valid {language} code with {output_file_type} extension, no explanations or markdown.
+"""
+        else:
+            impl_instructions = """
 
 Generate complete, working Python implementation that:
 - Makes all tests pass
@@ -743,6 +803,8 @@ Generate complete, working Python implementation that:
 
 Output only valid Python code, no explanations.
 """
+        
+        prompt += impl_instructions
         return prompt
     
     def _extract_coverage_from_output(self, pytest_output: str) -> float:

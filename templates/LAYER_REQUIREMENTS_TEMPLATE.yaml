@@ -93,6 +93,29 @@ traceability:
     from multiple formats; this layer delivers the YAML/XML portion."
 
 # ====================================================================================
+# TECHNICAL CONSTRAINTS - CRITICAL: Tells AI orchestrator which language to generate
+# ====================================================================================
+# This section is READ BY THE AI CODE GENERATOR to determine output language!
+# If missing, defaults to Python. Must match your project's tech stack.
+technical_constraints:
+  language: "[Python|TypeScript|JavaScript|etc]"        # CRITICAL: Primary language (defaults to Python if missing!)
+  framework: "[Framework name and version]"             # e.g., "React 18.2.0" or "FastAPI 0.104.0"
+  output_file_type: "[.py|.tsx|.ts|.js|.jsx|etc]"      # CRITICAL: File extension for generated code
+  runtime: "[Execution environment]"                    # e.g., "Browser (Node.js 18+)" or "Python 3.10+"
+  
+  # Example for Python projects:
+  # language: "Python"
+  # framework: "FastAPI 0.104.0"
+  # output_file_type: ".py"
+  # runtime: "Python 3.10+"
+  
+  # Example for React/TypeScript projects:
+  # language: "TypeScript"
+  # framework: "React 18.2.0"
+  # output_file_type: ".tsx"
+  # runtime: "Browser (Node.js 18+ for build)"
+
+# ====================================================================================
 # REQUIREMENT DEFINITION - What this layer does and why
 # ====================================================================================
 requirement:
@@ -119,13 +142,39 @@ requirement:
 # SPECIFICATION - Technical details of what to build
 # ====================================================================================
 specification:
+  # Technology Stack - CRITICAL: Defines programming language and frameworks
+  # This section determines what language the AI code generator will use
+  technology_stack:
+    programming_language: "[Python|TypeScript|JavaScript|etc]"  # PRIMARY language for this layer
+    file_extensions: ["[.py|.ts|.tsx|.js|.jsx|etc]"]           # File types to generate
+    runtime_environment: "[Python 3.10+|Node.js 18+|Browser|etc]"  # Execution environment
+    
+    # For Python projects:
+    # programming_language: "Python"
+    # file_extensions: [".py"]
+    # runtime_environment: "Python 3.10+"
+    # primary_framework: "N/A (standard library)"
+    
+    # For React/TypeScript projects:
+    # programming_language: "TypeScript"
+    # file_extensions: [".tsx", ".ts"]
+    # runtime_environment: "React Browser Environment (Node.js 18+)"
+    # primary_framework: "React 18.2.0 (functional components with hooks)"
+    # ui_framework: "Material-UI 5.x"
+    # type_checking: "TypeScript 5.0+ strict mode"
+    
+    primary_framework: "[Framework name and version]"  # e.g., "FastAPI 0.104.0" or "React 18.2.0"
+    additional_libraries:
+      - "[library1]"  # e.g., "pyyaml" or "@react-three/fiber"
+      - "[library2]"  # e.g., "pathlib" or "three.js"
+  
   # File/module structure
   structure:
-    entry_point: "src/[module_name]/[main_file].py"    # e.g., src/data_reader/yaml_reader.py
+    entry_point: "src/[module_name]/[main_file].[ext]"    # e.g., src/data_reader/yaml_reader.py OR src/components/Visualization.tsx
     modules:
-      - "[module1].py"        # Brief description
-      - "[module2].py"        # Brief description
-      - "[module3].py"        # Brief description
+      - "[module1].[ext]"        # Brief description
+      - "[module2].[ext]"        # Brief description
+      - "[module3].[ext]"        # Brief description
   
   # Main classes/functions to implement
   classes:
@@ -298,13 +347,37 @@ deployment:
 # ================================================================================
 code_generation_constraints:
   
+  # Language Specification - CRITICAL: Must match specification.technology_stack
+  # This MUST be filled in to ensure correct language generation
+  programming_language: "[COPY from specification.technology_stack.programming_language]"
+  file_extensions: ["[COPY from specification.technology_stack.file_extensions]"]
+  runtime_environment: "[COPY from specification.technology_stack.runtime_environment]"
+  primary_framework: "[COPY from specification.technology_stack.primary_framework]"
+  
+  # EXAMPLES:
+  # Python project:
+  #   programming_language: "Python"
+  #   file_extensions: [".py"]
+  #   runtime_environment: "Python 3.10+"
+  #   primary_framework: "FastAPI 0.104.0"
+  
+  # TypeScript/React project:
+  #   programming_language: "TypeScript"
+  #   file_extensions: [".tsx", ".ts"]
+  #   runtime_environment: "React Browser Environment (Node.js 18+)"
+  #   primary_framework: "React 18.2.0 (functional components with hooks)"
+  #   rendering_library: "@react-three/fiber (latest)"
+  #   graphics_library: "Three.js (latest)"
+  #   ui_framework: "Material-UI 5.x"
+  #   type_checking: "TypeScript 5.0+ strict mode"
+  
   # Output Format Rules - Prevents markdown wrapping
   output_format:
-    - "Return ONLY raw Python code - NO explanations or commentary"
-    - "NO markdown code fences (```python or ```)"
-    - "First line MUST be valid Python (import statement, class definition, or function)"
-    - "Last line MUST be valid Python code (NOT a closing markdown fence)"
-    - "File must be directly executable without any preprocessing"
+    - "Return ONLY raw code in the specified programming language - NO explanations or commentary"
+    - "NO markdown code fences (```python, ```typescript, or ```)"
+    - "First line MUST be valid code (import statement, class definition, interface, or function)"
+    - "Last line MUST be valid code (NOT a closing markdown fence)"
+    - "File must be directly executable/compilable without any preprocessing"
   
   # API Usage Rules - Prevents method invention
   api_usage:
@@ -324,9 +397,12 @@ code_generation_constraints:
   
   # Naming Convention Rules - Ensures consistency
   naming_conventions:
-    - "Primary class name MUST match the layer name or be clearly related"
-    - "Use descriptive, unambiguous names for methods and variables"
-    - "Follow PEP 8 naming conventions (snake_case for functions, PascalCase for classes)"
+    - "Primary class/component name MUST match the layer name or be clearly related"
+    - "Use descriptive, unambiguous names for methods/functions and variables"
+    - "Follow language conventions: PEP 8 for Python (snake_case functions, PascalCase classes) OR TypeScript/React (camelCase functions, PascalCase components)"
+    - "React components use PascalCase: VisualizationManager, SceneController"
+    - "React hooks start with 'use': useVisualizationMode, usePerformance"
+    - "Event handlers start with 'handle': handleModeChange, handleSliderUpdate"
     - "Avoid generic names like 'process', 'handle', 'do' without context"
   
   # Code Quality Rules - Prevents stub/placeholder code
@@ -339,10 +415,13 @@ code_generation_constraints:
   
   # Validation Requirements - Ensures code correctness
   validation_requirements:
-    - "Code MUST be syntactically valid Python 3.10+"
-    - "All referenced attributes MUST exist on their objects"
-    - "All method calls MUST match actual method signatures"
-    - "Type hints must be accurate and complete"
+    - "Code MUST be syntactically valid in the specified programming language"
+    - "For Python: Must be valid Python 3.10+ syntax"
+    - "For TypeScript: Must compile with TypeScript 5.0+ in strict mode"
+    - "For React: Components must handle mounting/unmounting properly"
+    - "All referenced attributes/properties MUST exist on their objects"
+    - "All method/function calls MUST match actual signatures"
+    - "Type hints/annotations must be accurate and complete"
     - "Code must pass basic static analysis (no obvious errors)"
 
 # ================================================================================

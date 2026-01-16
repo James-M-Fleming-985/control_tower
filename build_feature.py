@@ -38,6 +38,15 @@ def extract_code_constraints(requirements: Dict) -> Dict:
     return requirements.get('code_generation_constraints', {})
 
 
+def extract_technical_constraints(requirements: Dict) -> Dict:
+    """
+    Extract technical_constraints from layer requirements YAML.
+    This includes language, framework, output_file_type, etc.
+    Returns empty dict if not present - backwards compatible.
+    """
+    return requirements.get('technical_constraints', {})
+
+
 def extract_feature_constraints(requirements: Dict) -> Dict:
     """
     Extract feature_integration_constraints from feature requirements YAML.
@@ -651,15 +660,24 @@ class FeatureBuilder:
             layer_spec = self.find_layer_spec(layer_info)
             layer_dir = layer_spec.parent
             
-            # Find implementation file
-            impl_path = layer_dir / "src" / "implementation.py"
+            # Parse requirements from layer YAML to determine file extension
+            layer_yaml = yaml.safe_load(layer_spec.read_text())
+            tech_constraints = extract_technical_constraints(layer_yaml)
+            language = tech_constraints.get('language', 'python').lower()
+            
+            # Determine implementation file extension based on language
+            if 'typescript' in language or 'react' in language:
+                impl_filename = "implementation.tsx"
+            elif 'javascript' in language:
+                impl_filename = "implementation.js"
+            else:
+                impl_filename = "implementation.py"
+            
+            impl_path = layer_dir / "src" / impl_filename
             
             if not impl_path.exists():
-                print(f"⚠️  Warning: Implementation not found for {layer_id}")
+                print(f"⚠️  Warning: Implementation not found for {layer_id} at {impl_path}")
                 continue
-            
-            # Parse requirements from layer YAML
-            layer_yaml = yaml.safe_load(layer_spec.read_text())
             
             layer_impl = LayerInfo(
                 layer_id=layer_id,
@@ -1180,7 +1198,20 @@ Generate a complete test_e2e.py file with at least 3 comprehensive E2E tests."""
         for layer_info in layers_info:
             layer_spec = self.find_layer_spec(layer_info)
             layer_dir = layer_spec.parent
-            impl_file = layer_dir / "src" / "implementation.py"
+            
+            # Detect correct implementation file based on language
+            layer_yaml = yaml.safe_load(layer_spec.read_text())
+            tech_constraints = extract_technical_constraints(layer_yaml)
+            language = tech_constraints.get('language', 'python').lower()
+            
+            if 'typescript' in language or 'react' in language:
+                impl_filename = "implementation.tsx"
+            elif 'javascript' in language:
+                impl_filename = "implementation.js"
+            else:
+                impl_filename = "implementation.py"
+                
+            impl_file = layer_dir / "src" / impl_filename
             test_count = len(list((layer_dir / "tests").glob("test_*.py"))) if (layer_dir / "tests").exists() else 0
             
             print(f"   • {layer_info['layer_id']}: {layer_info['name']}")
