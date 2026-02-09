@@ -3,14 +3,6 @@
     {
       "name": "control_tower",
       "path": "."
-    },
-    {
-      "name": "business_ventures",
-      "path": "../business_ventures"
-    },
-    {
-      "name": "life_quality",
-      "path": "../life_quality"
     }
   ],
   "settings": {
@@ -18,6 +10,16 @@
     "editor.minimap.enabled": true,
     "terminal.integrated.defaultProfile.linux": "bash",
     "makefile.configureOnOpen": false,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "files.watcherExclude": {
+      "**/cloned_repos/**": true,
+      "**/node_modules/**": true,
+      "**/.git/**": true
+    },
+    "python.analysis.exclude": ["**/cloned_repos/**"],
+    "python.analysis.indexing": false,
+    "python.analysis.diagnosticMode": "openFilesOnly",
+    "pylint.enabled": false,
+    "flake8.enabled": false
   }
 }
