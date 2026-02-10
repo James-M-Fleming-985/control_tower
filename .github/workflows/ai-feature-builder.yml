@@ -250,11 +250,7 @@ jobs:
             echo "No changes to commit"
           else
             FEATURE="${{ inputs.feature_id }}"
-            git commit -m "🤖 AI-generated: $FEATURE implementation
-
-Built by AI Feature Builder workflow
-Trigger: workflow_dispatch
-Dry run: ${{ inputs.dry_run }}"
+            git commit -m "🤖 AI-generated: $FEATURE implementation"
             
             echo "Pushing to ${{ inputs.target_repo }}..."
             git push
@@ -280,19 +276,12 @@ Dry run: ${{ inputs.dry_run }}"
       - name: "📊 Generate summary"
         if: always()
         run: |
-          cat >> $GITHUB_STEP_SUMMARY << EOF
-          ## 🤖 AI Feature Builder Results
-          
-          | Setting | Value |
-          |---------|-------|
-          | **Target Repo** | \`${{ inputs.target_repo }}\` |
-          | **Target Path** | \`${{ inputs.target_path }}\` |
-          | **Feature** | \`${{ inputs.feature_id }}\` |
-          | **Dry Run** | ${{ inputs.dry_run }} |
-          | **Status** | ${{ job.status }} |
-          
-          ### 📝 Notes
-          - AI Provider: Anthropic Claude
-          - Build script: \`build_feature.py\`
-          - Changes pushed to target repository on success
-          EOF
+          echo "## 🤖 AI Feature Builder Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Repo** | \`${{ inputs.target_repo }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Path** | \`${{ inputs.target_path }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Feature** | \`${{ inputs.feature_id }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Dry Run** | ${{ inputs.dry_run }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
