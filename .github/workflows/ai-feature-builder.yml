@@ -179,7 +179,11 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          TARGET_PATH="$(pwd)/target_repo/${{ inputs.target_path }}"
+          # Use absolute paths to avoid cd navigation issues
+          WORKSPACE_ROOT="$(pwd)"
+          TARGET_PATH="$WORKSPACE_ROOT/target_repo/${{ inputs.target_path }}"
+          CONTROL_TOWER="$WORKSPACE_ROOT/control_tower"
+          TARGET_REPO="$WORKSPACE_ROOT/target_repo"
           DRY_RUN="${{ inputs.dry_run }}"
           
           FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
@@ -207,22 +211,23 @@ jobs:
               python -c "import yaml; yaml.safe_load(open('$YAML_PATH'))" && echo "✓ Valid"
               BUILD_RESULTS="$BUILD_RESULTS\n✓ $FEATURE: Valid YAML"
             else
-              cd control_tower
+              # Run build from control_tower directory
+              cd "$CONTROL_TOWER"
               if python build_feature.py "$YAML_PATH" --verbose; then
                 BUILD_RESULTS="$BUILD_RESULTS\n✅ $FEATURE: Success"
                 
                 # Commit after each successful build
-                cd ../target_repo
+                cd "$TARGET_REPO"
                 git config user.name "github-actions[bot]"
                 git config user.email "github-actions[bot]@users.noreply.github.com"
                 git add -A
                 git commit -m "🤖 AI-generated: $FEATURE implementation" || echo "No changes to commit"
-                cd ..
               else
                 BUILD_RESULTS="$BUILD_RESULTS\n❌ $FEATURE: Build failed"
                 echo "::warning::Build failed for $FEATURE, continuing with next feature"
               fi
-              cd ..
+              # Always return to workspace root for next iteration
+              cd "$WORKSPACE_ROOT"
             fi
           done
           
