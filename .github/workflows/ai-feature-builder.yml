@@ -247,19 +247,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Stage all changes
+          # Stage any remaining changes
           git add -A
           
-          # Check if there are changes to commit
+          # Commit if there are new changes
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No new changes to commit"
           else
             FEATURE="${{ inputs.feature_id }}"
             git commit -m "🤖 AI-generated: $FEATURE implementation"
-            
-            echo "Pushing to ${{ inputs.target_repo }}..."
+          fi
+          
+          # Always push if there are unpushed commits
+          COMMITS_AHEAD=$(git rev-list --count HEAD ^origin/$(git branch --show-current) 2>/dev/null || echo "0")
+          if [ "$COMMITS_AHEAD" -gt 0 ]; then
+            echo "Pushing $COMMITS_AHEAD commit(s) to ${{ inputs.target_repo }}..."
             git push
             echo "✅ Changes pushed successfully"
+          else
+            echo "No commits to push"
           fi
 
       # ========================================
