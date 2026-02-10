@@ -1,0 +1,298 @@
+# ============================================================
+# AI FEATURE BUILDER - Cross-Repository Workflow
+# ============================================================
+# Builds features in any repository using the AI Code Generator
+#
+# TRIGGER: Workflow dispatch from GitHub Actions tab or mobile
+#
+# REQUIRED SECRETS:
+#   - ANTHROPIC_API_KEY: API key for Claude AI
+#   - CROSS_REPO_PAT: Personal Access Token with 'repo' scope
+#     (needed to push changes to target repositories)
+#
+# SETUP:
+#   1. Go to GitHub Settings → Developer settings → Personal access tokens
+#   2. Generate new token (classic) with 'repo' scope
+#   3. Add as repository secret: CROSS_REPO_PAT
+#   4. Add ANTHROPIC_API_KEY as repository secret
+
+name: "🤖 AI Feature Builder"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Target repository (owner/repo)'
+        required: true
+        type: choice
+        options:
+          - 'James-M-Fleming-985/business_ventures'
+          - 'James-M-Fleming-985/control_tower'
+        default: 'James-M-Fleming-985/business_ventures'
+      
+      target_path:
+        description: 'Path to project within repo (e.g., Causal_affect)'
+        required: false
+        type: string
+        default: 'Causal_affect'
+      
+      feature_id:
+        description: 'Feature to build'
+        required: true
+        type: choice
+        options:
+          - 'FEATURE-CA-002-06'
+          - 'FEATURE-CA-002-08'
+          - 'FEATURE-CA-002-09'
+          - 'FEATURE-CA-002-10'
+          - 'ALL_IN_ORDER'
+      
+      dry_run:
+        description: 'Dry run (validate only, no AI generation)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  build:
+    name: "Build ${{ inputs.feature_id }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    
+    steps:
+      # ========================================
+      # SETUP
+      # ========================================
+      - name: "📥 Checkout control_tower (AI Code Generator)"
+        uses: actions/checkout@v4
+        with:
+          path: control_tower
+
+      - name: "📥 Checkout target repository"
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.target_repo }}
+          token: ${{ secrets.CROSS_REPO_PAT }}
+          path: target_repo
+          fetch-depth: 0
+
+      - name: "🐍 Set up Python ${{ env.PYTHON_VERSION }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: "📦 Install dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install anthropic pyyaml requests pytest numpy pandas scipy statsmodels
+          
+          # Install target repo dependencies if present
+          TARGET_PATH="target_repo/${{ inputs.target_path }}"
+          if [ -f "$TARGET_PATH/src/backend/requirements.txt" ]; then
+            pip install -r "$TARGET_PATH/src/backend/requirements.txt"
+          fi
+          if [ -f "$TARGET_PATH/requirements.txt" ]; then
+            pip install -r "$TARGET_PATH/requirements.txt"
+          fi
+
+      # ========================================
+      # VALIDATION
+      # ========================================
+      - name: "✅ Validate configuration"
+        id: validate
+        run: |
+          TARGET_PATH="target_repo/${{ inputs.target_path }}"
+          FEATURE="${{ inputs.feature_id }}"
+          
+          echo "Target path: $TARGET_PATH"
+          echo "Feature: $FEATURE"
+          
+          # Check target exists
+          if [ ! -d "$TARGET_PATH" ]; then
+            echo "::error::Target path not found: $TARGET_PATH"
+            exit 1
+          fi
+          
+          # Find feature YAMLs
+          if [ "$FEATURE" = "ALL_IN_ORDER" ]; then
+            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
+          else
+            FEATURES=("$FEATURE")
+          fi
+          
+          for F in "${FEATURES[@]}"; do
+            YAML_PATH=$(find "$TARGET_PATH" -name "${F}*.yaml" -path "*/${F}_*/*" -type f 2>/dev/null | grep -v "LAYER-" | head -1)
+            if [ -z "$YAML_PATH" ]; then
+              echo "::error::Feature YAML not found for $F in $TARGET_PATH"
+              find "$TARGET_PATH" -name "*.yaml" -type f 2>/dev/null | head -20
+              exit 1
+            fi
+            echo "✓ Found: $YAML_PATH"
+          done
+          
+          echo "validation_passed=true" >> $GITHUB_OUTPUT
+
+      # ========================================
+      # BUILD SINGLE FEATURE
+      # ========================================
+      - name: "🔨 Build feature: ${{ inputs.feature_id }}"
+        if: inputs.feature_id != 'ALL_IN_ORDER'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TARGET_PATH="$(pwd)/target_repo/${{ inputs.target_path }}"
+          FEATURE="${{ inputs.feature_id }}"
+          DRY_RUN="${{ inputs.dry_run }}"
+          
+          echo ""
+          echo "========================================"
+          echo "  Building: $FEATURE"
+          echo "  Target: $TARGET_PATH"
+          echo "  Dry run: $DRY_RUN"
+          echo "========================================"
+          echo ""
+          
+          # Find the feature YAML
+          YAML_PATH=$(find "$TARGET_PATH" -name "${FEATURE}*.yaml" -path "*/${FEATURE}_*/*" -type f 2>/dev/null | grep -v "LAYER-" | head -1)
+          
+          echo "Feature YAML: $YAML_PATH"
+          echo ""
+          
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "📋 DRY RUN - Validating YAML only"
+            python -c "import yaml; data = yaml.safe_load(open('$YAML_PATH')); print('✓ YAML valid'); print(f'Feature: {data.get(\"name\", \"unknown\")}'); print(f'Layers: {len(data.get(\"layers\", []))}')"
+          else
+            echo "🚀 Starting AI code generation..."
+            cd control_tower
+            python build_feature.py "$YAML_PATH" --verbose
+          fi
+
+      # ========================================
+      # BUILD ALL FEATURES IN ORDER
+      # ========================================
+      - name: "🔨 Build all features sequentially"
+        if: inputs.feature_id == 'ALL_IN_ORDER'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TARGET_PATH="$(pwd)/target_repo/${{ inputs.target_path }}"
+          DRY_RUN="${{ inputs.dry_run }}"
+          
+          FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
+          
+          BUILD_RESULTS=""
+          
+          for FEATURE in "${FEATURES[@]}"; do
+            echo ""
+            echo "========================================"
+            echo "  Building: $FEATURE"
+            echo "========================================"
+            echo ""
+            
+            YAML_PATH=$(find "$TARGET_PATH" -name "${FEATURE}*.yaml" -path "*/${FEATURE}_*/*" -type f 2>/dev/null | grep -v "LAYER-" | head -1)
+            
+            if [ -z "$YAML_PATH" ]; then
+              echo "⚠️ Skipping $FEATURE - YAML not found"
+              BUILD_RESULTS="$BUILD_RESULTS\n❌ $FEATURE: YAML not found"
+              continue
+            fi
+            
+            echo "Feature YAML: $YAML_PATH"
+            
+            if [ "$DRY_RUN" = "true" ]; then
+              python -c "import yaml; yaml.safe_load(open('$YAML_PATH'))" && echo "✓ Valid"
+              BUILD_RESULTS="$BUILD_RESULTS\n✓ $FEATURE: Valid YAML"
+            else
+              cd control_tower
+              if python build_feature.py "$YAML_PATH" --verbose; then
+                BUILD_RESULTS="$BUILD_RESULTS\n✅ $FEATURE: Success"
+                
+                # Commit after each successful build
+                cd ../target_repo
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
+                git add -A
+                git commit -m "🤖 AI-generated: $FEATURE implementation" || echo "No changes to commit"
+                cd ..
+              else
+                BUILD_RESULTS="$BUILD_RESULTS\n❌ $FEATURE: Build failed"
+                echo "::warning::Build failed for $FEATURE, continuing with next feature"
+              fi
+              cd ..
+            fi
+          done
+          
+          echo ""
+          echo "========================================"
+          echo "  BUILD SUMMARY"
+          echo "========================================"
+          echo -e "$BUILD_RESULTS"
+
+      # ========================================
+      # COMMIT & PUSH
+      # ========================================
+      - name: "📤 Commit and push changes"
+        if: inputs.dry_run != true
+        working-directory: target_repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Stage all changes
+          git add -A
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            FEATURE="${{ inputs.feature_id }}"
+            git commit -m "🤖 AI-generated: $FEATURE implementation
+
+Built by AI Feature Builder workflow
+Trigger: workflow_dispatch
+Dry run: ${{ inputs.dry_run }}"
+            
+            echo "Pushing to ${{ inputs.target_repo }}..."
+            git push
+            echo "✅ Changes pushed successfully"
+          fi
+
+      # ========================================
+      # ARTIFACTS & SUMMARY
+      # ========================================
+      - name: "📁 Upload build artifacts"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "build-${{ inputs.feature_id }}-${{ github.run_number }}"
+          path: |
+            target_repo/**/verification_*.md
+            target_repo/**/verification_*.yaml
+            target_repo/**/build_*.log
+            control_tower/**/build_*.log
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: "📊 Generate summary"
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 🤖 AI Feature Builder Results
+          
+          | Setting | Value |
+          |---------|-------|
+          | **Target Repo** | \`${{ inputs.target_repo }}\` |
+          | **Target Path** | \`${{ inputs.target_path }}\` |
+          | **Feature** | \`${{ inputs.feature_id }}\` |
+          | **Dry Run** | ${{ inputs.dry_run }} |
+          | **Status** | ${{ job.status }} |
+          
+          ### 📝 Notes
+          - AI Provider: Anthropic Claude
+          - Build script: \`build_feature.py\`
+          - Changes pushed to target repository on success
+          EOF
