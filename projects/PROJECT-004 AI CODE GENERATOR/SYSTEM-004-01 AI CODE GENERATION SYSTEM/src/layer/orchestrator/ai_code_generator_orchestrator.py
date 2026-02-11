@@ -168,6 +168,7 @@ class AICodeGeneratorOrchestrator:
         
         # Call AI provider to generate test code
         test_code = self.ai_provider.generate_code(prompt)
+        test_code = self._clean_code_fences(test_code)
         
         # Write test code to files
         output_base = Path(self.config['output_base_path'])
@@ -238,6 +239,7 @@ class AICodeGeneratorOrchestrator:
         
         # Call AI provider to generate implementation
         impl_code = self.ai_provider.generate_code(prompt)
+        impl_code = self._clean_code_fences(impl_code)
         
         # Write implementation to src/ directory
         output_base = Path(self.config['output_base_path'])
@@ -400,6 +402,28 @@ class AICodeGeneratorOrchestrator:
         """
         allowed = PHASE_TRANSITIONS.get(from_phase, [])
         return to_phase in allowed
+    
+    @staticmethod
+    def _clean_code_fences(code: str) -> str:
+        """
+        Remove markdown code fences from AI-generated code.
+        
+        AI providers often wrap code in ```python ... ``` blocks.
+        This strips those fences so files are valid source code.
+        """
+        if not code:
+            return code
+        lines = code.split('\n')
+        # Remove leading fence (e.g. ```python, ```typescript, ```javascript)
+        if lines and lines[0].strip().startswith('```'):
+            lines = lines[1:]
+        # Remove trailing fence
+        if lines and lines[-1].strip() == '```':
+            lines = lines[:-1]
+        # Remove any remaining standalone fence lines
+        cleaned = [l for l in lines if l.strip() not in 
+                   ('```', '```python', '```typescript', '```javascript', '```jsx', '```tsx')]
+        return '\n'.join(cleaned)
     
     def collect_evidence(self, phase_result: Dict[str, Any]) -> Dict[str, Any]:
         """
