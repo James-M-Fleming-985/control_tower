@@ -263,6 +263,10 @@ traceability:
 # ====================================================================================
 # DEPLOYMENT
 # ====================================================================================
+# NOTE: The 'deployment' section below covers package dependencies and manual steps.
+# For AUTOMATIC wiring into the production app (router registration, endpoint
+# creation), see the 'production_integration' section further down.
+# ====================================================================================
 
 deployment:
   dependencies:
@@ -355,6 +359,63 @@ feature_level_verification:
     
     - gate: "No critical integration issues"
       required: true
+
+# ====================================================================================
+# PRODUCTION INTEGRATION - Auto-wiring into the live application
+# ====================================================================================
+# CRITICAL: Without this section, the AI Feature Builder generates code that sits
+# orphaned in the feature directory — never imported or served by the running app.
+#
+# When present, the builder automatically patches the target router/app file after
+# building so the feature's FeatureOrchestrator is imported and its operations are
+# exposed as API endpoints (or CLI commands, depending on your architecture).
+#
+# The wiring is idempotent — re-running the build will skip if already connected.
+# ====================================================================================
+
+production_integration:
+  # Path to the router/app file to patch (relative to repo root)
+  target_router_file: "[e.g. src/backend/app/my_router.py]"
+  
+  # Unique alias for the imported FeatureOrchestrator (used in generated code)
+  import_alias: "[e.g. MyFeatureService]"
+  
+  # Unique module name for importlib loading (avoids collisions between features
+  # that all export FeatureOrchestrator)
+  module_name: "[e.g. feature_integration_XX]"
+  
+  # URL path prefix for all endpoints (appended to the router's existing prefix)
+  endpoint_prefix: "[e.g. /my-feature]"
+  
+  # Auto-generate a GET <prefix>/health endpoint (recommended: true)
+  health_endpoint: true
+  
+  # Pydantic request models that the builder will generate in the target file
+  # Omit this if all operations are simple GETs with no request body
+  pydantic_models:
+    - name: "[e.g. MyFeatureRequest]"
+      fields:
+        - name: "[field_name]"
+          type: "[e.g. str, int, List[float], Dict[str, Any]]"
+          default: "[e.g. ..., None, 10, 'default_value']"  # Use ... for required
+          description: "[What this field is for]"
+  
+  # Operations to expose as API endpoints
+  # Each operation maps to a method on the FeatureOrchestrator
+  operations:
+    - name: "[endpoint_function_name]"      # Python function name for the endpoint
+      http_method: "[get|post|put|delete]"   # HTTP method
+      path: "[e.g. /analyze]"               # Path suffix (appended to endpoint_prefix)
+      description: "[What this endpoint does]"
+      request_model: "[e.g. MyFeatureRequest]"  # Omit for GET endpoints with no body
+      orchestrator_method: "[e.g. execute]"     # Method to call on FeatureOrchestrator
+      orchestrator_args: "[e.g. request.data, request.params]"  # Args to pass
+    
+    - name: "[status_endpoint_name]"
+      http_method: "get"
+      path: "/status"
+      description: "Get feature service status"
+      orchestrator_method: "get_status"
 
 # ====================================================================================
 # FEATURE INTEGRATION CODE CONSTRAINTS - For feature_integration.py generation
