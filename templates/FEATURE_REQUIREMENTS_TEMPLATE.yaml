@@ -376,6 +376,11 @@ feature_level_verification:
 production_integration:
   # Path to the router/app file to patch (relative to repo root)
   target_router_file: "[e.g. src/backend/app/my_router.py]"
+
+  # Production entry point that Railway/uvicorn runs (relative to repo root).
+  # The builder will verify the target_router is include_router()'d here,
+  # and auto-mount it if missing. Default: main.py
+  app_entry_point: "main.py"
   
   # Unique alias for the imported FeatureOrchestrator (used in generated code)
   import_alias: "[e.g. MyFeatureService]"

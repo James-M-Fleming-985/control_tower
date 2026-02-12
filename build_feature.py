@@ -299,6 +299,10 @@ class ProductionIntegrationConfig:
     framework-specific glue code) that imports the feature_integration module
     and exposes its operations as API endpoints, then patches the target
     router/app file so the new endpoints are registered.
+
+    Additionally, verifies that the target router itself is mounted in the
+    production entry point (app_entry_point, default: main.py) to prevent
+    the 'Layer 2 gap' where features are invisible to production.
     """
     target_router_file: str          # e.g. "src/backend/app/causality_router.py"
     import_alias: str                # e.g. "CausalityOrchestrator"
@@ -307,6 +311,7 @@ class ProductionIntegrationConfig:
     operations: List[Dict[str, Any]] # list of {name, http_method, path, description}
     health_endpoint: bool = True     # auto-generate GET <prefix>/health
     pydantic_models: List[Dict[str, Any]] = field(default_factory=list)
+    app_entry_point: str = 'main.py' # production entry point to verify router is mounted in
 
 
 @dataclass
@@ -1398,6 +1403,14 @@ async def {import_alias.lower()}_health() -> Dict[str, Any]:
             print(f"     Endpoints: {len(operations)} operations" +
                   (" + health" if health_endpoint else ""))
             print(f"     Prefix: {endpoint_prefix}")
+
+            # --- Layer 2: Verify router is included in production entry point ---
+            app_entry_point = prod_config.get('app_entry_point', 'main.py')
+            app_entry_path = repo_root / app_entry_point
+            self._verify_router_in_entry_point(
+                target_path, app_entry_path, repo_root, target_file
+            )
+
             return True
 
         except Exception as e:
@@ -1406,6 +1419,123 @@ async def {import_alias.lower()}_health() -> Dict[str, Any]:
                 import traceback
                 traceback.print_exc()
             return False
+
+    def _verify_router_in_entry_point(
+        self,
+        target_router_path: Path,
+        app_entry_path: Path,
+        repo_root: Path,
+        target_file: str,
+    ) -> None:
+        """Verify the target router file is include_router'd in the production
+        entry point (e.g. main.py).  If not, warn loudly and attempt to add it.
+
+        This prevents the 'Layer 2 gap' where features are correctly wired into
+        a sub-router but the sub-router itself is never mounted in the app that
+        Railway/production actually runs.
+        """
+        if not app_entry_path.exists():
+            print(f"\n  ⚠️  PRODUCTION ENTRY POINT NOT FOUND: {app_entry_path}")
+            print(f"     Cannot verify that {target_file} is mounted in the live app.")
+            print(f"     YOU MUST MANUALLY add include_router() for this router.")
+            return
+
+        entry_code = app_entry_path.read_text()
+
+        # Derive the router module name from the target file path
+        # e.g. "Causal_affect/src/backend/app/causality_router.py" -> "causality_router"
+        router_module = target_router_path.stem  # e.g. "causality_router"
+
+        # Check if the router is already imported/included
+        if router_module in entry_code and 'include_router' in entry_code:
+            # Quick check: is there an include_router call that references this module?
+            import re as _re
+            pattern = _re.compile(
+                rf'include_router\([^)]*{router_module}[^)]*\)',
+                _re.IGNORECASE
+            )
+            if pattern.search(entry_code):
+                print(f"  ✅ Router '{router_module}' is already mounted in {app_entry_path.name}")
+                return
+
+        # --- Router is NOT mounted — warn loudly ---
+        print(f"\n  🚨 CRITICAL: Router '{router_module}' is NOT included in {app_entry_path.name}!")
+        print(f"     The production app ({app_entry_path.name}) does not import or")
+        print(f"     include_router() for '{router_module}'.")
+        print(f"     Features will be invisible to production until this is fixed.")
+        print(f"")
+
+        # Attempt auto-fix: add import and include_router
+        rel_import_path = target_router_path.relative_to(repo_root)
+        # Build a dotted import path, e.g. "Causal_affect.src.backend.app.causality_router"
+        # But for complex paths, use sys.path + importlib approach
+        router_var = f"{router_module}_router"
+
+        # Find the sys.path insert for the parent directory of the router
+        router_parent = target_router_path.parent.relative_to(repo_root)
+
+        import_block = f'''
+# ---------------------------------------------------------------------------
+# AUTO-MOUNTED by AI Feature Builder (Layer 2 verification)
+# ---------------------------------------------------------------------------
+try:
+    _{router_module}_path = Path(__file__).parent / "{router_parent}"
+    if str(_{router_module}_path) not in sys.path:
+        sys.path.insert(0, str(_{router_module}_path))
+    from {router_module} import router as {router_var}
+    logger.info("✅ {router_module} imported successfully")
+except Exception as _e:
+    logger.warning(f"⚠️  Could not import {router_module}: {{_e}}")
+    {router_var} = None
+'''
+
+        include_block = f'''
+# Mount {router_module} (auto-wired by AI Feature Builder)
+if {router_var} is not None:
+    app.include_router({router_var})
+'''
+
+        # Find where to inject — after existing imports, before app routes
+        # Look for the last "include_router" call
+        last_include = entry_code.rfind('app.include_router(')
+        if last_include != -1:
+            # Find end of that line
+            line_end = entry_code.index('\n', last_include)
+            entry_code = (
+                entry_code[:line_end + 1]
+                + include_block
+                + entry_code[line_end + 1:]
+            )
+        else:
+            entry_code += "\n" + include_block
+
+        # Add import block near the top — after existing try/except import blocks
+        # Find last "router = None" or "import" near top
+        marker_pos = entry_code.rfind('_router = None')
+        if marker_pos != -1:
+            line_end = entry_code.index('\n', marker_pos)
+            entry_code = (
+                entry_code[:line_end + 1]
+                + import_block
+                + entry_code[line_end + 1:]
+            )
+        else:
+            # Fallback: insert before the "# Include routers" comment or app definition
+            include_comment = entry_code.find('# Include routers')
+            if include_comment == -1:
+                include_comment = entry_code.find('app.include_router')
+            if include_comment != -1:
+                entry_code = (
+                    entry_code[:include_comment]
+                    + import_block + "\n"
+                    + entry_code[include_comment:]
+                )
+            else:
+                entry_code += "\n" + import_block
+
+        app_entry_path.write_text(entry_code)
+        print(f"  ✅ AUTO-FIX: Added '{router_module}' import + include_router()")
+        print(f"     to {app_entry_path.name}. Please review the changes.")
 
     def _show_enhanced_summary(self, layers_info: List[Dict], feature_spec: FeatureIntegrationSpec):
         """Show enhanced build summary including feature integration."""
