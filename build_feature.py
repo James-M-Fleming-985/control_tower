@@ -291,6 +291,25 @@ class LayerInfo:
 
 
 @dataclass
+class ProductionIntegrationConfig:
+    """Configuration for wiring a built feature into the production app.
+
+    Read from the 'production_integration' section of a feature YAML.
+    When present, the builder will generate a FastAPI router snippet (or other
+    framework-specific glue code) that imports the feature_integration module
+    and exposes its operations as API endpoints, then patches the target
+    router/app file so the new endpoints are registered.
+    """
+    target_router_file: str          # e.g. "src/backend/app/causality_router.py"
+    import_alias: str                # e.g. "CausalityOrchestrator"
+    module_name: str                 # unique importlib module name, e.g. "feature_integration_06"
+    endpoint_prefix: str             # e.g. "/granger"  (appended to the router's base prefix)
+    operations: List[Dict[str, Any]] # list of {name, http_method, path, description}
+    health_endpoint: bool = True     # auto-generate GET <prefix>/health
+    pydantic_models: List[Dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass
 class FeatureIntegrationSpec:
     """Specification for feature integration layer generation."""
     feature_id: str
@@ -1185,7 +1204,209 @@ Generate a complete test_e2e.py file with at least 3 comprehensive E2E tests."""
                 import traceback
                 traceback.print_exc()
             return False
-    
+
+    # -----------------------------------------------------------------
+    # Production Integration Wiring
+    # -----------------------------------------------------------------
+    def generate_production_wiring(
+        self,
+        feature_spec: FeatureIntegrationSpec,
+        prod_config: Dict[str, Any],
+    ) -> bool:
+        """Generate and inject production wiring into the target app file.
+
+        Reads the ``production_integration`` section from the feature YAML,
+        builds a code snippet that:
+        1. Imports the feature_integration module via importlib (avoids name
+           collisions between features that all export FeatureOrchestrator).
+        2. Instantiates the orchestrator at module level.
+        3. Registers FastAPI endpoints that delegate to the orchestrator.
+
+        The snippet is appended **before** any catch-all path-parameter route
+        (``/{...}``) so that specific routes take priority.
+
+        Returns True on success, False on failure.
+        """
+        try:
+            target_file = prod_config.get('target_router_file')
+            if not target_file:
+                print("  ❌ No target_router_file specified in production_integration")
+                return False
+
+            # Resolve relative to the repo root (feature_dir's grandparent
+            # typically, but we search upward for a .git marker)
+            repo_root = feature_spec.feature_dir
+            while repo_root != repo_root.parent:
+                if (repo_root / '.git').exists():
+                    break
+                repo_root = repo_root.parent
+
+            target_path = repo_root / target_file
+            if not target_path.exists():
+                print(f"  ❌ Target router file not found: {target_path}")
+                return False
+
+            import_alias = prod_config.get('import_alias', f'{feature_spec.feature_id}_Orchestrator')
+            module_name = prod_config.get('module_name', f'feature_integration_{feature_spec.feature_id}')
+            endpoint_prefix = prod_config.get('endpoint_prefix', f'/{feature_spec.feature_id}')
+            operations = prod_config.get('operations', [])
+            health_endpoint = prod_config.get('health_endpoint', True)
+            feature_integration_path = feature_spec.feature_dir / "src" / "feature_integration.py"
+
+            # Build the relative path from the repo root to the feature integration
+            rel_integration_dir = feature_integration_path.parent.relative_to(repo_root)
+
+            # --- Build Pydantic request models ---
+            pydantic_models_code = ""
+            for model_def in prod_config.get('pydantic_models', []):
+                model_name = model_def['name']
+                fields = model_def.get('fields', [])
+                field_lines = []
+                for f in fields:
+                    fname = f['name']
+                    ftype = f.get('type', 'Any')
+                    fdefault = f.get('default', '...')
+                    fdesc = f.get('description', '')
+                    field_lines.append(
+                        f'    {fname}: {ftype} = Field(default={fdefault}, description="{fdesc}")'
+                    )
+                pydantic_models_code += f"\n\nclass {model_name}(BaseModel):\n"
+                pydantic_models_code += "\n".join(field_lines) + "\n"
+
+            # --- Build import block ---
+            avail_flag = f'{import_alias.upper()}_AVAILABLE'
+            service_var = f'_{import_alias.lower()}'
+            import_block = f'''
+# ---------------------------------------------------------------------------
+# AUTO-WIRED by AI Feature Builder: {feature_spec.feature_id}
+# ---------------------------------------------------------------------------
+_fi_{module_name}_path = Path(__file__).parent.parent.parent.parent / "{rel_integration_dir}"
+try:
+    import importlib.util as _ilu_{module_name}
+    _spec_{module_name} = _ilu_{module_name}.spec_from_file_location(
+        "{module_name}", _fi_{module_name}_path / "feature_integration.py"
+    )
+    _mod_{module_name} = _ilu_{module_name}.module_from_spec(_spec_{module_name})
+    _spec_{module_name}.loader.exec_module(_mod_{module_name})
+    {import_alias} = _mod_{module_name}.FeatureOrchestrator
+    {avail_flag} = True
+    {service_var} = {import_alias}()
+except Exception as _e_{module_name}:
+    logging.warning(f"{feature_spec.feature_id} not available: {{_e_{module_name}}}")
+    {avail_flag} = False
+    {service_var} = None
+'''
+
+            # --- Build endpoint block ---
+            endpoint_block = f'''
+# =============================================================================
+# {feature_spec.feature_id}: {feature_spec.feature_name} (auto-wired)
+# =============================================================================
+{pydantic_models_code}'''
+
+            for op in operations:
+                method = op.get('http_method', 'get').lower()
+                path = op.get('path', f'/{op["name"]}')
+                op_name = op['name']
+                description = op.get('description', '')
+                request_model = op.get('request_model', None)
+                orchestrator_method = op.get('orchestrator_method', op_name)
+                orchestrator_args = op.get('orchestrator_args', '')
+
+                if request_model:
+                    endpoint_block += f'''
+
+@router.{method}("{endpoint_prefix}{path}")
+async def {op_name}(request: {request_model}) -> Dict[str, Any]:
+    """{description}"""
+    if not {avail_flag}:
+        raise HTTPException(status_code=503, detail="{feature_spec.feature_id} not available")
+    result = {service_var}.{orchestrator_method}({orchestrator_args})
+    return result.to_dict() if hasattr(result, 'to_dict') else {{"success": result.success, "data": result.data, "error": result.error}}
+'''
+                else:
+                    endpoint_block += f'''
+
+@router.{method}("{endpoint_prefix}{path}")
+async def {op_name}() -> Dict[str, Any]:
+    """{description}"""
+    if not {avail_flag}:
+        return {{"available": False, "error": "Service not loaded"}}
+    result = {service_var}.{orchestrator_method}()
+    return result.to_dict() if hasattr(result, 'to_dict') else {{"success": result.success, "data": result.data}}
+'''
+
+            if health_endpoint:
+                endpoint_block += f'''
+
+@router.get("{endpoint_prefix}/health")
+async def {import_alias.lower()}_health() -> Dict[str, Any]:
+    """Health check for {feature_spec.feature_name}."""
+    if not {avail_flag}:
+        return {{"available": False, "error": "Service not loaded"}}
+    result = {service_var}.health_check() if hasattr({service_var}, 'health_check') else None
+    if result:
+        return {{"available": True, "healthy": getattr(result, 'success', True), "data": getattr(result, 'data', None)}}
+    return {{"available": True, "status": "ok"}}
+'''
+
+            # --- Inject into target file ---
+            existing_code = target_path.read_text()
+
+            # Check if already wired (idempotent)
+            if f'AUTO-WIRED by AI Feature Builder: {feature_spec.feature_id}' in existing_code:
+                print(f"  ℹ️  {feature_spec.feature_id} already wired in {target_file}")
+                return True
+
+            # Insert import block after the last existing "except" block at
+            # module level (near the top of file, after other imports)
+            # Strategy: find the line "router = APIRouter" and inject just before it.
+            marker = 'router = APIRouter'
+            if marker in existing_code:
+                existing_code = existing_code.replace(
+                    marker,
+                    import_block + "\n" + marker,
+                    1
+                )
+            else:
+                # Fallback: append import block near end of imports
+                existing_code = existing_code + "\n" + import_block
+
+            # Insert endpoint block before any catch-all route or at end of file
+            # Look for a catch-all pattern like @router.get("/{
+            import re as _re
+            catch_all_pattern = _re.compile(
+                r'^@router\.\w+\("[^"]*\{[^}]+\}.*"\)', _re.MULTILINE
+            )
+            match = catch_all_pattern.search(existing_code)
+            if match:
+                # Insert before the catch-all
+                insert_pos = match.start()
+                existing_code = (
+                    existing_code[:insert_pos]
+                    + endpoint_block + "\n\n"
+                    + existing_code[insert_pos:]
+                )
+            else:
+                # Append at end
+                existing_code += "\n" + endpoint_block
+
+            target_path.write_text(existing_code)
+
+            print(f"  ✅ Production wiring injected into {target_file}")
+            print(f"     Import alias: {import_alias}")
+            print(f"     Endpoints: {len(operations)} operations" +
+                  (" + health" if health_endpoint else ""))
+            print(f"     Prefix: {endpoint_prefix}")
+            return True
+
+        except Exception as e:
+            print(f"  ❌ Error generating production wiring: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return False
+
     def _show_enhanced_summary(self, layers_info: List[Dict], feature_spec: FeatureIntegrationSpec):
         """Show enhanced build summary including feature integration."""
         
@@ -1340,7 +1561,23 @@ Generate a complete test_e2e.py file with at least 3 comprehensive E2E tests."""
         
         # Generate feature-level tests (integration + E2E)
         integration_test_count, e2e_test_count = self.generate_feature_tests(feature_integration_spec)
-        
+
+        # NEW: Production integration wiring
+        prod_config = self.feature_spec.get('production_integration')
+        if prod_config:
+            self.print_header("🔌 Production Integration Wiring")
+            wiring_success = self.generate_production_wiring(
+                feature_integration_spec, prod_config
+            )
+            if not wiring_success:
+                print("\n⚠️  Production wiring generation failed")
+                print("     Feature code is built but NOT connected to the live app.")
+                print("     You must manually update the target router/app file.")
+        else:
+            print("\n⚠️  No 'production_integration' section in feature YAML.")
+            print("     Feature code is built but NOT connected to the live app.")
+            print("     Add a production_integration section to auto-wire next time.")
+
         # Generate feature-level verification artifacts
         self.print_header("📋 Generating Feature-Level Verification")
         verification_success = self.generate_feature_level_verification(
