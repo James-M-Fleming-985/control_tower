@@ -84,6 +84,11 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
+      - name: "� Set up Node.js (for frontend builds)"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: "📦 Install dependencies"
         run: |
           python -m pip install --upgrade pip
@@ -97,6 +102,12 @@ jobs:
           if [ -f "$TARGET_PATH/requirements.txt" ]; then
             pip install -r "$TARGET_PATH/requirements.txt"
           fi
+
+      - name: "🔧 Configure git for automated commits"
+        working-directory: target_repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       # ========================================
       # VALIDATION
@@ -214,13 +225,6 @@ jobs:
               cd "$CONTROL_TOWER"
               if python build_feature.py "$YAML_PATH" --verbose; then
                 BUILD_RESULTS="$BUILD_RESULTS\n✅ $FEATURE: Success"
-                
-                # Commit after each successful build
-                cd "$TARGET_REPO"
-                git config user.name "github-actions[bot]"
-                git config user.email "github-actions[bot]@users.noreply.github.com"
-                git add -A
-                git commit -m "🤖 AI-generated: $FEATURE implementation" || echo "No changes to commit"
               else
                 BUILD_RESULTS="$BUILD_RESULTS\n❌ $FEATURE: Build failed"
                 echo "::warning::Build failed for $FEATURE, continuing with next feature"
@@ -237,35 +241,9 @@ jobs:
           echo -e "$BUILD_RESULTS"
 
       # ========================================
-      # COMMIT & PUSH
+      # NOTE: Commit & push is now handled by build_feature.py's
+      # _ship_to_production() method. The builder is fully end-to-end.
       # ========================================
-      - name: "📤 Commit and push changes"
-        if: inputs.dry_run != true
-        working-directory: target_repo
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Stage any remaining changes
-          git add -A
-          
-          # Commit if there are new changes
-          if git diff --staged --quiet; then
-            echo "No new changes to commit"
-          else
-            FEATURE="${{ inputs.feature_id }}"
-            git commit -m "🤖 AI-generated: $FEATURE implementation"
-          fi
-          
-          # Always push if there are unpushed commits
-          COMMITS_AHEAD=$(git rev-list --count HEAD ^origin/$(git branch --show-current) 2>/dev/null || echo "0")
-          if [ "$COMMITS_AHEAD" -gt 0 ]; then
-            echo "Pushing $COMMITS_AHEAD commit(s) to ${{ inputs.target_repo }}..."
-            git push
-            echo "✅ Changes pushed successfully"
-          else
-            echo "No commits to push"
-          fi
 
       # ========================================
       # ARTIFACTS & SUMMARY

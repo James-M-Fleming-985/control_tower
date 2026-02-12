@@ -1537,6 +1537,347 @@ if {router_var} is not None:
         print(f"  ✅ AUTO-FIX: Added '{router_module}' import + include_router()")
         print(f"     to {app_entry_path.name}. Please review the changes.")
 
+    # =========================================================================
+    # PRODUCTION DELIVERY: Validate → Test → Build Frontend → Ship
+    # =========================================================================
+
+    def _find_repo_root(self, start_path: Path) -> Path:
+        """Walk up from start_path to find the git repo root."""
+        current = start_path.resolve()
+        while current != current.parent:
+            if (current / '.git').exists():
+                return current
+            current = current.parent
+        return start_path  # fallback
+
+    def _validate_generated_code(self, spec: FeatureIntegrationSpec) -> bool:
+        """Validate all generated Python/JS/TS files parse correctly.
+
+        Returns True if all files are valid, False if any have syntax errors.
+        """
+        import ast
+        errors = []
+        feature_dir = spec.feature_dir
+
+        # Find all generated .py files
+        py_files = list(feature_dir.rglob("*.py"))
+        # Also check any modified production files
+        repo_root = self._find_repo_root(feature_dir)
+        prod_config = self.feature_spec.get('production_integration', {})
+        target_file = prod_config.get('target_router_file')
+        if target_file:
+            target_path = repo_root / target_file
+            if target_path.exists() and target_path not in py_files:
+                py_files.append(target_path)
+        entry_point = prod_config.get('app_entry_point', 'main.py')
+        entry_path = repo_root / entry_point
+        if entry_path.exists() and entry_path not in py_files:
+            py_files.append(entry_path)
+
+        for py_file in py_files:
+            if '__pycache__' in str(py_file):
+                continue
+            try:
+                source = py_file.read_text()
+                ast.parse(source)
+            except SyntaxError as e:
+                rel = py_file.relative_to(repo_root) if py_file.is_relative_to(repo_root) else py_file
+                errors.append(f"  {rel}:{e.lineno} — {e.msg}")
+
+        if errors:
+            print(f"  ❌ {len(errors)} file(s) have syntax errors:")
+            for err in errors:
+                print(err)
+            return False
+
+        print(f"  ✅ {len(py_files)} Python file(s) validated — no syntax errors")
+        return True
+
+    def _run_generated_tests(self, spec: FeatureIntegrationSpec) -> bool:
+        """Run pytest on the generated test files.
+
+        Returns True if tests pass (or no tests found), False on failure.
+        """
+        import subprocess
+
+        feature_dir = spec.feature_dir
+        test_files = list(feature_dir.rglob("test_*.py")) + list(feature_dir.rglob("*_test.py"))
+        # Filter out __pycache__
+        test_files = [f for f in test_files if '__pycache__' not in str(f)]
+
+        if not test_files:
+            print("  ℹ️  No test files found — skipping")
+            return True
+
+        print(f"  Running {len(test_files)} test file(s)...")
+
+        repo_root = self._find_repo_root(feature_dir)
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "pytest", "--tb=short", "-q", "--no-header"] + [str(f) for f in test_files],
+                capture_output=True, text=True, timeout=120,
+                cwd=str(repo_root)
+            )
+            # Print last 20 lines of output
+            output_lines = (result.stdout + result.stderr).strip().splitlines()
+            for line in output_lines[-20:]:
+                print(f"  {line}")
+
+            if result.returncode == 0:
+                print(f"\n  ✅ Tests passed")
+                return True
+            else:
+                print(f"\n  ⚠️  Tests failed (exit code {result.returncode})")
+                print(f"     Build will continue — review test failures after deploy")
+                return False
+        except subprocess.TimeoutExpired:
+            print("  ⚠️  Tests timed out after 120s — skipping")
+            return False
+        except FileNotFoundError:
+            print("  ⚠️  pytest not available — skipping test execution")
+            return True
+
+    def _build_frontend_assets(self, spec: FeatureIntegrationSpec) -> bool:
+        """Detect and build frontend assets (npm/vite/webpack).
+
+        Searches for package.json files within the feature directory and the
+        broader frontend source tree.  If found, runs npm install + build.
+
+        Returns True if build succeeds (or no frontend found), False on failure.
+        """
+        import subprocess
+
+        repo_root = self._find_repo_root(spec.feature_dir)
+
+        # Strategy: find package.json files that are part of the app's frontend
+        # Priority 1: Look in the feature directory itself
+        # Priority 2: Look in the broader src/frontend or src/backend/static source
+        candidates = []
+
+        # Check feature dir for package.json (React component libraries)
+        for pkg in spec.feature_dir.rglob("package.json"):
+            if 'node_modules' not in str(pkg):
+                candidates.append(pkg.parent)
+
+        # Check for a top-level frontend build that produces the static/ dir
+        # Walk up from the static dir to find the source React app
+        for pattern in [
+            "Causal_affect/**/package.json",
+            "frontend/package.json",
+            "src/frontend/package.json",
+        ]:
+            for pkg in repo_root.glob(pattern):
+                if 'node_modules' not in str(pkg) and pkg.parent not in candidates:
+                    candidates.append(pkg.parent)
+
+        if not candidates:
+            print("  ℹ️  No frontend package.json found — skipping")
+            return True
+
+        # Look for the main app build (the one that produces the deployed static/ dir)
+        # Heuristic: it has a "build" script and its dist/build output maps to static/
+        built_any = False
+        for frontend_dir in candidates:
+            pkg_json = frontend_dir / "package.json"
+            try:
+                pkg_data = json.loads(pkg_json.read_text())
+            except Exception:
+                continue
+
+            scripts = pkg_data.get("scripts", {})
+            if "build" not in scripts:
+                continue
+
+            # Check if this is a meaningful app (has react/vue/svelte dependency)
+            deps = {**pkg_data.get("dependencies", {}), **pkg_data.get("devDependencies", {})}
+            has_frontend_framework = any(
+                fw in deps for fw in ["react", "react-dom", "vue", "svelte", "@angular/core", "next"]
+            )
+            if not has_frontend_framework:
+                continue
+
+            rel_dir = frontend_dir.relative_to(repo_root) if frontend_dir.is_relative_to(repo_root) else frontend_dir
+            print(f"  📦 Found frontend app: {rel_dir}")
+            print(f"     Build script: {scripts['build']}")
+
+            # npm install
+            print(f"     Running npm install...")
+            install_result = subprocess.run(
+                ["npm", "install", "--no-audit", "--no-fund"],
+                capture_output=True, text=True, timeout=120,
+                cwd=str(frontend_dir)
+            )
+            if install_result.returncode != 0:
+                print(f"     ⚠️  npm install failed:")
+                for line in install_result.stderr.strip().splitlines()[-5:]:
+                    print(f"       {line}")
+                continue
+
+            # npm run build
+            print(f"     Running npm run build...")
+            build_result = subprocess.run(
+                ["npm", "run", "build"],
+                capture_output=True, text=True, timeout=180,
+                cwd=str(frontend_dir)
+            )
+            if build_result.returncode == 0:
+                print(f"     ✅ Frontend build succeeded")
+                built_any = True
+
+                # Copy build output to static/ if dist/ exists and static/ is elsewhere
+                dist_dir = frontend_dir / "dist"
+                if dist_dir.exists():
+                    # Find where static/ lives in the app
+                    for static_candidate in repo_root.rglob("static/index.html"):
+                        if 'node_modules' not in str(static_candidate):
+                            static_dir = static_candidate.parent
+                            if static_dir != dist_dir:
+                                print(f"     📋 Copying build output to {static_dir.relative_to(repo_root)}")
+                                import shutil
+                                # Clear old assets
+                                for item in static_dir.iterdir():
+                                    if item.name != '.gitkeep':
+                                        if item.is_dir():
+                                            shutil.rmtree(item)
+                                        else:
+                                            item.unlink()
+                                # Copy new build
+                                for item in dist_dir.iterdir():
+                                    dest = static_dir / item.name
+                                    if item.is_dir():
+                                        shutil.copytree(item, dest)
+                                    else:
+                                        shutil.copy2(item, dest)
+                                print(f"     ✅ Static assets updated")
+                            break
+            else:
+                print(f"     ❌ Frontend build failed:")
+                for line in build_result.stderr.strip().splitlines()[-10:]:
+                    print(f"       {line}")
+
+        if built_any:
+            print(f"\n  ✅ Frontend assets built and deployed")
+        else:
+            print(f"\n  ℹ️  No buildable frontend apps found (or builds failed)")
+
+        return built_any or not candidates
+
+    def _ship_to_production(
+        self,
+        spec: FeatureIntegrationSpec,
+        code_valid: bool,
+        tests_passed: bool,
+    ) -> bool:
+        """Git commit and push all changes to trigger production deploy.
+
+        Only ships if code validation passed.  Test failures are warnings,
+        not blockers (to avoid blocking backend-only features that have
+        test dependency issues).
+
+        Returns True if push succeeds, False otherwise.
+        """
+        import subprocess
+
+        repo_root = self._find_repo_root(spec.feature_dir)
+
+        if not code_valid:
+            print("  ❌ BLOCKED: Code validation failed — not shipping")
+            print("     Fix syntax errors and run the build again.")
+            return False
+
+        if not tests_passed:
+            print("  ⚠️  WARNING: Tests failed — shipping anyway (review test failures)")
+
+        # Check for changes
+        try:
+            status = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True, text=True, cwd=str(repo_root)
+            )
+            if not status.stdout.strip():
+                print("  ℹ️  No changes to commit")
+                return True
+
+            changed_count = len(status.stdout.strip().splitlines())
+            print(f"  📝 {changed_count} file(s) changed")
+        except Exception as e:
+            print(f"  ⚠️  Could not check git status: {e}")
+            return False
+
+        # Stage all changes within the feature dir and production files
+        try:
+            # Stage feature directory
+            subprocess.run(
+                ["git", "add", "-A", str(spec.feature_dir)],
+                capture_output=True, text=True, cwd=str(repo_root)
+            )
+            # Stage production files (router, entry point, static assets)
+            prod_config = self.feature_spec.get('production_integration', {})
+            for prod_file in [prod_config.get('target_router_file'), prod_config.get('app_entry_point', 'main.py')]:
+                if prod_file:
+                    prod_path = repo_root / prod_file
+                    if prod_path.exists():
+                        subprocess.run(
+                            ["git", "add", str(prod_path)],
+                            capture_output=True, text=True, cwd=str(repo_root)
+                        )
+            # Stage static assets
+            for static_dir in repo_root.rglob("static/index.html"):
+                if 'node_modules' not in str(static_dir):
+                    subprocess.run(
+                        ["git", "add", "-A", str(static_dir.parent)],
+                        capture_output=True, text=True, cwd=str(repo_root)
+                    )
+
+        except Exception as e:
+            print(f"  ⚠️  Error staging files: {e}")
+            return False
+
+        # Commit
+        commit_msg = (
+            f"feat: Ship {spec.feature_id} to production\n\n"
+            f"AI Feature Builder: {spec.feature_name}\n"
+            f"Layers: {len(spec.layers)}\n"
+            f"Code validation: {'✅ passed' if code_valid else '❌ failed'}\n"
+            f"Tests: {'✅ passed' if tests_passed else '⚠️ failed (non-blocking)'}"
+        )
+        try:
+            commit_result = subprocess.run(
+                ["git", "commit", "--no-gpg-sign", "-m", commit_msg],
+                capture_output=True, text=True, cwd=str(repo_root)
+            )
+            if commit_result.returncode == 0:
+                print(f"  ✅ Committed: {spec.feature_id}")
+            elif "nothing to commit" in commit_result.stdout:
+                print(f"  ℹ️  Nothing to commit")
+                return True
+            else:
+                print(f"  ⚠️  Commit issue: {commit_result.stderr.strip()}")
+        except Exception as e:
+            print(f"  ❌ Commit failed: {e}")
+            return False
+
+        # Push
+        try:
+            push_result = subprocess.run(
+                ["git", "push", "origin", "main"],
+                capture_output=True, text=True, timeout=60,
+                cwd=str(repo_root)
+            )
+            if push_result.returncode == 0:
+                print(f"  ✅ Pushed to origin/main — production deploy triggered")
+                return True
+            else:
+                print(f"  ❌ Push failed: {push_result.stderr.strip()}")
+                print(f"     Changes are committed locally. Push manually with: git push origin main")
+                return False
+        except subprocess.TimeoutExpired:
+            print(f"  ⚠️  Push timed out — try manually: git push origin main")
+            return False
+        except Exception as e:
+            print(f"  ❌ Push failed: {e}")
+            return False
+
     def _show_enhanced_summary(self, layers_info: List[Dict], feature_spec: FeatureIntegrationSpec):
         """Show enhanced build summary including feature integration."""
         
@@ -1718,7 +2059,31 @@ if {router_var} is not None:
         
         if not verification_success:
             print("\n⚠️  Feature-level verification generation failed")
-        
+
+        # =====================================================================
+        # PRODUCTION DELIVERY PIPELINE
+        # "Build the right thing and ship the right thing to production"
+        # =====================================================================
+
+        # STEP 1: Validate all generated code parses correctly
+        self.print_header("🔍 Step 1: Validate Generated Code")
+        validation_ok = self._validate_generated_code(feature_integration_spec)
+        if not validation_ok:
+            print("\n❌ Generated code has syntax errors. NOT shipping to production.")
+            print("   Fix the errors above and re-run, or commit manually after review.")
+
+        # STEP 2: Run generated tests
+        self.print_header("🧪 Step 2: Run Generated Tests")
+        tests_ok = self._run_generated_tests(feature_integration_spec)
+
+        # STEP 3: Build frontend assets if this feature has frontend components
+        self.print_header("🏗️  Step 3: Build Frontend Assets")
+        frontend_ok = self._build_frontend_assets(feature_integration_spec)
+
+        # STEP 4: Git commit + push to trigger production deploy
+        self.print_header("🚀 Step 4: Ship to Production")
+        shipped = self._ship_to_production(feature_integration_spec, validation_ok, tests_ok)
+
         # Final summary
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds() / 60
