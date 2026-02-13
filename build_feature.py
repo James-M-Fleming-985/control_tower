@@ -692,10 +692,21 @@ class FeatureBuilder:
             # Determine implementation file extension based on language
             if 'typescript' in language or 'react' in language:
                 impl_filename = "implementation.tsx"
+            elif 'jsx' in language:
+                impl_filename = "implementation.jsx"
             elif 'javascript' in language:
                 impl_filename = "implementation.js"
             else:
                 impl_filename = "implementation.py"
+
+            # Fallback: if the determined file doesn't exist, try other
+            # common extensions before giving up (AI may pick .jsx vs .js)
+            if not (layer_dir / "src" / impl_filename).exists():
+                for alt_ext in (".jsx", ".tsx", ".js", ".py"):
+                    alt = layer_dir / "src" / f"implementation{alt_ext}"
+                    if alt.exists():
+                        impl_filename = f"implementation{alt_ext}"
+                        break
             
             impl_path = layer_dir / "src" / impl_filename
             
@@ -1247,6 +1258,21 @@ Generate a complete test_e2e.py file with at least 3 comprehensive E2E tests."""
                 repo_root = repo_root.parent
 
             target_path = repo_root / target_file
+            if not target_path.exists():
+                # The target file may be relative to a project subdirectory
+                # (e.g. Causal_affect/) rather than the repo root.  Walk down
+                # from repo_root through the feature_dir path to find it.
+                try:
+                    rel_feature = feature_spec.feature_dir.relative_to(repo_root)
+                    for i in range(1, len(rel_feature.parts) + 1):
+                        candidate = repo_root / Path(*rel_feature.parts[:i]) / target_file
+                        if candidate.exists():
+                            target_path = candidate
+                            repo_root = repo_root / Path(*rel_feature.parts[:i])
+                            break
+                except ValueError:
+                    pass
+
             if not target_path.exists():
                 print(f"  ❌ Target router file not found: {target_path}")
                 return False
