@@ -410,20 +410,28 @@ class AICodeGeneratorOrchestrator:
         
         AI providers often wrap code in ```python ... ``` blocks.
         This strips those fences so files are valid source code.
+        Comprehensive version — handles all language identifiers and edge cases.
         """
         if not code:
             return code
         lines = code.split('\n')
-        # Remove leading fence (e.g. ```python, ```typescript, ```javascript)
+        # Remove leading fence (any language identifier)
         if lines and lines[0].strip().startswith('```'):
             lines = lines[1:]
         # Remove trailing fence
-        if lines and lines[-1].strip() == '```':
+        if lines and lines[-1].strip().startswith('```'):
             lines = lines[:-1]
-        # Remove any remaining standalone fence lines
-        cleaned = [l for l in lines if l.strip() not in 
-                   ('```', '```python', '```typescript', '```javascript', '```jsx', '```tsx')]
-        return '\n'.join(cleaned)
+        # Remove any remaining standalone fence lines (comprehensive list)
+        fence_markers = {
+            '```', '```python', '```typescript', '```javascript',
+            '```jsx', '```tsx', '```yaml', '```json', '```html',
+            '```css', '```bash', '```shell', '```sh', '```sql',
+        }
+        cleaned = [l for l in lines if l.strip() not in fence_markers]
+        result = '\n'.join(cleaned)
+        # Ensure single trailing newline
+        result = result.strip() + '\n'
+        return result
     
     def collect_evidence(self, phase_result: Dict[str, Any]) -> Dict[str, Any]:
         """

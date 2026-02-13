@@ -146,6 +146,46 @@ jobs:
           
           echo "validation_passed=true" >> $GITHUB_OUTPUT
 
+      - name: "🔍 Deep validate feature YAMLs"
+        id: deep_validate
+        run: |
+          TARGET_PATH="target_repo/${{ inputs.target_path }}"
+          FEATURE="${{ inputs.feature_id }}"
+          DRY_RUN="${{ inputs.dry_run }}"
+          
+          if [ "$FEATURE" = "ALL_IN_ORDER" ]; then
+            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09")
+          else
+            FEATURES=("$FEATURE")
+          fi
+          
+          # Require production wiring for non-dry-run builds
+          EXTRA_FLAGS=""
+          if [ "$DRY_RUN" != "true" ]; then
+            EXTRA_FLAGS="--require-production-wiring"
+          fi
+          
+          FAILED=0
+          for F in "${FEATURES[@]}"; do
+            YAML_PATH=$(find "$TARGET_PATH" -name "${F}*.yaml" -path "*/${F}_*/*" -type f 2>/dev/null | grep -v "LAYER-" | head -1)
+            if [ -z "$YAML_PATH" ]; then
+              echo "::error::Feature YAML not found for $F"
+              FAILED=1
+              continue
+            fi
+            
+            if ! python control_tower/validate_feature_yaml.py "$YAML_PATH" $EXTRA_FLAGS; then
+              FAILED=1
+            fi
+          done
+          
+          if [ "$FAILED" -eq 1 ]; then
+            echo "::error::Feature YAML validation failed — fix errors above before building"
+            exit 1
+          fi
+          
+          echo "✅ All feature YAMLs passed deep validation"
+
       # ========================================
       # BUILD SINGLE FEATURE
       # ========================================
@@ -241,9 +281,53 @@ jobs:
           echo -e "$BUILD_RESULTS"
 
       # ========================================
-      # NOTE: Commit & push is now handled by build_feature.py's
-      # _ship_to_production() method. The builder is fully end-to-end.
+      # SYSTEM INTEGRATION VERIFICATION
       # ========================================
+      - name: "🔗 Verify system integration"
+        if: inputs.feature_id == 'ALL_IN_ORDER' && inputs.dry_run != true
+        run: |
+          TARGET_PATH="target_repo/${{ inputs.target_path }}"
+          
+          # Find the SYSTEM-* directory
+          SYSTEM_DIR=$(find "$TARGET_PATH" -maxdepth 1 -type d -name "SYSTEM-*" | head -1)
+          if [ -z "$SYSTEM_DIR" ]; then
+            SYSTEM_DIR="$TARGET_PATH"
+          fi
+          
+          echo "Verifying system integration in: $SYSTEM_DIR"
+          python control_tower/verify_system_integration.py "$SYSTEM_DIR" \
+            --repo-root target_repo || echo "::warning::System integration verification found issues"
+
+      # ========================================
+      # COMMIT & PUSH TO TARGET REPO
+      # ========================================
+      - name: "🚀 Commit and push to target repo"
+        if: inputs.dry_run != true
+        working-directory: target_repo
+        run: |
+          # Stage all changes
+          git add -A
+          
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "ℹ️  No changes to commit"
+            exit 0
+          fi
+          
+          # Show what changed
+          CHANGED=$(git diff --cached --stat | tail -1)
+          echo "📝 Changes: $CHANGED"
+          
+          # Commit with traceability
+          FEATURE="${{ inputs.feature_id }}"
+          git commit -m "🤖 AI Feature Builder: ${FEATURE}" \
+            -m "Automated build by AI Feature Builder workflow" \
+            -m "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          # Push using CROSS_REPO_PAT (set during checkout)
+          git push origin main
+          
+          echo "✅ Pushed to origin/main — Railway deployment triggered"
 
       # ========================================
       # ARTIFACTS & SUMMARY

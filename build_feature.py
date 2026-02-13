@@ -1778,6 +1778,12 @@ if {router_var} is not None:
         """
         import subprocess
 
+        # In CI, commit/push is handled by the workflow's dedicated step
+        # which uses the correct working directory and CROSS_REPO_PAT token.
+        if os.getenv('CI'):
+            print("  ℹ️  Running in CI — commit/push handled by workflow step")
+            return True
+
         repo_root = self._find_repo_root(spec.feature_dir)
 
         if not code_valid:
@@ -2045,9 +2051,15 @@ if {router_var} is not None:
                 print("     Feature code is built but NOT connected to the live app.")
                 print("     You must manually update the target router/app file.")
         else:
-            print("\n⚠️  No 'production_integration' section in feature YAML.")
-            print("     Feature code is built but NOT connected to the live app.")
-            print("     Add a production_integration section to auto-wire next time.")
+            if os.getenv('CI'):
+                print("\n❌ BLOCKED: No 'production_integration' section in feature YAML.")
+                print("     Fire-and-forget mode requires production wiring configuration.")
+                print("     Add a production_integration section to the feature YAML.")
+                return False
+            else:
+                print("\n⚠️  No 'production_integration' section in feature YAML.")
+                print("     Feature code is built but NOT connected to the live app.")
+                print("     Add a production_integration section to auto-wire next time.")
 
         # Generate feature-level verification artifacts
         self.print_header("📋 Generating Feature-Level Verification")
@@ -2059,6 +2071,24 @@ if {router_var} is not None:
         
         if not verification_success:
             print("\n⚠️  Feature-level verification generation failed")
+
+        # =====================================================================
+        # POST-WRITE FENCE SWEEP (defense-in-depth)
+        # Strip any remaining markdown fences from all generated .py files
+        # =====================================================================
+        fence_fixed = 0
+        for py_file in feature_integration_spec.feature_dir.rglob("*.py"):
+            try:
+                content = py_file.read_text()
+                if '```' in content:
+                    cleaned = clean_generated_code(content)
+                    if cleaned != content:
+                        py_file.write_text(cleaned)
+                        fence_fixed += 1
+            except Exception:
+                pass
+        if fence_fixed:
+            print(f"\n🧹 Post-write sweep: stripped markdown fences from {fence_fixed} file(s)")
 
         # =====================================================================
         # PRODUCTION DELIVERY PIPELINE
