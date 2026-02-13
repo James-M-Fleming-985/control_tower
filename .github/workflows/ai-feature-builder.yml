@@ -44,6 +44,7 @@ on:
           - 'FEATURE-CA-002-06'
           - 'FEATURE-CA-002-08'
           - 'FEATURE-CA-002-09'
+          - 'FEATURE-CA-002-10'
           - 'ALL_IN_ORDER'
       
       dry_run:
@@ -129,7 +130,7 @@ jobs:
           
           # Find feature YAMLs
           if [ "$FEATURE" = "ALL_IN_ORDER" ]; then
-            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09")
+            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
           else
             FEATURES=("$FEATURE")
           fi
@@ -154,7 +155,7 @@ jobs:
           DRY_RUN="${{ inputs.dry_run }}"
           
           if [ "$FEATURE" = "ALL_IN_ORDER" ]; then
-            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09")
+            FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
           else
             FEATURES=("$FEATURE")
           fi
@@ -236,7 +237,7 @@ jobs:
           TARGET_REPO="$WORKSPACE_ROOT/target_repo"
           DRY_RUN="${{ inputs.dry_run }}"
           
-          FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09")
+          FEATURES=("FEATURE-CA-002-06" "FEATURE-CA-002-08" "FEATURE-CA-002-09" "FEATURE-CA-002-10")
           
           BUILD_RESULTS=""
           
