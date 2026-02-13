@@ -128,6 +128,19 @@ class AICodeGeneratorOrchestrator:
         if 'acceptance_criteria' not in requirements:
             requirements['acceptance_criteria'] = []
         
+        # Normalize acceptance_criteria: allow plain strings or dicts
+        normalized_ac = []
+        for i, ac in enumerate(requirements['acceptance_criteria'], 1):
+            if isinstance(ac, str):
+                normalized_ac.append({
+                    'criterion_id': f'AC-{i:03d}',
+                    'criterion': ac,
+                    'description': ac,
+                })
+            else:
+                normalized_ac.append(ac)
+        requirements['acceptance_criteria'] = normalized_ac
+        
         # Initialize integration and E2E test scenario sections
         if 'integration_test_scenarios' not in requirements:
             requirements['integration_test_scenarios'] = []

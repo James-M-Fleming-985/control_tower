@@ -1971,13 +1971,16 @@ if {router_var} is not None:
             else:
                 failed_layers.append(layer_info['name'])
                 
-                # Ask if should continue
+                # In CI mode, auto-continue; otherwise ask
                 if idx < total_layers:
-                    print("\n⚠️  Layer failed. Continue with next layer? (y/n): ", end='')
-                    response = input().strip().lower()
-                    if response != 'y':
-                        self.print_step("🛑", "Build cancelled by user")
-                        break
+                    if os.environ.get('CI'):
+                        print("\n⚠️  Layer failed. Auto-continuing in CI mode...")
+                    else:
+                        print("\n⚠️  Layer failed. Continue with next layer? (y/n): ", end='')
+                        response = input().strip().lower()
+                        if response != 'y':
+                            self.print_step("🛑", "Build cancelled by user")
+                            break
         
         # Check if all layers completed successfully
         if len(completed_layers) != total_layers:
