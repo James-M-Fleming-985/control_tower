@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 import yaml
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict, Any
 
 # Clean API key (remove whitespace/newlines)
