@@ -423,6 +423,38 @@ production_integration:
       orchestrator_method: "get_status"
 
 # ====================================================================================
+# FRONTEND INTEGRATION - For features that include a UI/dashboard layer
+# ====================================================================================
+# If the feature includes a React/JSX dashboard layer, this section tells the
+# builder where the frontend app lives and how to wire the component into it.
+# The builder will:
+#   1. Copy the layer's implementation.jsx → pages/<page_component_name>.jsx
+#   2. Add an import + <Route> to App.jsx
+#   3. Add a nav link to Layout.jsx (if nav_label is provided)
+#   4. Fix API URLs in the component to match the production_integration endpoints
+#   5. Rebuild the Vite/webpack bundle and copy output to static/
+#
+# OMIT this entire section if the feature has no frontend/UI layer.
+# ====================================================================================
+frontend_integration:
+  # Path to the React app directory (relative to repo root), containing
+  # package.json, src/App.jsx, and src/components/Layout.jsx
+  target_app_dir: "[e.g. path/to/dashboard-app]"
+
+  # Route path where the page will be accessible (e.g. /predictions)
+  route_path: "[e.g. /my-feature]"
+
+  # Label for the navigation link (shown in the top nav bar)
+  nav_label: "[e.g. My Feature]"
+
+  # Emoji icon for the nav link (optional)
+  nav_icon: "[e.g. 📊]"
+
+  # React component name — the component's default export name, also used as the
+  # filename: pages/<page_component_name>.jsx
+  page_component_name: "[e.g. MyFeatureDashboard]"
+
+# ====================================================================================
 # FEATURE INTEGRATION CODE CONSTRAINTS - For feature_integration.py generation
 # ====================================================================================
 # These constraints apply when AI generates the feature_integration.py file that

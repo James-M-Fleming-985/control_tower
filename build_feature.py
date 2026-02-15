@@ -315,6 +315,29 @@ class ProductionIntegrationConfig:
 
 
 @dataclass
+class FrontendIntegrationConfig:
+    """Configuration for wiring frontend components into the deployed UI.
+
+    Read from the optional 'frontend_integration' section of a feature YAML.
+    When absent, the builder will auto-discover settings from the repo
+    structure and production_integration config.
+
+    Example YAML:
+        frontend_integration:
+          target_app_dir: "SYSTEM-CA-006.../dashboard-app-complete"
+          route_path: "/predictions"
+          nav_label: "Predictions"
+          nav_icon: "🎯"
+          page_component_name: "PredictionDashboard"
+    """
+    target_app_dir: str = ''           # path to React app (relative to repo root or project dir)
+    route_path: str = ''               # URL path for the page route (e.g. "/predictions")
+    nav_label: str = ''                # label in nav bar
+    nav_icon: str = '📊'              # emoji or icon component for nav
+    page_component_name: str = ''      # override component name for the page
+
+
+@dataclass
 class FeatureIntegrationSpec:
     """Specification for feature integration layer generation."""
     feature_id: str
@@ -1663,6 +1686,549 @@ if {router_var} is not None:
             print("  ⚠️  pytest not available — skipping test execution")
             return True
 
+    # =========================================================================
+    # FRONTEND WIRING: Auto-wire React/JS components into the frontend app
+    # =========================================================================
+
+    def _discover_frontend_app(self, repo_root: Path) -> Optional[Path]:
+        """Auto-discover the main frontend React app in the repo.
+
+        Heuristic priority:
+        1. frontend_integration.target_app_dir from YAML (explicit)
+        2. The React app whose build output is served by the backend
+           (package.json with react + build script + dist/ that maps to static/)
+        3. Any React app with a build script
+
+        Returns the directory containing package.json, or None.
+        """
+        # Priority 1: Explicit config
+        fi_config = self.feature_spec.get('frontend_integration', {})
+        if fi_config.get('target_app_dir'):
+            explicit = repo_root / fi_config['target_app_dir']
+            if (explicit / 'package.json').exists():
+                return explicit
+            # Try within project subdirectory
+            for sub in repo_root.iterdir():
+                if sub.is_dir() and (sub / fi_config['target_app_dir'] / 'package.json').exists():
+                    return sub / fi_config['target_app_dir']
+
+        # Priority 2+3: Scan for React apps
+        best_candidate = None
+        for pkg_path in repo_root.rglob("package.json"):
+            if 'node_modules' in str(pkg_path) or 'archive' in str(pkg_path).lower():
+                continue
+            try:
+                pkg = json.loads(pkg_path.read_text())
+            except Exception:
+                continue
+            deps = {**pkg.get('dependencies', {}), **pkg.get('devDependencies', {})}
+            if 'react' not in deps and 'react-dom' not in deps:
+                continue
+            if 'build' not in pkg.get('scripts', {}):
+                continue
+
+            app_dir = pkg_path.parent
+
+            # Check if this is the "real" deployed app — look for App.jsx/tsx
+            # with react-router Routes
+            for app_file in ['App.jsx', 'App.tsx', 'App.js']:
+                src_app = app_dir / 'src' / app_file
+                if src_app.exists():
+                    content = src_app.read_text()
+                    if 'Routes' in content or 'Route' in content or 'Router' in content:
+                        # Strong candidate — it's a routed app
+                        if best_candidate is None:
+                            best_candidate = app_dir
+                        # Prefer the one that has dist/ or whose name
+                        # suggests it's the complete/production version
+                        name_lower = app_dir.name.lower()
+                        if 'complete' in name_lower or 'prod' in name_lower:
+                            return app_dir
+                        if (app_dir / 'dist').exists():
+                            return app_dir
+                    break
+
+        return best_candidate
+
+    def _find_frontend_layers(self, spec: FeatureIntegrationSpec) -> List[LayerInfo]:
+        """Find layers that have frontend (JSX/TSX) implementations."""
+        frontend_layers = []
+        for layer in spec.layers:
+            ext = layer.implementation_path.suffix.lower()
+            if ext in ('.jsx', '.tsx', '.js'):
+                # Verify it actually contains React code
+                try:
+                    content = layer.implementation_path.read_text()
+                    if 'React' in content or 'useState' in content or 'export default' in content:
+                        frontend_layers.append(layer)
+                except Exception:
+                    pass
+        return frontend_layers
+
+    def _infer_api_base_url(self) -> str:
+        """Infer the API base URL from production_integration config.
+
+        Combines the router's prefix with the endpoint_prefix to produce
+        the full path that the frontend should call.
+        """
+        prod_config = self.feature_spec.get('production_integration', {})
+        endpoint_prefix = prod_config.get('endpoint_prefix', '')
+        target_router = prod_config.get('target_router_file', '')
+
+        # Try to detect the router's own prefix from the target file
+        router_prefix = ''
+        if target_router:
+            repo_root = self._find_repo_root(Path(self.feature_path).parent)
+            # Search for the router file in both repo root and subdirectories
+            target_path = repo_root / target_router
+            if not target_path.exists():
+                for sub in repo_root.iterdir():
+                    if sub.is_dir() and (sub / target_router).exists():
+                        target_path = sub / target_router
+                        break
+
+            if target_path.exists():
+                try:
+                    content = target_path.read_text()
+                    # Look for APIRouter(prefix="...")
+                    import re
+                    match = re.search(r'APIRouter\([^)]*prefix\s*=\s*["\']([^"\']+)["\']', content)
+                    if match:
+                        router_prefix = match.group(1)
+                except Exception:
+                    pass
+
+        # Full API base = router_prefix + endpoint_prefix
+        api_base = router_prefix.rstrip('/') + '/' + endpoint_prefix.strip('/')
+        return api_base if api_base != '/' else '/api'
+
+    def _fix_api_urls_in_component(self, component_path: Path, api_base_url: str) -> int:
+        """Rewrite fetch/axios URLs in a component to use the correct API base.
+
+        Returns the number of URLs fixed.
+        """
+        import re
+        content = component_path.read_text()
+        fixed = 0
+
+        # Pattern: fetch('/api/...')  or  fetch("/api/...")
+        # Also: axios.get('/api/...'), axios.post('/api/...')
+        def replace_api_url(match):
+            nonlocal fixed
+            prefix = match.group(1)  # fetch(' or axios.get('
+            quote = match.group(2)   # ' or "
+            old_path = match.group(3)  # /api/predictions/accuracy
+
+            # Extract the endpoint-specific part (after the last known prefix)
+            # e.g. /api/predictions/accuracy → /accuracy
+            # Strategy: strip common API prefixes and keep the final path segment(s)
+            parts = old_path.strip('/').split('/')
+            # Remove leading 'api' if present
+            if parts and parts[0] == 'api':
+                parts = parts[1:]
+            # The endpoint suffix is everything after the feature's own prefix
+            # Try to find the useful part by looking at what's NOT the base URL
+            base_parts = api_base_url.strip('/').split('/')
+            # Find common prefix length
+            common = 0
+            for i, part in enumerate(parts):
+                if i < len(base_parts) and part == base_parts[i]:
+                    common = i + 1
+                else:
+                    break
+            endpoint_parts = parts[common:]
+
+            new_url = api_base_url.rstrip('/') + '/' + '/'.join(endpoint_parts) if endpoint_parts else api_base_url
+            fixed += 1
+            return f"{prefix}{quote}{new_url}{quote}"
+
+        # Match fetch('...') and axios.METHOD('...')
+        pattern = r"""((?:fetch|axios\.(?:get|post|put|patch|delete))\s*\()(['"])(\/api\/[^'"]+)(['"])"""
+        new_content = re.sub(pattern, replace_api_url, content)
+
+        if fixed > 0:
+            component_path.write_text(new_content)
+
+        return fixed
+
+    def _inject_react_route(self, app_jsx_path: Path, page_name: str,
+                            route_path: str, component_filename: str) -> bool:
+        """Add an import + Route entry to App.jsx/tsx.
+
+        Idempotent: skips if the import already exists.
+
+        Returns True on success, False on failure.
+        """
+        try:
+            content = app_jsx_path.read_text()
+
+            # Check idempotency
+            if page_name in content:
+                print(f"     ℹ️  {page_name} already imported in {app_jsx_path.name}")
+                return True
+
+            # Insert import after the last existing page import
+            import re
+            # Find all "import X from './pages/Y'" lines
+            import_pattern = re.compile(
+                r"^(import\s+\w+\s+from\s+['\"]\.\/pages\/[^'\"]+['\"])\s*$",
+                re.MULTILINE
+            )
+            matches = list(import_pattern.finditer(content))
+            if matches:
+                last_import_end = matches[-1].end()
+                import_line = f"\nimport {page_name} from './pages/{component_filename}'"
+                content = content[:last_import_end] + import_line + content[last_import_end:]
+            else:
+                # Fallback: after last import line
+                all_imports = list(re.finditer(r'^import\s+.*$', content, re.MULTILINE))
+                if all_imports:
+                    pos = all_imports[-1].end()
+                    content = content[:pos] + f"\nimport {page_name} from './pages/{component_filename}'" + content[pos:]
+                else:
+                    return False
+
+            # Insert Route before </Routes>
+            routes_close = content.rfind('</Routes>')
+            if routes_close == -1:
+                print(f"     ❌ Could not find </Routes> in {app_jsx_path.name}")
+                return False
+
+            # Find indentation of existing Route lines
+            route_pattern = re.compile(r'^(\s*)<Route\s', re.MULTILINE)
+            route_match = route_pattern.search(content)
+            indent = route_match.group(1) if route_match else '          '
+
+            route_line = f'{indent}<Route path="{route_path}" element={{<{page_name} />}} />\n'
+            content = content[:routes_close] + route_line + content[routes_close:]
+
+            app_jsx_path.write_text(content)
+            return True
+        except Exception as e:
+            print(f"     ❌ Failed to inject route: {e}")
+            return False
+
+    def _inject_nav_link(self, layout_path: Path, route_path: str,
+                         label: str, icon: str) -> bool:
+        """Add a navigation link to the Layout component.
+
+        Supports two patterns:
+        1. navItems array: appends a new entry
+        2. Direct <Link> elements: appends a new Link
+
+        Idempotent: skips if the path already exists in nav.
+
+        Returns True on success, False on failure.
+        """
+        try:
+            content = layout_path.read_text()
+
+            # Check idempotency
+            if route_path in content:
+                print(f"     ℹ️  Nav link for {route_path} already exists in {layout_path.name}")
+                return True
+
+            import re
+
+            # Pattern 1: navItems = [ ... ] — inject before the closing ]
+            nav_array_pattern = re.compile(
+                r"(const\s+navItems\s*=\s*\[)(.*?)(]\s*)",
+                re.DOTALL
+            )
+            match = nav_array_pattern.search(content)
+            if match:
+                existing_items = match.group(2).rstrip().rstrip(',')
+                new_item = f",\n    {{ path: '{route_path}', label: '{label}', icon: '{icon}' }}"
+                replacement = match.group(1) + existing_items + new_item + '\n  ' + match.group(3)
+                content = content[:match.start()] + replacement + content[match.end():]
+                layout_path.write_text(content)
+                return True
+
+            # Pattern 2: Direct <Link> or <NavLink> elements — add before closing </nav>
+            nav_close = content.rfind('</nav>')
+            if nav_close != -1:
+                link_line = f'''                <Link to="{route_path}" className="nav-link">{icon} {label}</Link>\n'''
+                content = content[:nav_close] + link_line + content[nav_close:]
+                layout_path.write_text(content)
+                return True
+
+            print(f"     ⚠️  Could not find nav pattern in {layout_path.name}")
+            return False
+        except Exception as e:
+            print(f"     ❌ Failed to inject nav link: {e}")
+            return False
+
+    def generate_frontend_wiring(self, spec: FeatureIntegrationSpec) -> bool:
+        """Auto-wire frontend React components into the deployed app.
+
+        This is the frontend counterpart to generate_production_wiring().
+        For each frontend layer (JSX/TSX implementation), it:
+        1. Copies the component to the app's pages/ directory
+        2. Adds a Route to App.jsx
+        3. Adds a nav link to the Layout component
+        4. Fixes API URLs to match the actual backend endpoints
+
+        Configuration comes from:
+        - frontend_integration section in feature YAML (explicit)
+        - Auto-discovery from production_integration + repo scan (implicit)
+
+        Returns True on success, False on failure.
+        """
+        repo_root = self._find_repo_root(spec.feature_dir)
+        fi_config = self.feature_spec.get('frontend_integration', {})
+        prod_config = self.feature_spec.get('production_integration', {})
+
+        # Step 1: Find frontend layers
+        frontend_layers = self._find_frontend_layers(spec)
+        if not frontend_layers:
+            print("  ℹ️  No frontend layers found — skipping frontend wiring")
+            return True  # Not a failure, just nothing to do
+
+        print(f"  Found {len(frontend_layers)} frontend layer(s) to wire")
+
+        # Step 2: Discover the frontend app
+        frontend_app = self._discover_frontend_app(repo_root)
+        if not frontend_app:
+            print("  ⚠️  Could not discover frontend React app")
+            print("     Add frontend_integration.target_app_dir to feature YAML")
+            return False
+
+        rel_app = frontend_app.relative_to(repo_root) if frontend_app.is_relative_to(repo_root) else frontend_app
+        print(f"  📱 Frontend app: {rel_app}")
+
+        pages_dir = frontend_app / 'src' / 'pages'
+        if not pages_dir.exists():
+            pages_dir.mkdir(parents=True, exist_ok=True)
+
+        # Find App.jsx and Layout component
+        app_jsx = None
+        for name in ['App.jsx', 'App.tsx', 'App.js']:
+            candidate = frontend_app / 'src' / name
+            if candidate.exists():
+                app_jsx = candidate
+                break
+        if not app_jsx:
+            print("  ❌ Could not find App.jsx/tsx in frontend app")
+            return False
+
+        layout_path = None
+        for comp_dir in [frontend_app / 'src' / 'components', frontend_app / 'src' / 'layouts']:
+            if comp_dir.exists():
+                for name in ['Layout.jsx', 'Layout.tsx', 'Layout.js',
+                              'Sidebar.jsx', 'Sidebar.tsx', 'Nav.jsx', 'Nav.tsx']:
+                    candidate = comp_dir / name
+                    if candidate.exists():
+                        layout_path = candidate
+                        break
+            if layout_path:
+                break
+
+        # Step 3: Infer API base URL
+        api_base = self._infer_api_base_url()
+        print(f"  🔗 API base URL: {api_base}")
+
+        # Step 4: Get route config from YAML or generate defaults
+        route_path = fi_config.get('route_path', '/' + prod_config.get('endpoint_prefix', spec.feature_id).strip('/'))
+        nav_label = fi_config.get('nav_label', spec.feature_name.split('_')[-1].title() if '_' in spec.feature_name else spec.feature_name)
+        nav_icon = fi_config.get('nav_icon', '📊')
+
+        # Step 5: Wire each frontend layer
+        wired = 0
+        for layer in frontend_layers:
+            layer_name = layer.layer_name.replace(' ', '').replace('_', '')
+            # Make a page component name
+            page_name = fi_config.get('page_component_name')
+            if not page_name:
+                # Derive from layer name: "Prediction Dashboard" → "PredictionDashboard"
+                words = layer.layer_name.replace('_', ' ').split()
+                page_name = ''.join(w.capitalize() for w in words)
+
+            page_filename = page_name  # without extension
+            ext = layer.implementation_path.suffix  # .jsx, .tsx, etc
+            dest_path = pages_dir / f"{page_filename}{ext}"
+
+            # Copy component
+            import shutil
+            shutil.copy2(layer.implementation_path, dest_path)
+            print(f"  📋 Copied {layer.layer_id} → pages/{page_filename}{ext}")
+
+            # Fix API URLs in the copied component
+            url_fixes = self._fix_api_urls_in_component(dest_path, api_base)
+            if url_fixes:
+                print(f"     Fixed {url_fixes} API URL(s) → {api_base}/*")
+
+            # Ensure the component has a default export
+            content = dest_path.read_text()
+            if f'export default {page_name}' not in content and f'export default' not in content:
+                # Try to find the component function/const and add export
+                import re
+                comp_pattern = re.compile(
+                    rf'(?:const|function)\s+(\w+)\s*[=(]',
+                    re.MULTILINE
+                )
+                comp_match = comp_pattern.search(content)
+                if comp_match:
+                    actual_name = comp_match.group(1)
+                    content += f"\n\nexport default {actual_name};\n"
+                    dest_path.write_text(content)
+                    page_name = actual_name  # Use the actual component name
+
+            # Check what the component is actually named (might differ from page_name)
+            import re
+            default_export = re.search(r'export\s+default\s+(?:function\s+)?(\w+)', content)
+            if default_export:
+                actual_component = default_export.group(1)
+                if actual_component != page_name:
+                    print(f"     Component name: {actual_component} (using this for route)")
+                    page_name = actual_component
+
+            # Add route to App.jsx
+            route_ok = self._inject_react_route(app_jsx, page_name, route_path, page_filename)
+            if route_ok:
+                print(f"     ✅ Route added: {route_path} → <{page_name} />")
+            else:
+                print(f"     ❌ Failed to add route — manual wiring needed")
+
+            # Add nav link to Layout (if found)
+            if layout_path:
+                nav_ok = self._inject_nav_link(layout_path, route_path, nav_label, nav_icon)
+                if nav_ok:
+                    print(f"     ✅ Nav link added: {nav_label}")
+                else:
+                    print(f"     ⚠️  Could not add nav link — add manually to {layout_path.name}")
+            else:
+                print(f"     ℹ️  No Layout component found — nav link not added")
+
+            wired += 1
+
+        if wired > 0:
+            print(f"\n  ✅ Frontend wiring complete: {wired} component(s) wired")
+        return wired > 0
+
+    # =========================================================================
+    # IMPORT VALIDATION: Catch AI hallucinations before production
+    # =========================================================================
+
+    def _validate_feature_integration_imports(self, spec: FeatureIntegrationSpec) -> bool:
+        """Validate that feature_integration.py imports actually exist in layers.
+
+        The AI frequently hallucates class names (e.g. 'PredictionStorage'
+        instead of 'PredictionTracking').  This catches that BEFORE shipping.
+
+        Strategy:
+        1. Parse feature_integration.py for import statements
+        2. For each imported name, verify it exists in the target layer file
+        3. If mismatches found, attempt auto-fix by finding the correct name
+
+        Returns True if imports are valid (or were auto-fixed), False if broken.
+        """
+        integration_file = spec.feature_dir / "src" / "feature_integration.py"
+        if not integration_file.exists():
+            return True  # Nothing to validate
+
+        import re
+        import ast
+
+        content = integration_file.read_text()
+
+        # Parse all "from LAYER_xxx...implementation import X, Y, Z" statements
+        import_pattern = re.compile(
+            r'from\s+(LAYER_\S+\.src\.implementation)\s+import\s+(.+?)$',
+            re.MULTILINE
+        )
+
+        fixes_needed = []
+        for match in import_pattern.finditer(content):
+            module_path_str = match.group(1)
+            imported_names = [n.strip().rstrip(',') for n in match.group(2).split(',')]
+
+            # Resolve the actual file
+            # LAYER_CA_002_10_01_Prediction_Storage.src.implementation
+            # → LAYER_CA_002_10_01_Prediction_Storage/src/implementation.py
+            rel_path = module_path_str.replace('.', '/') + '.py'
+            impl_file = spec.feature_dir / rel_path
+
+            if not impl_file.exists():
+                print(f"  ⚠️  Import target not found: {rel_path}")
+                continue
+
+            # Parse the implementation file to find actual class/function names
+            try:
+                impl_content = impl_file.read_text()
+                tree = ast.parse(impl_content)
+            except SyntaxError:
+                continue
+
+            # Collect all top-level class and function names
+            actual_names = set()
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                    actual_names.add(node.name)
+
+            # Check each imported name
+            for name in imported_names:
+                name = name.strip()
+                if not name or name.startswith('(') or name.startswith('#'):
+                    continue
+                # Strip parentheses from multi-line imports
+                name = name.strip('()')
+                if name in actual_names:
+                    continue  # ✅ Import is valid
+
+                # ❌ Import doesn't exist — try to find closest match
+                # Strategy: case-insensitive prefix match, then substring match
+                candidates = []
+                name_lower = name.lower()
+                for actual in actual_names:
+                    actual_lower = actual.lower()
+                    # Exact case-insensitive match
+                    if actual_lower == name_lower:
+                        candidates.insert(0, actual)
+                    # Prefix/suffix overlap
+                    elif (name_lower in actual_lower or actual_lower in name_lower):
+                        candidates.append(actual)
+                    # Shared word stems
+                    else:
+                        name_words = set(re.findall(r'[A-Z][a-z]+|[a-z]+', name))
+                        actual_words = set(re.findall(r'[A-Z][a-z]+|[a-z]+', actual))
+                        if name_words & actual_words:
+                            candidates.append(actual)
+
+                best_match = candidates[0] if candidates else None
+                fixes_needed.append({
+                    'file': integration_file,
+                    'wrong_name': name,
+                    'correct_name': best_match,
+                    'module': module_path_str,
+                    'all_available': sorted(actual_names),
+                })
+
+        if not fixes_needed:
+            print(f"  ✅ feature_integration.py imports validated — all names exist")
+            return True
+
+        # Attempt auto-fix
+        auto_fixed = 0
+        for fix in fixes_needed:
+            if fix['correct_name']:
+                print(f"  🔧 Auto-fixing: {fix['wrong_name']} → {fix['correct_name']}")
+                content = content.replace(fix['wrong_name'], fix['correct_name'])
+                auto_fixed += 1
+            else:
+                print(f"  ❌ No match for '{fix['wrong_name']}' in {fix['module']}")
+                print(f"     Available names: {', '.join(fix['all_available'])}")
+
+        if auto_fixed > 0:
+            integration_file.write_text(content)
+            print(f"  ✅ Auto-fixed {auto_fixed} import(s) in feature_integration.py")
+
+        unfixed = len(fixes_needed) - auto_fixed
+        if unfixed > 0:
+            print(f"  ❌ {unfixed} import(s) could not be auto-fixed")
+            return False
+
+        return True
+
     def _build_frontend_assets(self, spec: FeatureIntegrationSpec) -> bool:
         """Detect and build frontend assets (npm/vite/webpack).
 
@@ -2064,14 +2630,21 @@ if {router_var} is not None:
         if not integration_success:
             print("\n⚠️  Feature integration generation failed")
             print("Layers are complete, but feature integration layer was not generated.")
-        
+
+        # IMPORT VALIDATION: Catch AI hallucinations before they hit production
+        self.print_header("🔍 Validating Feature Integration Imports")
+        imports_valid = self._validate_feature_integration_imports(feature_integration_spec)
+        if not imports_valid:
+            print("\n⚠️  Feature integration has broken imports.")
+            print("     Auto-fix attempted. Check results above.")
+
         # Generate feature-level tests (integration + E2E)
         integration_test_count, e2e_test_count = self.generate_feature_tests(feature_integration_spec)
 
-        # NEW: Production integration wiring
+        # BACKEND WIRING: Wire feature into production API router
         prod_config = self.feature_spec.get('production_integration')
         if prod_config:
-            self.print_header("🔌 Production Integration Wiring")
+            self.print_header("🔌 Production Integration Wiring (Backend)")
             wiring_success = self.generate_production_wiring(
                 feature_integration_spec, prod_config
             )
@@ -2089,6 +2662,16 @@ if {router_var} is not None:
                 print("\n⚠️  No 'production_integration' section in feature YAML.")
                 print("     Feature code is built but NOT connected to the live app.")
                 print("     Add a production_integration section to auto-wire next time.")
+
+        # FRONTEND WIRING: Wire React/JS components into the deployed app
+        self.print_header("📱 Frontend Integration Wiring")
+        frontend_wiring_ok = self.generate_frontend_wiring(feature_integration_spec)
+        if not frontend_wiring_ok:
+            frontend_layers = self._find_frontend_layers(feature_integration_spec)
+            if frontend_layers:
+                print("\n⚠️  Frontend wiring failed — dashboard not accessible in UI")
+                print("     Add frontend_integration section to feature YAML for auto-wiring")
+            # Not a blocker if there are no frontend layers
 
         # Generate feature-level verification artifacts
         self.print_header("📋 Generating Feature-Level Verification")
