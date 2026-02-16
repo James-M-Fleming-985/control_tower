@@ -427,32 +427,66 @@ production_integration:
 # ====================================================================================
 # If the feature includes a React/JSX dashboard layer, this section tells the
 # builder where the frontend app lives and how to wire the component into it.
-# The builder will:
+# The builder will auto-detect your production frontend technology and wire accordingly:
+#
+# For Jinja2/Alpine.js (server-rendered templates):
+#   1. Add a tab button to the dashboard template (e.g., templates/dashboard.html)
+#   2. Add an Alpine.js view section with data-bound UI components
+#   3. Add fetch methods and state to the dashboard JS file (e.g., static/js/dashboard.js)
+#   4. Re-initialise icons (Lucide) after view switch
+#
+# For React SPA (client-side apps):
 #   1. Copy the layer's implementation.jsx → pages/<page_component_name>.jsx
 #   2. Add an import + <Route> to App.jsx
 #   3. Add a nav link to Layout.jsx (if nav_label is provided)
-#   4. Fix API URLs in the component to match the production_integration endpoints
+#   4. Fix API URLs in the component to match production_integration endpoints
 #   5. Rebuild the Vite/webpack bundle and copy output to static/
+#
+# The builder reads railway.toml / Procfile to find the actual entry point, then
+# checks whether it serves Jinja2 templates or proxies a JS build.
 #
 # OMIT this entire section if the feature has no frontend/UI layer.
 # ====================================================================================
 frontend_integration:
-  # Path to the React app directory (relative to repo root), containing
-  # package.json, src/App.jsx, and src/components/Layout.jsx
-  target_app_dir: "[e.g. path/to/dashboard-app]"
+  # ------ Technology detection (auto-filled by --detect-frontend) ---------
+  # "jinja2-alpinejs" | "react-spa" | "auto-detect"
+  # Set to "auto-detect" and the builder will inspect the repo for you.
+  frontend_type: "auto-detect"
 
-  # Route path where the page will be accessible (e.g. /predictions)
-  route_path: "[e.g. /my-feature]"
+  # ------ Common fields ---------------------------------------------------
 
-  # Label for the navigation link (shown in the top nav bar)
+  # Label for the navigation link / tab (shown in the nav bar or tab strip)
   nav_label: "[e.g. My Feature]"
 
-  # Emoji icon for the nav link (optional)
-  nav_icon: "[e.g. 📊]"
+  # Lucide icon name (for Jinja2/Alpine) or emoji (for React nav)
+  nav_icon: "[e.g. target]"
 
-  # React component name — the component's default export name, also used as the
-  # filename: pages/<page_component_name>.jsx
-  page_component_name: "[e.g. MyFeatureDashboard]"
+  # API endpoints this view calls (prefix only — routes added by backend layer)
+  api_prefix: "[e.g. /api/causality/predictions]"
+
+  # ------ Jinja2 / Alpine.js fields (server-rendered) ---------------------
+  jinja2_alpinejs:
+    # Path to the main dashboard template (relative to repo root)
+    dashboard_template: "[e.g. templates/dashboard.html]"
+
+    # Path to the Alpine.js data file (relative to repo root)
+    dashboard_js: "[e.g. static/js/dashboard.js]"
+
+    # Alpine.js activeView value for tab switching
+    view_name: "[e.g. predictions]"
+
+  # ------ React SPA fields (client-side) ----------------------------------
+  react_spa:
+    # Path to the React app directory (relative to repo root), containing
+    # package.json, src/App.jsx, and src/components/Layout.jsx
+    target_app_dir: "[e.g. path/to/dashboard-app]"
+
+    # Route path where the page will be accessible (e.g. /predictions)
+    route_path: "[e.g. /my-feature]"
+
+    # React component name — default export, also used as filename:
+    # pages/<page_component_name>.jsx
+    page_component_name: "[e.g. MyFeatureDashboard]"
 
 # ====================================================================================
 # FEATURE INTEGRATION CODE CONSTRAINTS - For feature_integration.py generation
