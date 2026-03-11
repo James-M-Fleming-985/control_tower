@@ -489,6 +489,131 @@ frontend_integration:
     page_component_name: "[e.g. MyFeatureDashboard]"
 
 # ====================================================================================
+# DATA PIPELINE - What produces data for this feature?
+# ====================================================================================
+# CRITICAL: Without a data producer, storage layers are empty and analytics return
+# zeros. Every feature that reads data must specify WHERE that data comes from.
+#
+# Lesson from CA-002-10: The feature defined a prediction_tracking table, analytics
+# queries, and a dashboard, but nothing ever WROTE predictions to the table.
+# The deep-analysis endpoint computed predictions client-side but never persisted
+# them. Result: empty dashboard.
+#
+# This section ensures the builder either:
+#   (a) Generates a hook in an EXISTING endpoint/function to write data, or
+#   (b) Generates a NEW producer endpoint/job that creates data.
+# ====================================================================================
+
+data_pipeline:
+  # Where does the primary data for this feature come from?
+  # "hook_existing" = patch an existing endpoint to also write to this feature's storage
+  # "new_producer"  = create a new endpoint/background job that produces data
+  # "external"      = data arrives via external API calls (no auto-wiring needed)
+  producer_type: "[hook_existing | new_producer | external]"
+
+  # --- For hook_existing: which existing code to patch -------------------------
+  hook_existing:
+    # Path to the file containing the function to hook (relative to repo root)
+    source_file: "[e.g. routers/dashboard_real.py]"
+
+    # The function/endpoint that currently computes but does not persist data
+    source_function: "[e.g. get_deep_analysis]"
+
+    # What data from the response should be persisted?
+    # Dot-path into the response dict, e.g. "prediction" means response["prediction"]
+    data_path: "[e.g. prediction]"
+
+    # The orchestrator method (or direct endpoint) to call for persistence
+    persist_via: "[e.g. POST /api/causality/predictions/store]"
+
+    # Description of the hook for the builder AI
+    hook_description: |
+      [e.g. After the deep-analysis endpoint computes a prediction dict,
+      POST it to the prediction store endpoint so it is persisted in the DB
+      and available for accuracy tracking.]
+
+  # --- For new_producer: define the job/endpoint to create --------------------
+  new_producer:
+    # "endpoint" (new API route) or "background_job" (scheduled task)
+    type: "[endpoint | background_job]"
+
+    # Cron schedule (for background_job only), e.g. "0 2 * * *" for 2am daily
+    schedule: "[cron expression or omit]"
+
+    # Description of what the producer does
+    description: |
+      [e.g. Every night, fetch latest market data and compare against
+      open predictions whose target_date has passed.]
+
+  # --- Backfill: should the builder also generate a one-time backfill? --------
+  backfill:
+    enabled: false
+    description: |
+      [e.g. Scan existing deep-analysis results in the DB and create
+      prediction_tracking rows retroactively for any that were computed
+      before this feature was deployed.]
+
+# ====================================================================================
+# RUNTIME DEPENDENCIES - DB sessions, caches, external services
+# ====================================================================================
+# CRITICAL: If any layer requires a database session, cache client, or external
+# service connection, it MUST be declared here so the builder wires injection
+# correctly in both FeatureOrchestrator and the production router.
+#
+# Lesson from CA-002-10: PredictionTracker.__init__ required db_session but the
+# FeatureOrchestrator called PredictionTracker() with no args → TypeError caught
+# silently → all analytics returned empty data.
+# ====================================================================================
+
+runtime_dependencies:
+  # Does this feature need a database session?
+  database:
+    required: false
+    # "sync" (SQLAlchemy Session) or "async" (AsyncSession)
+    session_type: "[sync | async]"
+    # How to obtain in the production app (import path + function)
+    provider: "[e.g. database.get_db or database.get_db_session]"
+    # Which layers need it passed?
+    inject_into:
+      - "[e.g. Layer 01 - PredictionStorage]"
+      - "[e.g. Layer 03 - AnalyticsService]"
+
+  # Does this feature need a cache/Redis client?
+  cache:
+    required: false
+    provider: "[e.g. from cache import redis_client]"
+
+  # Does this feature need external API keys?
+  external_services:
+    - name: "[e.g. Alpha Vantage]"
+      env_var: "[e.g. ALPHA_VANTAGE_API_KEY]"
+      required: false
+
+  # Builder instruction: how to handle dependency injection in orchestrator
+  injection_pattern: |
+    The FeatureOrchestrator must accept runtime dependencies in __init__
+    and pass them to layers that need them. The production router must
+    obtain these from the app's dependency injection system (e.g. FastAPI
+    Depends()) and pass them when constructing the orchestrator.
+
+    Pattern for DB:
+      class FeatureOrchestrator:
+          def __init__(self, db_session=None, config=None):
+              self._tracker = PredictionTracker(db_session) if db_session else None
+
+    Pattern in router:
+      @router.get("/my-endpoint")
+      async def my_endpoint(db: Session = Depends(get_db)):
+          svc = FeatureOrchestrator(db_session=db)
+          return svc.do_thing()
+
+    Or for singleton orchestrators:
+      # Store session factory, create sessions per-request
+      class FeatureOrchestrator:
+          def __init__(self, session_factory=None):
+              self._session_factory = session_factory
+
+# ====================================================================================
 # FEATURE INTEGRATION CODE CONSTRAINTS - For feature_integration.py generation
 # ====================================================================================
 # These constraints apply when AI generates the feature_integration.py file that
@@ -534,6 +659,21 @@ feature_integration_constraints:
     - "Import dataclasses decorator: from dataclasses import dataclass"
     - "Import Enum if using response status enums"
   
+  # Dependency Injection - CRITICAL: Prevents empty-data bugs
+  dependency_injection:
+    - "If runtime_dependencies.database.required is true, FeatureOrchestrator.__init__ MUST accept db_session parameter"
+    - "Pass db_session to every layer listed in runtime_dependencies.database.inject_into"
+    - "If a layer constructor requires db_session, NEVER call it without one"
+    - "If db_session is None at runtime, the orchestrator MUST return FeatureResponse(success=False, error='DB session required') — NOT silently succeed with empty data"
+    - "Orchestrator methods that need DB MUST fail loudly, not return stub messages"
+
+  # Data Completeness - CRITICAL: Prevents empty-dashboard bugs
+  data_completeness:
+    - "If data_pipeline.producer_type is 'hook_existing', the builder MUST patch the source function to persist data"
+    - "ALL orchestrator methods MUST be fully implemented — NO stub returns like 'Use async endpoint'"
+    - "If a method cannot function without DB, it MUST raise or return error, not return fake success"
+    - "Every read endpoint MUST have a corresponding write path that populates data"
+
   # Code Quality
   quality_requirements:
     - "Complete implementation - NO stub methods"

@@ -1637,6 +1637,9 @@ if {router_var} is not None:
             print(f"  ❌ {len(errors)} file(s) have syntax errors:")
             for err in errors:
                 print(err)
+            if getattr(self, '_build_metrics', None):
+                for err in errors:
+                    self._build_metrics.log_error('syntax_errors', err)
             return False
 
         print(f"  ✅ {len(py_files)} Python file(s) validated — no syntax errors")
@@ -1678,6 +1681,8 @@ if {router_var} is not None:
             else:
                 print(f"\n  ⚠️  Tests failed (exit code {result.returncode})")
                 print(f"     Build will continue — review test failures after deploy")
+                if getattr(self, '_build_metrics', None):
+                    self._build_metrics.log_error('test_failures', f"Tests failed with exit code {result.returncode}")
                 return False
         except subprocess.TimeoutExpired:
             print("  ⚠️  Tests timed out after 120s — skipping")
@@ -2225,6 +2230,10 @@ if {router_var} is not None:
         unfixed = len(fixes_needed) - auto_fixed
         if unfixed > 0:
             print(f"  ❌ {unfixed} import(s) could not be auto-fixed")
+            if getattr(self, '_build_metrics', None):
+                for fix in fixes_needed:
+                    if not fix['correct_name']:
+                        self._build_metrics.log_error('import_errors', f"Unresolved import: {fix['wrong_name']} in {fix['module']}")
             return False
 
         return True
@@ -2381,6 +2390,8 @@ if {router_var} is not None:
         if not code_valid:
             print("  ❌ BLOCKED: Code validation failed — not shipping")
             print("     Fix syntax errors and run the build again.")
+            if getattr(self, '_build_metrics', None):
+                self._build_metrics.log_error('syntax_errors', 'Ship blocked: code validation failed')
             return False
 
         if not tests_passed:
@@ -2527,6 +2538,15 @@ if {router_var} is not None:
     def build_feature(self):
         """Build complete feature layer by layer."""
         start_time = datetime.now()
+        
+        # Initialize build metrics tracking (M0)
+        try:
+            import build_error_tracker
+            self._build_metrics = build_error_tracker.start_build(
+                str(self.feature_path.stem)
+            )
+        except Exception:
+            self._build_metrics = None
         
         self.print_header("🚀 AI Feature Builder - Starting")
         
@@ -2743,10 +2763,20 @@ if {router_var} is not None:
     def run(self):
         """Execute feature build."""
         try:
-            return self.build_feature()
+            result = self.build_feature()
+            # Finalise and save build metrics (M0)
+            if getattr(self, '_build_metrics', None):
+                end_time = datetime.now()
+                self._build_metrics.finalise(result, 0)
+                self._build_metrics.save()
+            return result
         except Exception as e:
             self.print_header("❌ BUILD FAILED")
             print(f"Error: {str(e)}")
+            if getattr(self, '_build_metrics', None):
+                self._build_metrics.log_error('runtime_errors', str(e))
+                self._build_metrics.finalise(False, 0)
+                self._build_metrics.save()
             if self.verbose:
                 import traceback
                 traceback.print_exc()
