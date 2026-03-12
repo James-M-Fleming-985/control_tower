@@ -39,7 +39,7 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-epistemic_platform = ["**/*.json"]
+epistemic_platform = ["**/*.json", "templates/**", "static/**"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

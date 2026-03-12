@@ -1,7 +1,15 @@
-from fastapi import FastAPI
+from pathlib import Path
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from epistemic_platform.config import get_settings
+
+_PACKAGE_DIR = Path(__file__).resolve().parent
+_templates = Jinja2Templates(directory=str(_PACKAGE_DIR / "templates"))
 
 
 def create_app() -> FastAPI:
@@ -20,6 +28,14 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    app.mount("/static", StaticFiles(directory=str(_PACKAGE_DIR / "static")), name="static")
+
+    @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+    async def landing_page(request: Request):
+        return _templates.TemplateResponse(
+            "landing.html", {"request": request, "app_name": settings.app_name}
+        )
 
     @app.get("/health", tags=["health"])
     async def health_check():
