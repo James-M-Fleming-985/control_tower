@@ -1,0 +1,1305 @@
+project_name: Epistemic Communication Platform
+project_code: ECP-P1
+status: Active
+start_date: '2026-03-11'
+target_completion: '2026-06-17'
+completion_percentage: 0
+description: AI-driven communication development platform using epistemological reasoning
+milestones:
+- id: 60249aaf-33c3-484e-b3e4-dd52ed268a36
+  name: 'PROJECT-007: Epistemic Communication Platform'
+  target_date: '2026-06-17'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: AI-driven communication development platform using epistemological reasoning
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 1
+  parent_levels: null
+  is_true_milestone: false
+- id: c1d68970-3cc7-4a1a-b645-1757f7c9e216
+  name: 'M0: Foundation & Schema (Weeks 1-2)'
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Project structure, CRUD entities, ontology models, LLM abstraction, PresentationRenderer protocol
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: 909457cf-ce21-4187-b042-4f132dfd8ffb
+  name: Create PROJECT-007 folder hierarchy & registration YAML
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Follow PROJECT-004 naming conventions (SYSTEM, FEATURE, LAYER)
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'A: Structure'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 5d84c362-6df2-41eb-9b1e-6ad780dd282b
+  name: 'Set up Python package: src/epistemic_platform/ with main.py, config.py, database.py'
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: FastAPI app factory, Pydantic Settings, SQLAlchemy async engine
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'A: Structure'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 6910203a-afed-4fc7-91a0-289c3f9e4055
+  name: Create pyproject.toml with all dependencies
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: fastapi, uvicorn, sqlalchemy[asyncio], anthropic, openai, elevenlabs, python-jose, passlib, websockets
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'A: Structure'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 7d1adc4f-f86a-4455-bd3a-cc836e1a93b3
+  name: Create Dockerfile + docker-compose.yml (app + PostgreSQL)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Local dev environment
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'A: Structure'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: acfa25a0-2efe-4928-ac81-3640622c6fd3
+  name: Generate ActorProfile CRUD (model, repository, router, schemas)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Fields: name, description, epistemological_stance, ontology_config(JSON), archetype, is_active, avatar_config'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'B: Data Models'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 33827fe2-796f-4741-9165-913ce3fa4e19
+  name: Generate UserProfile CRUD
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Fields: email(unique), display_name, skill_level, assessment_history(JSON), preferences(JSON)'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'B: Data Models'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 027d64c9-6664-4ed6-8328-c47586ca2ffe
+  name: Generate ConversationSession CRUD
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Fields: user_id(FK), actor_id(FK), status, messages(JSON), coaching_annotations(JSON), trilemma_state(JSON)'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'B: Data Models'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: b3d73e4a-d051-4ff2-9bd2-a042157c9258
+  name: Generate ScenarioDefinition CRUD
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Fields: title, description, difficulty, actor_id(FK), objectives(JSON), evaluation_criteria(JSON), category'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'B: Data Models'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 3c35d977-406e-4c84-afb1-8a3d0262dd36
+  name: Generate JWT auth layer (registration, login, protected routes)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Based on tpl-fastapi-auth patterns
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'B: Data Models'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: f0481787-fc17-479b-bfe0-e2e75e1f8b36
+  name: Implement EpistemologicalStance models (6 stances with parameters)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: foundationalism, coherentism, infinitism, foundherentism, virtue_epistemology, fallibilism
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 4f4e7b73-ee09-4f41-bec2-49edc309aa6c
+  name: Implement CommunicationRegister model (7 dimensions, 0-1 scale)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: formality, directness, assertiveness, emotional_expressiveness, hedging_frequency, q_to_s_ratio, technical_density
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: cb15dfc8-aa2d-4dba-bf4c-9ff3b88af423
+  name: Implement GriceanMaxims compliance model
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: quantity, quality, relation, manner - each with compliance score + violation_patterns
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 6ad7e248-9cec-46a7-8e3c-10513616634e
+  name: Implement ExpressiveState model (tone, mood, urgency, connotation, energy)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Runtime layer - drives voice prosody + future avatar expressions
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: dff0c589-d258-433a-b734-2782247cff51
+  name: Implement composite ActorOntology model (6 layers)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Identity + Epistemological + CommRegister + Behavioural(10 vars) + Gricean + Expressive
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 14ceb1da-fad1-41cc-80c1-3799bb81220f
+  name: Create 6 seed actor profiles (one per epistemological stance)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: JSON fixtures in data/seed_actors/
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'C: Ontology'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 100d2b16-ef97-498c-a56b-001ba563f703
+  name: Implement EpistemicActorLLM Protocol class
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Methods: generate_response(), analyse_conversation(), assess_stance()'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'D: LLM Layer'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 9bec3afe-0e94-484f-92fa-90184585418e
+  name: Implement ClaudeAdapter (Sonnet for conversation, Opus for coaching)
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Streaming via AsyncMessageStream, async coaching calls
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'D: LLM Layer'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 25571014-a3da-4b55-aa71-2a0a31d5a043
+  name: Implement LLM config from environment variables
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Model names, temperature, max_tokens, rate limits
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'D: LLM Layer'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 4567a64e-949a-406a-9f1f-3f1784112229
+  name: Create PresentationRenderer protocol + TextRenderer
+  target_date: '2026-03-25'
+  start_date: '2026-03-11'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Protocol: render(text, expressive_state). TextRenderer = first implementation'
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: 'E: Presentation'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: false
+- id: 719cd6b4-02f8-42a1-9d7b-3914f3e8e5f4
+  name: 'Deliverable: All CRUD endpoints at /docs, seed actors loaded, Claude ping OK'
+  target_date: '2026-03-25'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: true
+- id: 39f27510-d8ed-4af5-b78d-b7b945adc179
+  name: 'MILESTONE: M0 Foundation & Schema Complete'
+  target_date: '2026-03-25'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M0: Foundation & Schema (Weeks 1-2)'
+  is_true_milestone: true
+- id: 227d9a22-dfc3-4947-b6bd-d13180c75cbf
+  name: 'M1: Core Conversation Engine (Weeks 3-4)'
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Prompt compositor, conversation manager, WebSocket endpoint
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: 76dfa550-077c-459d-afc7-4cb051a485ef
+  name: Implement prompt_compositor.py with Jinja2 prompt templates
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: system_base.j2, epistemological_stance.j2, communication_register.j2, gricean_rules.j2, scenario_context.j2
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'A: Prompts'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 8e77da3a-3023-4398-8ca7-f5afad95aff6
+  name: Implement context_manager.py (rolling window + summary)
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Last N messages + Sonnet-generated summary when window exceeds threshold
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'A: Prompts'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 8eb47f3b-187b-46f9-a3c3-325da5582d10
+  name: Implement conversation_manager.py (session orchestration)
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Turn-by-turn flow, LLM invocation, message storage, coaching trigger
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'B: Engine'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 7f9aac86-f17a-4821-8b63-a1c314317407
+  name: Implement turn_tracker.py (Opus trigger every 3-5 turns)
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Configurable coaching interval, async task lifecycle
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'B: Engine'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 751401c5-7af8-4d85-956f-27ab43136688
+  name: Implement /ws/conversation/{session_id} WebSocket endpoint
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Streamed responses, coaching updates, JWT auth via query param
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'C: WebSocket'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: fbd705d1-3bce-43ff-bb8d-7a09031e38c9
+  name: Implement WebSocket connection manager (concurrent sessions)
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Connection lifecycle, session isolation
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'C: WebSocket'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 992f37ac-9eaa-46cf-bae8-ff2cdd604f0a
+  name: Wire all routers into FastAPI app
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: CRUD + WebSocket + auth
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'D: Integration'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 64acba85-0cce-4cd6-b7c2-a6d0c32a8626
+  name: Set up Alembic migrations + initial migration
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'D: Integration'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: 9cf1404c-7747-4ed5-859e-f1f9f6399e50
+  name: Create scripts/seed_data.py
+  target_date: '2026-04-08'
+  start_date: '2026-03-25'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Load seed actors and sample scenarios into database
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: 'D: Integration'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: false
+- id: ba195b7d-2b62-45bf-a29f-c02c27345496
+  name: 'Deliverable: Text conversation with epistemologically-grounded actor via WebSocket'
+  target_date: '2026-04-08'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: true
+- id: 237c820a-68f6-4b83-94ee-26edb246be4d
+  name: 'MILESTONE: M1 Core Conversation Engine Complete'
+  target_date: '2026-04-08'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M1: Core Conversation Engine (Weeks 3-4)'
+  is_true_milestone: true
+- id: b54b8806-9ef4-4a06-b38a-a544ce0a495a
+  name: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Trilemma state machine, stance detection, coaching engine, ML feedback
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: 5ca320ec-10aa-4923-93a0-70ecc783382d
+  name: Implement Agrippa's trilemma state machine (7 states + transitions)
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: exploring, approaching_horn, on_horn_regress, on_horn_dogmatism, on_horn_circularity, escape_attempted, resolved
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'A: Trilemma'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: d9a3296f-045e-4b4d-ae35-ec0fae8210c4
+  name: Implement horn detection heuristics (pattern + LLM classification)
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Detect infinite regress, dogmatic assertion, circular reasoning
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'A: Trilemma'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: 6705ffb7-1352-43b4-8978-90f2e97244c4
+  name: Implement escape strategies per epistemological stance
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Foundationalist pushes toward dogmatism, coherentist toward circularity, etc.
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'A: Trilemma'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: af4aee38-9920-4e70-bb0a-f7bffe929f5a
+  name: Implement stance_detector.py (classify user epistemological tendency)
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Analyse justification patterns, evidence appeals, authority reliance
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'B: Detection'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: aae8ea5f-01b3-43e5-bce2-dfbd1354fddf
+  name: Implement confidence scoring + change tracking
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Track stance classification confidence across conversation turns
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'B: Detection'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: 97e90651-2e11-431e-9c5c-657252171ac3
+  name: Implement Opus coaching engine (CoachingAnnotation output)
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: what_happened, why_it_matters, what_to_try, epistemological_insight
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'C: Coaching'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: c45cca65-1eca-4434-89bb-d0269b4c7d05
+  name: Implement async coaching task + WebSocket push
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Background task triggered every 3-5 turns, result pushed as coaching_update
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'C: Coaching'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: b719e6f2-892a-4b66-a142-2296b9bd9036
+  name: Implement pre-conversation assessment (5-7 calibration questions)
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Establish baseline epistemological tendency + communication style
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'D: Assessment'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: e971429d-b2fe-40dd-af04-e00c99d4a55c
+  name: Implement actor/scenario recommendation from assessment results
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Match user profile to beneficial actor/scenario combinations
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'D: Assessment'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: 75ef2876-263a-49ed-9eae-4b36637baac6
+  name: Implement conversation outcome data collection
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'Post-session: stance_shift, trilemma_navigation, coaching_helpfulness scores'
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'E: ML Feedback'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: 6904dfbf-11f7-423a-86b8-55960a9686d7
+  name: Implement Claude (text, ExpressiveState) tuple output
+  target_date: '2026-04-29'
+  start_date: '2026-04-08'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Claude outputs both text response + expressive metadata per turn
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: 'E: ML Feedback'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: false
+- id: 0cd62871-59b0-4965-83cb-3f39a1a3ec81
+  name: 'Deliverable: Trilemma tracking, stance detection, coaching annotations live'
+  target_date: '2026-04-29'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: true
+- id: 4bab3c97-4d16-411f-bdf5-8c3aa87f3200
+  name: 'MILESTONE: M2 Epistemological Intelligence Complete'
+  target_date: '2026-04-29'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M2: Epistemological Intelligence (Weeks 5-7)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M2: Epistemological Intelligence (Weeks 5-7)'
+  is_true_milestone: true
+- id: ddc079c2-181f-4daa-ade2-63f6598dd113
+  name: 'M3: Voice Integration (Weeks 8-9)'
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ElevenLabs TTS + OpenAI Whisper STT, expressive state mapping. PARALLEL with M2 after M1.
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: e0edee36-e159-4406-a78d-a1a810f22c00
+  name: Implement ElevenLabs TTS client + OpenAI Whisper STT client
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Streaming TTS, voice selection, PCM16 audio encoding
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'A: Voice APIs'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: ddb07dd5-f8be-42ff-b8e4-8ba5797b3e1f
+  name: Implement ExpressiveState to ElevenLabs parameter mapping
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: tone/mood/urgency mapped to stability, similarity_boost, speed, style params
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'A: Voice APIs'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: c8464485-2f39-4fc3-a3b7-a67df4efcec1
+  name: Implement /ws/voice/{session_id} bidirectional audio WebSocket
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Browser audio -> Whisper STT -> text -> Claude -> text -> ElevenLabs TTS -> audio
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'B: Pipeline'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: 292c8595-2fdd-487a-aff0-841a0b3d1c48
+  name: Implement interruption/barge-in handling
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: User speaks while actor is still responding
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'B: Pipeline'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: 40367e12-a2b6-475b-8fa3-d529ba840b01
+  name: Implement latency monitoring (target <2s round-trip)
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: End-to-end latency tracking and logging
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'B: Pipeline'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: f93c4d7e-cc62-42a4-b869-a0cd412f9fcb
+  name: Create VoiceRenderer implementing PresentationRenderer protocol
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Consumes ExpressiveState, produces voiced audio
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'C: Renderer'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: 1ca17989-5949-4dc4-85e7-ba0fb6ee5ff8
+  name: 'Implement session mode: text | voice (unified message store)'
+  target_date: '2026-05-13'
+  start_date: '2026-04-29'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ConversationSession mode field, both modes share message history
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: 'C: Renderer'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+- id: ef906d7e-ca86-4f60-8ea5-2f7fefca6d36
+  name: 'Deliverable: Full voice conversation with epistemologically-grounded actors'
+  target_date: '2026-05-13'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: true
+- id: fed02ed9-10b3-41f2-8cc9-22f06cd8b2b8
+  name: 'MILESTONE: M3 Voice Integration Complete'
+  target_date: '2026-05-13'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: true
+- id: c0fa3c18-92c5-468b-847c-dfd49bd88f24
+  name: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: fad6c9ba-4787-4864-8dc1-e36b035f6232
+  name: Implement dialogue_analyser.py (post-conversation scoring)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Epistemological moves, trilemma encounters, stance shifts, Gricean compliance
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'A: Analytics'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: ef140a29-0821-471e-ae50-eb70667d8adc
+  name: Implement scoring rubric (communication effectiveness, argument quality)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Quantified metrics for each conversation
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'A: Analytics'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: ce564464-7808-43b8-93a2-9ac2a75c123f
+  name: Implement growth_tracker.py (skill progression across sessions)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Track stance flexibility, argument quality trends, trilemma navigation
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'B: Growth'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: 57e0e8ee-c44a-4aca-b2b4-af319e5092a8
+  name: Implement milestone detection (automatic achievement recognition)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: First escape from circularity horn, first detected stance shift, etc.
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'B: Growth'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: e11c18ec-9a8f-49c2-b7ee-cdf099654696
+  name: Create 12 scenario definitions (4 difficulty x 3 categories)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Workplace negotiation, academic debate, interpersonal conflict
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'C: Scenarios'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: a7050de6-6dd3-41f4-8af6-6b5075d4fef8
+  name: Implement scenario progression (recommended next scenario)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Based on user performance and growth trajectory
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'C: Scenarios'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: e76bc0e0-eb5d-4574-a2d4-ed20f3b49e7d
+  name: Implement Stance Discovery Engine (cluster analysis on conversation corpus)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Detect emerging reasoning patterns outside 6 defined stances
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'D: ML Stances'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: a188c05d-934c-41a6-b018-f0cb6aff04e1
+  name: Implement candidate stance surfacing + parameter auto-tuning
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Surface new stance candidates for validation, tune existing stance params
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'D: ML Stances'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: b746c5b8-5704-4534-b0fd-8c27f2993a64
+  name: Implement Actor Evolution (outcome-correlated ontology refinement)
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Which prompt configs drive most user growth? Refine automatically.
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'E: ML Actors'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: e261c485-ee8d-43f3-bf68-e49bdf66cfc4
+  name: Implement automatic actor archetype proposal
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: System proposes new actor archetypes discovered from data
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'E: ML Actors'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: 4ec39cc5-6e34-4e0a-a329-ac7abc0d691c
+  name: Implement session summary (Opus) + reporting API endpoints
+  target_date: '2026-05-27'
+  start_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: /api/analytics/sessions/{user_id}, /api/analytics/growth/{user_id}
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: 'F: Reporting'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+- id: d6f5d08e-f0b9-4571-a3f5-df05baf03aa1
+  name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery'
+  target_date: '2026-05-27'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: true
+- id: 11032394-48ae-4f04-8fd2-7f8a68f7244b
+  name: 'MILESTONE: M4 Assessment & ML Complete'
+  target_date: '2026-05-27'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: true
+- id: 8f8a9b17-744c-44d5-9edb-12e68bf3bff8
+  name: 'M5: UI & Polish (Weeks 12-14)'
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: 'React frontend: chat, voice, coaching overlay, dashboards'
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: false
+- id: f5f4a27d-1187-46ce-ab24-8d68bf5ff46a
+  name: Create React app (Vite + TypeScript + Tailwind CSS)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Project scaffold, routing, auth context
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'A: Chat UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 08043318-6054-4f59-ad37-41645baab71a
+  name: Implement chat interface (message bubbles, streaming, typing indicator)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: WebSocket connection, streamed text display
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'A: Chat UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 0c2451d2-df35-47a1-ab22-4dd68564c51a
+  name: Implement voice controls (mic button, audio viz, mode toggle)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Voice/text switch, audio recording, playback
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'A: Chat UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 0befe2f1-5ba3-4324-bbb7-8bc020986f10
+  name: Implement coaching side panel (real-time annotations)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Annotations appear during conversation, linked to message exchanges
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'B: Coaching UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 14b8730d-3115-4a99-92a7-13fdd408edac
+  name: Implement actor browser (grid/card view)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Stance, difficulty, description, radar chart for communication register
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'C: Actor UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 10c52302-57b1-4054-87ce-db46ffe46a8b
+  name: Implement actor profile detail (full ontology visualization)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Radar chart, stance description, Gricean profile
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'C: Actor UI'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 14ca325a-b4de-4402-976c-8ceea1034713
+  name: Implement progress dashboard (session history, growth charts, badges)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: Chart.js or Recharts visualizations
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'D: Dashboard'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: 5b4197b9-8428-4681-b1c6-92490f7e13e4
+  name: Implement scenario browser (filter by difficulty, category, recommended)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'D: Dashboard'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: d1bf9a93-d185-4656-bcf7-81807fa07525
+  name: Implement user settings (profile, preferences, assessment retake)
+  target_date: '2026-06-17'
+  start_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: 'D: Dashboard'
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+- id: fefce6fa-8284-4611-89db-c00913cd7f66
+  name: 'Deliverable: Complete web app - login -> assess -> actor -> converse -> analytics'
+  target_date: '2026-06-17'
+  start_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: Deliverable
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: true
+- id: ea11b7fc-9489-4669-bb88-6bb97ff30a5a
+  name: 'MILESTONE: M5 UI & Polish Complete'
+  target_date: '2026-06-17'
+  start_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: ''
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  resources: ''
+  project: ECP-P1
+  outline_level: 3
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: true
+- id: 922e0599-7232-44ea-a5be-19bb68f3abd3
+  name: 'M6: Avatar Integration (Future - Excluded from Initial Scope)'
+  target_date: '2026-06-17'
+  start_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: HeyGen/D-ID, demographic selection, expression mapping. AvatarRenderer implements PresentationRenderer.
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: true
+- id: c517d557-4e95-4d7c-9fc2-dc27e23039af
+  name: 'MILESTONE: PROJECT-007 Initial Build Complete'
+  target_date: '2026-06-17'
+  start_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_percentage: 0
+  notes: All M0-M5 milestones verified and complete.
+  parent_project: ''
+  resources: ''
+  project: ECP-P1
+  outline_level: 2
+  parent_levels:
+    '1': 'PROJECT-007: Epistemic Communication Platform'
+  is_true_milestone: true
+risks: []
+changes: []
