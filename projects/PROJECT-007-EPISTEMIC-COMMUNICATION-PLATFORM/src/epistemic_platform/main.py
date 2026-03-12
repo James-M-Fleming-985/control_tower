@@ -55,17 +55,24 @@ def _register_routers(app: FastAPI) -> None:
 def _register_events(app: FastAPI) -> None:
     @app.on_event("startup")
     async def on_startup():
-        from epistemic_platform.database import async_session_factory, engine, Base
-        # Import all models so Base.metadata is complete
-        from epistemic_platform.models import actor_profile, user_profile, conversation_session, scenario_definition  # noqa: F401
+        import logging
+        logger = logging.getLogger(__name__)
+        try:
+            from epistemic_platform.database import async_session_factory, engine, Base
+            # Import all models so Base.metadata is complete
+            from epistemic_platform.models import actor_profile, user_profile, conversation_session, scenario_definition  # noqa: F401
 
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
 
-        async with async_session_factory() as session:
-            from epistemic_platform.ontology.seed_loader import load_seed_actors
-            await load_seed_actors(session)
-            await session.commit()
+            async with async_session_factory() as session:
+                from epistemic_platform.ontology.seed_loader import load_seed_actors
+                await load_seed_actors(session)
+                await session.commit()
+            logger.info("Database initialized and seed actors loaded")
+        except Exception as e:
+            logger.error(f"Startup DB initialization failed: {e}")
+            logger.error("App will start but database features may not work")
 
     @app.on_event("shutdown")
     async def on_shutdown():
