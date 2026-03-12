@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 
 from epistemic_platform.config import get_settings
 
@@ -47,6 +47,12 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["health"])
     async def health_check():
         return {"status": "ok"}
+
+    favicon_path = _PACKAGE_DIR / "static" / "favicon.ico"
+    if favicon_path.is_file():
+        @app.get("/favicon.ico", include_in_schema=False)
+        async def favicon():
+            return FileResponse(str(favicon_path))
 
     _register_routers(app)
     _register_events(app)
