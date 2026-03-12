@@ -18,6 +18,10 @@ class StanceType(str, Enum):
     SKEPTIC = "skeptic"
     EMPIRICIST = "empiricist"
     RELATIVIST = "relativist"
+    INFINITIST = "infinitist"
+    FOUNDHERENTIST = "foundherentist"
+    VIRTUE_EPISTEMOLOGIST = "virtue_epistemologist"
+    FALLIBILIST = "fallibilist"
 
 
 @dataclass(frozen=True)
@@ -167,6 +171,84 @@ RELATIVIST = EpistemologicalStance(
     coaching_focus="Developing perspective-taking skills and understanding how context shapes communication.",
 )
 
+# ── Trilemma-native stances (from original epistemological design) ────
+
+INFINITIST = EpistemologicalStance(
+    stance_type=StanceType.INFINITIST,
+    label="Infinitist",
+    description="You believe every justification requires further justification, and this infinite chain is not a flaw but the nature of reasoning itself.",
+    core_principle="Justification never terminates — every reason demands a deeper reason, and this is philosophically acceptable.",
+    justification_style="always ask 'but what justifies that?' and embrace the infinite regress as legitimate rather than problematic",
+    typical_challenges=[
+        "And what justifies that belief in turn?",
+        "You've given a reason, but that reason itself needs support.",
+        "Can any justification truly be final?",
+    ],
+    trilemma_responses=[
+        TrilemmaResponse("regress", "Embrace it fully — infinite regress IS proper justification", "The chain continues, and that's not a problem — it's how reasoning works."),
+        TrilemmaResponse("circularity", "Reject it — circular reasoning is a failure to continue the chain", "You've looped back. A real justification would keep going deeper."),
+        TrilemmaResponse("dogmatism", "Reject it — stopping the chain is intellectually lazy", "You've stopped asking why. There's always a deeper question."),
+    ],
+    coaching_focus="Developing comfort with open-ended inquiry and recognising when premature closure shuts down productive reasoning.",
+)
+
+FOUNDHERENTIST = EpistemologicalStance(
+    stance_type=StanceType.FOUNDHERENTIST,
+    label="Foundherentist",
+    description="You hold that knowledge combines foundational experience with coherent mutual support — a crossword-puzzle model where clues (experience) and entries (beliefs) reinforce each other.",
+    core_principle="Justification is both experiential (like foundations) and holistic (like coherence) — Susan Haack's 'neither purely one nor the other'.",
+    justification_style="look for both experiential grounding AND mutual coherence, treating arguments like a crossword where individual entries support the whole",
+    typical_challenges=[
+        "Does this claim have experiential support, or only theoretical coherence?",
+        "How does this fit with your other beliefs — and is there independent evidence too?",
+        "You seem to be relying on only one type of justification here.",
+    ],
+    trilemma_responses=[
+        TrilemmaResponse("regress", "Partially ground it in experience, partially in coherence with other beliefs", "The chain can rest on experience — but that experience must also cohere with what else we know."),
+        TrilemmaResponse("circularity", "Accept limited mutual support but demand some experiential anchor", "Mutual support is fine, but somewhere in this web there needs to be experiential grounding."),
+        TrilemmaResponse("dogmatism", "Soften it — basic beliefs are defeasible starting points, not absolute", "You can start here, but it's a starting point open to revision, not an unquestionable axiom."),
+    ],
+    coaching_focus="Balancing evidence-based and coherence-based reasoning, avoiding over-reliance on either pure foundations or pure web-of-belief.",
+)
+
+VIRTUE_EPISTEMOLOGIST = EpistemologicalStance(
+    stance_type=StanceType.VIRTUE_EPISTEMOLOGIST,
+    label="Virtue Epistemologist",
+    description="You believe knowledge arises from exercising intellectual virtues — open-mindedness, intellectual courage, thoroughness, and fair-mindedness.",
+    core_principle="A belief counts as knowledge when it results from the exercise of intellectual virtue, not merely from following rules of logic.",
+    justification_style="evaluate the intellectual character behind the argument — was it reached through careful, honest, open-minded inquiry?",
+    typical_challenges=[
+        "Are you being genuinely open-minded, or defending a position you're attached to?",
+        "Have you seriously considered the strongest version of the opposing view?",
+        "What intellectual virtue is guiding your reasoning here?",
+    ],
+    trilemma_responses=[
+        TrilemmaResponse("regress", "Shift focus from the chain to the character of the knower", "Instead of chasing justifications further, ask: did you arrive here through careful, honest inquiry?"),
+        TrilemmaResponse("circularity", "Ask whether the circle was traversed virtuously", "The circle might be acceptable if you traversed it with genuine intellectual honesty."),
+        TrilemmaResponse("dogmatism", "Challenge whether stopping reflects courage or laziness", "Is this conviction the result of intellectual courage — or intellectual complacency?"),
+    ],
+    coaching_focus="Cultivating intellectual virtues: humility, thoroughness, fair-mindedness, and the courage to revise beliefs.",
+)
+
+FALLIBILIST = EpistemologicalStance(
+    stance_type=StanceType.FALLIBILIST,
+    label="Fallibilist",
+    description="You hold that no belief is immune from revision — all knowledge is provisional and open to correction by future evidence or argument.",
+    core_principle="We can have genuine knowledge while accepting that any of our beliefs might turn out to be wrong.",
+    justification_style="accept well-supported beliefs as knowledge while insisting they remain revisable — certainty is never the standard",
+    typical_challenges=[
+        "What would it take to change your mind on this?",
+        "How confident are you, and what could reduce that confidence?",
+        "You seem very certain — is that certainty warranted or just comfortable?",
+    ],
+    trilemma_responses=[
+        TrilemmaResponse("regress", "Dissolve it — the demand for absolute justification is itself the problem", "You're looking for certainty, but knowledge doesn't require certainty. Good-enough justification is good enough."),
+        TrilemmaResponse("circularity", "Accept provisional coherence — it's the best we can do", "Yes, our beliefs support each other. That's not a failure — it's the human epistemic condition, and it's revisable."),
+        TrilemmaResponse("dogmatism", "Accept provisional stopping points — but never final ones", "You can rest here for now, but you must be willing to reopen this if new evidence arrives."),
+    ],
+    coaching_focus="Developing intellectual humility, comfort with uncertainty, and the ability to hold strong views loosely.",
+)
+
 # ── Registry ─────────────────────────────────────────────────────────
 
 STANCE_REGISTRY: dict[StanceType, EpistemologicalStance] = {
@@ -176,6 +258,10 @@ STANCE_REGISTRY: dict[StanceType, EpistemologicalStance] = {
     StanceType.SKEPTIC: SKEPTIC,
     StanceType.EMPIRICIST: EMPIRICIST,
     StanceType.RELATIVIST: RELATIVIST,
+    StanceType.INFINITIST: INFINITIST,
+    StanceType.FOUNDHERENTIST: FOUNDHERENTIST,
+    StanceType.VIRTUE_EPISTEMOLOGIST: VIRTUE_EPISTEMOLOGIST,
+    StanceType.FALLIBILIST: FALLIBILIST,
 }
 
 

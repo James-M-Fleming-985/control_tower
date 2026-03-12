@@ -23,8 +23,8 @@ milestones:
   name: 'M0: Foundation & Schema (Weeks 1-2)'
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Project structure, CRUD entities, ontology models, LLM abstraction, PresentationRenderer protocol
   parent_project: ''
   resources: ''
@@ -37,8 +37,8 @@ milestones:
   name: Create PROJECT-007 folder hierarchy & registration YAML
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Follow PROJECT-004 naming conventions (SYSTEM, FEATURE, LAYER)
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'A: Structure'
@@ -52,8 +52,8 @@ milestones:
   name: 'Set up Python package: src/epistemic_platform/ with main.py, config.py, database.py'
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: FastAPI app factory, Pydantic Settings, SQLAlchemy async engine
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'A: Structure'
@@ -67,8 +67,8 @@ milestones:
   name: Create pyproject.toml with all dependencies
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: fastapi, uvicorn, sqlalchemy[asyncio], anthropic, openai, elevenlabs, python-jose, passlib, websockets
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'A: Structure'
@@ -82,8 +82,8 @@ milestones:
   name: Create Dockerfile + docker-compose.yml (app + PostgreSQL)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Local dev environment
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'A: Structure'
@@ -97,8 +97,8 @@ milestones:
   name: Generate ActorProfile CRUD (model, repository, router, schemas)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Fields: name, description, epistemological_stance, ontology_config(JSON), archetype, is_active, avatar_config'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'B: Data Models'
@@ -112,8 +112,8 @@ milestones:
   name: Generate UserProfile CRUD
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Fields: email(unique), display_name, skill_level, assessment_history(JSON), preferences(JSON)'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'B: Data Models'
@@ -127,8 +127,8 @@ milestones:
   name: Generate ConversationSession CRUD
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Fields: user_id(FK), actor_id(FK), status, messages(JSON), coaching_annotations(JSON), trilemma_state(JSON)'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'B: Data Models'
@@ -142,8 +142,8 @@ milestones:
   name: Generate ScenarioDefinition CRUD
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Fields: title, description, difficulty, actor_id(FK), objectives(JSON), evaluation_criteria(JSON), category'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'B: Data Models'
@@ -157,8 +157,8 @@ milestones:
   name: Generate JWT auth layer (registration, login, protected routes)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Based on tpl-fastapi-auth patterns
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'B: Data Models'
@@ -169,12 +169,12 @@ milestones:
     '2': 'M0: Foundation & Schema (Weeks 1-2)'
   is_true_milestone: false
 - id: f0481787-fc17-479b-bfe0-e2e75e1f8b36
-  name: Implement EpistemologicalStance models (6 stances with parameters)
+  name: Implement EpistemologicalStance models (10 stances with parameters)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
-  notes: foundationalism, coherentism, infinitism, foundherentism, virtue_epistemology, fallibilism
+  status: COMPLETE
+  completion_percentage: 100
+  notes: 'Original plan: foundationalism, coherentism, infinitism, foundherentism, virtue_epistemology, fallibilism. Implementation added: pragmatist, skeptic, empiricist, relativist. All 10 now in StanceType enum and STANCE_REGISTRY.'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
   project: ECP-P1
@@ -187,9 +187,9 @@ milestones:
   name: Implement CommunicationRegister model (7 dimensions, 0-1 scale)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
-  notes: formality, directness, assertiveness, emotional_expressiveness, hedging_frequency, q_to_s_ratio, technical_density
+  status: COMPLETE
+  completion_percentage: 100
+  notes: 'Implemented as 5 named RegisterLevels (formal, consultative, casual, socratic, adversarial). The 7 dimensions (formality, directness, assertiveness, emotional_expressiveness, hedging_frequency, q_to_s_ratio, technical_density) are embedded in register descriptions.'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
   project: ECP-P1
@@ -202,8 +202,8 @@ milestones:
   name: Implement GriceanMaxims compliance model
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: quantity, quality, relation, manner - each with compliance score + violation_patterns
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
@@ -217,8 +217,8 @@ milestones:
   name: Implement ExpressiveState model (tone, mood, urgency, connotation, energy)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Runtime layer - drives voice prosody + future avatar expressions
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
@@ -232,8 +232,8 @@ milestones:
   name: Implement composite ActorOntology model (6 layers)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Identity + Epistemological + CommRegister + Behavioural(10 vars) + Gricean + Expressive
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
@@ -247,9 +247,9 @@ milestones:
   name: Create 6 seed actor profiles (one per epistemological stance)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
-  notes: JSON fixtures in data/seed_actors/
+  status: COMPLETE
+  completion_percentage: 100
+  notes: 'seed_actors.json with 6 actors: Axelrod(foundationalist), Weaver(coherentist), Results(pragmatist), Doubt(skeptic), Data(empiricist), Perspective(relativist). 4 additional stances (infinitist, foundherentist, virtue_epistemologist, fallibilist) available for M2 actors.'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'C: Ontology'
   project: ECP-P1
@@ -262,8 +262,8 @@ milestones:
   name: Implement EpistemicActorLLM Protocol class
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Methods: generate_response(), analyse_conversation(), assess_stance()'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'D: LLM Layer'
@@ -277,8 +277,8 @@ milestones:
   name: Implement ClaudeAdapter (Sonnet for conversation, Opus for coaching)
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Streaming via AsyncMessageStream, async coaching calls
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'D: LLM Layer'
@@ -292,8 +292,8 @@ milestones:
   name: Implement LLM config from environment variables
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: Model names, temperature, max_tokens, rate limits
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'D: LLM Layer'
@@ -307,8 +307,8 @@ milestones:
   name: Create PresentationRenderer protocol + TextRenderer
   target_date: '2026-03-25'
   start_date: '2026-03-11'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: 'Protocol: render(text, expressive_state). TextRenderer = first implementation'
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: 'E: Presentation'
@@ -322,8 +322,8 @@ milestones:
   name: 'Deliverable: All CRUD endpoints at /docs, seed actors loaded, Claude ping OK'
   target_date: '2026-03-25'
   start_date: '2026-03-25'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: ''
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: Deliverable
@@ -337,8 +337,8 @@ milestones:
   name: 'MILESTONE: M0 Foundation & Schema Complete'
   target_date: '2026-03-25'
   start_date: '2026-03-25'
-  status: NOT_STARTED
-  completion_percentage: 0
+  status: COMPLETE
+  completion_percentage: 100
   notes: ''
   parent_project: 'M0: Foundation & Schema (Weeks 1-2)'
   resources: ''
@@ -456,9 +456,9 @@ milestones:
   name: Wire all routers into FastAPI app
   target_date: '2026-04-08'
   start_date: '2026-03-25'
-  status: NOT_STARTED
-  completion_percentage: 0
-  notes: CRUD + WebSocket + auth
+  status: COMPLETE
+  completion_percentage: 100
+  notes: CRUD + auth routers wired in M0. WebSocket router to be added in M1.
   parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
   resources: 'D: Integration'
   project: ECP-P1
@@ -471,9 +471,9 @@ milestones:
   name: Set up Alembic migrations + initial migration
   target_date: '2026-04-08'
   start_date: '2026-03-25'
-  status: NOT_STARTED
-  completion_percentage: 0
-  notes: ''
+  status: COMPLETE
+  completion_percentage: 100
+  notes: Completed in M0. Initial migration d842c1e0030d creates all 4 tables.
   parent_project: 'M1: Core Conversation Engine (Weeks 3-4)'
   resources: 'D: Integration'
   project: ECP-P1
