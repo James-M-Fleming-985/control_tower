@@ -24,6 +24,13 @@ Thumbs.db
 *.csv
 *.json
 development_tracking.json
+!projects/**/*.json
+
+# Environment files
+.env
+
+# Python build artifacts
+*.egg-info/
 
 # Reports (generated)
 todos/

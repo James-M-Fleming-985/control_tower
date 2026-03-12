@@ -1,0 +1,77 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from epistemic_platform.config import get_settings
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+
+    app = FastAPI(
+        title=settings.app_name,
+        version="0.1.0",
+        description="AI-driven communication development platform using epistemological reasoning",
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[o.strip() for o in settings.allowed_origins.split(",")],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/health", tags=["health"])
+    async def health_check():
+        return {"status": "ok"}
+
+    _register_routers(app)
+    _register_events(app)
+
+    return app
+
+
+def _register_routers(app: FastAPI) -> None:
+    from epistemic_platform.routers import (
+        actor_profile_router,
+        user_profile_router,
+        conversation_session_router,
+        scenario_definition_router,
+        auth_router,
+    )
+
+    prefix = get_settings().api_prefix
+    app.include_router(auth_router.router, prefix=f"{prefix}/auth", tags=["auth"])
+    app.include_router(actor_profile_router.router, prefix=f"{prefix}/actors", tags=["actors"])
+    app.include_router(user_profile_router.router, prefix=f"{prefix}/users", tags=["users"])
+    app.include_router(
+        conversation_session_router.router, prefix=f"{prefix}/sessions", tags=["sessions"]
+    )
+    app.include_router(
+        scenario_definition_router.router, prefix=f"{prefix}/scenarios", tags=["scenarios"]
+    )
+
+
+def _register_events(app: FastAPI) -> None:
+    @app.on_event("startup")
+    async def on_startup():
+        from epistemic_platform.database import async_session_factory, engine, Base
+        # Import all models so Base.metadata is complete
+        from epistemic_platform.models import actor_profile, user_profile, conversation_session, scenario_definition  # noqa: F401
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        async with async_session_factory() as session:
+            from epistemic_platform.ontology.seed_loader import load_seed_actors
+            await load_seed_actors(session)
+            await session.commit()
+
+    @app.on_event("shutdown")
+    async def on_shutdown():
+        from epistemic_platform.database import engine
+
+        await engine.dispose()
+
+
+app = create_app()
