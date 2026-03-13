@@ -1,0 +1,142 @@
+# ==============================================================================
+# PROJECT PLAN TEMPLATE — Systems3 Project Reporter Format
+# ==============================================================================
+# This template defines the YAML schema accepted by the project reporter
+# application for import via the upload endpoint.
+#
+# Upload: POST /upload/xml (accepts both XML and YAML despite the route name)
+# Rendering: Gantt chart, milestone cards with sibling task lists, calendar
+#
+# KEY CONCEPTS:
+#   - "milestones" array contains ALL entries: phase headers, tasks, and
+#     milestone markers.
+#   - is_true_milestone: true  → Milestone marker (diamond on Gantt, appears
+#     on calendar). Typically ONE per phase — the completion gate.
+#   - is_true_milestone: false → Either a phase header (outline_level 2) or
+#     a sibling task (outline_level 3). These appear inside the milestone
+#     card as work items but NOT on the calendar.
+#   - outline_level: 2 = Phase/group header (e.g. "M1: Foundation Scaling")
+#   - outline_level: 3 = Individual task or milestone marker under a phase
+#   - parent_levels: dict mapping level numbers (as strings) to ancestor
+#     names, building the hierarchy for grouping.
+# ==============================================================================
+
+# --- Top-Level Project Fields ------------------------------------------------
+project_name: "Your Project Name"          # REQUIRED — display name
+project_code: "PRJ-001"                    # REQUIRED — short code (max ~10 chars)
+status: "IN_PROGRESS"                      # Active | IN_PROGRESS | COMPLETED | ON_HOLD
+start_date: '2026-01-01'                   # YYYY-MM-DD (quoted to avoid YAML date parsing)
+target_completion: '2026-12-31'            # YYYY-MM-DD
+completion_percentage: 0                   # 0–100 (integer, NOT 0–10000)
+
+# --- Milestones Array --------------------------------------------------------
+# Contains phase headers, sibling tasks, and milestone markers.
+# Order matters — entries are displayed in array order on the Gantt.
+milestones:
+
+  # EXAMPLE 1: Phase Header (outline_level 2)
+  # Shown as a group container on the Gantt. Not a milestone itself.
+  - id: null
+    name: "Phase 1: Setup & Configuration"
+    start_date: '2026-01-01'
+    target_date: '2026-02-28'
+    status: NOT_STARTED                    # NOT_STARTED | IN_PROGRESS | COMPLETED
+    completion_date: null                  # YYYY-MM-DD or null
+    completion_percentage: 0
+    notes: "Phase description or target outcomes"
+    outline_level: 2                       # 2 = phase/group header
+    parent_levels:
+      '1': "Your Project Name"            # Level 1 = root project name
+    parent_project: null                   # null for level-2 entries
+    is_true_milestone: false               # Phase headers are NOT milestones
+    owner: null                            # Optional: person or role responsible
+    resources: null                        # Optional: comma-separated resource names
+    project: "PRJ-001"                     # Must match project_code above
+
+  # EXAMPLE 2: Sibling Task (outline_level 3)
+  # Appears inside the milestone card as a work item.
+  - id: null
+    name: "Configure database connection"
+    start_date: '2026-01-01'
+    target_date: '2026-01-14'
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track A: Setup (Owner: AI). Wire Railway Postgres, test connectivity."
+    outline_level: 3                       # 3 = task under a phase
+    parent_levels:
+      '1': "Your Project Name"
+      '2': "Phase 1: Setup & Configuration"
+    parent_project: "Phase 1: Setup & Configuration"  # Must match level-2 name
+    is_true_milestone: false               # Sibling tasks are NOT milestones
+    owner: "AI"
+    resources: null
+    project: "PRJ-001"
+
+  # EXAMPLE 3: Milestone Marker (outline_level 3, is_true_milestone true)
+  # Diamond on Gantt, shown on calendar. ONE per phase = the completion gate.
+  - id: null
+    name: "MILESTONE: Phase 1 Complete"
+    start_date: '2026-02-28'
+    target_date: '2026-02-28'              # Same as start = zero duration
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Gate criteria: database configured, API keys set, CI/CD running"
+    outline_level: 3
+    parent_levels:
+      '1': "Your Project Name"
+      '2': "Phase 1: Setup & Configuration"
+    parent_project: "Phase 1: Setup & Configuration"
+    is_true_milestone: true                # TRUE = this IS the milestone marker
+    owner: null
+    resources: null
+    project: "PRJ-001"
+
+# --- Risks Array (optional) --------------------------------------------------
+risks:
+  # - risk_id: "RISK-001"
+  #   description: "Key dependency unavailable"
+  #   severity: "HIGH"                     # HIGH | MEDIUM | LOW
+  #   probability: "MEDIUM"                # HIGH | MEDIUM | LOW
+  #   impact: "Schedule delay of 2 weeks"
+  #   mitigation: "Identify alternative supplier"
+  #   status: "OPEN"                       # OPEN | MITIGATED | CLOSED
+
+# --- Changes Array (optional) ------------------------------------------------
+changes:
+  # - change_id: "CHANGE-001"
+  #   date: '2026-03-01'
+  #   old_date: '2026-02-28'
+  #   new_date: '2026-03-15'
+  #   reason: "Resource unavailability"
+  #   impact: "15 days delay to Phase 1"
+
+# ==============================================================================
+# FIELD REFERENCE
+# ==============================================================================
+# Top-level:
+#   project_name      REQUIRED   str    Display name
+#   project_code      REQUIRED   str    Short code (auto-derived if missing)
+#   status            optional   str    Active | IN_PROGRESS | COMPLETED | ON_HOLD
+#   start_date        optional   str    YYYY-MM-DD (quote it)
+#   target_completion optional   str    YYYY-MM-DD
+#   completion_percentage optional int   0-100
+#
+# Milestone entry:
+#   name              REQUIRED   str    Task or milestone name
+#   target_date       REQUIRED   str    YYYY-MM-DD — finish/due date
+#   start_date        optional   str    YYYY-MM-DD
+#   status            optional   str    NOT_STARTED | IN_PROGRESS | COMPLETED
+#   completion_percentage optional int   0-100 (defaults to 0)
+#   completion_date   optional   str    YYYY-MM-DD or null
+#   id                optional   str    UUID (auto-generated if null)
+#   notes             optional   str    Description, owner info, deliverables
+#   outline_level     optional   int    2=phase header, 3=task, 4=subtask
+#   parent_levels     optional   dict   {level_str: parent_name} hierarchy
+#   parent_project    optional   str    Name of level-2 parent (for grouping)
+#   is_true_milestone optional   bool   true=milestone marker, false=task/header
+#   owner             optional   str    Responsible person/role
+#   resources         optional   str    Comma-separated resource names
+#   project           optional   str    Project code reference
+# ==============================================================================
