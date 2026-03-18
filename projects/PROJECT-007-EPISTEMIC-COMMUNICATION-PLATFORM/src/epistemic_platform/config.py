@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     @field_validator("database_url", mode="before")
     @classmethod
     def ensure_async_scheme(cls, v: str) -> str:
+        # Strip whitespace and any trailing garbage characters that can
+        # appear from misconfigured Railway variable references.
+        v = v.strip().rstrip(")")
         if v.startswith("postgresql://"):
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
         return v
