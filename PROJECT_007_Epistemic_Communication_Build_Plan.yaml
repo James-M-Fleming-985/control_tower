@@ -387,9 +387,9 @@ milestones:
   name: 'M1: Core Conversation Engine (Weeks 3-4)'
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: IN_PROGRESS
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 90
   notes: Prompt compositor, conversation manager, WebSocket endpoint
   outline_level: 2
   parent_levels:
@@ -403,9 +403,9 @@ milestones:
   name: Implement prompt_compositor.py with Jinja2 prompt templates
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: system_base.j2, epistemological_stance.j2, communication_register.j2, gricean_rules.j2, scenario_context.j2
   outline_level: 3
   parent_levels:
@@ -420,9 +420,9 @@ milestones:
   name: Implement context_manager.py (rolling window + summary)
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Last N messages + Sonnet-generated summary when window exceeds threshold
   outline_level: 3
   parent_levels:
@@ -437,9 +437,9 @@ milestones:
   name: Implement conversation_manager.py (session orchestration)
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Turn-by-turn flow, LLM invocation, message storage, coaching trigger
   outline_level: 3
   parent_levels:
@@ -454,9 +454,9 @@ milestones:
   name: Implement turn_tracker.py (Opus trigger every 3-5 turns)
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Configurable coaching interval, async task lifecycle
   outline_level: 3
   parent_levels:
@@ -471,9 +471,9 @@ milestones:
   name: Implement /ws/conversation/{session_id} WebSocket endpoint
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Streamed responses, coaching updates, JWT auth via query param
   outline_level: 3
   parent_levels:
@@ -488,9 +488,9 @@ milestones:
   name: Implement WebSocket connection manager (concurrent sessions)
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Connection lifecycle, session isolation
   outline_level: 3
   parent_levels:
@@ -539,9 +539,9 @@ milestones:
   name: Create scripts/seed_data.py
   start_date: '2026-03-25'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: Load seed actors and sample scenarios into database
   outline_level: 3
   parent_levels:
@@ -556,9 +556,9 @@ milestones:
   name: 'Deliverable: Text conversation with epistemologically-grounded actor via WebSocket'
   start_date: '2026-04-08'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:
@@ -573,9 +573,9 @@ milestones:
   name: 'MILESTONE: M1 Core Conversation Engine Complete'
   start_date: '2026-04-08'
   target_date: '2026-04-08'
-  status: NOT_STARTED
+  status: COMPLETE
   completion_date: null
-  completion_percentage: 0
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:

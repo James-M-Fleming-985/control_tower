@@ -67,6 +67,7 @@ def _register_routers(app: FastAPI) -> None:
         conversation_session_router,
         scenario_definition_router,
         auth_router,
+        websocket_router,
     )
 
     prefix = get_settings().api_prefix
@@ -79,6 +80,8 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(
         scenario_definition_router.router, prefix=f"{prefix}/scenarios", tags=["scenarios"]
     )
+    # WebSocket endpoint (no prefix — mounted at /ws/conversation/{session_id})
+    app.include_router(websocket_router.router, tags=["websocket"])
 
 
 def _register_events(app: FastAPI) -> None:
@@ -106,7 +109,9 @@ def _register_events(app: FastAPI) -> None:
     @app.on_event("shutdown")
     async def on_shutdown():
         from epistemic_platform.database import engine
+        from epistemic_platform.engine.connection_manager import manager
 
+        await manager.shutdown()
         await engine.dispose()
 
 
