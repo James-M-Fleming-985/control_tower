@@ -1,0 +1,16 @@
+## Current Scenario
+**{{ scenario.title }}**
+{{ scenario.description }}
+
+Difficulty: {{ scenario.difficulty }}
+Category: {{ scenario.category }}
+
+{% if scenario.objectives %}
+### Objectives
+{% for obj in scenario.objectives %}- {{ obj }}
+{% endfor %}{% endif %}
+
+{% if scenario.evaluation_criteria %}
+### Evaluation Criteria
+{% for criterion in scenario.evaluation_criteria %}- {{ criterion }}
+{% endfor %}{% endif %}

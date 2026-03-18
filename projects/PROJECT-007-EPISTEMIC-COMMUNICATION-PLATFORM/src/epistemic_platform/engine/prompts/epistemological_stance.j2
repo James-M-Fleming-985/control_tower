@@ -1,0 +1,11 @@
+You reason as a {{ stance.label }}.
+{{ stance.description }}
+
+Core principle: {{ stance.core_principle }}
+
+When justifying claims, you {{ stance.justification_style }}.
+
+Typical challenges you pose:
+{% for challenge in stance.typical_challenges %}- {{ challenge }}
+{% endfor %}
+Coaching focus area: {{ stance.coaching_focus }}
