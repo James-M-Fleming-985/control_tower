@@ -25,6 +25,8 @@ Thumbs.db
 *.json
 development_tracking.json
 !projects/**/*.json
+!m0v_baselines.json
+!build_metrics_history.json
 
 # Environment files
 .env

@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-03-19T12:32:00Z",
+  "milestone": "M0V",
+  "source": "https://businessventures-production.up.railway.app/api/dashboard/baselines",
+  "track_a_model_accuracy": {
+    "direction_accuracy_pct": 49.2,
+    "total_predictions": 3634,
+    "mape_pct": 41.48,
+    "total_validated": 3634,
+    "lag_error_avg_days": 32.2,
+    "total_with_lag_data": 3401,
+    "targets": {
+      "direction_accuracy": 90,
+      "mape": 5,
+      "lag_error_days": 7
+    }
+  },
+  "track_b_build_quality": {
+    "error_rate_pct": 0.0,
+    "total_builds": 0,
+    "successful_builds": 0,
+    "failed_builds": 0,
+    "target_error_rate": 5,
+    "note": "No builds executed yet — Track B requires 3-5 real builds"
+  },
+  "track_c_exploitation": {
+    "viability_accuracy_pct": 0.0,
+    "validated_count": 0,
+    "total_build_recommendations": 103,
+    "target_accuracy": 90,
+    "note": "No validations yet — Track C requires >= 15 validated"
+  },
+  "track_d_revenue": {
+    "total_mrr": 0.0,
+    "total_subscribers": 0,
+    "app_count": 2,
+    "snapshot_date": "2026-03-11",
+    "target_mrr": 20000,
+    "status": "COMPLETE — $0 baseline documented"
+  }
+}
