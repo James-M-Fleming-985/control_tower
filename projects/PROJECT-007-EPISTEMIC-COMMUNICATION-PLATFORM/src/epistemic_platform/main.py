@@ -1,12 +1,21 @@
+import os
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 
+from epistemic_platform import __version__
 from epistemic_platform.config import get_settings
 
 _PACKAGE_DIR = Path(__file__).resolve().parent
+
+# Build info — commit hash from Railway, timestamp from app startup
+_commit = os.getenv("RAILWAY_GIT_COMMIT_SHA", "")
+GIT_COMMIT = _commit[:7] if _commit else "unknown"
+DEPLOY_TIMESTAMP = datetime.utcnow().isoformat()
+BUILD_VERSION = f"{__version__}-{GIT_COMMIT}"
 
 
 def create_app() -> FastAPI:
@@ -41,12 +50,24 @@ def create_app() -> FastAPI:
         @app.get("/", response_class=HTMLResponse, include_in_schema=False)
         async def landing_page(request: Request):
             return _templates.TemplateResponse(
-                "landing.html", {"request": request, "app_name": settings.app_name}
+                "landing.html", {
+                    "request": request,
+                    "app_name": settings.app_name,
+                    "version": BUILD_VERSION,
+                    "git_commit": GIT_COMMIT,
+                    "deploy_timestamp": DEPLOY_TIMESTAMP,
+                }
             )
 
     @app.get("/health", tags=["health"])
     async def health_check():
-        return {"status": "ok"}
+        return {
+            "status": "ok",
+            "version": BUILD_VERSION,
+            "git_commit": GIT_COMMIT,
+            "deploy_timestamp": DEPLOY_TIMESTAMP,
+            "app": settings.app_name,
+        }
 
     favicon_path = _PACKAGE_DIR / "static" / "favicon.ico"
     if favicon_path.is_file():

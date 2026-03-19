@@ -238,7 +238,8 @@
     </div>
 
     <div class="footer">
-        <p>{{ app_name }} &middot; <a href="/docs">API Documentation</a> &middot; <a href="/health">Status</a></p>
+        <p>{{ app_name }} v{{ version }} ({{ git_commit }}) | Deployed: {{ deploy_timestamp[:19] }}<br>
+        <a href="/docs">API Documentation</a> &middot; <a href="/health">Status</a></p>
     </div>
 
 </body>
