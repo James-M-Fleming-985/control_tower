@@ -1,0 +1,36 @@
+You are evaluating a user's epistemological profile based on their assessment answers.
+
+## Assessment Answers
+{% for q in questions %}
+**Q{{ loop.index }}: {{ q.text }}**
+Answer: {{ q.answer }}
+{% endfor %}
+
+## The 10 Epistemological Stances
+1. foundationalist — Seeks self-evident axioms; traces claims to bedrock truths
+2. coherentist — Justifies beliefs by internal consistency and mutual support
+3. pragmatist — Evaluates truth by practical consequences and usefulness
+4. skeptic — Questions everything; demands proof; resists certainty claims
+5. empiricist — Grounds knowledge in observation, data, and experience
+6. relativist — Views truth as framework-dependent; considers perspective
+7. infinitist — Embraces infinite regress as legitimate; always asks "but why?"
+8. foundherentist — Combines experiential grounding with coherence
+9. virtue_epistemologist — Values intellectual character: honesty, courage, open-mindedness
+10. fallibilist — Accepts knowledge is provisional and always revisable
+
+## Instructions
+Based on the user's answers, determine their primary and secondary epistemological stances,
+their communication style preferences, and recommend actors and scenarios that would
+challenge and develop their communication skills.
+
+## Output Format
+Respond with ONLY valid JSON:
+{
+  "primary_stance": "stance_name",
+  "secondary_stance": "stance_name or null",
+  "confidence": 0.0,
+  "communication_style": "brief description of how this user tends to communicate",
+  "recommended_actors": ["actor stance that would challenge this user", "..."],
+  "recommended_scenarios": ["scenario type that would stretch their abilities", "..."],
+  "reasoning": "brief explanation of the classification"
+}

@@ -45,8 +45,11 @@ When the user's reasoning hits a justification limit, use these strategies:
 {% endif %}
 
 ## Response Format
-After your conversational response, output a JSON metadata line on its own line
-starting with `|||META|||`:
+You MUST end every response with a JSON metadata line on its own line
+starting with `|||META|||`. This is required for the platform to function correctly.
 |||META|||{"tone": "neutral", "mood": "calm", "energy": "medium", "urgency": 0.5, "connotation": 0.5}
 
 Replace the values with your actual expressive state for this turn.
+Valid values — tone: neutral/warm/challenging/encouraging/skeptical/curious/authoritative;
+mood: calm/engaged/intense/reflective/playful; energy: low/medium/high;
+urgency: 0.0-1.0; connotation: 0.0 (negative) to 1.0 (positive).

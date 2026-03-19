@@ -16,6 +16,19 @@ Watch for how the user handles:
 {% for tr in trilemma_responses %}- **{{ tr.horn | title }}**: {{ tr.strategy }}
 {% endfor %}
 
+{% if trilemma_state %}
+## Current Trilemma State
+- Machine state: {{ trilemma_state.state }}
+{% if trilemma_state.current_horn %}- Current horn: {{ trilemma_state.current_horn }}{% endif %}
+{% if trilemma_state.horn_visits %}- Horn visits so far: {{ trilemma_state.horn_visits | length }}{% endif %}
+{% endif %}
+
+{% if detected_stance %}
+## Detected User Stance
+The user appears to reason as a **{{ detected_stance }}** (confidence: {{ stance_confidence }}).
+Consider how this interacts with the actor's {{ stance.stance_type.value }} perspective.
+{% endif %}
+
 ## Output Format
 Respond with ONLY valid JSON:
 {
@@ -24,5 +37,10 @@ Respond with ONLY valid JSON:
   "improvements": ["specific actionable suggestion", "..."],
   "gricean_scores": {"quantity": 0, "quality": 0, "relation": 0, "manner": 0},
   "trilemma_awareness": 0,
-  "epistemological_insight": "observation about user's reasoning pattern"
+  "epistemological_insight": "observation about user's reasoning pattern",
+  "what_happened": "brief description of what occurred in the recent exchange",
+  "why_it_matters": "why this matters for the user's communication development",
+  "what_to_try": "one concrete thing the user should try next",
+  "detected_stance": "the epistemological stance the user is exhibiting or empty string",
+  "trilemma_horn": "which horn the user is near/on (regress/circularity/dogmatism) or empty string"
 }

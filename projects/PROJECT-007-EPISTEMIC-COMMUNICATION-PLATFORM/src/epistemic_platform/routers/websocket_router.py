@@ -125,8 +125,11 @@ async def conversation_websocket(
                 msg_type = msg.get("type")
 
                 if msg_type == "end_session":
-                    await conv_manager.end_session()
-                    await manager.send_json(session_id, {"type": "session_ended"})
+                    outcome = await conv_manager.end_session()
+                    await manager.send_json(session_id, {
+                        "type": "session_ended",
+                        "outcome": outcome,
+                    })
                     break
 
                 if msg_type == "message":
@@ -149,6 +152,23 @@ async def conversation_websocket(
                             })
 
                     await manager.send_json(session_id, {"type": "stream_end"})
+
+                    # M2: Push trilemma state update
+                    horn_detection = conv_manager.get_last_horn_detection()
+                    if horn_detection:
+                        await manager.send_json(session_id, {
+                            "type": "trilemma_update",
+                            "state": conv_manager.get_trilemma_state(),
+                            "horn_detection": horn_detection,
+                        })
+
+                    # M2: Push stance detection update (when available)
+                    stance_detection = conv_manager.get_last_stance_detection()
+                    if stance_detection:
+                        await manager.send_json(session_id, {
+                            "type": "stance_update",
+                            "detection": stance_detection,
+                        })
 
                     # Check coaching trigger
                     annotation = await conv_manager.maybe_run_coaching()

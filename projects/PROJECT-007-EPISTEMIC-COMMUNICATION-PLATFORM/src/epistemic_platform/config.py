@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     coaching_trigger_interval: int = 4
     max_concurrent_sessions: int = 50
 
+    # M2: Epistemological Intelligence
+    stance_detection_interval: int = 3  # Run stance detection every N user turns
+    horn_detection_llm_fallback: bool = True  # Use LLM when heuristics are uncertain
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

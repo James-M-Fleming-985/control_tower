@@ -590,10 +590,10 @@ milestones:
   name: 'M2: Epistemological Intelligence (Weeks 5-7)'
   start_date: '2026-04-08'
   target_date: '2026-04-29'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
-  notes: Trilemma state machine, stance detection, coaching engine, ML feedback
+  status: COMPLETE
+  completion_date: '2026-03-19'
+  completion_percentage: 100
+  notes: Trilemma state machine, stance detection, coaching engine, pre-conversation assessment, ML feedback, session outcome metrics — all implemented and wired
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform

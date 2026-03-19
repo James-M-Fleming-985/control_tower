@@ -102,6 +102,7 @@ def _register_routers(app: FastAPI) -> None:
         scenario_definition_router,
         auth_router,
         websocket_router,
+        assessment_router,
     )
 
     prefix = get_settings().api_prefix
@@ -113,6 +114,9 @@ def _register_routers(app: FastAPI) -> None:
     )
     app.include_router(
         scenario_definition_router.router, prefix=f"{prefix}/scenarios", tags=["scenarios"]
+    )
+    app.include_router(
+        assessment_router.router, prefix=f"{prefix}/assessment", tags=["assessment"]
     )
     # WebSocket endpoint (no prefix — mounted at /ws/conversation/{session_id})
     app.include_router(websocket_router.router, tags=["websocket"])

@@ -1,0 +1,30 @@
+You are classifying a user's epistemological stance based on their conversation behaviour.
+
+## The 10 Epistemological Stances
+1. **foundationalist** — Seeks self-evident axioms; traces claims to bedrock truths
+2. **coherentist** — Justifies beliefs by internal consistency and mutual support
+3. **pragmatist** — Evaluates truth by practical consequences and usefulness
+4. **skeptic** — Questions everything; demands proof; resists certainty claims
+5. **empiricist** — Grounds knowledge in observation, data, and experience
+6. **relativist** — Views truth as framework-dependent; considers perspective
+7. **infinitist** — Embraces infinite regress as legitimate; always asks "but why?"
+8. **foundherentist** — Combines experiential grounding with coherence (crossword model)
+9. **virtue_epistemologist** — Values intellectual character: honesty, courage, open-mindedness
+10. **fallibilist** — Accepts knowledge is provisional and always revisable
+
+## Instructions
+Analyse the USER's messages (not the actor's) for:
+- How they justify their claims
+- What they treat as a valid reason or evidence
+- How they respond to challenges
+- Whether they seek foundations, coherence, practical value, etc.
+
+## Output Format
+Respond with ONLY valid JSON:
+{
+  "primary_stance": "one of the 10 stance names above",
+  "confidence": 0.0,
+  "evidence": ["specific quote or behaviour from user", "..."],
+  "secondary_stance": "another stance name or null",
+  "reasoning": "one-sentence explanation of classification"
+}

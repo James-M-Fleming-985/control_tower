@@ -29,6 +29,12 @@ class CoachingAnnotation:
     trilemma_awareness: int = 0
     epistemological_insight: str = ""
     turn_number: int = 0
+    # M2 additions
+    what_happened: str = ""
+    why_it_matters: str = ""
+    what_to_try: str = ""
+    detected_stance: str = ""
+    trilemma_horn: str = ""
 
     def to_dict(self) -> dict:
         return {
@@ -39,6 +45,11 @@ class CoachingAnnotation:
             "trilemma_awareness": self.trilemma_awareness,
             "epistemological_insight": self.epistemological_insight,
             "turn_number": self.turn_number,
+            "what_happened": self.what_happened,
+            "why_it_matters": self.why_it_matters,
+            "what_to_try": self.what_to_try,
+            "detected_stance": self.detected_stance,
+            "trilemma_horn": self.trilemma_horn,
         }
 
 
@@ -68,6 +79,10 @@ class TurnTracker:
     async def run_coaching_analysis(
         self,
         messages: list[dict],
+        *,
+        trilemma_state: dict | None = None,
+        detected_stance: str = "",
+        stance_confidence: float = 0.0,
     ) -> CoachingAnnotation:
         """Run Opus coaching analysis on the conversation so far.
 
@@ -75,12 +90,23 @@ class TurnTracker:
         ----------
         messages : list[dict]
             The full conversation messages (role + content dicts).
+        trilemma_state : dict | None
+            Current trilemma state machine snapshot.
+        detected_stance : str
+            The user's detected epistemological stance.
+        stance_confidence : float
+            Confidence of the stance detection.
 
         Returns
         -------
         CoachingAnnotation with structured feedback.
         """
-        system_prompt = build_coaching_prompt(self._ontology)
+        system_prompt = build_coaching_prompt(
+            self._ontology,
+            trilemma_state=trilemma_state,
+            detected_stance=detected_stance,
+            stance_confidence=stance_confidence,
+        )
 
         transcript = "\n".join(
             f"{m['role'].upper()}: {m['content']}" for m in messages
@@ -112,6 +138,11 @@ class TurnTracker:
                 trilemma_awareness=data.get("trilemma_awareness", 0),
                 epistemological_insight=data.get("epistemological_insight", ""),
                 turn_number=self._user_turn_count,
+                what_happened=data.get("what_happened", ""),
+                why_it_matters=data.get("why_it_matters", ""),
+                what_to_try=data.get("what_to_try", ""),
+                detected_stance=data.get("detected_stance", ""),
+                trilemma_horn=data.get("trilemma_horn", ""),
             )
         except (json.JSONDecodeError, KeyError) as e:
             logger.warning("Failed to parse coaching response: %s", e)

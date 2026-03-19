@@ -54,6 +54,10 @@ def build_conversation_prompt(
 
 def build_coaching_prompt(
     ontology: ActorOntology,
+    *,
+    trilemma_state: dict | None = None,
+    detected_stance: str = "",
+    stance_confidence: float = 0.0,
 ) -> str:
     """Render the coaching analysis system prompt for the coaching LLM (Opus)."""
     tpl = _env.get_template("coaching_analysis.j2")
@@ -63,4 +67,7 @@ def build_coaching_prompt(
         register=ontology.register,
         trilemma_responses=ontology.stance.trilemma_responses,
         maxims=ALL_MAXIMS,
+        trilemma_state=trilemma_state,
+        detected_stance=detected_stance,
+        stance_confidence=f"{stance_confidence:.1f}",
     )
