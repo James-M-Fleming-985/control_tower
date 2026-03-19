@@ -999,7 +999,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution, gamification (XP, levels, achievements, scenario unlocks)
+  notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution, gamification (XP, levels, achievements, scenario unlocks), session completion detection, interactive coach debrief
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform
@@ -1298,7 +1298,75 @@ milestones:
   resources: 'G: Gamification'
   project: ECP-P1
 - id: null
-  name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery, gamification engine'
+  name: Implement session_planner.py (assessment + goals -> prescribed session structure)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Takes AssessmentResult + user learning goals -> session plan with target objectives, recommended turn budget, completion criteria. Stored on ConversationSession. Wires existing ScenarioDefinition.objectives / evaluation_criteria into runtime-checkable conditions.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'H: Coach Debrief'
+  project: ECP-P1
+- id: null
+  name: Implement completion_detector.py (objective-based session end trigger)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Evaluates scenario objectives + evaluation_criteria against live trilemma_state each turn. Detects when learning objectives met (horn escaped, stance demonstrated, Gricean threshold). Sends session_complete WebSocket message with outcome summary + feedback_available flag. Supplements user-driven end_session for prescribed sessions.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'H: Coach Debrief'
+  project: ECP-P1
+- id: null
+  name: Implement coach_debrief.py (interactive coaching conversation engine)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'New session type (mode=coaching_debrief) linked to parent actor session. Uses CoachingLLM adapter in conversational mode (multi-turn, not one-shot). Coach has full context: transcript, coaching annotations, trilemma journey, session outcome, proficiency scores. Maintains own dialogue history.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'H: Coach Debrief'
+  project: ECP-P1
+- id: null
+  name: Implement coach debrief WebSocket protocol + subscription gate
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'New WebSocket message types: coaching_debrief_start (server->client after session_complete), coaching_message (client->server), coaching_response (server->client streamed), coaching_debrief_end. Subscription check before launch: free tier gets static outcome only, paid tier gets interactive coach session.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'H: Coach Debrief'
+  project: ECP-P1
+- id: null
+  name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery, gamification engine, interactive coach debrief'
   start_date: '2026-05-27'
   target_date: '2026-05-27'
   status: NOT_STARTED
@@ -1338,7 +1406,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'React frontend: chat, voice, coaching overlay, dashboards, gamification UI (XP, levels, badges, radar chart, session results)'
+  notes: 'React frontend: chat, voice, coaching overlay, dashboards, gamification UI (XP, levels, badges, radar chart, session results), coach debrief UI, subscription gate'
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform
@@ -1552,6 +1620,74 @@ milestones:
   resources: 'E: Gamification UI'
   project: ECP-P1
 - id: null
+  name: Implement session completion screen (objectives met, transition prompt)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'When completion_detector fires session_complete: animated completion summary (objectives achieved, key moments). CTA button Start Feedback Session with Coach. Free tier shows outcome metrics + upgrade prompt. Paid tier launches debrief directly.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'F: Coach Debrief UI'
+  project: ECP-P1
+- id: null
+  name: Implement coach debrief chat interface (conversational feedback UI)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Separate chat view for coach persona (distinct avatar/colour from actor). Session context sidebar with key metrics, trilemma journey mini-map, coaching annotations. User asks questions about performance, coach responds conversationally.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'F: Coach Debrief UI'
+  project: ECP-P1
+- id: null
+  name: Implement feedback reference cards (clickable coaching annotations in debrief)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Coaching annotations from actor session displayed as tappable cards during debrief. User taps to ask coach to elaborate, e.g. Tell me more about why my quality score dropped on turn 5. Links to specific transcript moments.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'F: Coach Debrief UI'
+  project: ECP-P1
+- id: null
+  name: Implement subscription gate UI (tier check, upgrade prompt, feature preview)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Before debrief launch check subscription tier via API. Free tier: outcome metrics + blurred coach preview + upgrade CTA. Paid tier: launch directly. Settings page shows current plan and upgrade options. Stripe integration placeholder.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'F: Coach Debrief UI'
+  project: ECP-P1
+- id: null
   name: Implement scenario browser (filter by difficulty, category, recommended)
   start_date: '2026-05-27'
   target_date: '2026-06-17'
@@ -1586,7 +1722,7 @@ milestones:
   resources: 'D: Dashboard'
   project: ECP-P1
 - id: null
-  name: 'Deliverable: Complete web app - login -> assess -> actor -> converse -> results -> analytics -> achievements'
+  name: 'Deliverable: Complete web app - login -> assess -> actor -> converse -> coach debrief -> results -> analytics -> achievements'
   start_date: '2026-06-17'
   target_date: '2026-06-17'
   status: NOT_STARTED
