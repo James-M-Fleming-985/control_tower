@@ -351,32 +351,14 @@ milestones:
   resources: null
   project: CA-SCALE
 - id: null
-  name: Record Timing Accuracy baseline from Programme Baselines dashboard
+  name: Record Lag Error baseline from Programme Baselines dashboard
   start_date: '2026-03-12'
   target_date: '2026-03-15'
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'Track A: Complete Model Accuracy Baseline (Owner: AI). New Timing Accuracy card on dashboard shows this automatically.
-    Formula: count(|target_date - actual_date| <= 3d) / total × 100'
-  outline_level: 3
-  parent_levels:
-    '2': 'M0V: Validate Baselines (Weeks 3-4)'
-    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
-  parent_project: 'M0V: Validate Baselines (Weeks 3-4)'
-  is_true_milestone: false
-  owner: AI
-  resources: null
-  project: CA-SCALE
-- id: null
-  name: Compare granger_v1 vs granger_v1+lag_opt model accuracy
-  start_date: '2026-03-12'
-  target_date: '2026-03-15'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
-  notes: 'Track A: Complete Model Accuracy Baseline (Owner: AI). New Optimal Lag card on dashboard shows this automatically.
-    Formula: lag_opt_accuracy - base_accuracy'
+  notes: 'Track A: Complete Model Accuracy Baseline (Owner: AI). Lag Error card shows avg |actual_lag_days - predicted_lag_days|.
+    Replaced Timing Accuracy (dead code) and Optimal Lag model comparison (redundant with time series charts).'
   outline_level: 3
   parent_levels:
     '2': 'M0V: Validate Baselines (Weeks 3-4)'
@@ -573,7 +555,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'Gate criteria: (1) Direction accuracy, MAPE, timing, lag comparison all visible on dashboard (2) Build error rate
+  notes: 'Gate criteria: (1) Direction accuracy, MAPE, lag_error all visible on dashboard (2) Build error rate
     from real builds (>= 3 builds) (3) >= 15 exploitation recs validated (4) Revenue $0 documented'
   outline_level: 3
   parent_levels:
@@ -914,6 +896,60 @@ milestones:
   completion_date: null
   completion_percentage: 0
   notes: 'Track E: Revenue Dashboard v1: Central RevenueEvent model, webhook aggregation, basic MRR chart'
+  outline_level: 3
+  parent_levels:
+    '2': 'M1: Foundation Scaling (Weeks 4-9)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M1: Foundation Scaling (Weeks 4-9)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Create ProductDeployment model (product, config, market, outcome)
+  start_date: '2026-03-30'
+  target_date: '2026-05-10'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Foundation. SQLAlchemy model tracking what was built, tech stack,
+    target market, demographic, pricing tier, and commercial outcome. Links to ExploitationRecommendation.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M1: Foundation Scaling (Weeks 4-9)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M1: Foundation Scaling (Weeks 4-9)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Create ProductMetrics model (revenue, traffic, conversion per deployment)
+  start_date: '2026-03-30'
+  target_date: '2026-05-10'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Foundation. Time-series commercial metrics per ProductDeployment:
+    MRR, subscriber count, traffic, conversion rate, churn. Populated by Stripe webhooks and GA4.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M1: Foundation Scaling (Weeks 4-9)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M1: Foundation Scaling (Weeks 4-9)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Wire Stripe webhook and GA4 API to auto-populate commercial data
+  start_date: '2026-03-30'
+  target_date: '2026-05-10'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Foundation. Stripe webhook endpoint receives payment events,
+    GA4 scheduled pull gets traffic/conversion. Both write to ProductMetrics model.'
   outline_level: 3
   parent_levels:
     '2': 'M1: Foundation Scaling (Weeks 4-9)'
@@ -1270,6 +1306,60 @@ milestones:
   completion_date: null
   completion_percentage: 0
   notes: 'Track E: Data Scale to 500GB: FRED economic indicators, Alpha Vantage, GDELT news sentiment, ETL pipeline'
+  outline_level: 3
+  parent_levels:
+    '2': 'M2: Intelligence Layer (Weeks 10-15)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M2: Intelligence Layer (Weeks 10-15)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Auto-record ProductDeployment when build completes successfully
+  start_date: '2026-05-11'
+  target_date: '2026-06-21'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Instrumentation. Build pipeline writes ProductDeployment record
+    on success: tech stack, template, market category, pricing tier from YAML config.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M2: Intelligence Layer (Weeks 10-15)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M2: Intelligence Layer (Weeks 10-15)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Build /api/commercial-intelligence endpoint (revenue by config and market)
+  start_date: '2026-05-11'
+  target_date: '2026-06-21'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Instrumentation. API endpoint returns: top revenue configs,
+    market performance matrix, config-to-revenue correlation, best performing demographics.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M2: Intelligence Layer (Weeks 10-15)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M2: Intelligence Layer (Weeks 10-15)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Add Commercial Case panel to BUILD exploitation cards on dashboard
+  start_date: '2026-05-11'
+  target_date: '2026-06-21'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Instrumentation. BUILD cards show: similar products revenue range,
+    best-performing config for this market, commercial confidence score. Feeds the Build Decision Gate.'
   outline_level: 3
   parent_levels:
     '2': 'M2: Intelligence Layer (Weeks 10-15)'
@@ -1677,6 +1767,60 @@ milestones:
   completion_date: null
   completion_percentage: 0
   notes: 'Track F: Pricing Intelligence v1: IP geolocation, PPP tiers, pricing recommendation table, demand estimation'
+  outline_level: 3
+  parent_levels:
+    '2': 'M3: Self-Learning Foundation (Weeks 16-21)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M3: Self-Learning Foundation (Weeks 16-21)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: YAML auto-generator consults commercial intelligence for config decisions
+  start_date: '2026-06-22'
+  target_date: '2026-08-02'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Integration. When generating build YAML, system queries ProductDeployment
+    history to select tech stack, pricing model, and UI pattern with highest revenue for target market.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M3: Self-Learning Foundation (Weeks 16-21)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M3: Self-Learning Foundation (Weeks 16-21)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Configuration confidence scoring based on historical revenue data
+  start_date: '2026-06-22'
+  target_date: '2026-08-02'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Integration. Score each build config element (stack, template, market)
+    by number of prior deployments and average revenue. Low-data configs flagged for human review.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M3: Self-Learning Foundation (Weeks 16-21)'
+    '1': 'Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)'
+  parent_project: 'M3: Self-Learning Foundation (Weeks 16-21)'
+  is_true_milestone: false
+  owner: null
+  resources: null
+  project: CA-SCALE
+- id: null
+  name: Demographic and geographic pattern mapping for UI customisation
+  start_date: '2026-06-22'
+  target_date: '2026-08-02'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Track G: Commercial Intelligence Integration. Maps demographic segments to UI patterns,
+    colour schemes, layout preferences, and content tone based on ProductDeployment outcomes.'
   outline_level: 3
   parent_levels:
     '2': 'M3: Self-Learning Foundation (Weeks 16-21)'

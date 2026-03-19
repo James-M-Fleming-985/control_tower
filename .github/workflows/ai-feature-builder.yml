@@ -343,6 +343,7 @@ jobs:
             target_repo/**/verification_*.yaml
             target_repo/**/build_*.log
             control_tower/**/build_*.log
+            control_tower/build_metrics_history.json
           retention-days: 30
           if-no-files-found: ignore
 
