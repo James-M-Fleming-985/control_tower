@@ -1,13 +1,17 @@
+import logging
 import os
+import traceback
 from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from epistemic_platform import __version__
 from epistemic_platform.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 _PACKAGE_DIR = Path(__file__).resolve().parent
 
@@ -77,6 +81,15 @@ def create_app() -> FastAPI:
 
     _register_routers(app)
     _register_events(app)
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(request: Request, exc: Exception):
+        tb = traceback.format_exception(type(exc), exc, exc.__traceback__)
+        logger.error(f"Unhandled error on {request.method} {request.url.path}: {exc}\n{''.join(tb)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(exc), "type": type(exc).__name__},
+        )
 
     return app
 
