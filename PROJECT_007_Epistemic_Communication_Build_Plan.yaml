@@ -999,7 +999,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution
+  notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution, gamification (XP, levels, achievements, scenario unlocks)
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform
@@ -1196,7 +1196,109 @@ milestones:
   resources: 'F: Reporting'
   project: ECP-P1
 - id: null
-  name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery'
+  name: Implement proficiency_model.py (3-axis scoring — Awareness, Quality, Flexibility)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Aggregate per-session metrics into 3 skill axes: Epistemological Awareness (horn recognition, escape rate), Argumentative Quality (Gricean scores), Flexibility (stance diversity, cross-stance performance)'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: Implement XP/points system (weighted session outcome scoring)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'XP earned per session from: horns escaped, stance shifts, Gricean improvement, actor difficulty multiplier. Aggregate into user level (1-10)'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: Implement achievement_engine.py (badge definitions + unlock logic)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Achievement badges: Horn Spotter, Escape Artist, Stance Surfer, Maxim Keeper, Multi-Actor, Trilemma Navigator, Devils Advocate, Epistemic Athlete, Philosopher. Tracked in user profile JSON.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: Implement level progression (10 levels from Explorer to Philosopher)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'L1 Explorer -> L2 Horn Spotter -> L3 Escape Artist -> L4 Stance Surfer -> L5 Maxim Keeper -> L6 Multi-Actor -> L7 Trilemma Navigator -> L8 Devils Advocate -> L9 Epistemic Athlete -> L10 Philosopher. Level-up triggers from achievement + XP thresholds.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: Implement scenario unlock gates (difficulty gated by demonstrated skill)
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Harder scenarios require minimum level or specific achievements. E.g. advanced debate scenarios unlock at L5+, opposing-stance challenges at L6+.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: Implement gamification API endpoints
+  start_date: '2026-05-13'
+  target_date: '2026-05-27'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'GET /api/profile/level, /api/profile/achievements, /api/profile/xp-history, /api/profile/skill-axes. Returns current level, XP, unlocked badges, 3-axis scores, next-level requirements.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
+  is_true_milestone: false
+  owner: null
+  resources: 'G: Gamification'
+  project: ECP-P1
+- id: null
+  name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery, gamification engine'
   start_date: '2026-05-27'
   target_date: '2026-05-27'
   status: NOT_STARTED
@@ -1236,7 +1338,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'React frontend: chat, voice, coaching overlay, dashboards'
+  notes: 'React frontend: chat, voice, coaching overlay, dashboards, gamification UI (XP, levels, badges, radar chart, session results)'
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform
@@ -1354,7 +1456,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: Chart.js or Recharts visualizations
+  notes: 'Session history list, growth charts (3-axis radar over time), earned badges display, XP bar + level indicator. Chart.js or Recharts.'
   outline_level: 3
   parent_levels:
     '2': 'M5: UI & Polish (Weeks 12-14)'
@@ -1363,6 +1465,91 @@ milestones:
   is_true_milestone: false
   owner: null
   resources: 'D: Dashboard'
+  project: ECP-P1
+- id: null
+  name: Implement skill radar chart (3-axis — Awareness, Quality, Flexibility)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Interactive radar/spider chart showing current scores on 3 axes. Historical overlay showing progression over last 5/10/all sessions. Consumes /api/profile/skill-axes.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'E: Gamification UI'
+  project: ECP-P1
+- id: null
+  name: Implement level + XP display (progress bar, level badge, XP history)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Persistent header showing current level + XP bar to next level. Level-up animation on threshold cross. XP breakdown per session on hover.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'E: Gamification UI'
+  project: ECP-P1
+- id: null
+  name: Implement achievement badges gallery (earned + locked + progress)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Grid of all achievements — earned badges highlighted, locked badges greyed with unlock criteria tooltip. Toast notification on new badge earned. Consumes /api/profile/achievements.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'E: Gamification UI'
+  project: ECP-P1
+- id: null
+  name: Implement post-session results screen (XP earned, badges unlocked, metrics)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'After end_session: animated XP gain, new badge reveals, session metrics (horns visited/escaped, stance detected, Gricean scores), comparison to personal best. Call to action for next recommended session.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'E: Gamification UI'
+  project: ECP-P1
+- id: null
+  name: Implement session timeline (trilemma journey visualization)
+  start_date: '2026-05-27'
+  target_date: '2026-06-17'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Visual timeline showing state transitions through the trilemma per session. Exploring -> Horn -> Escape -> Resolved flow. Clickable to jump to that point in the conversation transcript.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M5: UI & Polish (Weeks 12-14)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M5: UI & Polish (Weeks 12-14)'
+  is_true_milestone: false
+  owner: null
+  resources: 'E: Gamification UI'
   project: ECP-P1
 - id: null
   name: Implement scenario browser (filter by difficulty, category, recommended)
@@ -1399,7 +1586,7 @@ milestones:
   resources: 'D: Dashboard'
   project: ECP-P1
 - id: null
-  name: 'Deliverable: Complete web app - login -> assess -> actor -> converse -> analytics'
+  name: 'Deliverable: Complete web app - login -> assess -> actor -> converse -> results -> analytics -> achievements'
   start_date: '2026-06-17'
   target_date: '2026-06-17'
   status: NOT_STARTED
