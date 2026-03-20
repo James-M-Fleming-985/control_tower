@@ -8,10 +8,13 @@ binary audio frames and JSON control messages. Supports barge-in
 from __future__ import annotations
 
 import asyncio
+import enum
 import json
 import logging
 import re
+import statistics
 import time
+from dataclasses import dataclass, field
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
@@ -33,6 +36,74 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 _META_RE = re.compile(r"\|\|\|META\|\|\|(\{.*\})\s*$", re.DOTALL)
+
+
+# ---------------------------------------------------------------------------
+# State machine & metrics
+# ---------------------------------------------------------------------------
+
+
+class VoiceState(enum.Enum):
+    """Server-side voice pipeline state."""
+
+    LISTENING = "listening"
+    PROCESSING = "processing"
+    SPEAKING = "speaking"
+
+
+@dataclass
+class TurnLatency:
+    """Latency breakdown for a single conversation turn."""
+
+    stt_ms: float = 0.0
+    llm_ms: float = 0.0
+    tts_first_byte_ms: float = 0.0
+    total_ms: float = 0.0
+
+
+@dataclass
+class SessionMetrics:
+    """Accumulated metrics across a voice session."""
+
+    turn_latencies: list[TurnLatency] = field(default_factory=list)
+    barge_in_count: int = 0
+
+    def summary(self) -> dict:
+        """Return aggregate latency stats and barge-in count."""
+        totals = [t.total_ms for t in self.turn_latencies]
+        result: dict = {"barge_in_count": self.barge_in_count}
+        if not totals:
+            return result
+        result.update(
+            {
+                "turn_count": len(totals),
+                "latency_avg_ms": round(statistics.mean(totals)),
+                "latency_p50_ms": round(statistics.median(totals)),
+                "latency_p90_ms": round(_percentile(totals, 90)),
+                "latency_max_ms": round(max(totals)),
+            }
+        )
+        return result
+
+
+def _percentile(data: list[float], p: float) -> float:
+    """Simple percentile without numpy."""
+    if not data:
+        return 0.0
+    s = sorted(data)
+    k = (len(s) - 1) * (p / 100.0)
+    f = int(k)
+    c = min(f + 1, len(s) - 1)
+    return s[f] + (k - f) * (s[c] - s[f])
+
+
+async def _cancel_tts(task: asyncio.Task, timeout: float = 0.5) -> None:
+    """Cancel a running TTS task with a brief grace period."""
+    task.cancel()
+    try:
+        await asyncio.wait_for(asyncio.shield(task), timeout=timeout)
+    except (asyncio.CancelledError, asyncio.TimeoutError, Exception):
+        pass
 
 
 def _authenticate_ws(token: str | None) -> int | None:
@@ -66,16 +137,28 @@ async def _stream_tts(
     text: str,
     voice_params: dict,
     cancel: asyncio.Event,
+    first_byte_event: asyncio.Event | None = None,
 ) -> None:
-    """Stream TTS audio chunks to the client. Stops when cancel is set."""
+    """Stream TTS audio chunks to the client. Stops when cancel is set.
+
+    If *first_byte_event* is provided it is set after the first audio
+    chunk is sent, allowing callers to measure time-to-first-byte.
+    """
     try:
         async for chunk in tts.synthesize_stream(text, voice_params):
             if cancel.is_set():
                 break
             await websocket.send_bytes(chunk)
+            if first_byte_event and not first_byte_event.is_set():
+                first_byte_event.set()
+    except asyncio.CancelledError:
+        logger.debug("TTS streaming cancelled (barge-in)")
     except Exception:
         logger.exception("TTS streaming error")
     finally:
+        # Unblock any waiters even on error / cancel
+        if first_byte_event and not first_byte_event.is_set():
+            first_byte_event.set()
         try:
             await websocket.send_json({"type": "audio_end"})
         except Exception:
@@ -94,6 +177,7 @@ async def voice_websocket(
         Binary frames: audio chunks (WebM/Opus from MediaRecorder)
         {"type": "end_utterance"}: signals end of user speech
         {"type": "end_session"}: ends conversation
+        {"type": "ping"}: connection health check
 
     Server -> Client:
         {"type": "transcription", "text": "..."}
@@ -103,7 +187,10 @@ async def voice_websocket(
         {"type": "vocal_state", "composure_score": ..., ...}
         {"type": "trilemma_update", ...} / {"type": "stance_update", ...}
         {"type": "coaching", "annotation": {...}}
+        {"type": "state_change", "state": "listening|processing|speaking"}
         {"type": "barge_in"}
+        {"type": "latency_report", "turn": N, "stt_ms": ..., ...}
+        {"type": "pong", "server_ts": ...}
         {"type": "session_ended", "outcome": {...}}
         {"type": "error", "detail": "..."}
     """
@@ -165,7 +252,15 @@ async def voice_websocket(
             audio_buffer = bytearray()
             tts_task: asyncio.Task | None = None
             barge_in = asyncio.Event()
+            tts_first_byte = asyncio.Event()
             latency_warn_ms = settings.voice_latency_warn_threshold_ms
+            cancel_timeout = settings.voice_barge_in_cancel_timeout_ms / 1000.0
+            metrics = SessionMetrics()
+            state = VoiceState.LISTENING
+
+            await websocket.send_json(
+                {"type": "state_change", "state": state.value}
+            )
 
             while True:
                 message = await websocket.receive()
@@ -177,11 +272,16 @@ async def voice_websocket(
                 raw_bytes = message.get("bytes")
                 if raw_bytes:
                     if tts_task and not tts_task.done():
-                        # Barge-in: cancel TTS playback
+                        # Barge-in: cancel TTS immediately
                         barge_in.set()
-                        await tts_task
+                        await _cancel_tts(tts_task, timeout=cancel_timeout)
                         tts_task = None
+                        metrics.barge_in_count += 1
+                        state = VoiceState.LISTENING
                         await websocket.send_json({"type": "barge_in"})
+                        await websocket.send_json(
+                            {"type": "state_change", "state": state.value}
+                        )
                     audio_buffer.extend(raw_bytes)
                     continue
 
@@ -204,7 +304,7 @@ async def voice_websocket(
                 if cmd == "end_session":
                     if tts_task and not tts_task.done():
                         barge_in.set()
-                        await tts_task
+                        await _cancel_tts(tts_task, timeout=cancel_timeout)
 
                     # Aggregate composure metrics
                     composure_metrics = None
@@ -221,8 +321,13 @@ async def voice_websocket(
                                 scores[-1] - scores[0], 4
                             )
 
+                    # Merge composure + session-level latency / barge-in stats
+                    extra = {**metrics.summary()}
+                    if composure_metrics:
+                        extra.update(composure_metrics)
+
                     outcome = await conv_manager.end_session(
-                        extra_metrics=composure_metrics
+                        extra_metrics=extra if extra else None
                     )
                     await websocket.send_json(
                         {"type": "session_ended", "outcome": outcome}
@@ -240,8 +345,14 @@ async def voice_websocket(
                     # Cancel any lingering TTS
                     if tts_task and not tts_task.done():
                         barge_in.set()
-                        await tts_task
+                        await _cancel_tts(tts_task, timeout=cancel_timeout)
                         tts_task = None
+                        metrics.barge_in_count += 1
+
+                    state = VoiceState.PROCESSING
+                    await websocket.send_json(
+                        {"type": "state_change", "state": state.value}
+                    )
 
                     t0 = time.monotonic()
                     audio_data = bytes(audio_buffer)
@@ -256,6 +367,10 @@ async def voice_websocket(
                     t_stt = time.monotonic()
 
                     if not transcription.text:
+                        state = VoiceState.LISTENING
+                        await websocket.send_json(
+                            {"type": "state_change", "state": state.value}
+                        )
                         await websocket.send_json(
                             {"type": "error", "detail": "Could not transcribe audio"}
                         )
@@ -348,6 +463,7 @@ async def voice_websocket(
                         )
 
                     # --- Stream TTS audio (background for barge-in) ---
+                    tts_first_byte_ms = 0.0
                     if clean_text.strip():
                         voice_params = (
                             expressive_state.to_voice_params()
@@ -359,22 +475,55 @@ async def voice_websocket(
                             }
                         )
                         barge_in.clear()
+                        tts_first_byte.clear()
+                        t_tts_start = time.monotonic()
                         tts_task = asyncio.create_task(
                             _stream_tts(
-                                websocket, tts, clean_text, voice_params, barge_in
+                                websocket,
+                                tts,
+                                clean_text,
+                                voice_params,
+                                barge_in,
+                                first_byte_event=tts_first_byte,
                             )
                         )
+                        state = VoiceState.SPEAKING
+                        await websocket.send_json(
+                            {"type": "state_change", "state": state.value}
+                        )
 
-                    # Latency logging
+                        # Wait briefly for first TTS byte (non-blocking cap)
+                        try:
+                            await asyncio.wait_for(
+                                tts_first_byte.wait(), timeout=5.0
+                            )
+                            tts_first_byte_ms = (
+                                time.monotonic() - t_tts_start
+                            ) * 1000
+                        except asyncio.TimeoutError:
+                            tts_first_byte_ms = 5000.0
+
+                    # Latency logging + client report
                     t_end = time.monotonic()
                     stt_ms = (t_stt - t0) * 1000
                     llm_ms = (t_llm - t_stt) * 1000
                     total_ms = (t_end - t0) * 1000
+
+                    turn_lat = TurnLatency(
+                        stt_ms=stt_ms,
+                        llm_ms=llm_ms,
+                        tts_first_byte_ms=tts_first_byte_ms,
+                        total_ms=total_ms,
+                    )
+                    metrics.turn_latencies.append(turn_lat)
+
                     logger.info(
-                        "Voice pipeline session=%d: STT=%.0fms LLM=%.0fms total=%.0fms",
+                        "Voice pipeline session=%d: STT=%.0fms LLM=%.0fms "
+                        "TTS-FB=%.0fms total=%.0fms",
                         session_id,
                         stt_ms,
                         llm_ms,
+                        tts_first_byte_ms,
                         total_ms,
                     )
                     if total_ms > latency_warn_ms:
@@ -385,6 +534,29 @@ async def voice_websocket(
                             session_id,
                         )
 
+                    await websocket.send_json(
+                        {
+                            "type": "latency_report",
+                            "turn": len(metrics.turn_latencies),
+                            "stt_ms": round(stt_ms),
+                            "llm_ms": round(llm_ms),
+                            "tts_first_byte_ms": round(tts_first_byte_ms),
+                            "total_ms": round(total_ms),
+                        }
+                    )
+
+                    continue
+
+                # ---- ping (connection health check) ----
+                if cmd == "ping":
+                    client_ts = msg.get("ts")
+                    await websocket.send_json(
+                        {
+                            "type": "pong",
+                            "server_ts": time.time(),
+                            **({"client_ts": client_ts} if client_ts else {}),
+                        }
+                    )
                     continue
 
                 await websocket.send_json(

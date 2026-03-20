@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     # Voice
     voice_latency_warn_threshold_ms: int = 2000
+    voice_barge_in_cancel_timeout_ms: int = 500
 
     # Conversation
     context_window_max_messages: int = 20
