@@ -830,7 +830,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: ElevenLabs TTS + OpenAI Whisper STT, expressive state mapping. PARALLEL with M2 after M1.
+  notes: ElevenLabs TTS + OpenAI Whisper STT, expressive state mapping, user voice analysis (composure scoring). PARALLEL with M2 after M1.
   outline_level: 2
   parent_levels:
     '1': Epistemic Communication Platform
@@ -959,7 +959,41 @@ milestones:
   resources: 'C: Renderer'
   project: ECP-P1
 - id: null
-  name: 'Deliverable: Full voice conversation with epistemologically-grounded actors'
+  name: Implement voice_analyser.py (user vocal prosody extraction)
+  start_date: '2026-04-29'
+  target_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Extract pitch variability, speaking rate (WPM), volume stability, vocal jitter from raw user audio BEFORE Whisper transcription. Produces VocalState dataclass per turn (pitch_var, rate_wpm, volume_stability, jitter, composure_score 0.0-1.0). Uses librosa (MIT, lightweight). Hooks into /ws/voice/ pipeline: audio buffer -> voice_analyser + Whisper STT in parallel (no latency penalty). Add librosa>=0.10.0 and numpy>=1.26.0 to pyproject.toml.'
+  outline_level: 3
+  parent_levels:
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+  owner: null
+  resources: 'D: Voice Analysis'
+  project: ECP-P1
+- id: null
+  name: Implement VocalState persistence + WebSocket push
+  start_date: '2026-04-29'
+  target_date: '2026-05-13'
+  status: NOT_STARTED
+  completion_date: null
+  completion_percentage: 0
+  notes: 'Store VocalState per turn in ConversationSession (alongside messages). Push vocal_state_update via WebSocket for real-time composure indicator. Aggregate per-session vocal composure into session_outcome metrics: avg_composure, composure_improvement (first half vs second half), composure_under_pressure (score when on trilemma horn vs exploring). Text-only sessions produce null VocalState (graceful degradation).'
+  outline_level: 3
+  parent_levels:
+    '2': 'M3: Voice Integration (Weeks 8-9)'
+    '1': Epistemic Communication Platform
+  parent_project: 'M3: Voice Integration (Weeks 8-9)'
+  is_true_milestone: false
+  owner: null
+  resources: 'D: Voice Analysis'
+  project: ECP-P1
+- id: null
+  name: 'Deliverable: Full voice conversation with epistemologically-grounded actors + user composure analysis'
   start_date: '2026-05-13'
   target_date: '2026-05-13'
   status: NOT_STARTED
@@ -1196,13 +1230,13 @@ milestones:
   resources: 'F: Reporting'
   project: ECP-P1
 - id: null
-  name: Implement proficiency_model.py (3-axis scoring — Awareness, Quality, Flexibility)
+  name: Implement proficiency_model.py (4-axis scoring — Awareness, Quality, Flexibility, Composure)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'Aggregate per-session metrics into 3 skill axes: Epistemological Awareness (horn recognition, escape rate), Argumentative Quality (Gricean scores), Flexibility (stance diversity, cross-stance performance)'
+  notes: 'Aggregate per-session metrics into 4 skill axes: Epistemological Awareness (horn recognition, escape rate), Argumentative Quality (Gricean scores), Flexibility (stance diversity, cross-stance performance), Composure (vocal prosody — avg composure_score, composure improvement over session, composure-under-pressure when on trilemma horn vs exploring). Composure axis null for text-only sessions. VocalState data from voice_analyser.py feeds directly into this axis.'
   outline_level: 3
   parent_levels:
     '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
@@ -1287,7 +1321,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'GET /api/profile/level, /api/profile/achievements, /api/profile/xp-history, /api/profile/skill-axes. Returns current level, XP, unlocked badges, 3-axis scores, next-level requirements.'
+  notes: 'GET /api/profile/level, /api/profile/achievements, /api/profile/xp-history, /api/profile/skill-axes. Returns current level, XP, unlocked badges, 4-axis scores (Composure null for text-only sessions), next-level requirements.'
   outline_level: 3
   parent_levels:
     '2': 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
@@ -1535,13 +1569,13 @@ milestones:
   resources: 'D: Dashboard'
   project: ECP-P1
 - id: null
-  name: Implement skill radar chart (3-axis — Awareness, Quality, Flexibility)
+  name: Implement skill radar chart (4-axis — Awareness, Quality, Flexibility, Composure)
   start_date: '2026-05-27'
   target_date: '2026-06-17'
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'Interactive radar/spider chart showing current scores on 3 axes. Historical overlay showing progression over last 5/10/all sessions. Consumes /api/profile/skill-axes.'
+  notes: 'Interactive radar/spider chart showing current scores on 4 axes (Composure axis only shown for voice-mode sessions). Historical overlay showing progression over last 5/10/all sessions. Consumes /api/profile/skill-axes. Adapts to 3-axis for text-only session history.'
   outline_level: 3
   parent_levels:
     '2': 'M5: UI & Polish (Weeks 12-14)'
@@ -1592,7 +1626,7 @@ milestones:
   status: NOT_STARTED
   completion_date: null
   completion_percentage: 0
-  notes: 'After end_session: animated XP gain, new badge reveals, session metrics (horns visited/escaped, stance detected, Gricean scores), comparison to personal best. Call to action for next recommended session.'
+  notes: 'After end_session: animated XP gain, new badge reveals, session metrics (horns visited/escaped, stance detected, Gricean scores, vocal composure trend sparkline for voice sessions), comparison to personal best. Composure-under-pressure comparison (exploring vs on-horn). Highlight moments where composure dropped/recovered. Call to action for next recommended session.'
   outline_level: 3
   parent_levels:
     '2': 'M5: UI & Polish (Weeks 12-14)'
