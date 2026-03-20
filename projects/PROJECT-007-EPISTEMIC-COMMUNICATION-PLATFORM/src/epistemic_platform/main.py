@@ -102,6 +102,7 @@ def _register_routers(app: FastAPI) -> None:
         scenario_definition_router,
         auth_router,
         websocket_router,
+        voice_websocket_router,
         assessment_router,
     )
 
@@ -118,8 +119,9 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(
         assessment_router.router, prefix=f"{prefix}/assessment", tags=["assessment"]
     )
-    # WebSocket endpoint (no prefix — mounted at /ws/conversation/{session_id})
+    # WebSocket endpoints (no prefix — mounted at /ws/...)
     app.include_router(websocket_router.router, tags=["websocket"])
+    app.include_router(voice_websocket_router.router, tags=["voice-websocket"])
 
 
 def _register_events(app: FastAPI) -> None:

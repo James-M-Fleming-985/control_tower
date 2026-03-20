@@ -95,6 +95,9 @@ class ConversationManager:
             llm_fallback=settings.horn_detection_llm_fallback,
         )
 
+        # Last expressive state from actor response
+        self._last_expressive_state: ExpressiveState | None = None
+
         # M2: Stance detector + history
         self._stance_detector = StanceDetector(conversation_llm)
         self._stance_history = StanceHistory.from_list(
@@ -110,9 +113,15 @@ class ConversationManager:
     def session_id(self) -> int:
         return self._session.id
 
+    @property
+    def last_expressive_state(self) -> ExpressiveState | None:
+        """The ExpressiveState parsed from the most recent actor response."""
+        return self._last_expressive_state
+
     async def handle_user_message(
         self,
         user_text: str,
+        user_vocal_state: dict | None = None,
     ) -> AsyncIterator[LLMStreamChunk]:
         """Process a user message and yield streamed actor response chunks.
 
@@ -124,10 +133,10 @@ class ConversationManager:
         """
         # 1. Add user message to context + DB
         self._context.add_message("user", user_text)
-        await self._repo.append_message(
-            self._session.id,
-            {"role": "user", "content": user_text},
-        )
+        msg_data: dict[str, Any] = {"role": "user", "content": user_text}
+        if user_vocal_state:
+            msg_data["vocal_state"] = user_vocal_state
+        await self._repo.append_message(self._session.id, msg_data)
 
         # 2. Summarise if context exceeds window
         await summarise_overflow(self._context, self._conversation_llm)
@@ -147,6 +156,7 @@ class ConversationManager:
 
         # 5. Parse metadata from response
         clean_text, expressive_state = self._extract_metadata(full_response)
+        self._last_expressive_state = expressive_state
         if expressive_state is None:
             logger.warning(
                 "Session %d turn %d: actor response missing |||META||| metadata",
@@ -255,8 +265,12 @@ class ConversationManager:
             "reasoning": self._last_stance_result.reasoning,
         }
 
-    async def end_session(self) -> dict[str, Any]:
+    async def end_session(self, extra_metrics: dict | None = None) -> dict[str, Any]:
         """End the conversation session and compute outcome metrics.
+
+        Parameters
+        ----------
+        extra_metrics : optional dict merged into the outcome (e.g. composure).
 
         Returns
         -------
@@ -296,6 +310,9 @@ class ConversationManager:
             "total_turns": self._turn_tracker.user_turn_count,
             "coaching_count": len(coaching),
         }
+
+        if extra_metrics:
+            outcome.update(extra_metrics)
 
         # Persist outcome in trilemma_state alongside existing data
         trilemma_dict = self._trilemma.to_dict()

@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     elevenlabs_default_voice_id: str = ""
     elevenlabs_model_id: str = "eleven_multilingual_v2"
 
+    # Voice
+    voice_latency_warn_threshold_ms: int = 2000
+
     # Conversation
     context_window_max_messages: int = 20
     coaching_trigger_interval: int = 4
