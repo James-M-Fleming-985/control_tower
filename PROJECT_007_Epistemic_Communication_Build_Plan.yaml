@@ -1030,9 +1030,9 @@ milestones:
   name: 'M4: Assessment, Scenarios & ML (Weeks 10-11)'
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Analytics, growth tracking, scenario library, stance discovery, actor evolution, gamification (XP, levels, achievements, scenario unlocks), session completion detection, interactive coach debrief
   outline_level: 2
   parent_levels:
@@ -1046,9 +1046,9 @@ milestones:
   name: Implement dialogue_analyser.py (post-conversation scoring)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Epistemological moves, trilemma encounters, stance shifts, Gricean compliance
   outline_level: 3
   parent_levels:
@@ -1063,9 +1063,9 @@ milestones:
   name: Implement scoring rubric (communication effectiveness, argument quality)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Quantified metrics for each conversation
   outline_level: 3
   parent_levels:
@@ -1080,9 +1080,9 @@ milestones:
   name: Implement growth_tracker.py (skill progression across sessions)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Track stance flexibility, argument quality trends, trilemma navigation
   outline_level: 3
   parent_levels:
@@ -1097,9 +1097,9 @@ milestones:
   name: Implement milestone detection (automatic achievement recognition)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: First escape from circularity horn, first detected stance shift, etc.
   outline_level: 3
   parent_levels:
@@ -1114,9 +1114,9 @@ milestones:
   name: Create 12 scenario definitions (4 difficulty x 3 categories)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Workplace negotiation, academic debate, interpersonal conflict
   outline_level: 3
   parent_levels:
@@ -1131,9 +1131,9 @@ milestones:
   name: Implement scenario progression (recommended next scenario)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Based on user performance and growth trajectory
   outline_level: 3
   parent_levels:
@@ -1148,9 +1148,9 @@ milestones:
   name: Implement Stance Discovery Engine (cluster analysis on conversation corpus)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Detect emerging reasoning patterns outside 6 defined stances
   outline_level: 3
   parent_levels:
@@ -1165,9 +1165,9 @@ milestones:
   name: Implement candidate stance surfacing + parameter auto-tuning
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Surface new stance candidates for validation, tune existing stance params
   outline_level: 3
   parent_levels:
@@ -1182,9 +1182,9 @@ milestones:
   name: Implement Actor Evolution (outcome-correlated ontology refinement)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: Which prompt configs drive most user growth? Refine automatically.
   outline_level: 3
   parent_levels:
@@ -1199,9 +1199,9 @@ milestones:
   name: Implement automatic actor archetype proposal
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: System proposes new actor archetypes discovered from data
   outline_level: 3
   parent_levels:
@@ -1216,9 +1216,9 @@ milestones:
   name: Implement session summary (Opus) + reporting API endpoints
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: /api/analytics/sessions/{user_id}, /api/analytics/growth/{user_id}
   outline_level: 3
   parent_levels:
@@ -1233,9 +1233,9 @@ milestones:
   name: Implement proficiency_model.py (4-axis scoring — Awareness, Quality, Flexibility, Composure)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'Aggregate per-session metrics into 4 skill axes: Epistemological Awareness (horn recognition, escape rate), Argumentative Quality (Gricean scores), Flexibility (stance diversity, cross-stance performance), Composure (vocal prosody — avg composure_score, composure improvement over session, composure-under-pressure when on trilemma horn vs exploring). Composure axis null for text-only sessions. VocalState data from voice_analyser.py feeds directly into this axis.'
   outline_level: 3
   parent_levels:
@@ -1250,9 +1250,9 @@ milestones:
   name: Implement XP/points system (weighted session outcome scoring)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'XP earned per session from: horns escaped, stance shifts, Gricean improvement, actor difficulty multiplier. Aggregate into user level (1-10)'
   outline_level: 3
   parent_levels:
@@ -1267,9 +1267,9 @@ milestones:
   name: Implement achievement_engine.py (badge definitions + unlock logic)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'Achievement badges: Horn Spotter, Escape Artist, Stance Surfer, Maxim Keeper, Multi-Actor, Trilemma Navigator, Devils Advocate, Epistemic Athlete, Philosopher. Tracked in user profile JSON.'
   outline_level: 3
   parent_levels:
@@ -1284,9 +1284,9 @@ milestones:
   name: Implement level progression (10 levels from Explorer to Philosopher)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'L1 Explorer -> L2 Horn Spotter -> L3 Escape Artist -> L4 Stance Surfer -> L5 Maxim Keeper -> L6 Multi-Actor -> L7 Trilemma Navigator -> L8 Devils Advocate -> L9 Epistemic Athlete -> L10 Philosopher. Level-up triggers from achievement + XP thresholds.'
   outline_level: 3
   parent_levels:
@@ -1301,9 +1301,9 @@ milestones:
   name: Implement scenario unlock gates (difficulty gated by demonstrated skill)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'Harder scenarios require minimum level or specific achievements. E.g. advanced debate scenarios unlock at L5+, opposing-stance challenges at L6+.'
   outline_level: 3
   parent_levels:
@@ -1318,9 +1318,9 @@ milestones:
   name: Implement gamification API endpoints
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'GET /api/profile/level, /api/profile/achievements, /api/profile/xp-history, /api/profile/skill-axes. Returns current level, XP, unlocked badges, 4-axis scores (Composure null for text-only sessions), next-level requirements.'
   outline_level: 3
   parent_levels:
@@ -1335,9 +1335,9 @@ milestones:
   name: Implement session_planner.py (assessment + goals -> prescribed session structure)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'Takes AssessmentResult + user learning goals -> session plan with target objectives, recommended turn budget, completion criteria. Stored on ConversationSession. Wires existing ScenarioDefinition.objectives / evaluation_criteria into runtime-checkable conditions.'
   outline_level: 3
   parent_levels:
@@ -1352,9 +1352,9 @@ milestones:
   name: Implement completion_detector.py (objective-based session end trigger)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'Evaluates scenario objectives + evaluation_criteria against live trilemma_state each turn. Detects when learning objectives met (horn escaped, stance demonstrated, Gricean threshold). Sends session_complete WebSocket message with outcome summary + feedback_available flag. Supplements user-driven end_session for prescribed sessions.'
   outline_level: 3
   parent_levels:
@@ -1369,9 +1369,9 @@ milestones:
   name: Implement coach_debrief.py (interactive coaching conversation engine)
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'New session type (mode=coaching_debrief) linked to parent actor session. Uses CoachingLLM adapter in conversational mode (multi-turn, not one-shot). Coach has full context: transcript, coaching annotations, trilemma journey, session outcome, proficiency scores. Maintains own dialogue history.'
   outline_level: 3
   parent_levels:
@@ -1386,9 +1386,9 @@ milestones:
   name: Implement coach debrief WebSocket protocol + subscription gate
   start_date: '2026-05-13'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: 'New WebSocket message types: coaching_debrief_start (server->client after session_complete), coaching_message (client->server), coaching_response (server->client streamed), coaching_debrief_end. Subscription check before launch: free tier gets static outcome only, paid tier gets interactive coach session.'
   outline_level: 3
   parent_levels:
@@ -1403,9 +1403,9 @@ milestones:
   name: 'Deliverable: Actionable feedback, progress tracking, ML stance discovery, gamification engine, interactive coach debrief'
   start_date: '2026-05-27'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:
@@ -1420,9 +1420,9 @@ milestones:
   name: 'MILESTONE: M4 Assessment & ML Complete'
   start_date: '2026-05-27'
   target_date: '2026-05-27'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-21'
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:
