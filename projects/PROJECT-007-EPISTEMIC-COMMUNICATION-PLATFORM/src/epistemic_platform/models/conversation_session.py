@@ -30,10 +30,18 @@ class ConversationSession(BaseModel):
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # M4: Coach debrief — self-referential FK to link debrief session to parent
+    parent_session_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("conversation_sessions.id"), nullable=True
+    )
+
     # Relationships
     user = relationship("UserProfile", lazy="selectin")
     actor = relationship("ActorProfile", lazy="selectin")
     scenario = relationship("ScenarioDefinition", lazy="selectin")
+    parent_session = relationship(
+        "ConversationSession", remote_side="ConversationSession.id", lazy="selectin"
+    )
 
     def __repr__(self) -> str:
         return f"<ConversationSession(id={self.id}, status='{self.status}', turns={self.turn_count})>"

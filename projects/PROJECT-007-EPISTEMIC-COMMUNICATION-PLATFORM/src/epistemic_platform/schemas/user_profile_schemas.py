@@ -29,5 +29,9 @@ class UserProfileRead(UserProfileBase):
     id: int
     assessment_history: list[dict[str, Any]]
     is_active: bool
+    xp: int
+    level: int
+    achievements: list[dict[str, Any]]
+    subscription_tier: str
     created_at: datetime
     updated_at: datetime

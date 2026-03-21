@@ -116,3 +116,31 @@ class ClaudeCoachingAdapter:
                 "output_tokens": response.usage.output_tokens,
             },
         )
+
+    async def analyse_stream(
+        self,
+        messages: list[LLMMessage],
+        system_prompt: str,
+        temperature: float | None = None,
+        max_tokens: int = 2048,
+    ) -> AsyncIterator[LLMStreamChunk]:
+        temp = temperature if temperature is not None else self._default_temp
+        async with self._client.messages.stream(
+            model=self._model,
+            system=system_prompt,
+            messages=self._build_messages(messages),
+            temperature=temp,
+            max_tokens=max_tokens,
+        ) as stream:
+            async for text in stream.text_stream:
+                yield LLMStreamChunk(delta=text)
+
+            final_message = await stream.get_final_message()
+            yield LLMStreamChunk(
+                delta="",
+                is_final=True,
+                usage={
+                    "input_tokens": final_message.usage.input_tokens,
+                    "output_tokens": final_message.usage.output_tokens,
+                },
+            )

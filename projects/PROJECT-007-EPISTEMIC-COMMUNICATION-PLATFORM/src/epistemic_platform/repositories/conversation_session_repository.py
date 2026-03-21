@@ -117,6 +117,22 @@ class ConversationSessionRepository:
         await self.db.flush()
         return session
 
+    async def list_completed_by_user(
+        self, user_id: int, skip: int = 0, limit: int = 100
+    ) -> list[ConversationSession]:
+        """Return completed sessions for a user, oldest first (for growth tracking)."""
+        result = await self.db.execute(
+            select(ConversationSession)
+            .where(
+                ConversationSession.user_id == user_id,
+                ConversationSession.status == "completed",
+            )
+            .order_by(ConversationSession.started_at.asc())
+            .offset(skip)
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
     async def delete(self, session_id: int) -> bool:
         session = await self.get(session_id)
         if not session:

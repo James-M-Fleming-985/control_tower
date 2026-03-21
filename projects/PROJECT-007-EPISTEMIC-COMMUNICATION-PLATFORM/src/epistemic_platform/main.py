@@ -104,6 +104,9 @@ def _register_routers(app: FastAPI) -> None:
         websocket_router,
         voice_websocket_router,
         assessment_router,
+        gamification_router,
+        analytics_router,
+        debrief_websocket_router,
     )
 
     prefix = get_settings().api_prefix
@@ -119,9 +122,16 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(
         assessment_router.router, prefix=f"{prefix}/assessment", tags=["assessment"]
     )
+    app.include_router(
+        gamification_router.router, prefix=f"{prefix}/gamification", tags=["gamification"]
+    )
+    app.include_router(
+        analytics_router.router, prefix=f"{prefix}/analytics", tags=["analytics"]
+    )
     # WebSocket endpoints (no prefix — mounted at /ws/...)
     app.include_router(websocket_router.router, tags=["websocket"])
     app.include_router(voice_websocket_router.router, tags=["voice-websocket"])
+    app.include_router(debrief_websocket_router.router, tags=["debrief-websocket"])
 
 
 def _register_events(app: FastAPI) -> None:
@@ -138,10 +148,11 @@ def _register_events(app: FastAPI) -> None:
                 await conn.run_sync(Base.metadata.create_all)
 
             async with async_session_factory() as session:
-                from epistemic_platform.ontology.seed_loader import load_seed_actors
+                from epistemic_platform.ontology.seed_loader import load_seed_actors, load_seed_scenarios
                 await load_seed_actors(session)
+                await load_seed_scenarios(session)
                 await session.commit()
-            logger.info("Database initialized and seed actors loaded")
+            logger.info("Database initialized and seed data loaded")
         except Exception as e:
             logger.error(f"Startup DB initialization failed: {e}")
             logger.error("App will start but database features may not work")

@@ -1,0 +1,138 @@
+[
+  {
+    "title": "The Ethics of AI Art",
+    "description": "Debate whether AI-generated art can be considered 'real' art. Explore questions of creativity, authorship, and authenticity.",
+    "difficulty": "beginner",
+    "category": "ethics",
+    "objectives": [
+      "Articulate a clear position on AI art's legitimacy",
+      "Identify at least one epistemological assumption in your argument",
+      "Respond to a challenge without retreating to dogmatism"
+    ],
+    "evaluation_criteria": [
+      "Clarity of core argument",
+      "Engagement with counter-arguments",
+      "Recognition of underlying assumptions"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "Should We Trust Expert Consensus?",
+    "description": "Examine when and why we should defer to expert opinion vs. thinking for ourselves. Navigate the tension between authority and autonomy.",
+    "difficulty": "beginner",
+    "category": "epistemology",
+    "objectives": [
+      "Distinguish between authority-based and evidence-based justification",
+      "Navigate the foundationalist-coherentist tension",
+      "Practice Gricean quality — cite evidence for claims"
+    ],
+    "evaluation_criteria": [
+      "Nuance in handling authority vs. autonomy",
+      "Evidence quality for claims made",
+      "Ability to revise position when challenged"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "The Trolley Problem Revisited",
+    "description": "Go beyond the classic trolley problem to examine the epistemological foundations of moral reasoning. What do we actually KNOW about right and wrong?",
+    "difficulty": "intermediate",
+    "category": "ethics",
+    "objectives": [
+      "Move beyond surface-level moral intuition",
+      "Identify the trilemma horn in your moral justification",
+      "Attempt an escape from at least one horn"
+    ],
+    "evaluation_criteria": [
+      "Depth of epistemological engagement",
+      "Trilemma awareness",
+      "Willingness to question own moral foundations"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "What Counts as Scientific Evidence?",
+    "description": "Explore the demarcation problem: what makes something 'scientific'? Navigate empiricist, pragmatist, and foundationalist perspectives on evidence.",
+    "difficulty": "intermediate",
+    "category": "science",
+    "objectives": [
+      "Engage with multiple epistemological stances on evidence",
+      "Demonstrate stance flexibility by steelmanning opposing views",
+      "Maintain Gricean relevance across the discussion"
+    ],
+    "evaluation_criteria": [
+      "Stance diversity (engaging with 2+ perspectives)",
+      "Quality of steelman arguments",
+      "Relevance and focus throughout"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "Free Will vs Determinism",
+    "description": "Is free will an illusion? Navigate the infinite regress of causal chains and the circularity of self-referential agency claims.",
+    "difficulty": "advanced",
+    "category": "philosophy",
+    "objectives": [
+      "Encounter and navigate all three trilemma horns",
+      "Maintain communication quality under challenging questioning",
+      "Demonstrate epistemological self-awareness about your own position"
+    ],
+    "evaluation_criteria": [
+      "Trilemma navigation (all 3 horns encountered)",
+      "Communication composure under pressure",
+      "Meta-epistemological reflection"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "Can We Know Other Minds?",
+    "description": "The problem of other minds — how do you know anyone else is conscious? Push through skeptical arguments and find your escape route.",
+    "difficulty": "advanced",
+    "category": "philosophy",
+    "objectives": [
+      "Survive sustained skeptical challenge without collapse",
+      "Find a productive escape from the regress horn",
+      "Maintain Gricean manner under adversarial questioning"
+    ],
+    "evaluation_criteria": [
+      "Resilience under skeptical pressure",
+      "Quality of trilemma escape attempt",
+      "Communication clarity when stakes are high"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "Persuading a Hostile Audience",
+    "description": "Practice making your case when the other party actively disagrees. Focus on Gricean quality, finding common ground, and strategic communication.",
+    "difficulty": "intermediate",
+    "category": "communication",
+    "objectives": [
+      "Identify shared premises with the interlocutor",
+      "Score highly on all four Gricean maxims",
+      "Adapt your communication style to the audience"
+    ],
+    "evaluation_criteria": [
+      "Gricean maxim scores (target 7+ average)",
+      "Evidence of audience adaptation",
+      "Strategic use of concession and common ground"
+    ],
+    "is_active": true
+  },
+  {
+    "title": "The Paradox of Tolerance",
+    "description": "Should a tolerant society tolerate intolerance? Navigate the circular reasoning at the heart of liberal democratic theory.",
+    "difficulty": "expert",
+    "category": "political_philosophy",
+    "objectives": [
+      "Identify and navigate the circularity horn",
+      "Engage with fallibilist and relativist perspectives",
+      "Demonstrate S-rank communication quality"
+    ],
+    "evaluation_criteria": [
+      "Circularity horn navigation",
+      "Engagement with 3+ epistemological stances",
+      "Overall session score target: 80+"
+    ],
+    "is_active": true
+  }
+]

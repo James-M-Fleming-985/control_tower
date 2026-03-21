@@ -827,9 +827,9 @@ milestones:
   name: 'M3: Voice Integration (Weeks 8-9)'
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: ElevenLabs TTS + OpenAI Whisper STT, expressive state mapping, user voice analysis (composure scoring). PARALLEL with M2 after M1.
   outline_level: 2
   parent_levels:
@@ -843,9 +843,9 @@ milestones:
   name: Implement ElevenLabs TTS client + OpenAI Whisper STT client
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: Streaming TTS, voice selection, PCM16 audio encoding
   outline_level: 3
   parent_levels:
@@ -860,9 +860,9 @@ milestones:
   name: Implement ExpressiveState to ElevenLabs parameter mapping
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: tone/mood/urgency mapped to stability, similarity_boost, speed, style params
   outline_level: 3
   parent_levels:
@@ -877,9 +877,9 @@ milestones:
   name: Implement /ws/voice/{session_id} bidirectional audio WebSocket
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: Browser audio -> Whisper STT -> text -> Claude -> text -> ElevenLabs TTS -> audio
   outline_level: 3
   parent_levels:
@@ -894,9 +894,9 @@ milestones:
   name: Implement interruption/barge-in handling
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: User speaks while actor is still responding
   outline_level: 3
   parent_levels:
@@ -911,9 +911,9 @@ milestones:
   name: Implement latency monitoring (target <2s round-trip)
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: End-to-end latency tracking and logging
   outline_level: 3
   parent_levels:
@@ -928,9 +928,9 @@ milestones:
   name: Create VoiceRenderer implementing PresentationRenderer protocol
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: Consumes ExpressiveState, produces voiced audio
   outline_level: 3
   parent_levels:
@@ -945,9 +945,9 @@ milestones:
   name: 'Implement session mode: text | voice (unified message store)'
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: ConversationSession mode field, both modes share message history
   outline_level: 3
   parent_levels:
@@ -962,9 +962,9 @@ milestones:
   name: Implement voice_analyser.py (user vocal prosody extraction)
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: 'Extract pitch variability, speaking rate (WPM), volume stability, vocal jitter from raw user audio BEFORE Whisper transcription. Produces VocalState dataclass per turn (pitch_var, rate_wpm, volume_stability, jitter, composure_score 0.0-1.0). Uses librosa (MIT, lightweight). Hooks into /ws/voice/ pipeline: audio buffer -> voice_analyser + Whisper STT in parallel (no latency penalty). Add librosa>=0.10.0 and numpy>=1.26.0 to pyproject.toml.'
   outline_level: 3
   parent_levels:
@@ -979,9 +979,9 @@ milestones:
   name: Implement VocalState persistence + WebSocket push
   start_date: '2026-04-29'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: 'Store VocalState per turn in ConversationSession (alongside messages). Push vocal_state_update via WebSocket for real-time composure indicator. Aggregate per-session vocal composure into session_outcome metrics: avg_composure, composure_improvement (first half vs second half), composure_under_pressure (score when on trilemma horn vs exploring). Text-only sessions produce null VocalState (graceful degradation).'
   outline_level: 3
   parent_levels:
@@ -996,9 +996,9 @@ milestones:
   name: 'Deliverable: Full voice conversation with epistemologically-grounded actors + user composure analysis'
   start_date: '2026-05-13'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:
@@ -1013,9 +1013,9 @@ milestones:
   name: 'MILESTONE: M3 Voice Integration Complete'
   start_date: '2026-05-13'
   target_date: '2026-05-13'
-  status: NOT_STARTED
-  completion_date: null
-  completion_percentage: 0
+  status: COMPLETE
+  completion_date: '2026-03-20'
+  completion_percentage: 100
   notes: ''
   outline_level: 3
   parent_levels:

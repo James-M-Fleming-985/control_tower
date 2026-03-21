@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import JSON, String
+from sqlalchemy import JSON, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from epistemic_platform.models.base import BaseModel
@@ -20,6 +20,12 @@ class UserProfile(BaseModel):
     assessment_history: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=list)
     preferences: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
+
+    # M4: Gamification
+    xp: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    achievements: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=list)
+    subscription_tier: Mapped[str] = mapped_column(String(20), default="free", nullable=False)
 
     def __repr__(self) -> str:
         return f"<UserProfile(id={self.id}, email='{self.email}')>"

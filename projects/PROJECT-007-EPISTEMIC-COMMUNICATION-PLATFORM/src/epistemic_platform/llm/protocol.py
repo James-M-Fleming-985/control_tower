@@ -65,3 +65,11 @@ class CoachingLLM(Protocol):
         temperature: float = 0.3,
         max_tokens: int = 2048,
     ) -> LLMResponse: ...
+
+    async def analyse_stream(
+        self,
+        messages: list[LLMMessage],
+        system_prompt: str,
+        temperature: float = 0.3,
+        max_tokens: int = 2048,
+    ) -> AsyncIterator[LLMStreamChunk]: ...
