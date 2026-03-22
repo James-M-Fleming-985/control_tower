@@ -42,7 +42,7 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-epistemic_platform = ["**/*.json", "**/*.j2", "templates/*.html", "templates/**/*.html", "static/*", "static/**/*"]
+epistemic_platform = ["**/*.json", "**/*.j2", "templates/*.html", "templates/**/*.html", "static/*", "static/**/*", "frontend/dist/**/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

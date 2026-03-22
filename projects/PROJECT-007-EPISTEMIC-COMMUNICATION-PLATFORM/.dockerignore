@@ -1,0 +1,13 @@
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.env
+.venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+src/epistemic_platform/frontend/node_modules/
