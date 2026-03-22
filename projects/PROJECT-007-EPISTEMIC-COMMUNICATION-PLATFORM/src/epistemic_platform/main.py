@@ -82,6 +82,32 @@ def create_app() -> FastAPI:
     _register_routers(app)
     _register_events(app)
 
+    # SPA frontend — serve built React app from frontend/dist
+    frontend_dist = _PACKAGE_DIR / "frontend" / "dist"
+    if frontend_dist.is_dir():
+        from fastapi.staticfiles import StaticFiles
+
+        # Mount assets directory for JS/CSS/images
+        assets_dir = frontend_dist / "assets"
+        if assets_dir.is_dir():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
+
+        spa_index = frontend_dist / "index.html"
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa_fallback(request: Request, full_path: str):
+            # Don't catch API, WS, health, or static paths
+            if full_path.startswith(("api/", "ws/", "health", "static/", "favicon.ico")):
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
+            # Serve actual files from dist if they exist
+            file_path = frontend_dist / full_path
+            if file_path.is_file() and frontend_dist in file_path.resolve().parents:
+                return FileResponse(str(file_path))
+            # SPA fallback — serve index.html
+            if spa_index.is_file():
+                return FileResponse(str(spa_index))
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception):
         tb = traceback.format_exception(type(exc), exc, exc.__traceback__)
