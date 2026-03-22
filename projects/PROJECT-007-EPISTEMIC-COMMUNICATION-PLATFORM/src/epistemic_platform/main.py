@@ -45,23 +45,31 @@ def create_app() -> FastAPI:
         from fastapi.staticfiles import StaticFiles
         app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-    # Landing page — only if templates directory exists
-    templates_dir = _PACKAGE_DIR / "templates"
-    if templates_dir.is_dir():
-        from fastapi.templating import Jinja2Templates
-        _templates = Jinja2Templates(directory=str(templates_dir))
+    # Root route — SPA when frontend is built, else Coming Soon landing page
+    frontend_dist = _PACKAGE_DIR / "frontend" / "dist"
+    spa_index = frontend_dist / "index.html"
 
+    if spa_index.is_file():
         @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-        async def landing_page(request: Request):
-            return _templates.TemplateResponse(
-                "landing.html", {
-                    "request": request,
-                    "app_name": settings.app_name,
-                    "version": BUILD_VERSION,
-                    "git_commit": GIT_COMMIT,
-                    "deploy_timestamp": DEPLOY_TIMESTAMP,
-                }
-            )
+        async def root_page():
+            return FileResponse(str(spa_index))
+    else:
+        templates_dir = _PACKAGE_DIR / "templates"
+        if templates_dir.is_dir():
+            from fastapi.templating import Jinja2Templates
+            _templates = Jinja2Templates(directory=str(templates_dir))
+
+            @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+            async def landing_page(request: Request):
+                return _templates.TemplateResponse(
+                    "landing.html", {
+                        "request": request,
+                        "app_name": settings.app_name,
+                        "version": BUILD_VERSION,
+                        "git_commit": GIT_COMMIT,
+                        "deploy_timestamp": DEPLOY_TIMESTAMP,
+                    }
+                )
 
     @app.get("/health", tags=["health"])
     async def health_check():
@@ -83,7 +91,6 @@ def create_app() -> FastAPI:
     _register_events(app)
 
     # SPA frontend — serve built React app from frontend/dist
-    frontend_dist = _PACKAGE_DIR / "frontend" / "dist"
     if frontend_dist.is_dir():
         from fastapi.staticfiles import StaticFiles
 
@@ -91,8 +98,6 @@ def create_app() -> FastAPI:
         assets_dir = frontend_dist / "assets"
         if assets_dir.is_dir():
             app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
-
-        spa_index = frontend_dist / "index.html"
 
         @app.get("/{full_path:path}", include_in_schema=False)
         async def spa_fallback(request: Request, full_path: str):
