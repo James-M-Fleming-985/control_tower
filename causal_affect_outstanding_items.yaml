@@ -1,0 +1,250 @@
+# Causal Affect — Outstanding Items
+# Generated: 2026-03-23
+# Source: M0V baselines assessment, M1 completion audit, M2 scaling plan
+# Repo: James-M-Fleming-985/business_ventures (v2.2.3)
+
+project: Causal Affect
+current_version: "2.2.3"
+production_url: https://businessventures-production.up.railway.app
+
+# ============================================================
+# M0V BASELINES (Weeks 3-4 — MOSTLY COMPLETE)
+# ============================================================
+m0v:
+  status: COMPLETE
+  recorded_at: "2026-03-19T12:32:00Z"
+  summary: "All 4 baseline metrics captured. Dashboard visible. Gate criteria met."
+  baselines:
+    track_a_model_accuracy:
+      direction_accuracy_pct: 49.2
+      mape_pct: 41.48
+      lag_error_avg_days: 32.2
+      target: "90% accuracy, 5% MAPE, 7-day lag"
+      status: COMPLETE
+    track_b_build_quality:
+      error_rate_pct: 0.0
+      total_builds: 0
+      note: "No builds at baseline time. Pipeline now functional (v2.2.2+)"
+      status: COMPLETE
+    track_c_exploitation:
+      viability_accuracy_pct: 0.0
+      validated_count: 0
+      total_recommendations: 103
+      note: "Auto-validation added in v2.2.3 for LIVE builds"
+      status: COMPLETE
+    track_d_revenue:
+      total_mrr: 0.00
+      total_subscribers: 0
+      app_count: 1
+      note: "$0 baseline documented. Revenue comes from MVP-built apps."
+      status: COMPLETE
+
+# ============================================================
+# M1 OUTSTANDING ITEMS (Weeks 4-9 — 12/16 COMPLETE)
+# ============================================================
+m1:
+  status: MOSTLY_COMPLETE
+  completed_count: 13  # 12 previously + Revenue tab just added
+  total_count: 16
+  summary: "Core foundation built. Revenue tab added v2.2.4. Remaining items deferred to M2."
+
+  completed:
+    - task: "Wikipedia daily ingestion pipeline"
+      track: A
+      version: "2.1.0"
+
+    - task: "Walk-forward validation framework"
+      track: A
+      version: "2.1.1"
+
+    - task: "Multi-lag Granger causality testing"
+      track: A
+      version: "2.1.2"
+
+    - task: "Pre-build validation & import resolution"
+      track: B
+      version: "2.2.0"
+
+    - task: "Structured error reporting in build pipeline"
+      track: B
+      version: "2.2.0"
+
+    - task: "GREEN phase 5-retry loop with contract enforcement"
+      track: B
+      version: "2.2.0"
+
+    - task: "RED phase stub module creation"
+      track: B
+      version: "2.2.2"
+
+    - task: "Exploitation backtester with viability scoring"
+      track: C
+      version: "2.1.3"
+
+    - task: "TimescaleDB hypertables + connection pooling"
+      track: D
+      version: "2.1.4"
+
+    - task: "Revenue tracking models (RevenueEvent, Stripe webhook handler)"
+      track: E
+      version: "2.1.5"
+
+    - task: "Revenue dashboard backend (/revenue/dashboard endpoint)"
+      track: E
+      version: "2.1.5"
+
+    - task: "Revenue dashboard UI tab"
+      track: E
+      version: "2.2.4"
+      note: "Just implemented — navigation tab + KPI cards + MRR chart + per-app breakdown + events table"
+
+    - task: "Commercial Intelligence tables (ProductDeployment, ProductMetrics)"
+      track: G
+      version: "2.1.5"
+
+  outstanding:
+    - task: "Reddit historical data ingestion"
+      track: A
+      priority: MEDIUM
+      reason: "Reddit API rate limits. Wikipedia ingestion working. Could improve prediction accuracy."
+      action: "Implement Pushshift/Reddit API ingestion with rate limiting"
+      deferred_to: M2
+
+    - task: "Exploitation weight calibration"
+      track: C
+      priority: MEDIUM
+      reason: "Backtester built but weight calibration needs validated outcomes to tune"
+      action: "After 15+ validations accumulate, run calibration pass"
+      deferred_to: M2
+
+    - task: "S3 Glacier cold storage lifecycle"
+      track: D
+      priority: LOW
+      reason: "Data volume not yet at threshold requiring cold storage"
+      action: "Set up S3 lifecycle rules when data exceeds 100GB"
+      deferred_to: M2
+
+# ============================================================
+# BUILD PIPELINE FIXES (v2.2.0-2.2.3)
+# ============================================================
+build_pipeline_fixes:
+  status: COMPLETE
+  summary: "All critical build pipeline issues resolved."
+  versions:
+    v2.2.0:
+      - "GREEN phase retry loop (5 attempts) with contract enforcement"
+      - "error_output→pytest_output field fix"
+    v2.2.1:
+      - "pytest added to requirements.txt"
+      - "Attempts tracking display fix"
+    v2.2.2:
+      - "RED phase stub module creation (ModuleNotFoundError fix)"
+      - "Build status stability (_step COMPLETE exception safety)"
+      - "Poll generation counter in dashboard.js"
+    v2.2.3:
+      - "Removed confusing Build Quality sparkline"
+      - "Revenue card tooltip context corrected (MVP apps, not CA subscriptions)"
+      - "Auto-validation: LIVE builds create ExploitationValidation records"
+
+# ============================================================
+# M2 IMPLEMENTATION PLAN (Weeks 10-15)
+# ============================================================
+m2:
+  name: "M2: Intelligence Layer"
+  status: NOT_STARTED
+  start_date: "2026-05-11"
+  target_date: "2026-06-21"
+  targets:
+    model_accuracy: "65%"
+    exploitation_accuracy: "60%"
+    build_time: "4 hours"
+    build_error_rate: "20%"
+    data_scale: "500GB"
+  summary: "Ensemble models, AI code review, Google Trends, one-click deploy, FRED/Alpha Vantage data."
+
+  tracks:
+    track_a_model_accuracy:
+      target: "65% direction accuracy"
+      tasks:
+        - name: "Add ensemble model: Granger + linear regression + ARIMA"
+          priority: HIGH
+        - name: "Implement confidence-weighted ensemble (weight by historical accuracy)"
+          priority: HIGH
+        - name: "Add feature engineering: rolling averages (7d, 30d, 90d), rate of change, volatility"
+          priority: MEDIUM
+        - name: "Add cross-validation signal confidence (Wikipedia + Reddit agreement as feature)"
+          priority: MEDIUM
+
+    track_b_build_quality:
+      target: "20% error rate"
+      tasks:
+        - name: "Add AI-powered code review step (LLM validates code before commit)"
+          priority: HIGH
+        - name: "Add integration test templates for common patterns (CRUD, auth, Stripe)"
+          priority: HIGH
+        - name: "Fix top 5 most common build failure patterns from M1 data"
+          priority: MEDIUM
+
+    track_c_exploitation:
+      target: "60% exploitation accuracy"
+      tasks:
+        - name: "Add Google Trends integration (pytrends with proxy rotation)"
+          priority: HIGH
+        - name: "Cross-reference viability scores with Google Trends search volume"
+          priority: HIGH
+        - name: "Add competition scoring from real arXiv citation counts"
+          priority: MEDIUM
+
+    track_d_build_automation:
+      target: "4 hour build time, one-click deploy"
+      tasks:
+        - name: "Automate GitHub repo creation via GitHub API"
+          priority: HIGH
+        - name: "Auto-generate Railway project via Railway API"
+          priority: HIGH
+        - name: "Auto-wire Stripe subscription (create product + price via Stripe API)"
+          priority: HIGH
+          note: "Closes M1 Stripe gap — production config not just code"
+        - name: "Auto-inject GA4 measurement ID from analytics template"
+          priority: MEDIUM
+        - name: "Deliverable: One-click Build and Deploy from Exploitation Board"
+          priority: HIGH
+
+    track_e_data_scale:
+      target: "500GB total data"
+      tasks:
+        - name: "Add FRED economic indicators (50+ variables: GDP, CPI, unemployment)"
+          priority: HIGH
+        - name: "Add Alpha Vantage intraday data for top 10 stocks (5-min intervals)"
+          priority: MEDIUM
+        - name: "Add news sentiment from GDELT API (daily event counts by theme)"
+          priority: MEDIUM
+        - name: "Set up ETL pipeline with batch scheduling (APScheduler)"
+          priority: HIGH
+          note: "Carries over Reddit ingestion from M1"
+
+    track_g_commercial_intelligence:
+      target: "Commercial intelligence API + UI"
+      tasks:
+        - name: "Auto-record ProductDeployment when build completes"
+          priority: MEDIUM
+        - name: "Build /api/commercial-intelligence endpoint (revenue by config and market)"
+          priority: MEDIUM
+        - name: "Add Commercial Case panel to BUILD exploitation cards"
+          priority: MEDIUM
+
+# ============================================================
+# STRIPE CONFIGURATION (Blocks Revenue)
+# ============================================================
+stripe:
+  status: NOT_CONFIGURED
+  code_complete: true
+  files:
+    - services/stripe_service.py
+    - routers/subscription.py
+  missing:
+    - "STRIPE_SECRET_KEY env var on Railway"
+    - "STRIPE_WEBHOOK_SECRET env var on Railway"
+    - "Stripe product + price creation for deployed apps"
+  action: "Configure in M2 Track D (auto-wire Stripe for deployed apps)"
+  note: "Backend code fully implemented. Webhook handler ready. Just needs env vars and Stripe dashboard setup."
