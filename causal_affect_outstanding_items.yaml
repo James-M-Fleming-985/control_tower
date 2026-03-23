@@ -1,10 +1,10 @@
 # Causal Affect — Outstanding Items
 # Generated: 2026-03-23
 # Source: M0V baselines assessment, M1 completion audit, M2 scaling plan
-# Repo: James-M-Fleming-985/business_ventures (v2.2.3)
+# Repo: James-M-Fleming-985/business_ventures (v2.2.5)
 
 project: Causal Affect
-current_version: "2.2.3"
+current_version: "2.2.5"
 production_url: https://businessventures-production.up.railway.app
 
 # ============================================================
@@ -36,7 +36,8 @@ m0v:
       total_mrr: 0.00
       total_subscribers: 0
       app_count: 1
-      note: "$0 baseline documented. Revenue comes from MVP-built apps."
+      currency: GBP
+      note: "£0 baseline documented. Revenue comes from MVP-built apps. Currency localised to GBP (v2.2.5)."
       status: COMPLETE
 
 # ============================================================
@@ -145,93 +146,397 @@ build_pipeline_fixes:
       - "Removed confusing Build Quality sparkline"
       - "Revenue card tooltip context corrected (MVP apps, not CA subscriptions)"
       - "Auto-validation: LIVE builds create ExploitationValidation records"
+    v2.2.4:
+      - "Revenue dashboard tab UI (nav button + KPI cards + MRR chart + per-app + events table)"
+      - "Created causal_affect_outstanding_items.yaml in control_tower"
+    v2.2.5:
+      - "Fixed Revenue tab 500 error (get_db_session → get_db in revenue.py)"
+      - "GBP currency localisation: all £ instead of $ in revenue contexts"
+      - "Lucide icons: pound-sterling replaces dollar-sign in revenue areas"
+      - "Model default currency changed from usd to gbp"
+      - "Cleaned __pycache__ from git tracking, added .gitignore rule"
 
 # ============================================================
-# M2 IMPLEMENTATION PLAN (Weeks 10-15)
+# M2 IMPLEMENTATION PLAN — Intelligence Layer (Ensemble & Scale)
+# ============================================================
+# Duration: Weeks 10-15 (May 11 – June 21, 2026)
+# 6 Phases, 6 Tracks (A/B/C/D/E/G), 20 Steps
 # ============================================================
 m2:
-  name: "M2: Intelligence Layer"
+  name: "M2: Intelligence Layer (Ensemble & Scale)"
   status: NOT_STARTED
   start_date: "2026-05-11"
   target_date: "2026-06-21"
+  duration_weeks: 6
+
   targets:
-    model_accuracy: "65%"
-    exploitation_accuracy: "60%"
-    build_time: "4 hours"
-    build_error_rate: "20%"
-    data_scale: "500GB"
-  summary: "Ensemble models, AI code review, Google Trends, one-click deploy, FRED/Alpha Vantage data."
+    model_accuracy: "65% direction accuracy (from baseline ~49%)"
+    exploitation_accuracy: "60% viability prediction (from baseline ~45%)"
+    build_time: "4 hours end-to-end (one-click deploy)"
+    build_error_rate: "≤20% (measurable over 20+ builds)"
+    data_scale: "500GB total (from ~100GB at M1 end)"
 
-  tracks:
-    track_a_model_accuracy:
-      target: "65% direction accuracy"
-      tasks:
-        - name: "Add ensemble model: Granger + linear regression + ARIMA"
-          priority: HIGH
-        - name: "Implement confidence-weighted ensemble (weight by historical accuracy)"
-          priority: HIGH
-        - name: "Add feature engineering: rolling averages (7d, 30d, 90d), rate of change, volatility"
-          priority: MEDIUM
-        - name: "Add cross-validation signal confidence (Wikipedia + Reddit agreement as feature)"
-          priority: MEDIUM
+  # ----------------------------------------------------------
+  # Phase 1: Foundation (Week 10, May 11–17) — All parallel
+  # ----------------------------------------------------------
+  phase_1_foundation:
+    week: 10
+    dates: "May 11–17, 2026"
+    parallel: true
 
-    track_b_build_quality:
-      target: "20% error rate"
-      tasks:
-        - name: "Add AI-powered code review step (LLM validates code before commit)"
-          priority: HIGH
-        - name: "Add integration test templates for common patterns (CRUD, auth, Stripe)"
-          priority: HIGH
-        - name: "Fix top 5 most common build failure patterns from M1 data"
-          priority: MEDIUM
+    step_01_ensemble_scaffold:
+      track: A
+      task: "Scaffold ensemble model framework"
+      description: "Combine Granger causality + simple linear regression + ARIMA into weighted ensemble"
+      new_file: "services/ensemble_model.py"
+      dependencies:
+        - "Walk-forward validation framework (M1 COMPLETE)"
+        - "Multi-lag Granger testing results (M1 COMPLETE)"
+      success_criteria: "Basic ensemble produces predictions, all 3 sub-models callable"
+      priority: HIGH
 
-    track_c_exploitation:
-      target: "60% exploitation accuracy"
-      tasks:
-        - name: "Add Google Trends integration (pytrends with proxy rotation)"
-          priority: HIGH
-        - name: "Cross-reference viability scores with Google Trends search volume"
-          priority: HIGH
-        - name: "Add competition scoring from real arXiv citation counts"
-          priority: MEDIUM
+    step_02_fred_pipeline:
+      track: E
+      task: "FRED economic data pipeline"
+      description: "Add 50+ FRED indicators (GDP, CPI, unemployment, etc.) via free FRED API. Set up APScheduler batch job for daily ingestion."
+      new_file: "services/data_pipelines/fred_pipeline.py"
+      dependencies:
+        - "TimescaleDB hypertables (M1 COMPLETE)"
+      success_criteria: "50+ variables ingesting daily, stored in TimescaleDB, queryable"
+      api: "FRED API (free tier, no key required for basic access)"
+      priority: HIGH
 
-    track_d_build_automation:
-      target: "4 hour build time, one-click deploy"
-      tasks:
-        - name: "Automate GitHub repo creation via GitHub API"
-          priority: HIGH
-        - name: "Auto-generate Railway project via Railway API"
-          priority: HIGH
-        - name: "Auto-wire Stripe subscription (create product + price via Stripe API)"
-          priority: HIGH
-          note: "Closes M1 Stripe gap — production config not just code"
-        - name: "Auto-inject GA4 measurement ID from analytics template"
-          priority: MEDIUM
-        - name: "Deliverable: One-click Build and Deploy from Exploitation Board"
-          priority: HIGH
+    step_03_google_trends:
+      track: C
+      task: "Google Trends integration"
+      description: "pytrends with proxy rotation to avoid bans. Cross-reference viability scores with search volume."
+      new_file: "services/data_pipelines/google_trends.py"
+      dependencies:
+        - "Exploitation validation table (M0V COMPLETE)"
+      success_criteria: "Google Trends data retrievable for exploitation signals, >0.5 correlation with viability"
+      risk: "Rate limiting — needs proxy rotation to avoid bans"
+      priority: HIGH
 
-    track_e_data_scale:
-      target: "500GB total data"
-      tasks:
-        - name: "Add FRED economic indicators (50+ variables: GDP, CPI, unemployment)"
-          priority: HIGH
-        - name: "Add Alpha Vantage intraday data for top 10 stocks (5-min intervals)"
-          priority: MEDIUM
-        - name: "Add news sentiment from GDELT API (daily event counts by theme)"
-          priority: MEDIUM
-        - name: "Set up ETL pipeline with batch scheduling (APScheduler)"
-          priority: HIGH
-          note: "Carries over Reddit ingestion from M1"
+  # ----------------------------------------------------------
+  # Phase 2: Core Intelligence (Weeks 11–12, May 18–31)
+  # ----------------------------------------------------------
+  phase_2_core_intelligence:
+    weeks: "11-12"
+    dates: "May 18–31, 2026"
 
-    track_g_commercial_intelligence:
-      target: "Commercial intelligence API + UI"
-      tasks:
-        - name: "Auto-record ProductDeployment when build completes"
-          priority: MEDIUM
-        - name: "Build /api/commercial-intelligence endpoint (revenue by config and market)"
-          priority: MEDIUM
-        - name: "Add Commercial Case panel to BUILD exploitation cards"
-          priority: MEDIUM
+    step_04_confidence_ensemble:
+      track: A
+      task: "Confidence-weighted ensemble with feature engineering"
+      description: |
+        Weight models by historical accuracy per-signal.
+        Feature engineering: rolling averages (7d, 30d, 90d), rate of change, volatility.
+        Cross-validation using Wikipedia + Reddit agreement as confidence booster.
+      modify_file: "services/ensemble_model.py"
+      depends_on: step_01
+      success_criteria:
+        - "Ensemble achieves 65% direction accuracy on walk-forward validation"
+        - "Confidence scores correlate with prediction accuracy"
+        - "Lag error reduced from 32.2 days toward <10 days"
+      priority: HIGH
+
+    step_05_ai_code_review:
+      track: B
+      task: "AI-powered code review step"
+      description: "LLM validates generated code before commit in build pipeline. Catches syntax, logic, and import errors before they become build failures."
+      modify_file: "services/ai_code_generator_orchestrator.py"
+      parallel_with: step_04
+      success_criteria: "Catches ≥10% of issues before commit"
+      priority: HIGH
+
+    step_06_alpha_vantage:
+      track: E
+      task: "Alpha Vantage intraday stock data"
+      description: "Top 10 stocks at 5-minute intervals (8,640 daily records per stock)"
+      new_file: "services/data_pipelines/alpha_vantage.py"
+      parallel_with: step_04
+      depends_on: step_02  # shared ETL infrastructure
+      success_criteria: "5-minute bars for 10 stocks ingesting daily, queryable in TimescaleDB"
+      api: "Alpha Vantage API (free tier has strict call limits)"
+      risk: "Rate limits on free tier — may need premium key for reliability"
+      priority: MEDIUM
+
+    step_07_integration_tests:
+      track: B
+      task: "Integration test templates + fix top failure patterns"
+      description: |
+        Integration test templates for common patterns: CRUD, auth, Stripe endpoints.
+        Fix top 5 most common build failure patterns from build_error_tracker.py data.
+      depends_on: step_05
+      success_criteria:
+        - "Build error rate measured at 20% or better over 20+ builds"
+        - "Top 5 failure patterns documented and fixed"
+        - "Integration tests auto-execute for all builds"
+      priority: HIGH
+
+  # ----------------------------------------------------------
+  # Phase 3: Automation & Scale (Weeks 13–14, June 1–14)
+  # ----------------------------------------------------------
+  phase_3_automation:
+    weeks: "13-14"
+    dates: "June 1–14, 2026"
+
+    step_08_github_auto:
+      track: D
+      task: "Auto GitHub repo creation"
+      description: "GitHub API integration for one-click repo provisioning when building an MVP"
+      new_file: "services/deployment_automation.py"
+      requires_config: "GitHub OAuth/PAT configured on Railway"
+      success_criteria: "Repo created automatically with correct structure"
+      priority: HIGH
+
+    step_09_railway_auto:
+      track: D
+      task: "Auto Railway project provisioning"
+      description: "Railway API to auto-create project + deploy from GitHub repo"
+      modify_file: "services/deployment_automation.py"
+      depends_on: step_08
+      requires_config: "Railway API access configured"
+      success_criteria: "Railway project auto-created and deployed from generated repo"
+      priority: HIGH
+
+    step_10_stripe_auto:
+      track: D
+      task: "Stripe auto-wiring for deployed apps"
+      description: "Auto-create Stripe product + price + webhook endpoint for each deployed app"
+      modify_file: "services/stripe_service.py"
+      depends_on: step_09
+      requires_config:
+        - "STRIPE_SECRET_KEY (Railway env)"
+        - "STRIPE_WEBHOOK_SECRET (Railway env)"
+        - "STRIPE_PUBLISHABLE_KEY (Railway env)"
+        - "4 Stripe price IDs (for subscription tiers)"
+      blocker: "Stripe env vars NOT configured on Railway — manual setup required first"
+      success_criteria: "Stripe subscriptions auto-configured for deployed apps"
+      priority: HIGH
+
+    step_11_one_click_deploy:
+      track: D
+      task: "One-click Build & Deploy button"
+      description: |
+        Single button on Exploitation Board triggers full pipeline:
+        repo creation → AI code generation → Railway deploy → Stripe setup → GA4 injection.
+        Replaces current "Build MVP" button.
+      depends_on: [step_08, step_09, step_10]
+      modify_files:
+        - "services/mvp_builder_service.py"
+        - "routers/dashboard_real.py"
+        - "templates/dashboard.html"
+        - "static/js/dashboard.js"
+      success_criteria:
+        - "Build time ≤4 hours end-to-end"
+        - "Single button trigger completes full pipeline"
+        - "Zero missing configuration errors in deployed app"
+      priority: HIGH
+
+    step_12_gdelt:
+      track: E
+      task: "GDELT news sentiment integration"
+      description: "Daily event counts by theme from GDELT API, weekly sentiment scores"
+      new_file: "services/data_pipelines/gdelt_pipeline.py"
+      parallel_with: [step_08, step_09, step_10, step_11]
+      success_criteria: "Weekly sentiment scores integrated and queryable"
+      priority: MEDIUM
+
+    step_13_arxiv_scoring:
+      track: C
+      task: "arXiv competition scoring"
+      description: "Real citation counts for competitive analysis. Rescore all 103 existing BUILD recommendations with new signals."
+      parallel_with: [step_08, step_09, step_10, step_11]
+      success_criteria:
+        - ">0.5 correlation between competition signals and actual success"
+        - "All 103 BUILD recommendations rescored"
+        - "False positives reduced by >20%"
+      priority: MEDIUM
+
+  # ----------------------------------------------------------
+  # Phase 4: Commercial Intelligence (Week 14, June 8–14)
+  # ----------------------------------------------------------
+  phase_4_commercial:
+    week: 14
+    dates: "June 8–14, 2026"
+
+    step_14_auto_deployment_record:
+      track: G
+      task: "Auto-record ProductDeployment on build completion"
+      description: "When build reaches LIVE status, auto-create ProductDeployment record with tech stack, template, market category, pricing tier (from YAML config)"
+      modify_file: "routers/dashboard_real.py"
+      depends_on: step_11
+      dependencies:
+        - "ProductDeployment model (M1 COMPLETE)"
+      success_criteria: "Every successful build auto-creates ProductDeployment record"
+      priority: MEDIUM
+
+    step_15_commercial_api:
+      track: G
+      task: "Commercial intelligence API endpoint"
+      description: "GET /api/commercial-intelligence returning: top revenue configs, market performance matrix, config-to-revenue correlation, best performing demographics"
+      new_file: "routers/commercial_intelligence.py"
+      depends_on: step_14
+      success_criteria: "/api/commercial-intelligence returns >50 deployments with metrics"
+      priority: MEDIUM
+
+    step_16_commercial_panel:
+      track: G
+      task: "Commercial Case panel on dashboard"
+      description: "Shows similar products' revenue range, best-performing config for market, commercial confidence score on BUILD exploitation cards"
+      depends_on: step_15
+      modify_files:
+        - "templates/dashboard.html"
+        - "static/js/dashboard.js"
+      success_criteria: "Panel displays for >80% of BUILD recommendations"
+      priority: MEDIUM
+
+  # ----------------------------------------------------------
+  # Phase 5: Deferred M1 Items (woven into Weeks 12–14)
+  # ----------------------------------------------------------
+  phase_5_deferred:
+    dates: "Woven into Weeks 12–14"
+
+    step_17_reddit_ingestion:
+      track: E
+      task: "Reddit historical data ingestion"
+      description: "Pushshift/Reddit API with rate limiting. Deferred from M1 due to API rate limits."
+      deferred_from: M1
+      parallel: true
+      priority: MEDIUM
+
+    step_18_weight_calibration:
+      track: C
+      task: "Exploitation weight calibration"
+      description: "Run calibration pass after 15+ validated outcomes accumulate. Deferred from M1 (needed data)."
+      deferred_from: M1
+      depends_on: "15+ ExploitationValidation records accumulated"
+      priority: MEDIUM
+
+  # ----------------------------------------------------------
+  # Phase 6: Validation & Closure (Week 15, June 15–21)
+  # ----------------------------------------------------------
+  phase_6_validation:
+    week: 15
+    dates: "June 15–21, 2026"
+
+    step_19_full_validation:
+      task: "Full M2 validation pass"
+      description: "Verify all 6 success gates are met"
+      gates:
+        - "Ensemble: 65% direction accuracy confirmed (walk-forward)"
+        - "Build: ≤20% error rate over 20+ builds measured"
+        - "Exploitation: 60% accuracy over 30+ validated recommendations"
+        - "Deploy: One-click end-to-end functional"
+        - "Data: 500GB reached (or 400GB+ if some sources delayed)"
+        - "Commercial: API returns >50 deployment records"
+
+    step_20_signoff:
+      task: "M2 sign-off and M3 planning prep"
+      description: "Document outcomes, update scaling plan YAML, begin M3 scope definition"
+
+  # ----------------------------------------------------------
+  # INFRASTRUCTURE REQUIREMENTS
+  # ----------------------------------------------------------
+  infrastructure:
+    apis_required:
+      - name: "FRED API"
+        purpose: "Economic indicators (GDP, CPI, unemployment)"
+        cost: "Free tier available"
+      - name: "Alpha Vantage API"
+        purpose: "Stock intraday data"
+        cost: "Free tier (rate limited), premium available"
+      - name: "GDELT API"
+        purpose: "News sentiment/events"
+        cost: "Free"
+      - name: "Google Trends (pytrends)"
+        purpose: "Search volume for viability scoring"
+        cost: "Free (needs proxy rotation)"
+      - name: "arXiv API"
+        purpose: "Citation data for competition scoring"
+        cost: "Free"
+      - name: "GitHub API"
+        purpose: "Auto repo creation"
+        config: "Requires OAuth/PAT"
+      - name: "Railway API"
+        purpose: "Auto project provisioning"
+        config: "Requires API token"
+      - name: "Stripe API"
+        purpose: "Auto subscription wiring"
+        config: "Requires STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PUBLISHABLE_KEY + 4 price IDs"
+
+    database:
+      engine: "PostgreSQL + TimescaleDB"
+      target_size: "500GB"
+      retention: "Raw daily data 2 years, aggregated forever"
+      connection_pool: "pool_size=20, max_overflow=10 (from M1)"
+
+    compute:
+      scheduler: "APScheduler (batch jobs for FRED, Alpha Vantage, GDELT, pytrends)"
+      ai: "LLM API for code review (OpenAI or similar)"
+      ci_cd: "GitHub Actions for build metrics + artifact storage"
+
+    deployment:
+      hosting: "Railway (main app + scheduled jobs)"
+      source_control: "GitHub + Actions workflows"
+      cold_storage: "S3 Glacier (deferred to M3 — volume not at threshold)"
+
+  # ----------------------------------------------------------
+  # NEW FILES TO CREATE (M2)
+  # ----------------------------------------------------------
+  new_files:
+    - "services/ensemble_model.py"             # Track A: weighted ensemble
+    - "services/data_pipelines/fred_pipeline.py"     # Track E: FRED ingestion
+    - "services/data_pipelines/alpha_vantage.py"     # Track E: stock data
+    - "services/data_pipelines/gdelt_pipeline.py"    # Track E: news sentiment
+    - "services/data_pipelines/google_trends.py"     # Track C: pytrends
+    - "services/deployment_automation.py"             # Track D: one-click deploy
+    - "routers/commercial_intelligence.py"            # Track G: commercial API
+
+  # ----------------------------------------------------------
+  # EXISTING FILES TO MODIFY (M2)
+  # ----------------------------------------------------------
+  files_to_modify:
+    - "services/ai_code_generator_orchestrator.py"  # Track B: AI code review
+    - "services/mvp_builder_service.py"             # Track D: one-click deploy
+    - "services/stripe_service.py"                  # Track D: auto-wiring
+    - "routers/dashboard_real.py"                   # Track G: auto ProductDeployment
+    - "templates/dashboard.html"                    # Track G: commercial panel + Track D: deploy button
+    - "static/js/dashboard.js"                      # Track G: commercial panel UI
+
+  # ----------------------------------------------------------
+  # KEY RISKS
+  # ----------------------------------------------------------
+  risks:
+    - id: R1
+      severity: CRITICAL
+      risk: "Stripe env vars not configured on Railway"
+      impact: "Blocks entire Track D completion"
+      mitigation: "User must manually configure Stripe dashboard + Railway env vars before Track D step 10"
+
+    - id: R2
+      severity: MEDIUM
+      risk: "API rate limits (Google Trends, Alpha Vantage, Reddit)"
+      impact: "Data ingestion could be throttled or blocked"
+      mitigation: "Proxy rotation for pytrends, careful scheduling, consider premium API tiers"
+
+    - id: R3
+      severity: MEDIUM
+      risk: "Model accuracy plateau — ensemble may not hit 65%"
+      impact: "Track A success gate not met"
+      mitigation: "Implement manual weight tuning fallback if auto-weights underperform"
+
+    - id: R4
+      severity: LOW
+      risk: "Build time 4hr target — depends on parallel API calls"
+      impact: "Track D may exceed time target"
+      mitigation: "Async job queue if sequential GitHub/Railway/Stripe calls exceed target"
+
+    - id: R5
+      severity: LOW
+      risk: "Data quality from new sources (FRED, Alpha Vantage, GDELT)"
+      impact: "Feature engineering could use bad data"
+      mitigation: "Schema validation + null checks before feature engineering"
 
 # ============================================================
 # STRIPE CONFIGURATION (Blocks Revenue)
