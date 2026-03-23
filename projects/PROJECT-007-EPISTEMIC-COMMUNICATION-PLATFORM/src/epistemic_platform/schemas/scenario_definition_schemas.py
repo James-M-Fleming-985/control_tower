@@ -11,8 +11,8 @@ class ScenarioDefinitionBase(BaseModel):
     description: str | None = None
     difficulty: str
     actor_id: int | None = None
-    objectives: list[dict[str, Any]] = []
-    evaluation_criteria: list[dict[str, Any]] = []
+    objectives: list[Any] = []
+    evaluation_criteria: list[Any] = []
     category: str
     is_active: bool = True
 
@@ -26,8 +26,8 @@ class ScenarioDefinitionUpdate(BaseModel):
     description: str | None = None
     difficulty: str | None = None
     actor_id: int | None = None
-    objectives: list[dict[str, Any]] | None = None
-    evaluation_criteria: list[dict[str, Any]] | None = None
+    objectives: list[Any] | None = None
+    evaluation_criteria: list[Any] | None = None
     category: str | None = None
     is_active: bool | None = None
 

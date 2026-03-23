@@ -50,6 +50,6 @@ class UserProfileRepository:
         user = await self.get(user_id)
         if not user:
             return False
-        await self.db.delete(user)
+        self.db.delete(user)
         await self.db.flush()
         return True

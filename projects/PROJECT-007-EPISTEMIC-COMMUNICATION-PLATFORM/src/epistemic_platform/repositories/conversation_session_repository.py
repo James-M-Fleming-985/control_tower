@@ -137,6 +137,6 @@ class ConversationSessionRepository:
         session = await self.get(session_id)
         if not session:
             return False
-        await self.db.delete(session)
+        self.db.delete(session)
         await self.db.flush()
         return True

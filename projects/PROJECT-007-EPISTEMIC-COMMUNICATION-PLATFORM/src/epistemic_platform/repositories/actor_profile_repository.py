@@ -55,6 +55,6 @@ class ActorProfileRepository:
         actor = await self.get(actor_id)
         if not actor:
             return False
-        await self.db.delete(actor)
+        self.db.delete(actor)
         await self.db.flush()
         return True

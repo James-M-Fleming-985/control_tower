@@ -62,6 +62,6 @@ class ScenarioDefinitionRepository:
         scenario = await self.get(scenario_id)
         if not scenario:
             return False
-        await self.db.delete(scenario)
+        self.db.delete(scenario)
         await self.db.flush()
         return True

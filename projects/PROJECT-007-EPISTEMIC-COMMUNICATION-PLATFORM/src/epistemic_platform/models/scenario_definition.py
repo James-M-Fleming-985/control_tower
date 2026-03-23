@@ -19,8 +19,8 @@ class ScenarioDefinition(BaseModel):
     actor_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("actor_profiles.id"), nullable=True
     )
-    objectives: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list)
-    evaluation_criteria: Mapped[list[dict[str, Any]]] = mapped_column(
+    objectives: Mapped[list[Any]] = mapped_column(JSON, nullable=False, default=list)
+    evaluation_criteria: Mapped[list[Any]] = mapped_column(
         JSON, nullable=False, default=list
     )
     category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
