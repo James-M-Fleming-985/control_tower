@@ -18,11 +18,18 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _has_column(table: str, column: str) -> bool:
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    return any(c["name"] == column for c in insp.get_columns(table))
+
+
 def upgrade() -> None:
-    op.add_column(
-        "conversation_sessions",
-        sa.Column("parent_session_id", sa.Integer, sa.ForeignKey("conversation_sessions.id"), nullable=True),
-    )
+    if not _has_column("conversation_sessions", "parent_session_id"):
+        op.add_column(
+            "conversation_sessions",
+            sa.Column("parent_session_id", sa.Integer, sa.ForeignKey("conversation_sessions.id"), nullable=True),
+        )
 
 
 def downgrade() -> None:

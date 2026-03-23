@@ -18,11 +18,21 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _has_column(table: str, column: str) -> bool:
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    return any(c["name"] == column for c in insp.get_columns(table))
+
+
 def upgrade() -> None:
-    op.add_column("user_profiles", sa.Column("xp", sa.Integer, nullable=False, server_default="0"))
-    op.add_column("user_profiles", sa.Column("level", sa.Integer, nullable=False, server_default="1"))
-    op.add_column("user_profiles", sa.Column("achievements", sa.JSON, nullable=False, server_default="[]"))
-    op.add_column("user_profiles", sa.Column("subscription_tier", sa.String(20), nullable=False, server_default="free"))
+    if not _has_column("user_profiles", "xp"):
+        op.add_column("user_profiles", sa.Column("xp", sa.Integer, nullable=False, server_default="0"))
+    if not _has_column("user_profiles", "level"):
+        op.add_column("user_profiles", sa.Column("level", sa.Integer, nullable=False, server_default="1"))
+    if not _has_column("user_profiles", "achievements"):
+        op.add_column("user_profiles", sa.Column("achievements", sa.JSON, nullable=False, server_default="[]"))
+    if not _has_column("user_profiles", "subscription_tier"):
+        op.add_column("user_profiles", sa.Column("subscription_tier", sa.String(20), nullable=False, server_default="free"))
 
 
 def downgrade() -> None:

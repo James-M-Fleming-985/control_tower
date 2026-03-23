@@ -170,7 +170,7 @@ export function ConversationPage() {
 
   // --- Connect WebSocket ---
   useEffect(() => {
-    if (!sessionId || !accessToken || ended) return;
+    if (!sessionId || !accessToken || ended || !session) return;
 
     const wsPath = isVoice
       ? `/ws/voice/${sessionId}`
@@ -188,7 +188,7 @@ export function ConversationPage() {
       ws.close();
       wsRef.current = null;
     };
-  }, [sessionId, accessToken, ended, isVoice, handleWsMessage, enqueueAudio]);
+  }, [sessionId, accessToken, ended, isVoice, session, handleWsMessage, enqueueAudio]);
 
   // Cleanup audio context on unmount
   useEffect(() => {
