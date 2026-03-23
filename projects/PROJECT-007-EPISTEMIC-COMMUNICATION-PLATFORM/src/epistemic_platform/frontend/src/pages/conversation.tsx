@@ -150,7 +150,10 @@ export function ConversationPage() {
         break;
       case 'state_change':
         if ('state' in data) {
-          setVoiceState(data.state as VoiceState);
+          // Backend "listening" = ready for user input → show idle (tap to speak)
+          // Only startRecording() sets 'listening' locally when mic is active
+          const mapped = data.state === 'listening' ? 'idle' : data.state as VoiceState;
+          setVoiceState(mapped);
         }
         break;
       case 'audio_end':
@@ -237,7 +240,7 @@ export function ConversationPage() {
     mediaRecorderRef.current = null;
     setRecording(false);
     if (wsRef.current) {
-      wsRef.current.sendJSON({ type: 'audio_end' });
+      wsRef.current.sendJSON({ type: 'end_utterance' });
     }
   }, []);
 
