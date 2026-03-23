@@ -367,10 +367,24 @@ async def voice_websocket(
                     barge_in.clear()
 
                     # --- Parallel: STT + composure analysis ---
-                    transcription, vocal_state = await asyncio.gather(
-                        stt.transcribe(audio_data, audio_format="webm"),
-                        analyser.analyse(audio_data),
-                    )
+                    try:
+                        transcription, vocal_state = await asyncio.gather(
+                            stt.transcribe(audio_data, audio_format="webm"),
+                            analyser.analyse(audio_data),
+                        )
+                    except Exception as stt_err:
+                        logger.error("STT/analysis failed session=%d: %s", session_id, stt_err)
+                        state = VoiceState.LISTENING
+                        await websocket.send_json(
+                            {"type": "state_change", "state": state.value}
+                        )
+                        detail = "Speech service unavailable"
+                        if "insufficient_quota" in str(stt_err) or "429" in str(stt_err):
+                            detail = "Speech service quota exceeded — please check OpenAI billing"
+                        await websocket.send_json(
+                            {"type": "error", "detail": detail}
+                        )
+                        continue
                     t_stt = time.monotonic()
 
                     if not transcription.text:

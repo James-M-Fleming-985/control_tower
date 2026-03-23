@@ -9,9 +9,15 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
+import subprocess
+import shutil
 from dataclasses import asdict, dataclass
 
 logger = logging.getLogger(__name__)
+
+_HAS_FFMPEG = shutil.which("ffmpeg") is not None
+if not _HAS_FFMPEG:
+    logger.warning("ffmpeg not found — WebM/Opus audio analysis will be unavailable")
 
 try:
     import librosa
@@ -66,6 +72,31 @@ class VoiceAnalyser:
             None, self._analyse_sync, audio_bytes, word_count, sample_rate
         )
 
+    @staticmethod
+    def _convert_webm_to_wav(audio_bytes: bytes, sample_rate: int) -> bytes | None:
+        """Convert WebM/Opus audio to WAV using ffmpeg subprocess."""
+        if not _HAS_FFMPEG:
+            return None
+        try:
+            result = subprocess.run(
+                [
+                    "ffmpeg", "-i", "pipe:0",
+                    "-f", "wav", "-ar", str(sample_rate),
+                    "-ac", "1", "-acodec", "pcm_s16le",
+                    "pipe:1",
+                ],
+                input=audio_bytes,
+                capture_output=True,
+                timeout=10,
+            )
+            if result.returncode == 0 and len(result.stdout) > 44:
+                return result.stdout
+            logger.warning("ffmpeg conversion failed (rc=%d)", result.returncode)
+            return None
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError) as exc:
+            logger.warning("ffmpeg conversion error: %s", exc)
+            return None
+
     def _analyse_sync(
         self,
         audio_bytes: bytes,
@@ -73,7 +104,15 @@ class VoiceAnalyser:
         sample_rate: int,
     ) -> VocalState | None:
         try:
-            y, sr = librosa.load(io.BytesIO(audio_bytes), sr=sample_rate, mono=True)
+            # Try direct load first; if that fails, convert via ffmpeg
+            try:
+                y, sr = librosa.load(io.BytesIO(audio_bytes), sr=sample_rate, mono=True)
+            except Exception:
+                wav_bytes = self._convert_webm_to_wav(audio_bytes, sample_rate)
+                if wav_bytes is None:
+                    logger.warning("Cannot decode audio format and ffmpeg unavailable")
+                    return None
+                y, sr = librosa.load(io.BytesIO(wav_bytes), sr=sample_rate, mono=True)
             duration = len(y) / sr
             if duration < 0.5:
                 logger.debug("Audio too short (%.1fs) for composure analysis", duration)
