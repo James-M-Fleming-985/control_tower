@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+_META_SENTINEL = "|||META|||"
+
 
 def _authenticate_ws(token: str | None) -> int | None:
     """Validate a JWT token from query param. Returns user_id or None."""
@@ -141,15 +143,43 @@ async def conversation_websocket(
                         })
                         continue
 
-                    # Stream actor response
+                    # Stream actor response (filter |||META||| from deltas)
                     await manager.send_json(session_id, {"type": "stream_start"})
 
+                    _pending = ""
+                    _meta_found = False
                     async for chunk in conv_manager.handle_user_message(content):
                         if chunk.delta:
-                            await manager.send_json(session_id, {
-                                "type": "stream_delta",
-                                "content": chunk.delta,
-                            })
+                            if _meta_found:
+                                continue
+                            _pending += chunk.delta
+                            _mi = _pending.find(_META_SENTINEL)
+                            if _mi >= 0:
+                                if _mi > 0:
+                                    await manager.send_json(session_id, {
+                                        "type": "stream_delta",
+                                        "content": _pending[:_mi],
+                                    })
+                                _pending = ""
+                                _meta_found = True
+                                continue
+                            _flush = len(_pending)
+                            for _i in range(1, min(len(_META_SENTINEL), len(_pending)) + 1):
+                                if _META_SENTINEL.startswith(_pending[-_i:]):
+                                    _flush = len(_pending) - _i
+                                    break
+                            if _flush > 0:
+                                await manager.send_json(session_id, {
+                                    "type": "stream_delta",
+                                    "content": _pending[:_flush],
+                                })
+                                _pending = _pending[_flush:]
+
+                    if _pending and not _meta_found:
+                        await manager.send_json(session_id, {
+                            "type": "stream_delta",
+                            "content": _pending,
+                        })
 
                     await manager.send_json(session_id, {"type": "stream_end"})
 

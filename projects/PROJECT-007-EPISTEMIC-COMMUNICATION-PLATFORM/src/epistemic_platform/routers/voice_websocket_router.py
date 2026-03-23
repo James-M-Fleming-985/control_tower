@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 _META_RE = re.compile(r"\|\|\|META\|\|\|(\{.*\})\s*$", re.DOTALL)
+_META_SENTINEL = "|||META|||"
 
 
 # ---------------------------------------------------------------------------
@@ -208,13 +209,11 @@ async def voice_websocket(
 
     # Voice API clients
     stt = WhisperSTTClient(api_key=settings.openai_api_key, model=settings.whisper_model)
-    tts = ElevenLabsTTSClient(
-        api_key=settings.elevenlabs_api_key,
-        voice_id=settings.elevenlabs_default_voice_id,
-        model_id=settings.elevenlabs_model_id,
-    )
     analyser = VoiceAnalyser()
     vocal_states: list[dict] = []
+    tts: ElevenLabsTTSClient | None = None
+    tts_task: asyncio.Task | None = None
+    barge_in = asyncio.Event()
 
     try:
         async with async_session_factory() as db:
@@ -240,6 +239,14 @@ async def voice_websocket(
                     {"type": "error", "detail": "Actor not found"}
                 )
                 return
+
+            # Per-actor voice: prefer actor's voice_id, fall back to global default
+            voice_id = (actor.ontology_config or {}).get("voice_id") or settings.elevenlabs_default_voice_id
+            tts = ElevenLabsTTSClient(
+                api_key=settings.elevenlabs_api_key,
+                voice_id=voice_id,
+                model_id=settings.elevenlabs_model_id,
+            )
 
             conv_manager = ConversationManager(
                 session=session,
@@ -423,15 +430,41 @@ async def voice_websocket(
                     await websocket.send_json({"type": "stream_start"})
 
                     raw_response = ""
+                    _pending = ""
+                    _meta_found = False
                     async for chunk in conv_manager.handle_user_message(
                         transcription.text,
                         user_vocal_state=vocal_dict,
                     ):
                         if chunk.delta:
                             raw_response += chunk.delta
-                            await websocket.send_json(
-                                {"type": "stream_delta", "content": chunk.delta}
-                            )
+                            if _meta_found:
+                                continue
+                            _pending += chunk.delta
+                            _mi = _pending.find(_META_SENTINEL)
+                            if _mi >= 0:
+                                if _mi > 0:
+                                    await websocket.send_json(
+                                        {"type": "stream_delta", "content": _pending[:_mi]}
+                                    )
+                                _pending = ""
+                                _meta_found = True
+                                continue
+                            _flush = len(_pending)
+                            for _i in range(1, min(len(_META_SENTINEL), len(_pending)) + 1):
+                                if _META_SENTINEL.startswith(_pending[-_i:]):
+                                    _flush = len(_pending) - _i
+                                    break
+                            if _flush > 0:
+                                await websocket.send_json(
+                                    {"type": "stream_delta", "content": _pending[:_flush]}
+                                )
+                                _pending = _pending[_flush:]
+
+                    if _pending and not _meta_found:
+                        await websocket.send_json(
+                            {"type": "stream_delta", "content": _pending}
+                        )
 
                     await websocket.send_json({"type": "stream_end"})
                     t_llm = time.monotonic()
@@ -577,5 +610,6 @@ async def voice_websocket(
         if tts_task and not tts_task.done():
             barge_in.set()
             tts_task.cancel()
-        await tts.close()
+        if tts:
+            await tts.close()
         await stt.close()
