@@ -7,6 +7,7 @@ import { ChatBubble } from '@/components/conversation/chat-bubble';
 import { ChatInput } from '@/components/conversation/chat-input';
 import { CoachingPanel } from '@/components/conversation/coaching-panel';
 import { TrilemmaVisual } from '@/components/conversation/trilemma-visual';
+import { VoiceOrb } from '@/components/voice/voice-orb';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,12 +20,15 @@ interface LocalMessage {
   timestamp: string;
 }
 
+type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking';
+
 export function ConversationPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const accessToken = useAuthStore((s) => s.accessToken);
   const { data: session, isLoading: sessionLoading } = useSession(Number(sessionId) || 0);
   const { data: actor } = useActor(session?.actor_id ?? 0);
+  const isVoice = session?.mode === 'voice';
 
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [streamBuf, setStreamBuf] = useState('');
@@ -35,8 +39,16 @@ export function ConversationPage() {
   const [lastStance, setLastStance] = useState<StanceDetection | null>(null);
   const [ended, setEnded] = useState(false);
 
+  // Voice-specific state
+  const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const [recording, setRecording] = useState(false);
+
   const wsRef = useRef<WebSocketManager | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioQueueRef = useRef<ArrayBuffer[]>([]);
+  const isPlayingRef = useRef(false);
 
   // Load existing messages from session
   useEffect(() => {
@@ -59,52 +71,114 @@ export function ConversationPage() {
     }
   }, [session]);
 
-  // Connect WebSocket
+  // --- Audio playback helpers ---
+  const playNextChunk = useCallback(async () => {
+    if (isPlayingRef.current || audioQueueRef.current.length === 0) return;
+    isPlayingRef.current = true;
+    const chunk = audioQueueRef.current.shift()!;
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      const ctx = audioContextRef.current;
+      const buffer = await ctx.decodeAudioData(chunk.slice(0));
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.onended = () => {
+        isPlayingRef.current = false;
+        playNextChunk();
+      };
+      source.start();
+    } catch {
+      isPlayingRef.current = false;
+      playNextChunk();
+    }
+  }, []);
+
+  const enqueueAudio = useCallback((data: ArrayBuffer) => {
+    audioQueueRef.current.push(data);
+    playNextChunk();
+  }, [playNextChunk]);
+
+  const stopPlayback = useCallback(() => {
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+  }, []);
+
+  // --- WebSocket message handler ---
+  const handleWsMessage = useCallback((data: WSServerMessage) => {
+    switch (data.type) {
+      case 'stream_start':
+        setIsStreaming(true);
+        setStreamBuf('');
+        break;
+      case 'stream_delta':
+        setStreamBuf((prev) => prev + (data.content ?? ''));
+        break;
+      case 'stream_end':
+        setStreamBuf((buf) => {
+          if (buf) {
+            setMessages((prev) => [
+              ...prev,
+              { role: 'actor', content: buf, timestamp: new Date().toISOString() },
+            ]);
+          }
+          return '';
+        });
+        setIsStreaming(false);
+        break;
+      case 'trilemma_update':
+        if (data.state) setTrilemmaState(data.state as TrilemmaState);
+        if (data.horn_detection) setLastHorn(data.horn_detection as HornDetection);
+        break;
+      case 'stance_update':
+        if (data.detection) setLastStance(data.detection as StanceDetection);
+        break;
+      case 'coaching':
+        if (data.annotation) {
+          setAnnotations((prev) => [...prev, data.annotation as CoachingAnnotation]);
+        }
+        break;
+      case 'transcription':
+        if ('text' in data) {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'user', content: data.text, timestamp: new Date().toISOString() },
+          ]);
+        }
+        break;
+      case 'state_change':
+        if ('state' in data) {
+          setVoiceState(data.state as VoiceState);
+        }
+        break;
+      case 'audio_end':
+        setVoiceState('idle');
+        break;
+      case 'barge_in':
+        stopPlayback();
+        break;
+      case 'session_ended':
+        setEnded(true);
+        break;
+      case 'error':
+        console.error('WS error:', (data as { detail: string }).detail);
+        break;
+    }
+  }, [stopPlayback]);
+
+  // --- Connect WebSocket ---
   useEffect(() => {
     if (!sessionId || !accessToken || ended) return;
 
-    const ws = new WebSocketManager(`/ws/conversation/${sessionId}`, {
-      onMessage: (data: WSServerMessage) => {
-        switch (data.type) {
-          case 'stream_start':
-            setIsStreaming(true);
-            setStreamBuf('');
-            break;
-          case 'stream_delta':
-            setStreamBuf((prev) => prev + (data.content ?? ''));
-            break;
-          case 'stream_end':
-            setStreamBuf((buf) => {
-              if (buf) {
-                setMessages((prev) => [
-                  ...prev,
-                  { role: 'actor', content: buf, timestamp: new Date().toISOString() },
-                ]);
-              }
-              return '';
-            });
-            setIsStreaming(false);
-            break;
-          case 'trilemma_update':
-            if (data.state) setTrilemmaState(data.state as TrilemmaState);
-            if (data.horn_detection) setLastHorn(data.horn_detection as HornDetection);
-            break;
-          case 'stance_update':
-            if (data.detection) setLastStance(data.detection as StanceDetection);
-            break;
-          case 'coaching':
-            if (data.annotation) {
-              setAnnotations((prev) => [...prev, data.annotation as CoachingAnnotation]);
-            }
-            break;
-          case 'session_ended':
-            setEnded(true);
-            break;
-          case 'error':
-            console.error('WS error:', data.detail);
-            break;
-        }
-      },
+    const wsPath = isVoice
+      ? `/ws/voice/${sessionId}`
+      : `/ws/conversation/${sessionId}`;
+
+    const ws = new WebSocketManager(wsPath, {
+      onMessage: handleWsMessage,
+      onBinary: isVoice ? enqueueAudio : undefined,
     });
 
     ws.connect();
@@ -114,12 +188,66 @@ export function ConversationPage() {
       ws.close();
       wsRef.current = null;
     };
-  }, [sessionId, accessToken, ended]);
+  }, [sessionId, accessToken, ended, isVoice, handleWsMessage, enqueueAudio]);
+
+  // Cleanup audio context on unmount
+  useEffect(() => {
+    return () => {
+      audioContextRef.current?.close();
+      mediaRecorderRef.current?.stop();
+    };
+  }, []);
 
   // Auto-scroll
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streamBuf]);
+
+  // --- Recording controls ---
+  const startRecording = useCallback(async () => {
+    if (!wsRef.current) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : 'audio/webm',
+      });
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0 && wsRef.current) {
+          e.data.arrayBuffer().then((buf) => wsRef.current?.send(buf));
+        }
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      recorder.start(250); // 250ms chunks
+      mediaRecorderRef.current = recorder;
+      setRecording(true);
+      setVoiceState('listening');
+    } catch (err) {
+      console.error('Microphone access denied:', err);
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    mediaRecorderRef.current = null;
+    setRecording(false);
+    if (wsRef.current) {
+      wsRef.current.sendJSON({ type: 'audio_end' });
+    }
+  }, []);
+
+  const toggleRecording = useCallback(() => {
+    if (recording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [recording, startRecording, stopRecording]);
 
   const sendMessage = useCallback(
     (text: string) => {
@@ -163,7 +291,7 @@ export function ConversationPage() {
                 {lastStance.stance}
               </Badge>
             )}
-            {session?.mode === 'voice' && (
+            {isVoice && (
               <Badge variant="default" className="text-xs">
                 <Mic className="mr-1 h-3 w-3" /> Voice
               </Badge>
@@ -204,8 +332,13 @@ export function ConversationPage() {
           )}
         </div>
 
-        {/* Input */}
-        {!ended && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
+        {/* Voice controls or text input */}
+        {!ended && isVoice && (
+          <div className="flex flex-col items-center gap-2 border-t border-border px-4 py-6">
+            <VoiceOrb state={voiceState} recording={recording} onToggle={toggleRecording} />
+          </div>
+        )}
+        {!ended && !isVoice && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
         {ended && (
           <div className="border-t border-border px-4 py-3 text-center text-sm text-muted-foreground">
             Session ended.{' '}

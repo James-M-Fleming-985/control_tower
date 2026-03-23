@@ -81,6 +81,53 @@ def create_app() -> FastAPI:
             "app": settings.app_name,
         }
 
+    @app.get("/health/db", tags=["health"])
+    async def db_health_check():
+        """Diagnostic: check DB connection, migration status, and schema."""
+        from sqlalchemy import text as sa_text
+        from epistemic_platform.database import async_session_factory
+
+        info: dict = {"status": "checking"}
+        try:
+            async with async_session_factory() as db:
+                try:
+                    row = (await db.execute(sa_text("SELECT version_num FROM alembic_version"))).fetchone()
+                    info["alembic_version"] = row[0] if row else "no rows"
+                except Exception as exc:
+                    info["alembic_version"] = f"error: {exc}"
+
+                try:
+                    await db.execute(sa_text("SELECT xp, level, achievements, subscription_tier FROM user_profiles LIMIT 0"))
+                    info["gamification_columns"] = "present"
+                except Exception:
+                    info["gamification_columns"] = "MISSING"
+
+                try:
+                    await db.execute(sa_text("SELECT parent_session_id FROM conversation_sessions LIMIT 0"))
+                    info["parent_session_id_column"] = "present"
+                except Exception:
+                    info["parent_session_id_column"] = "MISSING"
+
+                try:
+                    row = (await db.execute(sa_text("SELECT count(*) FROM actor_profiles"))).fetchone()
+                    info["actor_count"] = row[0] if row else 0
+                except Exception as exc:
+                    info["actor_count"] = f"error: {exc}"
+
+                try:
+                    row = (await db.execute(sa_text(
+                        "SELECT count(*) FROM actor_profiles WHERE ontology_config::text LIKE '%voice_id%'"
+                    ))).fetchone()
+                    info["actors_with_voice_id"] = row[0] if row else 0
+                except Exception as exc:
+                    info["actors_with_voice_id"] = f"error: {exc}"
+
+                info["status"] = "ok"
+        except Exception as exc:
+            info["status"] = f"error: {exc}"
+
+        return info
+
     favicon_path = _PACKAGE_DIR / "static" / "favicon.ico"
     if favicon_path.is_file():
         @app.get("/favicon.ico", include_in_schema=False)

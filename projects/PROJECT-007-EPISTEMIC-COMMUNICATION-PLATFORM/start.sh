@@ -9,7 +9,13 @@ else
 fi
 
 echo "Running database migrations..."
-timeout 30 alembic upgrade head || echo "WARNING: Alembic migration failed or timed out — app startup will create tables as fallback"
+ALEMBIC_OUTPUT=$(timeout 60 alembic upgrade head 2>&1) || {
+  ALEMBIC_EXIT=$?
+  echo "ERROR: Alembic migration failed (exit code $ALEMBIC_EXIT)"
+  echo "Alembic output: $ALEMBIC_OUTPUT"
+  echo "Attempting to continue anyway..."
+}
+echo "Alembic output: $ALEMBIC_OUTPUT"
 
 echo "Verifying app import..."
 python -c "from epistemic_platform.main import app; print(f'App loaded: {len(app.routes)} routes')" || echo "WARNING: App import check failed"

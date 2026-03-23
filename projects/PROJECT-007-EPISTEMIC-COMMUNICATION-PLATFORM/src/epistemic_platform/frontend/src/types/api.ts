@@ -250,5 +250,10 @@ export type WSServerMessage =
   | { type: 'session_ended'; outcome: Record<string, unknown> }
   | { type: 'state_change'; state: 'listening' | 'processing' | 'speaking' }
   | { type: 'barge_in' }
+  | { type: 'transcription'; text: string }
+  | { type: 'vocal_state'; composure_score: number; [key: string]: unknown }
+  | { type: 'audio_end' }
+  | { type: 'latency_report'; turn: number; stt_ms: number; llm_ms: number; tts_first_byte_ms: number; total_ms: number }
+  | { type: 'pong'; server_ts: number; client_ts?: number }
   | { type: 'debrief_start'; session_id: number }
   | { type: 'error'; detail: string };
