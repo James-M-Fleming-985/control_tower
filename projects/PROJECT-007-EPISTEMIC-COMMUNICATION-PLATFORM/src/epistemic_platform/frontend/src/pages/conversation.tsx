@@ -96,7 +96,17 @@ export function ConversationPage() {
 
   // --- Audio playback helpers (Blob + <audio> element) ---
   const playAccumulatedAudio = useCallback(() => {
-    if (audioChunksRef.current.length === 0) return;
+    if (audioChunksRef.current.length === 0) {
+      console.warn('playAccumulatedAudio: no audio chunks to play');
+      return;
+    }
+    // Check total byte size
+    const totalBytes = audioChunksRef.current.reduce((sum, buf) => sum + buf.byteLength, 0);
+    if (totalBytes < 100) {
+      console.warn('playAccumulatedAudio: audio too small (%d bytes), skipping', totalBytes);
+      audioChunksRef.current = [];
+      return;
+    }
     // Revoke previous URL if any
     if (audioBlobUrlRef.current) {
       URL.revokeObjectURL(audioBlobUrlRef.current);
@@ -122,7 +132,9 @@ export function ConversationPage() {
       }
     };
     audio.onerror = () => {
-      console.error('Audio playback error');
+      const code = audio.error?.code;
+      const msg = audio.error?.message;
+      console.error('Audio playback error:', { code, msg, blobSize: blob.size, chunks: audioChunksRef.current.length });
       URL.revokeObjectURL(url);
       audioBlobUrlRef.current = null;
       setVoiceState('idle');

@@ -4,11 +4,20 @@ from __future__ import annotations
 
 import io
 import logging
+import re
 from dataclasses import dataclass
 
 from openai import AsyncOpenAI
 
 logger = logging.getLogger(__name__)
+
+# Common Whisper hallucination patterns on silence/noise/filler sounds
+_HALLUCINATION_RE = re.compile(
+    r"^[\s♪♫🎵🎶\-–—.…,!?]+$"  # music symbols / punctuation only
+    r"|(?:thank you for watching|please subscribe|like and subscribe"
+    r"|thanks for watching|copyright|subtitles by)",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -18,6 +27,7 @@ class TranscriptionResult:
     text: str
     language: str | None = None
     duration: float | None = None
+    no_speech_prob: float = 0.0
 
 
 class WhisperSTTClient:
@@ -56,10 +66,30 @@ class WhisperSTTClient:
             logger.exception("Whisper API call failed")
             raise
 
+        text = response.text.strip()
+
+        # Extract no_speech_prob from first segment (if available)
+        no_speech_prob = 0.0
+        segments = getattr(response, "segments", None)
+        if segments and len(segments) > 0:
+            no_speech_prob = getattr(segments[0], "no_speech_prob", 0.0) or 0.0
+
+        # Filter hallucinated transcriptions
+        if no_speech_prob > 0.4:
+            logger.info("Filtering high no_speech_prob (%.2f): '%s'", no_speech_prob, text)
+            text = ""
+        elif _HALLUCINATION_RE.search(text):
+            logger.info("Filtering hallucinated transcription: '%s'", text)
+            text = ""
+        elif len(text) > 0 and not any(c.isalnum() for c in text):
+            logger.info("Filtering non-alphanumeric transcription: '%s'", text)
+            text = ""
+
         return TranscriptionResult(
-            text=response.text.strip(),
+            text=text,
             language=getattr(response, "language", None),
             duration=getattr(response, "duration", None),
+            no_speech_prob=no_speech_prob,
         )
 
     async def close(self) -> None:

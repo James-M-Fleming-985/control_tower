@@ -397,10 +397,14 @@ async def voice_websocket(
                         )
                         continue
 
+                    # Run STT and voice analysis in PARALLEL (analysis is non-blocking)
+                    analyse_task = asyncio.create_task(analyser.analyse(audio_data))
+
                     try:
                         transcription = await stt.transcribe(audio_data, audio_format="webm")
                     except Exception as stt_err:
                         logger.exception("STT failed session=%d", session_id)
+                        analyse_task.cancel()
                         state = VoiceState.LISTENING
                         await websocket.send_json(
                             {"type": "state_change", "state": state.value}
@@ -412,13 +416,14 @@ async def voice_websocket(
                             {"type": "error", "detail": detail}
                         )
                         continue
-
-                    try:
-                        vocal_state = await analyser.analyse(audio_data)
-                    except Exception:
-                        logger.exception("Voice analyser failed session=%d (non-fatal)", session_id)
-                        vocal_state = None
                     t_stt = time.monotonic()
+
+                    # Collect voice analysis result (should be done by now or nearly)
+                    try:
+                        vocal_state = await asyncio.wait_for(analyse_task, timeout=2.0)
+                    except (asyncio.TimeoutError, Exception):
+                        logger.debug("Voice analysis skipped/timed-out session=%d", session_id)
+                        vocal_state = None
 
                     if not transcription.text:
                         state = VoiceState.LISTENING

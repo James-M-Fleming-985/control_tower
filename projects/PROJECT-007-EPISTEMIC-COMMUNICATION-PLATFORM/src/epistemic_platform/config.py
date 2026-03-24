@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # ElevenLabs (TTS)
     elevenlabs_api_key: str = ""
     elevenlabs_default_voice_id: str = ""
-    elevenlabs_model_id: str = "eleven_multilingual_v2"
+    elevenlabs_model_id: str = "eleven_turbo_v2_5"
 
     # Voice
     voice_latency_warn_threshold_ms: int = 2000

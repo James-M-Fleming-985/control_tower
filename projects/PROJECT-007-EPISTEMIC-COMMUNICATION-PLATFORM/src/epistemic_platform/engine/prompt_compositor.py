@@ -25,6 +25,7 @@ def build_conversation_prompt(
     ontology: ActorOntology,
     *,
     scenario: dict | None = None,
+    mode: str = "text",
 ) -> str:
     """Render the full conversation system prompt for the actor LLM (Sonnet).
 
@@ -35,6 +36,8 @@ def build_conversation_prompt(
     scenario : dict | None
         Optional scenario dict with keys: title, description, objectives,
         evaluation_criteria, difficulty, category.
+    mode : str
+        Conversation mode ('text' or 'voice'). Affects response style.
     """
     tpl = _env.get_template("system_base.j2")
     return tpl.render(
@@ -49,6 +52,7 @@ def build_conversation_prompt(
         scenario_title=scenario.get("title") if scenario else None,
         scenario_description=scenario.get("description", "") if scenario else "",
         scenario_objectives=scenario.get("objectives", []) if scenario else [],
+        mode=mode,
     )
 
 

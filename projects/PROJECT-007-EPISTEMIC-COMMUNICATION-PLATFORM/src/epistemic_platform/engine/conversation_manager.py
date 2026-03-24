@@ -66,7 +66,9 @@ class ConversationManager:
                 "difficulty": session.scenario.difficulty,
                 "category": session.scenario.category,
             }
-        self._system_prompt = build_conversation_prompt(self._ontology, scenario=scenario)
+        self._system_prompt = build_conversation_prompt(
+            self._ontology, scenario=scenario, mode=session.mode or "text",
+        )
 
         # Context window
         self._context = ConversationContext(
@@ -241,9 +243,11 @@ class ConversationManager:
         llm_messages = self._context.get_llm_messages()
 
         # 4. Stream actor response — caller is responsible for accumulating full_response
+        _voice_mode = (self._session.mode == "voice")
         async for chunk in self._conversation_llm.generate_stream(
             messages=llm_messages,
             system_prompt=self._system_prompt,
+            max_tokens=256 if _voice_mode else 1024,
         ):
             yield chunk
 
