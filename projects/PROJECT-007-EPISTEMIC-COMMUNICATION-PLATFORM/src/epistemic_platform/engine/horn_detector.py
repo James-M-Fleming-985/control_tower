@@ -126,7 +126,15 @@ async def detect_horn_llm(
         )
 
         import json
-        data = json.loads(response.content)
+        import re as _re
+        raw = response.content.strip()
+        if not raw:
+            logger.warning("LLM horn detection returned empty response")
+            return HornDetectionResult(horn=None, confidence=0.0, evidence="LLM returned empty response")
+        # Strip markdown code fences if present
+        raw = _re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = _re.sub(r"\s*```$", "", raw)
+        data = json.loads(raw)
         horn = data.get("horn")
         if horn not in ("regress", "dogmatism", "circularity", None):
             horn = None

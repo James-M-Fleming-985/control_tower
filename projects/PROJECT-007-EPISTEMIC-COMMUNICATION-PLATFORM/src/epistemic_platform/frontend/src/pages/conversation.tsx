@@ -38,6 +38,7 @@ export function ConversationPage() {
   const [lastHorn, setLastHorn] = useState<HornDetection | null>(null);
   const [lastStance, setLastStance] = useState<StanceDetection | null>(null);
   const [ended, setEnded] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Voice-specific state
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
@@ -167,6 +168,11 @@ export function ConversationPage() {
         break;
       case 'error':
         console.error('WS error:', (data as { detail: string }).detail);
+        setErrorMsg((data as { detail: string }).detail);
+        setIsStreaming(false);
+        setStreamBuf('');
+        setVoiceState('idle');
+        setTimeout(() => setErrorMsg(null), 6000);
         break;
     }
   }, [stopPlayback]);
@@ -315,6 +321,11 @@ export function ConversationPage() {
         </div>
 
         {/* Messages */}
+        {errorMsg && (
+          <div className="mx-4 mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+            {errorMsg}
+          </div>
+        )}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {messages.map((m, i) => (
             <ChatBubble

@@ -1,0 +1,6 @@
+Evaluate the user's communication against the Gricean Cooperative Principle:
+
+{% for maxim in maxims %}- **Maxim of {{ maxim.label }}**: {{ maxim.principle }}
+  Sub-maxims: {{ maxim.sub_maxims | join("; ") }}
+  Evaluation: {{ maxim.evaluation_questions | join(" ") }}
+{% endfor %}

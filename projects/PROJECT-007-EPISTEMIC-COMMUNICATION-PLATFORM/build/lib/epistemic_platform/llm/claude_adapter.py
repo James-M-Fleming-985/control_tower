@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import logging
 from typing import AsyncIterator
 
 import anthropic
-
-logger = logging.getLogger(__name__)
 
 from epistemic_platform.config import get_settings
 from epistemic_platform.llm.protocol import (
@@ -74,13 +71,8 @@ class ClaudeConversationAdapter:
             temperature=temp,
             max_tokens=max_tokens,
         )
-        content_text = ""
-        if response.content and hasattr(response.content[0], "text"):
-            content_text = response.content[0].text
-        else:
-            logger.warning("Claude returned empty content blocks (model=%s)", response.model)
         return LLMResponse(
-            content=content_text,
+            content=response.content[0].text,
             model=response.model,
             usage={
                 "input_tokens": response.usage.input_tokens,
@@ -116,44 +108,11 @@ class ClaudeCoachingAdapter:
             temperature=temp,
             max_tokens=max_tokens,
         )
-        content_text = ""
-        if response.content and hasattr(response.content[0], "text"):
-            content_text = response.content[0].text
-        else:
-            logger.warning("Claude coaching returned empty content blocks (model=%s)", response.model)
         return LLMResponse(
-            content=content_text,
+            content=response.content[0].text,
             model=response.model,
             usage={
                 "input_tokens": response.usage.input_tokens,
                 "output_tokens": response.usage.output_tokens,
             },
         )
-
-    async def analyse_stream(
-        self,
-        messages: list[LLMMessage],
-        system_prompt: str,
-        temperature: float | None = None,
-        max_tokens: int = 2048,
-    ) -> AsyncIterator[LLMStreamChunk]:
-        temp = temperature if temperature is not None else self._default_temp
-        async with self._client.messages.stream(
-            model=self._model,
-            system=system_prompt,
-            messages=self._build_messages(messages),
-            temperature=temp,
-            max_tokens=max_tokens,
-        ) as stream:
-            async for text in stream.text_stream:
-                yield LLMStreamChunk(delta=text)
-
-            final_message = await stream.get_final_message()
-            yield LLMStreamChunk(
-                delta="",
-                is_final=True,
-                usage={
-                    "input_tokens": final_message.usage.input_tokens,
-                    "output_tokens": final_message.usage.output_tokens,
-                },
-            )

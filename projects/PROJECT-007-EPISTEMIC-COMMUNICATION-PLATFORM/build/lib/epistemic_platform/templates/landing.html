@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1b1b1b;
+            color: #d1d1d1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Header ────────────────────────────────── */
+        .header {
+            text-align: center;
+            padding: 80px 24px 40px;
+            max-width: 720px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #6264A7;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 6px 16px;
+            border-radius: 14px;
+            margin-bottom: 28px;
+        }
+
+        .tagline {
+            font-size: 1.15rem;
+            color: #a0a0a0;
+            line-height: 1.6;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        /* ── Divider ───────────────────────────────── */
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: #6264A7;
+            margin: 40px auto;
+            border-radius: 1px;
+        }
+
+        /* ── Feature cards ─────────────────────────── */
+        .section-label {
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #7B83EB;
+            margin-bottom: 32px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 960px;
+            width: 100%;
+            padding: 0 24px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: #2d2d2d;
+            border: 1px solid #3b3b3b;
+            border-radius: 8px;
+            padding: 28px 24px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: #6264A7;
+            transform: translateY(-2px);
+        }
+
+        .card-milestone {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #6264A7;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            line-height: 1.55;
+        }
+
+        .card-status {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-top: 16px;
+        }
+
+        .status-complete {
+            background: rgba(76, 175, 80, 0.15);
+            color: #66bb6a;
+        }
+
+        .status-next {
+            background: rgba(98, 100, 167, 0.2);
+            color: #7B83EB;
+        }
+
+        .status-planned {
+            background: rgba(255, 255, 255, 0.05);
+            color: #666;
+        }
+
+        /* ── Footer ────────────────────────────────── */
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            font-size: 0.8rem;
+            color: #555;
+            border-top: 1px solid #2d2d2d;
+            width: 100%;
+            max-width: 960px;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #6264A7;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #7B83EB;
+        }
+
+        /* ── Responsive ────────────────────────────── */
+        @media (max-width: 640px) {
+            .header { padding: 48px 20px 24px; }
+            .header h1 { font-size: 2rem; }
+            .tagline { font-size: 1rem; }
+            .cards { grid-template-columns: 1fr; padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span class="badge">Coming Soon</span>
+        <h1>{{ app_name }}</h1>
+        <p class="tagline">
+            AI-powered communication coaching through epistemological reasoning.
+            Practice structured dialogue with AI actors grounded in distinct philosophical traditions.
+        </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">What's Coming</div>
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-milestone">M0 — Foundation</div>
+            <h3>Platform Core</h3>
+            <p>Six epistemological stances, actor profiles, authentication, and the ontology framework that powers every conversation.</p>
+            <span class="card-status status-complete">Complete</span>
+        </div>
+
+        <div class="card">
+            <div class="card-milestone">M1 — Conversation Engine</div>
+            <h3>Live Dialogue</h3>
+            <p>Real-time conversations with AI actors via WebSocket. Prompt composition, context management, and turn-by-turn orchestration.</p>
+            <span class="card-status status-next">Up Next</span>
+        </div>
+
+        <div class="card">
+            <div class="card-milestone">M2 — Epistemological Intelligence</div>
+            <h3>Trilemma &amp; Coaching</h3>
+            <p>Agrippa's trilemma state machine, stance detection, Opus-powered coaching annotations, and pre-conversation assessment.</p>
+            <span class="card-status status-planned">Planned</span>
+        </div>
+
+        <div class="card">
+            <div class="card-milestone">M3 — Voice Integration</div>
+            <h3>Spoken Dialogue</h3>
+            <p>Full voice conversations using ElevenLabs TTS and Whisper STT, with expressive state mapping to voice prosody.</p>
+            <span class="card-status status-planned">Planned</span>
+        </div>
+
+        <div class="card">
+            <div class="card-milestone">M4 — Assessment &amp; ML</div>
+            <h3>Growth Analytics</h3>
+            <p>Post-session scoring, skills progression tracking, scenario library, and ML-driven stance discovery.</p>
+            <span class="card-status status-planned">Planned</span>
+        </div>
+
+        <div class="card">
+            <div class="card-milestone">M5 — Full Experience</div>
+            <h3>Web Application</h3>
+            <p>Complete React interface — chat, voice, coaching overlay, actor browser, progress dashboards, and scenario explorer.</p>
+            <span class="card-status status-planned">Planned</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>{{ app_name }} &middot; <a href="/docs">API Documentation</a> &middot; <a href="/health">Status</a></p>
+    </div>
+
+</body>
+</html>

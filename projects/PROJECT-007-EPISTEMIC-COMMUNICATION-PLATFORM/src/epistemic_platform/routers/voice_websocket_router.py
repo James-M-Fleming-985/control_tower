@@ -366,14 +366,11 @@ async def voice_websocket(
                     audio_buffer.clear()
                     barge_in.clear()
 
-                    # --- Parallel: STT + composure analysis ---
+                    # --- STT (required) + composure analysis (optional, best-effort) ---
                     try:
-                        transcription, vocal_state = await asyncio.gather(
-                            stt.transcribe(audio_data, audio_format="webm"),
-                            analyser.analyse(audio_data),
-                        )
+                        transcription = await stt.transcribe(audio_data, audio_format="webm")
                     except Exception as stt_err:
-                        logger.error("STT/analysis failed session=%d: %s", session_id, stt_err)
+                        logger.exception("STT failed session=%d", session_id)
                         state = VoiceState.LISTENING
                         await websocket.send_json(
                             {"type": "state_change", "state": state.value}
@@ -385,6 +382,12 @@ async def voice_websocket(
                             {"type": "error", "detail": detail}
                         )
                         continue
+
+                    try:
+                        vocal_state = await analyser.analyse(audio_data)
+                    except Exception:
+                        logger.exception("Voice analyser failed session=%d (non-fatal)", session_id)
+                        vocal_state = None
                     t_stt = time.monotonic()
 
                     if not transcription.text:

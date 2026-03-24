@@ -68,9 +68,13 @@ class VoiceAnalyser:
             return None
 
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
-            None, self._analyse_sync, audio_bytes, word_count, sample_rate
-        )
+        try:
+            return await loop.run_in_executor(
+                None, self._analyse_sync, audio_bytes, word_count, sample_rate
+            )
+        except Exception:
+            logger.exception("Voice analysis executor failed")
+            return None
 
     @staticmethod
     def _convert_webm_to_wav(audio_bytes: bytes, sample_rate: int) -> bytes | None:

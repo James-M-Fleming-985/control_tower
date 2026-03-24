@@ -1,0 +1,126 @@
+from __future__ import annotations
+
+"""ConversationSession repository."""
+
+from datetime import datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from epistemic_platform.models.conversation_session import ConversationSession
+from epistemic_platform.schemas.conversation_session_schemas import (
+    ConversationSessionCreate,
+    ConversationSessionUpdate,
+)
+
+
+class ConversationSessionRepository:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def get(self, session_id: int) -> ConversationSession | None:
+        result = await self.db.execute(
+            select(ConversationSession).where(ConversationSession.id == session_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def list_by_user(
+        self, user_id: int, skip: int = 0, limit: int = 50
+    ) -> list[ConversationSession]:
+        result = await self.db.execute(
+            select(ConversationSession)
+            .where(ConversationSession.user_id == user_id)
+            .order_by(ConversationSession.started_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def list_active(self, user_id: int) -> list[ConversationSession]:
+        result = await self.db.execute(
+            select(ConversationSession).where(
+                ConversationSession.user_id == user_id,
+                ConversationSession.status == "active",
+            )
+        )
+        return list(result.scalars().all())
+
+    async def create(
+        self, user_id: int, data: ConversationSessionCreate
+    ) -> ConversationSession:
+        session = ConversationSession(
+            user_id=user_id,
+            actor_id=data.actor_id,
+            scenario_id=data.scenario_id,
+            mode=data.mode,
+            status="active",
+            messages=[],
+            coaching_annotations=[],
+            trilemma_state={"current_horn": None, "state": "exploring"},
+            turn_count=0,
+            started_at=datetime.now(timezone.utc),
+        )
+        self.db.add(session)
+        await self.db.flush()
+        return session
+
+    async def update(
+        self, session_id: int, data: ConversationSessionUpdate
+    ) -> ConversationSession | None:
+        session = await self.get(session_id)
+        if not session:
+            return None
+        for field, value in data.model_dump(exclude_unset=True).items():
+            setattr(session, field, value)
+        await self.db.flush()
+        return session
+
+    async def append_message(
+        self, session_id: int, message: dict
+    ) -> ConversationSession | None:
+        session = await self.get(session_id)
+        if not session:
+            return None
+        session.messages = [*session.messages, message]
+        session.turn_count = len(
+            [m for m in session.messages if m.get("role") == "user"]
+        )
+        await self.db.flush()
+        return session
+
+    async def append_coaching(
+        self, session_id: int, annotation: dict
+    ) -> ConversationSession | None:
+        session = await self.get(session_id)
+        if not session:
+            return None
+        session.coaching_annotations = [*session.coaching_annotations, annotation]
+        await self.db.flush()
+        return session
+
+    async def update_trilemma_state(
+        self, session_id: int, state: dict
+    ) -> ConversationSession | None:
+        session = await self.get(session_id)
+        if not session:
+            return None
+        session.trilemma_state = state
+        await self.db.flush()
+        return session
+
+    async def end_session(self, session_id: int) -> ConversationSession | None:
+        session = await self.get(session_id)
+        if not session:
+            return None
+        session.status = "completed"
+        session.ended_at = datetime.now(timezone.utc)
+        await self.db.flush()
+        return session
+
+    async def delete(self, session_id: int) -> bool:
+        session = await self.get(session_id)
+        if not session:
+            return False
+        await self.db.delete(session)
+        await self.db.flush()
+        return True

@@ -40,11 +40,16 @@ class WhisperSTTClient:
         audio_file = io.BytesIO(audio_bytes)
         audio_file.name = f"audio.{audio_format}"
 
-        response = await self._client.audio.transcriptions.create(
-            model=self._model,
-            file=audio_file,
-            response_format="verbose_json",
-        )
+        logger.debug("Transcribing %d bytes of %s audio", len(audio_bytes), audio_format)
+        try:
+            response = await self._client.audio.transcriptions.create(
+                model=self._model,
+                file=audio_file,
+                response_format="verbose_json",
+            )
+        except Exception:
+            logger.exception("Whisper API call failed")
+            raise
 
         return TranscriptionResult(
             text=response.text.strip(),
