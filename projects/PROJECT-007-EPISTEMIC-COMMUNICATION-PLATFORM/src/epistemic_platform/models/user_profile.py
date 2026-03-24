@@ -26,6 +26,7 @@ class UserProfile(BaseModel):
     level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     achievements: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=list)
     subscription_tier: Mapped[str] = mapped_column(String(20), default="free", nullable=False)
+    role: Mapped[str] = mapped_column(String(20), default="user", nullable=False, server_default="user")
 
     def __repr__(self) -> str:
         return f"<UserProfile(id={self.id}, email='{self.email}')>"

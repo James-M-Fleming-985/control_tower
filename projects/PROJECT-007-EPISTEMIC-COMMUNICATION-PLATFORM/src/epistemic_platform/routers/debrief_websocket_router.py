@@ -80,7 +80,7 @@ async def debrief_websocket(
             await websocket.close()
             return
 
-        if user.subscription_tier != "premium":
+        if user.role != "admin" and user.subscription_tier != "premium":
             await websocket.send_json({
                 "type": "error",
                 "detail": "Coach debrief requires premium subscription",

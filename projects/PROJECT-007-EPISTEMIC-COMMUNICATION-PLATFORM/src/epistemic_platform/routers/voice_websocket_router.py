@@ -319,6 +319,22 @@ async def voice_websocket(
                         barge_in.set()
                         await _cancel_tts(tts_task, timeout=cancel_timeout)
 
+                    # Wait for background post-processing to finish
+                    # so coaching/horn/stance data is persisted before scoring
+                    if post_task and not post_task.done():
+                        try:
+                            await asyncio.wait_for(post_task, timeout=15.0)
+                        except asyncio.TimeoutError:
+                            logger.warning(
+                                "Post-processing timed out before end_session session=%d",
+                                session_id,
+                            )
+                        except Exception:
+                            logger.exception(
+                                "Post-processing error before end_session session=%d",
+                                session_id,
+                            )
+
                     # Aggregate composure metrics
                     composure_metrics = None
                     if vocal_states:
@@ -553,25 +569,34 @@ async def voice_websocket(
 
                             horn = conv_manager.get_last_horn_detection()
                             if horn:
-                                await websocket.send_json(
-                                    {
-                                        "type": "trilemma_update",
-                                        "state": conv_manager.get_trilemma_state(),
-                                        "horn_detection": horn,
-                                    }
-                                )
+                                try:
+                                    await websocket.send_json(
+                                        {
+                                            "type": "trilemma_update",
+                                            "state": conv_manager.get_trilemma_state(),
+                                            "horn_detection": horn,
+                                        }
+                                    )
+                                except Exception:
+                                    pass  # WS may be closed
 
                             stance = conv_manager.get_last_stance_detection()
                             if stance:
-                                await websocket.send_json(
-                                    {"type": "stance_update", "detection": stance}
-                                )
+                                try:
+                                    await websocket.send_json(
+                                        {"type": "stance_update", "detection": stance}
+                                    )
+                                except Exception:
+                                    pass
 
                             annotation = await conv_manager.maybe_run_coaching()
                             if annotation:
-                                await websocket.send_json(
-                                    {"type": "coaching", "annotation": annotation.to_dict()}
-                                )
+                                try:
+                                    await websocket.send_json(
+                                        {"type": "coaching", "annotation": annotation.to_dict()}
+                                    )
+                                except Exception:
+                                    pass
                         except Exception:
                             logger.exception(
                                 "Background post-processing failed session=%d",
@@ -654,8 +679,15 @@ async def voice_websocket(
         if tts_task and not tts_task.done():
             barge_in.set()
             tts_task.cancel()
+        # Let post-processing finish so scores/coaching persist to DB
         if post_task and not post_task.done():
-            post_task.cancel()
+            try:
+                await asyncio.wait_for(post_task, timeout=10.0)
+            except (asyncio.TimeoutError, asyncio.CancelledError, Exception):
+                logger.warning(
+                    "Post-processing did not complete on disconnect session=%d",
+                    session_id,
+                )
         if tts:
             await tts.close()
         await stt.close()
