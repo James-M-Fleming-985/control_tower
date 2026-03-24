@@ -110,11 +110,16 @@ async def _cancel_tts(task: asyncio.Task, timeout: float = 0.5) -> None:
 def _authenticate_ws(token: str | None) -> int | None:
     """Validate JWT from query param. Returns user_id or None."""
     if not token:
+        logger.warning("Voice WS: no token provided")
         return None
     from epistemic_platform.auth import decode_token
 
     payload = decode_token(token)
-    if payload is None or payload.get("type") != "access":
+    if payload is None:
+        logger.warning("Voice WS: token decode failed")
+        return None
+    if payload.get("type") != "access":
+        logger.warning("Voice WS: token type=%s (expected access)", payload.get("type"))
         return None
     return int(payload["sub"])
 
