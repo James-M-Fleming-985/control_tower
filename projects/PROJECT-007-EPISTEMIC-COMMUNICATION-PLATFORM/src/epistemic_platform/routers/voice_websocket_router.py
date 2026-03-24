@@ -263,6 +263,7 @@ async def voice_websocket(
 
             audio_buffer = bytearray()
             tts_task: asyncio.Task | None = None
+            post_task: asyncio.Task | None = None
             barge_in = asyncio.Event()
             tts_first_byte = asyncio.Event()
             latency_warn_ms = settings.voice_latency_warn_threshold_ms
@@ -462,7 +463,7 @@ async def voice_websocket(
                     raw_response = ""
                     _pending = ""
                     _meta_found = False
-                    async for chunk in conv_manager.handle_user_message(
+                    async for chunk in conv_manager.stream_response(
                         transcription.text,
                         user_vocal_state=vocal_dict,
                     ):
@@ -502,30 +503,7 @@ async def voice_websocket(
                     # Parse ExpressiveState for TTS voice params
                     clean_text, expressive_state = _strip_meta(raw_response)
 
-                    # Push trilemma / stance / coaching
-                    horn = conv_manager.get_last_horn_detection()
-                    if horn:
-                        await websocket.send_json(
-                            {
-                                "type": "trilemma_update",
-                                "state": conv_manager.get_trilemma_state(),
-                                "horn_detection": horn,
-                            }
-                        )
-
-                    stance = conv_manager.get_last_stance_detection()
-                    if stance:
-                        await websocket.send_json(
-                            {"type": "stance_update", "detection": stance}
-                        )
-
-                    annotation = await conv_manager.maybe_run_coaching()
-                    if annotation:
-                        await websocket.send_json(
-                            {"type": "coaching", "annotation": annotation.to_dict()}
-                        )
-
-                    # --- Stream TTS audio (background for barge-in) ---
+                    # --- Start TTS IMMEDIATELY (don't wait for horn/stance/coaching) ---
                     tts_first_byte_ms = 0.0
                     if clean_text.strip():
                         voice_params = (
@@ -565,6 +543,42 @@ async def voice_websocket(
                             ) * 1000
                         except asyncio.TimeoutError:
                             tts_first_byte_ms = 5000.0
+
+                    # --- Post-processing in background (horn/stance/coaching/DB) ---
+                    # This runs while TTS is streaming, so user hears the
+                    # response without waiting for analysis.
+                    async def _background_post_process():
+                        try:
+                            await conv_manager.post_process_turn(raw_response)
+
+                            horn = conv_manager.get_last_horn_detection()
+                            if horn:
+                                await websocket.send_json(
+                                    {
+                                        "type": "trilemma_update",
+                                        "state": conv_manager.get_trilemma_state(),
+                                        "horn_detection": horn,
+                                    }
+                                )
+
+                            stance = conv_manager.get_last_stance_detection()
+                            if stance:
+                                await websocket.send_json(
+                                    {"type": "stance_update", "detection": stance}
+                                )
+
+                            annotation = await conv_manager.maybe_run_coaching()
+                            if annotation:
+                                await websocket.send_json(
+                                    {"type": "coaching", "annotation": annotation.to_dict()}
+                                )
+                        except Exception:
+                            logger.exception(
+                                "Background post-processing failed session=%d",
+                                session_id,
+                            )
+
+                    post_task = asyncio.create_task(_background_post_process())
 
                     # Latency logging + client report
                     t_end = time.monotonic()
@@ -640,6 +654,8 @@ async def voice_websocket(
         if tts_task and not tts_task.done():
             barge_in.set()
             tts_task.cancel()
+        if post_task and not post_task.done():
+            post_task.cancel()
         if tts:
             await tts.close()
         await stt.close()

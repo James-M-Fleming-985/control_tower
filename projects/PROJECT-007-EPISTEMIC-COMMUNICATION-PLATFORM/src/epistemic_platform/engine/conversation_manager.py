@@ -154,6 +154,16 @@ class ConversationManager:
                 full_response += chunk.delta
             yield chunk
 
+        # 5. Post-process: store response, detect horn/stance, persist
+        await self._post_process_turn(full_response)
+
+    async def _post_process_turn(self, full_response: str) -> None:
+        """Post-processing after LLM streaming completes.
+
+        Parses metadata, stores response, runs horn/stance detection,
+        and persists to DB.  Extracted so the voice router can call
+        ``stream_response`` + ``post_process_turn`` separately.
+        """
         # 5. Parse metadata from response
         clean_text, expressive_state = self._extract_metadata(full_response)
         self._last_expressive_state = expressive_state
@@ -206,6 +216,40 @@ class ConversationManager:
         await self._repo.update_trilemma_state(self._session.id, trilemma_dict)
 
         await self._db.commit()
+
+    async def stream_response(
+        self,
+        user_text: str,
+        user_vocal_state: dict | None = None,
+    ) -> AsyncIterator[LLMStreamChunk]:
+        """Stream only the LLM response without post-processing.
+
+        For voice mode: call this to get fast text streaming, then call
+        ``post_process_turn(raw_response)`` separately (can run in background).
+        """
+        # 1. Add user message to context + DB
+        self._context.add_message("user", user_text)
+        msg_data: dict[str, Any] = {"role": "user", "content": user_text}
+        if user_vocal_state:
+            msg_data["vocal_state"] = user_vocal_state
+        await self._repo.append_message(self._session.id, msg_data)
+
+        # 2. Summarise if context exceeds window
+        await summarise_overflow(self._context, self._conversation_llm)
+
+        # 3. Build LLM messages
+        llm_messages = self._context.get_llm_messages()
+
+        # 4. Stream actor response — caller is responsible for accumulating full_response
+        async for chunk in self._conversation_llm.generate_stream(
+            messages=llm_messages,
+            system_prompt=self._system_prompt,
+        ):
+            yield chunk
+
+    async def post_process_turn(self, full_response: str) -> None:
+        """Public wrapper for post-processing. Used by voice router."""
+        await self._post_process_turn(full_response)
 
     async def maybe_run_coaching(self) -> CoachingAnnotation | None:
         """Check if coaching should trigger and run it if so.
