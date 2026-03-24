@@ -28,6 +28,7 @@ export function ConversationPage() {
   const navigate = useNavigate();
   const accessToken = useAuthStore((s) => s.accessToken);
   const { data: session, isLoading: sessionLoading } = useSession(Number(sessionId) || 0);
+  const sessionReady = !!session;
   const { data: actor } = useActor(session?.actor_id ?? 0);
   const isVoice = session?.mode === 'voice';
 
@@ -126,7 +127,11 @@ export function ConversationPage() {
       audioBlobUrlRef.current = null;
       setVoiceState('idle');
     };
-    audio.play().catch((e) => console.error('Audio play() failed:', e));
+    audio.play().catch((e) => {
+      console.error('Audio play() failed:', e);
+      setErrorMsg('Audio playback blocked — tap the page and try again');
+      setTimeout(() => setErrorMsg(null), 4000);
+    });
   }, []);
 
   const enqueueAudio = useCallback((data: ArrayBuffer) => {
@@ -222,8 +227,10 @@ export function ConversationPage() {
   }, [stopPlayback]);
 
   // --- Connect WebSocket ---
+  // NOTE: Use `sessionReady` (boolean) instead of `session` (object) in deps
+  // to prevent React Query refetches from tearing down the WebSocket mid-pipeline.
   useEffect(() => {
-    if (!sessionId || !accessToken || ended || !session) return;
+    if (!sessionId || !accessToken || ended || !sessionReady) return;
 
     const wsPath = isVoice
       ? `/ws/voice/${sessionId}`
@@ -241,7 +248,7 @@ export function ConversationPage() {
       ws.close();
       wsRef.current = null;
     };
-  }, [sessionId, accessToken, ended, isVoice, session, handleWsMessage, enqueueAudio]);
+  }, [sessionId, accessToken, ended, isVoice, sessionReady, handleWsMessage, enqueueAudio]);
 
   // Cleanup audio context on unmount
   useEffect(() => {
@@ -278,20 +285,39 @@ export function ConversationPage() {
 
   const stopRecording = useCallback(() => {
     stopSilenceDetection();
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    const recorder = mediaRecorderRef.current;
+    if (recorder?.state === 'recording') {
+      // Wait for MediaRecorder to flush final audio chunk before signalling end.
+      // onstop fires AFTER the last ondataavailable, so end_utterance arrives
+      // at the backend after all audio data.
+      recorder.onstop = () => {
+        // Stop mic stream tracks
+        if (micStreamRef.current) {
+          micStreamRef.current.getTracks().forEach((t) => t.stop());
+          micStreamRef.current = null;
+        }
+        // Small delay ensures the last ondataavailable's arrayBuffer().then()
+        // resolves before we send end_utterance
+        setTimeout(() => {
+          if (wsRef.current) {
+            wsRef.current.sendJSON({ type: 'end_utterance' });
+          }
+        }, 80);
+      };
+      recorder.stop();
+    } else {
+      // Recorder not active — just send end_utterance
+      if (micStreamRef.current) {
+        micStreamRef.current.getTracks().forEach((t) => t.stop());
+        micStreamRef.current = null;
+      }
+      if (wsRef.current) {
+        wsRef.current.sendJSON({ type: 'end_utterance' });
+      }
     }
     mediaRecorderRef.current = null;
-    // Stop mic stream tracks
-    if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach((t) => t.stop());
-      micStreamRef.current = null;
-    }
     setRecording(false);
     setAnalyserNode(null);
-    if (wsRef.current) {
-      wsRef.current.sendJSON({ type: 'end_utterance' });
-    }
   }, [stopSilenceDetection]);
 
   const startRecording = useCallback(async () => {
