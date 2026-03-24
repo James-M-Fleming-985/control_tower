@@ -61,9 +61,16 @@ export function ConversationPage() {
   const handsFreeRef = useRef(false);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const silenceCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recordingStartTimeRef = useRef<number>(0);
+  const speechDetectedRef = useRef(false);
+  const lastErrorTimeRef = useRef<number>(0);
 
-  const SILENCE_THRESHOLD = 0.015; // RMS below this = silence
-  const SILENCE_DURATION_MS = 1500; // ms of silence before auto-stop
+  const SILENCE_THRESHOLD = 0.02; // RMS below this = silence
+  const SPEECH_THRESHOLD = 0.03; // RMS above this = speech detected
+  const SILENCE_DURATION_MS = 2000; // ms of silence after speech before auto-stop
+  const MIN_RECORDING_MS = 2500; // minimum recording time before silence can trigger
+  const GRACE_PERIOD_MS = 2000; // delay before silence detection kicks in
+  const ERROR_COOLDOWN_MS = 3000; // don't auto-restart within this time after error
 
   // Load existing messages from session
   useEffect(() => {
@@ -108,8 +115,8 @@ export function ConversationPage() {
       URL.revokeObjectURL(url);
       audioBlobUrlRef.current = null;
       setVoiceState('idle');
-      // Auto-start mic for next turn in hands-free mode
-      if (handsFreeRef.current) {
+      // Auto-start mic for next turn — but only if no recent error
+      if (handsFreeRef.current && Date.now() - lastErrorTimeRef.current > ERROR_COOLDOWN_MS) {
         startRecordingRef.current();
       }
     };
@@ -118,9 +125,6 @@ export function ConversationPage() {
       URL.revokeObjectURL(url);
       audioBlobUrlRef.current = null;
       setVoiceState('idle');
-      if (handsFreeRef.current) {
-        startRecordingRef.current();
-      }
     };
     audio.play().catch((e) => console.error('Audio play() failed:', e));
   }, []);
@@ -188,14 +192,8 @@ export function ConversationPage() {
         if ('state' in data) {
           const backendState = data.state as string;
           if (backendState === 'listening') {
-            // Backend says ready for input — in hands-free mode auto-start mic
-            // (but don't set voiceState to idle if we're about to auto-record)
-            if (handsFreeRef.current) {
-              setVoiceState('idle');
-              startRecordingRef.current();
-            } else {
-              setVoiceState('idle');
-            }
+            setVoiceState('idle');
+            // Don't auto-restart if we just had an error (prevents bounce loop)
           } else {
             setVoiceState(backendState as VoiceState);
           }
@@ -217,6 +215,7 @@ export function ConversationPage() {
         setIsStreaming(false);
         setStreamBuf('');
         setVoiceState('idle');
+        lastErrorTimeRef.current = Date.now();
         setTimeout(() => setErrorMsg(null), 6000);
         break;
     }
@@ -328,35 +327,48 @@ export function ConversationPage() {
       mediaRecorderRef.current = recorder;
       setRecording(true);
       setVoiceState('listening');
-      handsFreeRef.current = true; // Enable hands-free after first recording
+      handsFreeRef.current = true;
+      recordingStartTimeRef.current = Date.now();
+      speechDetectedRef.current = false;
 
-      // --- Silence detection ---
+      // --- Silence detection with grace period ---
       const dataArray = new Float32Array(analyser.fftSize);
       let silentSince: number | null = null;
 
-      silenceCheckRef.current = setInterval(() => {
-        analyser.getFloatTimeDomainData(dataArray);
-        // Compute RMS
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          sum += dataArray[i] * dataArray[i];
-        }
-        const rms = Math.sqrt(sum / dataArray.length);
-
-        if (rms < SILENCE_THRESHOLD) {
-          if (silentSince === null) silentSince = Date.now();
-          if (Date.now() - silentSince >= SILENCE_DURATION_MS) {
-            // Silence long enough — auto-stop recording
-            stopRecording();
+      // Don't start silence detection until after the grace period
+      silenceTimerRef.current = setTimeout(() => {
+        silenceCheckRef.current = setInterval(() => {
+          const elapsed = Date.now() - recordingStartTimeRef.current;
+          analyser.getFloatTimeDomainData(dataArray);
+          // Compute RMS
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i] * dataArray[i];
           }
-        } else {
-          silentSince = null;
-        }
-      }, 100);
+          const rms = Math.sqrt(sum / dataArray.length);
+
+          // Track whether user has actually spoken
+          if (rms >= SPEECH_THRESHOLD) {
+            speechDetectedRef.current = true;
+            silentSince = null;
+          } else if (rms < SILENCE_THRESHOLD) {
+            // Only start counting silence AFTER speech was detected AND min time passed
+            if (speechDetectedRef.current && elapsed >= MIN_RECORDING_MS) {
+              if (silentSince === null) silentSince = Date.now();
+              if (Date.now() - silentSince >= SILENCE_DURATION_MS) {
+                stopRecording();
+              }
+            }
+          } else {
+            // Between thresholds — ambiguous, reset silence counter
+            silentSince = null;
+          }
+        }, 100);
+      }, GRACE_PERIOD_MS);
     } catch (err) {
       console.error('Microphone access denied:', err);
     }
-  }, [recording, stopRecording, SILENCE_THRESHOLD, SILENCE_DURATION_MS]);
+  }, [recording, stopRecording, SILENCE_THRESHOLD, SPEECH_THRESHOLD, SILENCE_DURATION_MS, MIN_RECORDING_MS, GRACE_PERIOD_MS]);
 
   // Stable ref so callbacks can access latest startRecording without re-renders
   const startRecordingRef = useRef(startRecording);

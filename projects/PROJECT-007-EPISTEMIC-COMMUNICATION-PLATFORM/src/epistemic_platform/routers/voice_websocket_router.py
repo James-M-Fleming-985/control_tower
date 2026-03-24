@@ -372,6 +372,14 @@ async def voice_websocket(
                     barge_in.clear()
 
                     # --- STT (required) + composure analysis (optional, best-effort) ---
+                    if len(audio_data) < 1000:
+                        logger.warning("Audio too short (%d bytes) session=%d, skipping", len(audio_data), session_id)
+                        state = VoiceState.LISTENING
+                        await websocket.send_json(
+                            {"type": "state_change", "state": state.value}
+                        )
+                        continue
+
                     try:
                         transcription = await stt.transcribe(audio_data, audio_format="webm")
                     except Exception as stt_err:

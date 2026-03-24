@@ -37,6 +37,10 @@ class WhisperSTTClient:
         audio_bytes : raw audio data
         audio_format : file extension hint (webm, wav, mp3, etc.)
         """
+        if len(audio_bytes) < 1000:
+            logger.warning("Audio too short (%d bytes), skipping STT", len(audio_bytes))
+            return TranscriptionResult(text="", language=None, duration=0.0)
+
         audio_file = io.BytesIO(audio_bytes)
         audio_file.name = f"audio.{audio_format}"
 
@@ -46,6 +50,7 @@ class WhisperSTTClient:
                 model=self._model,
                 file=audio_file,
                 response_format="verbose_json",
+                language="en",
             )
         except Exception:
             logger.exception("Whisper API call failed")
