@@ -1,16 +1,24 @@
-import { Mic, MicOff, Loader2 } from 'lucide-react';
+import { Mic, Loader2, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Props {
   state: 'idle' | 'listening' | 'processing' | 'speaking';
   recording: boolean;
   onToggle: () => void;
+  actorName?: string;
 }
 
-export function VoiceOrb({ state, recording, onToggle }: Props) {
+export function VoiceOrb({ state, recording, onToggle, actorName }: Props) {
   const isActive = state === 'listening' || recording;
   const isProcessing = state === 'processing';
   const isSpeaking = state === 'speaking';
+
+  const label = (() => {
+    if (isProcessing) return 'Processing...';
+    if (isSpeaking) return `${actorName ?? 'Actor'} is speaking...`;
+    if (isActive) return 'Listening...';
+    return 'Tap to speak';
+  })();
 
   return (
     <button
@@ -22,7 +30,7 @@ export function VoiceOrb({ state, recording, onToggle }: Props) {
         isSpeaking && 'bg-green-500/20 ring-4 ring-green-500/40',
         !isActive && !isProcessing && !isSpeaking && 'bg-muted hover:bg-muted/80',
       )}
-      disabled={isProcessing}
+      disabled={isProcessing || isSpeaking}
     >
       <div className={cn(
         'flex h-16 w-16 items-center justify-center rounded-full transition-colors',
@@ -33,16 +41,16 @@ export function VoiceOrb({ state, recording, onToggle }: Props) {
       )}>
         {isProcessing ? (
           <Loader2 className="h-6 w-6 text-white animate-spin" />
-        ) : recording ? (
-          <MicOff className="h-6 w-6 text-white" />
+        ) : isSpeaking ? (
+          <Volume2 className="h-6 w-6 text-white" />
         ) : (
-          <Mic className={cn('h-6 w-6', isActive || isSpeaking ? 'text-white' : 'text-muted-foreground')} />
+          <Mic className={cn('h-6 w-6', isActive ? 'text-white' : 'text-muted-foreground')} />
         )}
       </div>
 
       {/* State label */}
-      <span className="absolute -bottom-6 text-xs text-muted-foreground capitalize">
-        {state === 'idle' ? 'Tap to speak' : state}
+      <span className="absolute -bottom-6 whitespace-nowrap text-xs text-muted-foreground">
+        {label}
       </span>
     </button>
   );

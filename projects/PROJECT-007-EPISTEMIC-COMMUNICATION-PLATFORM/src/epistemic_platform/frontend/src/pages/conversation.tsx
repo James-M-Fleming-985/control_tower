@@ -8,6 +8,7 @@ import { ChatInput } from '@/components/conversation/chat-input';
 import { CoachingPanel } from '@/components/conversation/coaching-panel';
 import { TrilemmaVisual } from '@/components/conversation/trilemma-visual';
 import { VoiceOrb } from '@/components/voice/voice-orb';
+import { AudioWaveform } from '@/components/voice/audio-waveform';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -43,13 +44,26 @@ export function ConversationPage() {
   // Voice-specific state
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [recording, setRecording] = useState(false);
+  const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
 
   const wsRef = useRef<WebSocketManager | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const audioQueueRef = useRef<ArrayBuffer[]>([]);
-  const isPlayingRef = useRef(false);
+
+  // Blob-based audio playback refs
+  const audioChunksRef = useRef<ArrayBuffer[]>([]);
+  const audioElRef = useRef<HTMLAudioElement | null>(null);
+  const audioBlobUrlRef = useRef<string | null>(null);
+
+  // Hands-free turn-taking refs
+  const handsFreeRef = useRef(false);
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const silenceCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const SILENCE_THRESHOLD = 0.015; // RMS below this = silence
+  const SILENCE_DURATION_MS = 1500; // ms of silence before auto-stop
 
   // Load existing messages from session
   useEffect(() => {
@@ -72,39 +86,60 @@ export function ConversationPage() {
     }
   }, [session]);
 
-  // --- Audio playback helpers ---
-  const playNextChunk = useCallback(async () => {
-    if (isPlayingRef.current || audioQueueRef.current.length === 0) return;
-    isPlayingRef.current = true;
-    const chunk = audioQueueRef.current.shift()!;
-    try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext();
-      }
-      const ctx = audioContextRef.current;
-      const buffer = await ctx.decodeAudioData(chunk.slice(0));
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      source.onended = () => {
-        isPlayingRef.current = false;
-        playNextChunk();
-      };
-      source.start();
-    } catch {
-      isPlayingRef.current = false;
-      playNextChunk();
+  // --- Audio playback helpers (Blob + <audio> element) ---
+  const playAccumulatedAudio = useCallback(() => {
+    if (audioChunksRef.current.length === 0) return;
+    // Revoke previous URL if any
+    if (audioBlobUrlRef.current) {
+      URL.revokeObjectURL(audioBlobUrlRef.current);
+      audioBlobUrlRef.current = null;
     }
+    const blob = new Blob(audioChunksRef.current, { type: 'audio/mpeg' });
+    audioChunksRef.current = [];
+    const url = URL.createObjectURL(blob);
+    audioBlobUrlRef.current = url;
+
+    if (!audioElRef.current) {
+      audioElRef.current = new Audio();
+    }
+    const audio = audioElRef.current;
+    audio.src = url;
+    audio.onended = () => {
+      URL.revokeObjectURL(url);
+      audioBlobUrlRef.current = null;
+      setVoiceState('idle');
+      // Auto-start mic for next turn in hands-free mode
+      if (handsFreeRef.current) {
+        startRecordingRef.current();
+      }
+    };
+    audio.onerror = () => {
+      console.error('Audio playback error');
+      URL.revokeObjectURL(url);
+      audioBlobUrlRef.current = null;
+      setVoiceState('idle');
+      if (handsFreeRef.current) {
+        startRecordingRef.current();
+      }
+    };
+    audio.play().catch((e) => console.error('Audio play() failed:', e));
   }, []);
 
   const enqueueAudio = useCallback((data: ArrayBuffer) => {
-    audioQueueRef.current.push(data);
-    playNextChunk();
-  }, [playNextChunk]);
+    audioChunksRef.current.push(data);
+  }, []);
 
   const stopPlayback = useCallback(() => {
-    audioQueueRef.current = [];
-    isPlayingRef.current = false;
+    audioChunksRef.current = [];
+    if (audioElRef.current) {
+      audioElRef.current.pause();
+      audioElRef.current.src = '';
+      audioElRef.current.onended = null;
+    }
+    if (audioBlobUrlRef.current) {
+      URL.revokeObjectURL(audioBlobUrlRef.current);
+      audioBlobUrlRef.current = null;
+    }
   }, []);
 
   // --- WebSocket message handler ---
@@ -151,14 +186,24 @@ export function ConversationPage() {
         break;
       case 'state_change':
         if ('state' in data) {
-          // Backend "listening" = ready for user input → show idle (tap to speak)
-          // Only startRecording() sets 'listening' locally when mic is active
-          const mapped = data.state === 'listening' ? 'idle' : data.state as VoiceState;
-          setVoiceState(mapped);
+          const backendState = data.state as string;
+          if (backendState === 'listening') {
+            // Backend says ready for input — in hands-free mode auto-start mic
+            // (but don't set voiceState to idle if we're about to auto-record)
+            if (handsFreeRef.current) {
+              setVoiceState('idle');
+              startRecordingRef.current();
+            } else {
+              setVoiceState('idle');
+            }
+          } else {
+            setVoiceState(backendState as VoiceState);
+          }
         }
         break;
       case 'audio_end':
-        setVoiceState('idle');
+        // All TTS chunks arrived — play the accumulated audio blob
+        playAccumulatedAudio();
         break;
       case 'barge_in':
         stopPlayback();
@@ -204,6 +249,14 @@ export function ConversationPage() {
     return () => {
       audioContextRef.current?.close();
       mediaRecorderRef.current?.stop();
+      micStreamRef.current?.getTracks().forEach((t) => t.stop());
+      if (audioBlobUrlRef.current) URL.revokeObjectURL(audioBlobUrlRef.current);
+      if (audioElRef.current) {
+        audioElRef.current.pause();
+        audioElRef.current.src = '';
+      }
+      if (silenceCheckRef.current) clearInterval(silenceCheckRef.current);
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     };
   }, []);
 
@@ -212,11 +265,55 @@ export function ConversationPage() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streamBuf]);
 
-  // --- Recording controls ---
+  // --- Recording controls with silence detection ---
+  const stopSilenceDetection = useCallback(() => {
+    if (silenceCheckRef.current) {
+      clearInterval(silenceCheckRef.current);
+      silenceCheckRef.current = null;
+    }
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    stopSilenceDetection();
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    mediaRecorderRef.current = null;
+    // Stop mic stream tracks
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach((t) => t.stop());
+      micStreamRef.current = null;
+    }
+    setRecording(false);
+    setAnalyserNode(null);
+    if (wsRef.current) {
+      wsRef.current.sendJSON({ type: 'end_utterance' });
+    }
+  }, [stopSilenceDetection]);
+
   const startRecording = useCallback(async () => {
-    if (!wsRef.current) return;
+    if (!wsRef.current || recording) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micStreamRef.current = stream;
+
+      // Set up AudioContext + AnalyserNode for silence detection & waveform
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') await ctx.resume();
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      setAnalyserNode(analyser);
+
+      // Start MediaRecorder
       const recorder = new MediaRecorder(stream, {
         mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
           ? 'audio/webm;codecs=opus'
@@ -227,28 +324,43 @@ export function ConversationPage() {
           e.data.arrayBuffer().then((buf) => wsRef.current?.send(buf));
         }
       };
-      recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-      };
-      recorder.start(250); // 250ms chunks
+      recorder.start(250);
       mediaRecorderRef.current = recorder;
       setRecording(true);
       setVoiceState('listening');
+      handsFreeRef.current = true; // Enable hands-free after first recording
+
+      // --- Silence detection ---
+      const dataArray = new Float32Array(analyser.fftSize);
+      let silentSince: number | null = null;
+
+      silenceCheckRef.current = setInterval(() => {
+        analyser.getFloatTimeDomainData(dataArray);
+        // Compute RMS
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i] * dataArray[i];
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+
+        if (rms < SILENCE_THRESHOLD) {
+          if (silentSince === null) silentSince = Date.now();
+          if (Date.now() - silentSince >= SILENCE_DURATION_MS) {
+            // Silence long enough — auto-stop recording
+            stopRecording();
+          }
+        } else {
+          silentSince = null;
+        }
+      }, 100);
     } catch (err) {
       console.error('Microphone access denied:', err);
     }
-  }, []);
+  }, [recording, stopRecording, SILENCE_THRESHOLD, SILENCE_DURATION_MS]);
 
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop();
-    }
-    mediaRecorderRef.current = null;
-    setRecording(false);
-    if (wsRef.current) {
-      wsRef.current.sendJSON({ type: 'end_utterance' });
-    }
-  }, []);
+  // Stable ref so callbacks can access latest startRecording without re-renders
+  const startRecordingRef = useRef(startRecording);
+  startRecordingRef.current = startRecording;
 
   const toggleRecording = useCallback(() => {
     if (recording) {
@@ -305,6 +417,12 @@ export function ConversationPage() {
                 <Mic className="mr-1 h-3 w-3" /> Voice
               </Badge>
             )}
+            {isVoice && recording && (
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {!ended && (
@@ -348,8 +466,14 @@ export function ConversationPage() {
 
         {/* Voice controls or text input */}
         {!ended && isVoice && (
-          <div className="flex flex-col items-center gap-2 border-t border-border px-4 py-6">
-            <VoiceOrb state={voiceState} recording={recording} onToggle={toggleRecording} />
+          <div className="flex flex-col items-center gap-3 border-t border-border px-4 py-6">
+            <VoiceOrb
+              state={voiceState}
+              recording={recording}
+              onToggle={toggleRecording}
+              actorName={actor?.name}
+            />
+            <AudioWaveform analyser={analyserNode} isActive={recording} />
           </div>
         )}
         {!ended && !isVoice && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
