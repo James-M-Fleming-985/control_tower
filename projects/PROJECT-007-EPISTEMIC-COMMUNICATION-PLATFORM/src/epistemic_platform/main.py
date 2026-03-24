@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +11,18 @@ from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from epistemic_platform import __version__
 from epistemic_platform.config import get_settings
+
+# Configure root logger so ALL application loggers emit to stdout/stderr
+# (visible in Railway deploy logs)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    stream=sys.stdout,
+)
+# Silence noisy libraries
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("anthropic").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 

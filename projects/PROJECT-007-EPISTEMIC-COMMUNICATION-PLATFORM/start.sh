@@ -34,7 +34,8 @@ try:
     elif has_app_tables and has_alembic:
         with engine.connect() as conn:
             row = conn.execute(sqlalchemy.text('SELECT version_num FROM alembic_version')).fetchone()
-            print(f'Alembic already tracking: {row[0] if row else "no version"}')
+            ver = row[0] if row else 'no version'
+            print(f'Alembic already tracking: {ver}')
     else:
         print('Fresh database - no stamp needed')
     engine.dispose()
