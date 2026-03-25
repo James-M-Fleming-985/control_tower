@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from epistemic_platform.auth import decode_token
 from epistemic_platform.database import get_db, async_session_factory
+from epistemic_platform.engine.achievement_engine import AchievementEngine
 from epistemic_platform.engine.connection_manager import manager
 from epistemic_platform.engine.conversation_manager import ConversationManager
 from epistemic_platform.llm.claude_adapter import ClaudeConversationAdapter, ClaudeCoachingAdapter
@@ -21,6 +22,7 @@ from epistemic_platform.repositories.actor_profile_repository import ActorProfil
 from epistemic_platform.repositories.conversation_session_repository import (
     ConversationSessionRepository,
 )
+from epistemic_platform.repositories.user_profile_repository import UserProfileRepository
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +101,13 @@ async def conversation_websocket(
             await manager.disconnect(session_id)
             return
 
+        user_repo = UserProfileRepository(db)
+        user = await user_repo.get(user_id)
+        if not user:
+            await manager.send_json(session_id, {"type": "error", "detail": "User not found"})
+            await manager.disconnect(session_id)
+            return
+
         # 4. Create conversation manager
         conversation_llm = ClaudeConversationAdapter()
         coaching_llm = ClaudeCoachingAdapter()
@@ -128,10 +137,33 @@ async def conversation_websocket(
 
                 if msg_type == "end_session":
                     outcome = await conv_manager.end_session()
-                    await manager.send_json(session_id, {
-                        "type": "session_ended",
-                        "outcome": outcome,
-                    })
+
+                    # Run achievement engine to compute scores, XP, proficiency
+                    reward_data = None
+                    try:
+                        engine = AchievementEngine(db)
+                        reward = await engine.process_session(session, user)
+                        session.trilemma_state = {
+                            **(session.trilemma_state or {}),
+                            "reward_processed": True,
+                        }
+                        await db.commit()
+                        reward_data = reward.to_dict()
+                        logger.info(
+                            "Text session %d reward: grade=%s xp=+%d",
+                            session_id,
+                            reward.score.grade if reward.score else "?",
+                            reward.xp_award.total if reward.xp_award else 0,
+                        )
+                    except Exception:
+                        logger.exception(
+                            "AchievementEngine failed for session %d", session_id
+                        )
+
+                    msg: dict = {"type": "session_ended", "outcome": outcome}
+                    if reward_data:
+                        msg["reward"] = reward_data
+                    await manager.send_json(session_id, msg)
                     break
 
                 if msg_type == "message":

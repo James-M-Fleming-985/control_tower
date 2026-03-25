@@ -1,11 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 import { useGamificationProfile, useProficiency, useGrowth, useSessions } from '@/hooks/use-api';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { xpProgress } from '@/lib/utils';
 import { LEVEL_NAMES } from '@/lib/constants';
-import { BarChart3, Zap, Target, TrendingUp } from 'lucide-react';
+import { BarChart3, Zap, Target, TrendingUp, ArrowRight, BookOpen, MessageSquare, CheckCircle2 } from 'lucide-react';
 import {
   RadarChart,
   PolarGrid,
@@ -21,7 +23,23 @@ import {
   CartesianGrid,
 } from 'recharts';
 
+const PROFICIENCY_LABELS: Record<string, string> = {
+  gricean: 'Gricean Clarity',
+  trilemma: 'Trilemma Navigation',
+  flexibility: 'Stance Flexibility',
+  engagement: 'Engagement Depth',
+};
+
+const JOURNEY_STAGES = [
+  { level: 0, label: 'Assessment', icon: BookOpen },
+  { level: 1, label: 'Beginner', icon: MessageSquare },
+  { level: 3, label: 'Intermediate', icon: Target },
+  { level: 5, label: 'Advanced', icon: TrendingUp },
+  { level: 8, label: 'Expert', icon: Zap },
+];
+
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { data: profile, isLoading: profileLoading } = useGamificationProfile();
   const { data: proficiency, isLoading: profLoading } = useProficiency();
   const { data: growth, isLoading: growthLoading } = useGrowth();
@@ -116,10 +134,46 @@ export function DashboardPage() {
         </Card>
       </div>
 
+      {/* Learning Path */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Your Learning Journey</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-1 overflow-x-auto pb-2">
+            {JOURNEY_STAGES.map((stage, i) => {
+              const reached = level >= stage.level || (stage.level === 0 && (sessions?.length ?? 0) >= 0);
+              const current = i < JOURNEY_STAGES.length - 1
+                ? level >= stage.level && level < JOURNEY_STAGES[i + 1].level
+                : level >= stage.level;
+              const Icon = stage.icon;
+              return (
+                <div key={stage.label} className="flex items-center">
+                  <div className={`flex flex-col items-center gap-1 px-3 py-2 rounded-md min-w-[80px] ${
+                    current ? 'bg-primary/20 ring-1 ring-primary' : reached ? 'opacity-100' : 'opacity-40'
+                  }`}>
+                    {reached ? (
+                      <CheckCircle2 className={`h-5 w-5 ${current ? 'text-primary' : 'text-green-400'}`} />
+                    ) : (
+                      <Icon className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <span className={`text-xs font-medium ${current ? 'text-primary' : ''}`}>{stage.label}</span>
+                    {stage.level > 0 && <span className="text-[10px] text-muted-foreground">L{stage.level}+</span>}
+                  </div>
+                  {i < JOURNEY_STAGES.length - 1 && (
+                    <ArrowRight className={`h-4 w-4 mx-1 ${reached ? 'text-primary' : 'text-muted-foreground/30'}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Proficiency Radar */}
-        {radarData.length > 0 && (
+        {radarData.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Proficiency Radar</CardTitle>
@@ -135,10 +189,23 @@ export function DashboardPage() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Proficiency Radar</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+              <Target className="h-10 w-10 text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">Complete your first conversation to see your proficiency radar</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate('/actors')}>
+                Start a conversation <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* Growth chart */}
-        {growthData.length > 1 && (
+        {growthData.length > 1 ? (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -160,7 +227,99 @@ export function DashboardPage() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <TrendingUp className="h-4 w-4" /> Score Growth
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+              <BarChart3 className="h-10 w-10 text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">
+                {growthData.length === 1
+                  ? 'One more session will show your growth trend'
+                  : 'Complete conversations to track your score over time'}
+              </p>
+            </CardContent>
+          </Card>
         )}
+      </div>
+
+      {/* Strengths / Weaknesses + Recommended Next */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Strengths & Weaknesses */}
+        {radarData.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Strengths &amp; Areas to Improve</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[...radarData].sort((a, b) => b.value - a.value).map((d, i) => {
+                const isStrength = i < 2 && d.value >= 40;
+                const isWeakness = i >= radarData.length - 1 || d.value < 30;
+                return (
+                  <div key={d.axis} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{PROFICIENCY_LABELS[d.axis.replace(/ /g, '_')] ?? d.axis}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{d.value}%</span>
+                        {isStrength && <Badge variant="default" className="text-[10px] px-1.5 py-0">Strength</Badge>}
+                        {isWeakness && <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/50 text-amber-400">Improve</Badge>}
+                      </div>
+                    </div>
+                    <Progress value={d.value} className="h-1.5" />
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recommended Next */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Recommended Next</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {(sessions?.length ?? 0) === 0 ? (
+              <>
+                <p className="text-sm text-muted-foreground">Start your first practice conversation to get personalised recommendations.</p>
+                <Button size="sm" onClick={() => navigate('/actors')}>
+                  Choose an actor <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </>
+            ) : (
+              <>
+                {radarData.length > 0 && (() => {
+                  const weakest = [...radarData].sort((a, b) => a.value - b.value)[0];
+                  const label = PROFICIENCY_LABELS[weakest.axis.replace(/ /g, '_')] ?? weakest.axis;
+                  return (
+                    <div className="rounded-md border border-card-border p-3 space-y-1">
+                      <p className="text-sm font-medium">Focus on: {label}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Your {label.toLowerCase()} is at {weakest.value}%. Try a conversation specifically challenging this skill.
+                      </p>
+                    </div>
+                  );
+                })()}
+                <div className="rounded-md border border-card-border p-3 space-y-1">
+                  <p className="text-sm font-medium">Try a new scenario</p>
+                  <p className="text-xs text-muted-foreground">Guided scenarios push you to practice specific epistemological skills.</p>
+                  <Button variant="outline" size="sm" className="mt-1" onClick={() => navigate('/scenarios')}>
+                    Browse scenarios <ArrowRight className="ml-1 h-3 w-3" />
+                  </Button>
+                </div>
+                {(sessions?.length ?? 0) >= 3 && level < 3 && (
+                  <div className="rounded-md border border-card-border p-3 space-y-1">
+                    <p className="text-sm font-medium">Review past debriefs</p>
+                    <p className="text-xs text-muted-foreground">Your coach debrief offers personalised analysis — revisit previous sessions for deeper insight.</p>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Recent achievements */}

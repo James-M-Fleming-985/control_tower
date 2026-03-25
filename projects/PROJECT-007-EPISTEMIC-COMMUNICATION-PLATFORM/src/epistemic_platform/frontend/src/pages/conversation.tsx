@@ -41,6 +41,8 @@ export function ConversationPage() {
   const [lastStance, setLastStance] = useState<StanceDetection | null>(null);
   const [ended, setEnded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [sessionReward, setSessionReward] = useState<Record<string, any> | null>(null);
 
   // Voice-specific state
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
@@ -225,6 +227,9 @@ export function ConversationPage() {
         break;
       case 'session_ended':
         setEnded(true);
+        if ('reward' in data && data.reward) {
+          setSessionReward(data.reward as Record<string, unknown>);
+        }
         break;
       case 'error':
         console.error('WS error:', (data as { detail: string }).detail);
@@ -481,7 +486,7 @@ export function ConversationPage() {
               </Button>
             )}
             {ended && (
-              <Button size="sm" onClick={() => navigate(`/results/${sessionId}`)}>
+              <Button size="sm" onClick={() => navigate(`/results/${sessionId}`, { state: { reward: sessionReward } })}>
                 View Results
               </Button>
             )}
@@ -528,14 +533,49 @@ export function ConversationPage() {
         )}
         {!ended && !isVoice && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
         {ended && (
-          <div className="border-t border-border px-4 py-3 text-center text-sm text-muted-foreground">
-            Session ended.{' '}
-            <button
-              onClick={() => navigate(`/results/${sessionId}`)}
-              className="text-primary hover:underline"
-            >
-              View results →
-            </button>
+          <div className="border-t border-border px-4 py-4 space-y-3">
+            {/* Celebration banner when reward data is available */}
+            {sessionReward?.score && (
+              <div className="rounded-lg bg-primary/10 border border-primary/30 px-4 py-3 text-center space-y-1">
+                <p className="text-lg font-bold text-primary">
+                  Session Complete!
+                </p>
+                <div className="flex items-center justify-center gap-4 text-sm">
+                  {sessionReward.score.grade && (
+                    <span className="font-semibold">Grade: {sessionReward.score.grade}</span>
+                  )}
+                  {sessionReward.score.final_score != null && (
+                    <span>Score: {Math.round(sessionReward.score.final_score)}/100</span>
+                  )}
+                  {sessionReward.xp_award?.total != null && (
+                    <span className="text-primary font-medium">+{sessionReward.xp_award.total} XP</span>
+                  )}
+                  {sessionReward.xp_award?.levelled_up && (
+                    <span className="font-bold text-amber-400">Level Up!</span>
+                  )}
+                </div>
+                {sessionReward.milestones?.newly_unlocked?.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    🏆 {sessionReward.milestones.newly_unlocked.length} new achievement{sessionReward.milestones.newly_unlocked.length > 1 ? 's' : ''} unlocked!
+                  </p>
+                )}
+              </div>
+            )}
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                size="sm"
+                onClick={() => navigate(`/results/${sessionId}`, { state: { reward: sessionReward } })}
+              >
+                View Results
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/actors')}
+              >
+                New Conversation
+              </Button>
+            </div>
           </div>
         )}
       </div>

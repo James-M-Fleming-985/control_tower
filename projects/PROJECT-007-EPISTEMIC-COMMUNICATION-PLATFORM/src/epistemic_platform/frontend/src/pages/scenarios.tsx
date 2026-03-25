@@ -4,9 +4,11 @@ import { useScenarios, useActors, useCreateSession } from '@/hooks/use-api';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { difficultyClass } from '@/lib/utils';
-import { Search, Map } from 'lucide-react';
+import { Search, Map, X } from 'lucide-react';
+import type { ScenarioDefinition } from '@/types/api';
 
 export function ScenariosPage() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ export function ScenariosPage() {
   const { data: actors } = useActors();
   const createSession = useCreateSession();
   const [filter, setFilter] = useState('');
+  const [pickActorFor, setPickActorFor] = useState<ScenarioDefinition | null>(null);
 
   const actorMap = Object.fromEntries((actors ?? []).map((a) => [a.id, a]));
 
@@ -23,17 +26,21 @@ export function ScenariosPage() {
       s.category.toLowerCase().includes(filter.toLowerCase()),
   );
 
-  const startScenario = async (scenarioId: number, actorId?: number) => {
-    if (!actorId) {
-      navigate('/actors');
-      return;
-    }
+  const startScenario = async (scenarioId: number, actorId: number) => {
     const session = await createSession.mutateAsync({
       actor_id: actorId,
       scenario_id: scenarioId,
       mode: 'text',
     });
     navigate(`/conversation/${session.id}`);
+  };
+
+  const handleScenarioClick = (scenario: ScenarioDefinition) => {
+    if (scenario.actor_id) {
+      startScenario(scenario.id, scenario.actor_id);
+    } else {
+      setPickActorFor(scenario);
+    }
   };
 
   return (
@@ -74,7 +81,7 @@ export function ScenariosPage() {
               <Card
                 key={s.id}
                 className="cursor-pointer transition-colors hover:border-primary/50"
-                onClick={() => startScenario(s.id, s.actor_id ?? undefined)}
+                onClick={() => handleScenarioClick(s)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between gap-2">
@@ -97,6 +104,39 @@ export function ScenariosPage() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Actor picker overlay */}
+      {pickActorFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setPickActorFor(null)}>
+          <div className="bg-card border border-card-border rounded-lg p-6 max-w-md w-full mx-4 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Choose a discussion partner</h2>
+              <button onClick={() => setPickActorFor(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Pick an actor for <span className="font-medium text-foreground">{pickActorFor.title}</span>
+            </p>
+            <div className="grid gap-2 max-h-60 overflow-auto">
+              {(actors ?? []).map((a) => (
+                <Button
+                  key={a.id}
+                  variant="outline"
+                  className="justify-start h-auto py-3"
+                  disabled={createSession.isPending}
+                  onClick={() => startScenario(pickActorFor.id, a.id)}
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{a.name}</div>
+                    <div className="text-xs text-muted-foreground">{a.epistemological_stance}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

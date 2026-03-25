@@ -5,9 +5,10 @@ import { Send } from 'lucide-react';
 interface Props {
   onSend: (text: string) => void;
   disabled?: boolean;
+  placeholder?: string;
 }
 
-export function ChatInput({ onSend, disabled }: Props) {
+export function ChatInput({ onSend, disabled, placeholder }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +33,7 @@ export function ChatInput({ onSend, disabled }: Props) {
         ref={inputRef}
         className="flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
         rows={1}
-        placeholder="Type your message…"
+        placeholder={placeholder ?? "Type your message…"}
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={onKeyDown}

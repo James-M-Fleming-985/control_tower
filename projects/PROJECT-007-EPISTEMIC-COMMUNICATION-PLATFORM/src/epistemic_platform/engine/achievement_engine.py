@@ -83,6 +83,15 @@ class AchievementEngine:
         """
         reward = SessionReward()
 
+        # Idempotency: skip XP/milestone/proficiency persistence if already processed
+        already_processed = bool(
+            session.trilemma_state
+            and isinstance(session.trilemma_state, dict)
+            and session.trilemma_state.get("reward_processed")
+        )
+        if already_processed:
+            logger.info("Session %d already reward-processed, returning read-only analysis", session.id)
+
         # 1. Analyse the session
         session_data = self._session_to_dict(session)
         reward.analysis = self._analyser.analyse(session_data)
@@ -142,31 +151,32 @@ class AchievementEngine:
             profile, reward.analysis, reward.score
         )
 
-        # 7. Persist user updates
-        user.xp = user.xp + reward.xp_award.total
-        user.level = reward.xp_award.new_level
+        # 7. Persist user updates (skip if already processed to prevent double-award)
+        if not already_processed:
+            user.xp = user.xp + reward.xp_award.total
+            user.level = reward.xp_award.new_level
 
-        # Append newly unlocked milestones
-        current_achievements = list(user.achievements) if user.achievements else []
-        for m in reward.milestones.newly_unlocked:
-            current_achievements.append(m.to_dict())
-        user.achievements = current_achievements
+            # Append newly unlocked milestones
+            current_achievements = list(user.achievements) if user.achievements else []
+            for m in reward.milestones.newly_unlocked:
+                current_achievements.append(m.to_dict())
+            user.achievements = current_achievements
 
-        # Save proficiency in preferences
-        prefs = dict(user.preferences) if user.preferences else {}
-        prefs["proficiency"] = reward.proficiency.to_dict()
-        user.preferences = prefs
+            # Save proficiency in preferences
+            prefs = dict(user.preferences) if user.preferences else {}
+            prefs["proficiency"] = reward.proficiency.to_dict()
+            user.preferences = prefs
 
-        await self._db.flush()
+            await self._db.flush()
 
-        logger.info(
-            "Session %d rewards: grade=%s, xp=+%d (→L%d), milestones=%d",
-            session.id,
-            reward.score.grade,
-            reward.xp_award.total,
-            reward.xp_award.new_level,
-            len(reward.milestones.newly_unlocked),
-        )
+            logger.info(
+                "Session %d rewards: grade=%s, xp=+%d (→L%d), milestones=%d",
+                session.id,
+                reward.score.grade,
+                reward.xp_award.total,
+                reward.xp_award.new_level,
+                len(reward.milestones.newly_unlocked),
+            )
 
         return reward
 

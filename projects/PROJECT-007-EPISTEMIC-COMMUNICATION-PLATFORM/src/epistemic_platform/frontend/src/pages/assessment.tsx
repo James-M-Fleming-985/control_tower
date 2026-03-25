@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessmentQuestions, useSubmitAssessment } from '@/hooks/use-api';
+import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ export function AssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const updateUser = useAuthStore((s) => s.updateUser);
 
   const questions: Question[] = data?.questions ?? [];
   const total = questions.length;
@@ -41,7 +43,15 @@ export function AssessmentPage() {
 
   const submit = async () => {
     const res = await submitMutation.mutateAsync({ answers });
-    setResult(res as Record<string, unknown>);
+    const resultData = res as Record<string, unknown>;
+    setResult(resultData);
+    // Update auth store so the Layout soft-gate opens
+    const currentUser = useAuthStore.getState().user;
+    if (currentUser) {
+      updateUser({
+        assessment_history: [...(currentUser.assessment_history || []), resultData as never],
+      });
+    }
   };
 
   if (isLoading) {

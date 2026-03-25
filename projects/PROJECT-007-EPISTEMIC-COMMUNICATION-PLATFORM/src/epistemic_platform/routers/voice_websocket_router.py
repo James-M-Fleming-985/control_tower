@@ -20,6 +20,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
 from epistemic_platform.config import get_settings
 from epistemic_platform.database import async_session_factory
+from epistemic_platform.engine.achievement_engine import AchievementEngine
 from epistemic_platform.engine.conversation_manager import ConversationManager
 from epistemic_platform.llm.claude_adapter import ClaudeConversationAdapter, ClaudeCoachingAdapter
 from epistemic_platform.ontology.expressive_state import ExpressiveState
@@ -27,6 +28,7 @@ from epistemic_platform.repositories.actor_profile_repository import ActorProfil
 from epistemic_platform.repositories.conversation_session_repository import (
     ConversationSessionRepository,
 )
+from epistemic_platform.repositories.user_profile_repository import UserProfileRepository
 from epistemic_platform.voice.elevenlabs_tts import ElevenLabsTTSClient
 from epistemic_platform.voice.whisper_stt import WhisperSTTClient
 from epistemic_platform.voice.voice_analyser import VoiceAnalyser
@@ -245,6 +247,14 @@ async def voice_websocket(
                 )
                 return
 
+            user_repo = UserProfileRepository(db)
+            user = await user_repo.get(user_id)
+            if not user:
+                await websocket.send_json(
+                    {"type": "error", "detail": "User not found"}
+                )
+                return
+
             # Per-actor voice: prefer actor's voice_id, fall back to global default
             voice_id = (actor.ontology_config or {}).get("voice_id") or settings.elevenlabs_default_voice_id
             tts = ElevenLabsTTSClient(
@@ -358,9 +368,33 @@ async def voice_websocket(
                     outcome = await conv_manager.end_session(
                         extra_metrics=extra if extra else None
                     )
-                    await websocket.send_json(
-                        {"type": "session_ended", "outcome": outcome}
-                    )
+
+                    # Run achievement engine to compute scores, XP, proficiency
+                    reward_data = None
+                    try:
+                        engine = AchievementEngine(db)
+                        reward = await engine.process_session(session, user)
+                        session.trilemma_state = {
+                            **(session.trilemma_state or {}),
+                            "reward_processed": True,
+                        }
+                        await db.commit()
+                        reward_data = reward.to_dict()
+                        logger.info(
+                            "Voice session %d reward: grade=%s xp=+%d",
+                            session_id,
+                            reward.score.grade if reward.score else "?",
+                            reward.xp_award.total if reward.xp_award else 0,
+                        )
+                    except Exception:
+                        logger.exception(
+                            "AchievementEngine failed for session %d", session_id
+                        )
+
+                    msg: dict = {"type": "session_ended", "outcome": outcome}
+                    if reward_data:
+                        msg["reward"] = reward_data
+                    await websocket.send_json(msg)
                     break
 
                 # ---- end_utterance ----

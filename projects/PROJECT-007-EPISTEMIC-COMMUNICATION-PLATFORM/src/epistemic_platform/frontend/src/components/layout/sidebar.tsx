@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { to: '/actors', label: 'Actors', icon: Users },
   { to: '/scenarios', label: 'Scenarios', icon: Map },
   { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-  { to: '/dashboard?tab=achievements', label: 'Achievements', icon: Trophy },
+  { to: '/achievements', label: 'Achievements', icon: Trophy },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
 

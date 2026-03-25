@@ -6,6 +6,8 @@ POST /api/assessment/evaluate           — takes answers, returns assessment re
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,4 +41,14 @@ async def evaluate_assessment(
     coaching_llm = ClaudeCoachingAdapter()
     engine = AssessmentEngine(coaching_llm)
     result = await engine.evaluate(body.answers)
-    return result.to_dict()
+
+    # Persist result to user's assessment_history
+    result_dict = result.to_dict()
+    result_dict["completed_at"] = datetime.now(timezone.utc).isoformat()
+    history = list(user.assessment_history or [])
+    history.append(result_dict)
+    user.assessment_history = history
+    db.add(user)
+    await db.commit()
+
+    return result_dict

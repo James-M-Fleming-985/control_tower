@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/stores/auth-store';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { xpProgress } from '@/lib/utils';
+import { xpProgress, xpForLevel } from '@/lib/utils';
 import { LEVEL_NAMES } from '@/lib/constants';
 
 export function Header() {
@@ -10,6 +10,9 @@ export function Header() {
 
   const progress = xpProgress(user.xp, user.level);
   const levelName = LEVEL_NAMES[user.level] ?? `Level ${user.level}`;
+  const nextLevelXp = xpForLevel(user.level + 1);
+  const xpRemaining = Math.max(0, nextLevelXp - user.xp);
+  const nextLevelName = LEVEL_NAMES[user.level + 1];
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4 md:px-6">
@@ -18,11 +21,16 @@ export function Header() {
         <Badge variant="default" className="shrink-0">
           Lv.{user.level} {levelName}
         </Badge>
-        <div className="hidden sm:flex items-center gap-2 flex-1 max-w-xs">
+        <div className="hidden sm:flex items-center gap-2 flex-1 max-w-xs group relative">
           <Progress value={progress} className="h-1.5" />
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             {user.xp} XP
           </span>
+          {/* Tooltip */}
+          <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-50 rounded-md bg-popover border border-border px-3 py-2 shadow-md text-xs whitespace-nowrap">
+            <p className="font-medium">{user.xp} / {nextLevelXp} XP</p>
+            <p className="text-muted-foreground">{xpRemaining} XP to {nextLevelName ? `Lv.${user.level + 1} ${nextLevelName}` : 'next level'}</p>
+          </div>
         </div>
       </div>
 
