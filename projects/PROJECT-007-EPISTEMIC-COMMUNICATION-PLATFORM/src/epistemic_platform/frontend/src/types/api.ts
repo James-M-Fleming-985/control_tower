@@ -131,11 +131,16 @@ export interface ChatMessage {
 }
 
 export interface CoachingAnnotation {
-  type: 'trilemma' | 'gricean' | 'stance' | 'general';
-  coaching_type?: string;
-  content: string;
-  suggestion?: string;
-  turn: number;
+  summary: string;
+  what_happened: string;
+  why_it_matters: string;
+  what_to_try: string;
+  strengths?: string[];
+  improvements?: string[];
+  detected_stance?: string;
+  trilemma_horn?: string;
+  epistemological_insight?: string;
+  turn_number: number;
   [key: string]: unknown;
 }
 

@@ -1,5 +1,4 @@
 import type { CoachingAnnotation } from '@/types/api';
-import { Badge } from '@/components/ui/badge';
 import { Lightbulb, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -32,14 +31,17 @@ export function CoachingPanel({ annotations }: Props) {
               >
                 <X className="h-3 w-3" />
               </button>
-              {ann.coaching_type && (
-                <Badge variant="outline" className="mb-1 text-[10px]">
-                  {String(ann.coaching_type)}
-                </Badge>
+              {ann.what_happened && (
+                <p className="text-foreground font-medium mb-1">{ann.what_happened}</p>
               )}
-              <p className="text-muted-foreground leading-relaxed">{String(ann.content)}</p>
-              {ann.suggestion && (
-                <p className="mt-1 text-foreground italic">💡 {String(ann.suggestion)}</p>
+              {ann.why_it_matters && (
+                <p className="text-muted-foreground leading-relaxed">{ann.why_it_matters}</p>
+              )}
+              {ann.what_to_try && (
+                <p className="mt-1 text-foreground italic">💡 {ann.what_to_try}</p>
+              )}
+              {!ann.what_happened && ann.summary && (
+                <p className="text-muted-foreground leading-relaxed">{ann.summary}</p>
               )}
             </div>
           );
