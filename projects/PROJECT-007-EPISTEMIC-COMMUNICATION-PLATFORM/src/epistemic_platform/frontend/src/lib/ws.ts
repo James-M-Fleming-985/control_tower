@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/auth-store';
-import type { WSServerMessage } from '@/types/api';
+import api from '@/lib/api';
+import type { WSServerMessage, TokenResponse } from '@/types/api';
 
 export type WSMessageHandler = (msg: WSServerMessage) => void;
 export type WSBinaryHandler = (data: ArrayBuffer) => void;
@@ -27,8 +28,39 @@ export class WebSocketManager {
 
   connect(): void {
     this.intentionallyClosed = false;
-    const token = useAuthStore.getState().accessToken;
-    if (!token) return;
+    this._ensureFreshToken().then((token) => {
+      if (!token) return;
+      this._openSocket(token);
+    });
+  }
+
+  private async _ensureFreshToken(): Promise<string | null> {
+    const store = useAuthStore.getState();
+    let token = store.accessToken;
+    if (!token) return null;
+
+    // Check if token expires within 60 seconds
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiresAt = payload.exp * 1000;
+      if (Date.now() > expiresAt - 60_000) {
+        // Token expired or about to expire — refresh
+        if (!store.refreshToken) return null;
+        const { data } = await api.post<TokenResponse>(
+          '/auth/refresh',
+          null,
+          { params: { refresh_token: store.refreshToken } },
+        );
+        store.setTokens(data.access_token, data.refresh_token);
+        token = data.access_token;
+      }
+    } catch {
+      // If decode fails, try connecting anyway
+    }
+    return token;
+  }
+
+  private _openSocket(token: string): void {
 
     const separator = this.url.includes('?') ? '&' : '?';
     const wsUrl = `${this.url}${separator}token=${token}`;

@@ -65,7 +65,13 @@ export function DashboardPage() {
   const radarData = proficiency
     ? Object.entries(proficiency)
         .filter(([k]) => !k.startsWith('_'))
-        .map(([k, v]) => ({ axis: k.replace(/_/g, ' '), value: Math.round(Number(v ?? 0) * 100) }))
+        .map(([k, v]) => {
+          // v may be {name, value, history} object or a plain number (overall)
+          const raw = typeof v === 'object' && v !== null && 'value' in (v as Record<string, unknown>)
+            ? (v as { value: number }).value
+            : Number(v ?? 0);
+          return { axis: k.replace(/_/g, ' '), value: Math.round(raw * 100) };
+        })
     : [];
 
   // Growth line data

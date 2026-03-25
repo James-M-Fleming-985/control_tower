@@ -80,14 +80,6 @@ async def debrief_websocket(
             await websocket.close()
             return
 
-        if user.role != "admin" and user.subscription_tier != "premium":
-            await websocket.send_json({
-                "type": "error",
-                "detail": "Coach debrief requires premium subscription",
-            })
-            await websocket.close()
-            return
-
         # 3. Load parent session
         session_repo = ConversationSessionRepository(db)
         parent_session = await session_repo.get(session_id)
