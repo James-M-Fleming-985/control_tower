@@ -1,0 +1,22 @@
+{
+  "output_directory": "./compliance_reports",
+  "backup_enabled": false,
+  "log_level": "INFO",
+  "report_format": {
+    "include_timestamps": true,
+    "include_recommendations": true,
+    "max_recommendations": 5,
+    "decimal_places": 1
+  },
+  "compliance_thresholds": {
+    "excellent": 95,
+    "good": 85,
+    "acceptable": 70,
+    "needs_improvement": 50
+  },
+  "file_settings": {
+    "encoding": "utf-8",
+    "indent": 2,
+    "ensure_ascii": false
+  }
+}

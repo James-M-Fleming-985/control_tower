@@ -33,6 +33,7 @@ export function LoginPage() {
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
             <Input
+              name="email"
               type="email"
               placeholder="Email"
               value={email}
@@ -41,6 +42,7 @@ export function LoginPage() {
               autoComplete="email"
             />
             <Input
+              name="password"
               type="password"
               placeholder="Password"
               value={password}

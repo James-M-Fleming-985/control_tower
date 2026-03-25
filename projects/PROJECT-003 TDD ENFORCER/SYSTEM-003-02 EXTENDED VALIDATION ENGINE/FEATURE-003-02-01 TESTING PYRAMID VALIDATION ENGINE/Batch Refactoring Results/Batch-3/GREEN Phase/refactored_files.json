@@ -1,0 +1,107 @@
+[
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 234,
+    "current": "subprocess.run(['pytest', test_path], capture_output=True)",
+    "target": "validate_red_phase_execution(test_result: TestExecutionResult)",
+    "description": "Executes RED phase tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 567,
+    "current": "subprocess.run(['pytest', '-v', test_file])",
+    "target": "validate_green_phase_execution(test_result: TestExecutionResult)",
+    "description": "Executes GREEN phase tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_gates.py",
+    "line": 123,
+    "current": "subprocess.run(['pytest', '--tb=short'])",
+    "target": "validate_stage_gate_results(test_result: TestExecutionResult)",
+    "description": "Executes stage gate tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_green_phase_engine.py",
+    "line": 456,
+    "current": "result = subprocess.run(['pytest', impl_test])",
+    "target": "validate_implementation_test_results(test_result: TestExecutionResult)",
+    "description": "Executes implementation tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 789,
+    "current": "subprocess.run(['pytest'] + test_files)",
+    "target": "validate_test_results(test_result: TestExecutionResult)",
+    "description": "Executes multiple test files - should validate results instead"
+  },
+  {
+    "file": "src/business_logic/tdd_cycle_enforcer.py",
+    "line": 234,
+    "current": "subprocess.run(['python', '-m', 'pytest', test_dir])",
+    "target": "validate_test_execution_results(test_result: TestExecutionResult)",
+    "description": "Executes test directory - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 890,
+    "current": "subprocess.run(pytest_cmd, shell=True)",
+    "target": "validate_pytest_results(test_result: TestExecutionResult)",
+    "description": "Executes pytest command - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_gates.py",
+    "line": 345,
+    "current": "os.system('pytest tests/unit')",
+    "target": "validate_unit_test_results(test_result: TestExecutionResult)",
+    "description": "Executes unit tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_gates.py",
+    "line": 456,
+    "current": "os.system('pytest tests/integration')",
+    "target": "validate_integration_test_results(test_result: TestExecutionResult)",
+    "description": "Executes integration tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_green_phase_engine.py",
+    "line": 678,
+    "current": "subprocess.run(['pytest', '--cov'])",
+    "target": "validate_coverage_results(test_result: TestExecutionResult)",
+    "description": "Executes coverage tests - should validate results instead"
+  },
+  {
+    "file": "src/business_logic/test_generation_verification_logic.py",
+    "line": 456,
+    "current": "subprocess.run(['pytest', generated_test])",
+    "target": "validate_generated_test_results(test_result: TestExecutionResult)",
+    "description": "Executes generated tests - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 1234,
+    "current": "subprocess.Popen(['pytest', '-x', test_suite])",
+    "target": "validate_test_suite_results(test_result: TestExecutionResult)",
+    "description": "Executes test suite - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/real_tdd_gates.py",
+    "line": 567,
+    "current": "subprocess.run(['pytest', '--cov-report=term'])",
+    "target": "validate_coverage_report(test_result: TestExecutionResult)",
+    "description": "Generates coverage report - should validate results instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 456,
+    "current": "subprocess.run(['pytest', '--tb=long', workspace])",
+    "target": "validate_refactor_test_results(test_result: TestExecutionResult)",
+    "description": "Executes REFACTOR phase tests - should validate results instead"
+  },
+  {
+    "file": "src/business_logic/tdd_cycle_enforcer.py",
+    "line": 789,
+    "current": "subprocess.run(['pytest', '-m', 'checkpoint'])",
+    "target": "validate_checkpoint_test_results(test_result: TestExecutionResult)",
+    "description": "Executes checkpoint tests - should validate results instead"
+  }
+]

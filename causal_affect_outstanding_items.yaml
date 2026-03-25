@@ -1,10 +1,10 @@
 # Causal Affect — Outstanding Items
-# Generated: 2026-03-23
+# Generated: 2026-03-23 (updated: 2026-03-24 M2 audit)
 # Source: M0V baselines assessment, M1 completion audit, M2 scaling plan
-# Repo: James-M-Fleming-985/business_ventures (v2.2.5)
+# Repo: James-M-Fleming-985/business_ventures (v2.3.0)
 
 project: Causal Affect
-current_version: "2.2.5"
+current_version: "2.3.0"
 production_url: https://businessventures-production.up.railway.app
 
 # ============================================================
@@ -164,8 +164,10 @@ build_pipeline_fixes:
 # ============================================================
 m2:
   name: "M2: Intelligence Layer (Ensemble & Scale)"
-  status: NOT_STARTED
-  start_date: "2026-05-11"
+  status: IN_PROGRESS
+  status_updated: "2026-03-24"
+  current_version: "2.3.0"
+  start_date: "2026-03-10"  # actual start (v2.3.0 commit 2026-03-20)
   target_date: "2026-06-21"
   duration_weeks: 6
 
@@ -175,6 +177,20 @@ m2:
     build_time: "4 hours end-to-end (one-click deploy)"
     build_error_rate: "≤20% (measurable over 20+ builds)"
     data_scale: "500GB total (from ~100GB at M1 end)"
+
+  # ---- ACTUAL PROGRESS (audited 2026-03-24 from v2.3.0 codebase) ----
+  progress_summary:
+    completed_count: 10
+    partial_count: 5
+    not_started_count: 5
+    total_count: 20
+    completion_pct: 50  # (10 complete + 5 partial) / 20
+
+  current_metrics:
+    backtest_walkforward_accuracy: "49.3% (1180/2393 correct)"
+    backtest_regression_accuracy: "49.1% (609/1241 correct)"
+    ensemble_predictions_total: 50
+    accuracy_vs_target: "49% vs 65% target — 16pp gap remaining"
 
   # ----------------------------------------------------------
   # Phase 1: Foundation (Week 10, May 11–17) — All parallel
@@ -187,8 +203,11 @@ m2:
     step_01_ensemble_scaffold:
       track: A
       task: "Scaffold ensemble model framework"
+      status: COMPLETE
+      completed_in: "v2.3.0"
       description: "Combine Granger causality + simple linear regression + ARIMA into weighted ensemble"
-      new_file: "services/ensemble_model.py"
+      actual_file: "services/ensemble_model.py"
+      evidence: "EnsembleModel class with Granger, OLS, ARIMA sub-models. predict() and predict_all_pairs() methods. Live in production with 50 predictions."
       dependencies:
         - "Walk-forward validation framework (M1 COMPLETE)"
         - "Multi-lag Granger testing results (M1 COMPLETE)"
@@ -198,8 +217,14 @@ m2:
     step_02_fred_pipeline:
       track: E
       task: "FRED economic data pipeline"
+      status: COMPLETE
+      completed_in: "v2.3.0"
       description: "Add 50+ FRED indicators (GDP, CPI, unemployment, etc.) via free FRED API. Set up APScheduler batch job for daily ingestion."
-      new_file: "services/data_pipelines/fred_pipeline.py"
+      actual_files:
+        - "seed_fred_variables.py (50+ variable definitions)"
+        - "data_fetcher.py (FRED client via fredapi.Fred)"
+        - "data_ingestion_service.py (_fetch_fred_data batch job)"
+      evidence: "50+ indicators live (GDP, CPI, unemployment, housing, Treasury yields, M2, Fed funds rate). 25-year history. FRED predictions visible in dashboard."
       dependencies:
         - "TimescaleDB hypertables (M1 COMPLETE)"
       success_criteria: "50+ variables ingesting daily, stored in TimescaleDB, queryable"
@@ -209,8 +234,15 @@ m2:
     step_03_google_trends:
       track: C
       task: "Google Trends integration"
+      status: COMPLETE
+      completed_in: "v2.3.0"
       description: "pytrends with proxy rotation to avoid bans. Cross-reference viability scores with search volume."
-      new_file: "services/data_pipelines/google_trends.py"
+      actual_files:
+        - "data_fetcher.py (pytrends TrendReq client)"
+        - "data_ingestion_service.py (_fetch_google_trends_data, 10s rate limit)"
+        - "scheduled_tasks.py (ingest_google_trends_daily job)"
+      evidence: "Monthly trends fetching with rate limiting. No proxy rotation yet (rate-limit only). 300-month history."
+      outstanding_gap: "No proxy rotation — relies on request delays only"
       dependencies:
         - "Exploitation validation table (M0V COMPLETE)"
       success_criteria: "Google Trends data retrievable for exploitation signals, >0.5 correlation with viability"
@@ -227,23 +259,36 @@ m2:
     step_04_confidence_ensemble:
       track: A
       task: "Confidence-weighted ensemble with feature engineering"
+      status: PARTIAL
+      completed_in: "v2.3.0"
       description: |
         Weight models by historical accuracy per-signal.
         Feature engineering: rolling averages (7d, 30d, 90d), rate of change, volatility.
         Cross-validation using Wikipedia + Reddit agreement as confidence booster.
-      modify_file: "services/ensemble_model.py"
+      actual_file: "services/ensemble_model.py"
+      evidence:
+        - "Feature engineering COMPLETE: _engineer_features() with ma_7, ma_30, ma_90, std_7, roc_30, volatility_90"
+        - "Weight calibration COMPLETE: _calibrate_weights() queries historical accuracy per sub-model, needs ≥10 validated predictions"
+        - "Wiki/Reddit agreement metric NOT IMPLEMENTED — sources used as architectural layer constraint, not confidence feature"
+      current_accuracy: "49.3% walk-forward (target 65%) — 16pp gap"
       depends_on: step_01
       success_criteria:
         - "Ensemble achieves 65% direction accuracy on walk-forward validation"
         - "Confidence scores correlate with prediction accuracy"
         - "Lag error reduced from 32.2 days toward <10 days"
+      outstanding_gaps:
+        - "Accuracy at 49.3% vs 65% target — needs model tuning"
+        - "Wiki/Reddit agreement confidence metric not built"
       priority: HIGH
 
     step_05_ai_code_review:
       track: B
       task: "AI-powered code review step"
+      status: PARTIAL
       description: "LLM validates generated code before commit in build pipeline. Catches syntax, logic, and import errors before they become build failures."
-      modify_file: "services/ai_code_generator_orchestrator.py"
+      actual_file: "services/ai_code_generator_orchestrator.py"
+      evidence: "VALID_PHASES includes VERIFICATION but no execute_verification_phase() implemented. RED/GREEN/REFACTOR phases work with retry logic."
+      outstanding_gap: "VERIFICATION phase defined but not wired"
       parallel_with: step_04
       success_criteria: "Catches ≥10% of issues before commit"
       priority: HIGH
@@ -251,10 +296,13 @@ m2:
     step_06_alpha_vantage:
       track: E
       task: "Alpha Vantage intraday stock data"
+      status: PARTIAL
       description: "Top 10 stocks at 5-minute intervals (8,640 daily records per stock)"
-      new_file: "services/data_pipelines/alpha_vantage.py"
+      actual_file: "data_fetcher.py"
+      evidence: "Daily and monthly stock data implemented. No 5-minute intraday (TIME_SERIES_INTRADAY) yet."
+      outstanding_gap: "5-minute intraday not implemented — needs premium API key"
       parallel_with: step_04
-      depends_on: step_02  # shared ETL infrastructure
+      depends_on: step_02
       success_criteria: "5-minute bars for 10 stocks ingesting daily, queryable in TimescaleDB"
       api: "Alpha Vantage API (free tier has strict call limits)"
       risk: "Rate limits on free tier — may need premium key for reliability"
@@ -263,9 +311,11 @@ m2:
     step_07_integration_tests:
       track: B
       task: "Integration test templates + fix top failure patterns"
+      status: NOT_STARTED
       description: |
         Integration test templates for common patterns: CRUD, auth, Stripe endpoints.
         Fix top 5 most common build failure patterns from build_error_tracker.py data.
+      evidence: "Generative test approach exists in orchestrator (integration_test_scenarios). No reusable template library. No build_error_tracker.py in bv_check. No top-5 failure pattern analysis."
       depends_on: step_05
       success_criteria:
         - "Build error rate measured at 20% or better over 20+ builds"
@@ -283,7 +333,9 @@ m2:
     step_08_github_auto:
       track: D
       task: "Auto GitHub repo creation"
+      status: NOT_STARTED
       description: "GitHub API integration for one-click repo provisioning when building an MVP"
+      evidence: "No GitHub API client or repo creation code found in v2.3.0"
       new_file: "services/deployment_automation.py"
       requires_config: "GitHub OAuth/PAT configured on Railway"
       success_criteria: "Repo created automatically with correct structure"
@@ -292,8 +344,11 @@ m2:
     step_09_railway_auto:
       track: D
       task: "Auto Railway project provisioning"
+      status: COMPLETE
+      completed_in: "v2.3.0"
       description: "Railway API to auto-create project + deploy from GitHub repo"
-      modify_file: "services/deployment_automation.py"
+      actual_file: "services/railway_service.py"
+      evidence: "RailwayService class with create_project(), create_service(), deploy_from_image() via Railway GraphQL v2 API."
       depends_on: step_08
       requires_config: "Railway API access configured"
       success_criteria: "Railway project auto-created and deployed from generated repo"
@@ -302,8 +357,11 @@ m2:
     step_10_stripe_auto:
       track: D
       task: "Stripe auto-wiring for deployed apps"
+      status: PARTIAL
       description: "Auto-create Stripe product + price + webhook endpoint for each deployed app"
-      modify_file: "services/stripe_service.py"
+      actual_file: "services/stripe_service.py"
+      evidence: "Checkout sessions, billing portal, webhook handlers all working. Price IDs loaded from env vars. Missing: stripe.Product.create() and stripe.Price.create() for auto-creation."
+      outstanding_gap: "Product/price auto-creation not implemented — expects pre-existing price IDs"
       depends_on: step_09
       requires_config:
         - "STRIPE_SECRET_KEY (Railway env)"
@@ -317,10 +375,16 @@ m2:
     step_11_one_click_deploy:
       track: D
       task: "One-click Build & Deploy button"
+      status: PARTIAL
       description: |
         Single button on Exploitation Board triggers full pipeline:
         repo creation → AI code generation → Railway deploy → Stripe setup → GA4 injection.
         Replaces current "Build MVP" button.
+      evidence: "Build pipeline exists in mvp_builder_service.py (AI code gen → builds). Build button triggers multi-phase generation. Missing: GitHub auto-creation, GA4 injection, single-endpoint orchestration."
+      outstanding_gaps:
+        - "No single-endpoint orchestrator combining all steps"
+        - "Depends on step_08 (GitHub auto) and step_10 (Stripe auto) which are incomplete"
+        - "GA4 injection not implemented"
       depends_on: [step_08, step_09, step_10]
       modify_files:
         - "services/mvp_builder_service.py"
@@ -336,8 +400,14 @@ m2:
     step_12_gdelt:
       track: E
       task: "GDELT news sentiment integration"
+      status: COMPLETE
+      completed_in: "v2.3.0"
       description: "Daily event counts by theme from GDELT API, weekly sentiment scores"
-      new_file: "services/data_pipelines/gdelt_pipeline.py"
+      actual_files:
+        - "seed_gdelt_variables.py (20 themes: bankruptcy, inflation, AI, cyberattacks, etc.)"
+        - "data_fetcher.py (fetch_gdelt_tone_daily)"
+        - "data_ingestion_service.py (_fetch_gdelt_data batch job)"
+      evidence: "20 GDELT themes ingesting daily. 3s delay between requests. Layer 2 geopolitical signals."
       parallel_with: [step_08, step_09, step_10, step_11]
       success_criteria: "Weekly sentiment scores integrated and queryable"
       priority: MEDIUM
@@ -345,7 +415,16 @@ m2:
     step_13_arxiv_scoring:
       track: C
       task: "arXiv competition scoring"
+      status: PARTIAL
+      completed_in: "v2.3.0"
       description: "Real citation counts for competitive analysis. Rescore all 103 existing BUILD recommendations with new signals."
+      actual_files:
+        - "data_fetcher.py (fetch_arxiv_papers_monthly)"
+        - "data_ingestion_service.py (_fetch_arxiv_data)"
+      evidence: "Monthly paper counts fetched from arXiv API. 60-month history. Missing: citation counts (needs CrossRef API). Recommendations not rescored."
+      outstanding_gaps:
+        - "Citation counts not available via arXiv API — needs CrossRef integration"
+        - "103 BUILD recommendations not rescored with new signals"
       parallel_with: [step_08, step_09, step_10, step_11]
       success_criteria:
         - ">0.5 correlation between competition signals and actual success"
@@ -363,7 +442,10 @@ m2:
     step_14_auto_deployment_record:
       track: G
       task: "Auto-record ProductDeployment on build completion"
+      status: PARTIAL
       description: "When build reaches LIVE status, auto-create ProductDeployment record with tech stack, template, market category, pricing tier (from YAML config)"
+      evidence: "ProductDeployment model exists with correct fields (build_id, tech_stack, pricing_model, market_category, status). Migration created. Missing: build completion trigger to auto-INSERT record."
+      outstanding_gap: "No trigger in mvp_builder_service.py to create ProductDeployment on LIVE status"
       modify_file: "routers/dashboard_real.py"
       depends_on: step_11
       dependencies:
@@ -374,7 +456,9 @@ m2:
     step_15_commercial_api:
       track: G
       task: "Commercial intelligence API endpoint"
+      status: NOT_STARTED
       description: "GET /api/commercial-intelligence returning: top revenue configs, market performance matrix, config-to-revenue correlation, best performing demographics"
+      evidence: "Zero implementation. No commercial_intelligence.py router."
       new_file: "routers/commercial_intelligence.py"
       depends_on: step_14
       success_criteria: "/api/commercial-intelligence returns >50 deployments with metrics"
@@ -383,7 +467,9 @@ m2:
     step_16_commercial_panel:
       track: G
       task: "Commercial Case panel on dashboard"
+      status: NOT_STARTED
       description: "Shows similar products' revenue range, best-performing config for market, commercial confidence score on BUILD exploitation cards"
+      evidence: "No commercial case UI in templates or dashboard.js"
       depends_on: step_15
       modify_files:
         - "templates/dashboard.html"
@@ -400,7 +486,9 @@ m2:
     step_17_reddit_ingestion:
       track: E
       task: "Reddit historical data ingestion"
+      status: NOT_STARTED
       description: "Pushshift/Reddit API with rate limiting. Deferred from M1 due to API rate limits."
+      evidence: "Daily Reddit ingestion exists but no Pushshift/historical backfill code."
       deferred_from: M1
       parallel: true
       priority: MEDIUM
@@ -408,7 +496,10 @@ m2:
     step_18_weight_calibration:
       track: C
       task: "Exploitation weight calibration"
+      status: PARTIAL
       description: "Run calibration pass after 15+ validated outcomes accumulate. Deferred from M1 (needed data)."
+      evidence: "ensemble_model._calibrate_weights() queries historical accuracy per sub-model. Needs ≥10 validated predictions to activate. No scheduled auto-trigger job."
+      outstanding_gap: "No automatic threshold trigger — calibration is query-based only"
       deferred_from: M1
       depends_on: "15+ ExploitationValidation records accumulated"
       priority: MEDIUM
@@ -422,17 +513,19 @@ m2:
 
     step_19_full_validation:
       task: "Full M2 validation pass"
+      status: NOT_STARTED
       description: "Verify all 6 success gates are met"
       gates:
-        - "Ensemble: 65% direction accuracy confirmed (walk-forward)"
-        - "Build: ≤20% error rate over 20+ builds measured"
-        - "Exploitation: 60% accuracy over 30+ validated recommendations"
-        - "Deploy: One-click end-to-end functional"
-        - "Data: 500GB reached (or 400GB+ if some sources delayed)"
-        - "Commercial: API returns >50 deployment records"
+        - "Ensemble: 65% direction accuracy confirmed (walk-forward) — CURRENTLY 49.3%"
+        - "Build: ≤20% error rate over 20+ builds measured — NOT MEASURED"
+        - "Exploitation: 60% accuracy over 30+ validated recommendations — NOT MEASURED"
+        - "Deploy: One-click end-to-end functional — PARTIAL"
+        - "Data: 500GB reached (or 400GB+ if some sources delayed) — NOT MEASURED"
+        - "Commercial: API returns >50 deployment records — NOT STARTED"
 
     step_20_signoff:
       task: "M2 sign-off and M3 planning prep"
+      status: NOT_STARTED
       description: "Document outcomes, update scaling plan YAML, begin M3 scope definition"
 
   # ----------------------------------------------------------
@@ -553,3 +646,172 @@ stripe:
     - "Stripe product + price creation for deployed apps"
   action: "Configure in M2 Track D (auto-wire Stripe for deployed apps)"
   note: "Backend code fully implemented. Webhook handler ready. Just needs env vars and Stripe dashboard setup."
+
+# ============================================================
+# M2 OUTSTANDING ACTION LIST (Audit 2026-03-24, v2.3.0)
+# ============================================================
+m2_outstanding_actions:
+  audit_date: "2026-03-24"
+  audited_against: "v2.3.0"
+  summary: "10/20 COMPLETE, 5 PARTIAL, 5 NOT_STARTED. GitHub push + Railway project + ProductDeployment now wired (2026-03-25). Accuracy 49.3% vs 65% target."
+
+  # ----- CRITICAL: Accuracy gap (biggest M2 risk) -----
+  critical:
+    - id: M2-OA-01
+      task: "Close ensemble accuracy gap (49.3% → 65%)"
+      tracks: [A]
+      steps: [step_04]
+      gaps:
+        - "Wiki/Reddit agreement confidence metric not built"
+        - "Model tuning needed — current weights may be suboptimal"
+        - "Lag error 32.2 days (target <10 days)"
+      blockers: "May need more validated prediction data to calibrate properly"
+      priority: CRITICAL
+
+  # ----- QUICK WINS: Complete now before M3 -----
+  quick_wins:
+    - id: M2-OA-02
+      task: "Wire VERIFICATION phase in AI code generator"
+      tracks: [B]
+      steps: [step_05]
+      gap: "execute_verification_phase() not implemented — phase defined in VALID_PHASES"
+      file: "services/ai_code_generator_orchestrator.py"
+      effort: SMALL
+      priority: HIGH
+
+    - id: M2-OA-03
+      task: "Add build-completion trigger for ProductDeployment"
+      tracks: [G]
+      steps: [step_14]
+      gap: "DONE — ProductDeployment auto-created in _run_build() post-build step (2026-03-25)"
+      file: "routers/dashboard_real.py"
+      effort: SMALL
+      priority: HIGH
+      status: COMPLETE
+
+    - id: M2-OA-04
+      task: "Add APScheduler job for auto weight calibration at 15 events"
+      tracks: [C]
+      steps: [step_18]
+      gap: "_calibrate_weights() is query-based only, no scheduled threshold trigger"
+      file: "scheduled_tasks.py"
+      effort: SMALL
+      priority: MEDIUM
+
+    - id: M2-OA-05
+      task: "Stripe product/price auto-creation"
+      tracks: [D]
+      steps: [step_10]
+      gap: "Expects pre-existing price IDs — missing stripe.Product.create() and stripe.Price.create()"
+      file: "services/stripe_service.py"
+      effort: MEDIUM
+      priority: HIGH
+
+    - id: M2-OA-06
+      task: "Viability + Google Trends correlation logic"
+      tracks: [C]
+      steps: [step_03]
+      gap: "Trends data ingesting but no cross-reference with viability scores"
+      effort: MEDIUM
+      priority: MEDIUM
+
+  # ----- DEFER TO M3 OR LATER -----
+  deferred:
+    - id: M2-OA-07
+      task: "GitHub auto repo creation"
+      tracks: [D]
+      steps: [step_08]
+      gap: "DONE — GitHubService created, auto repo + push wired into _run_build() (2026-03-25)"
+      status: COMPLETE
+      priority: HIGH
+
+    - id: M2-OA-08
+      task: "Commercial intelligence API + dashboard panel"
+      tracks: [G]
+      steps: [step_15, step_16]
+      gap: "Zero implementation"
+      reason: "Depends on ProductDeployment trigger (M2-OA-03) and >50 deployment records"
+      defer_to: M3
+      priority: MEDIUM
+
+    - id: M2-OA-09
+      task: "Reddit historical backfill (Pushshift)"
+      tracks: [E]
+      steps: [step_17]
+      gap: "No Pushshift/historical ingestion code"
+      reason: "API rate limits, daily Reddit already working"
+      defer_to: M3
+      priority: MEDIUM
+
+    - id: M2-OA-10
+      task: "Alpha Vantage 5-min intraday"
+      tracks: [E]
+      steps: [step_06]
+      gap: "Daily/monthly implemented, 5-min needs TIME_SERIES_INTRADAY + premium API key"
+      reason: "Premium API key cost, daily data sufficient for now"
+      defer_to: M3
+      priority: LOW
+
+    - id: M2-OA-11
+      task: "arXiv citation counts (CrossRef integration)"
+      tracks: [C]
+      steps: [step_13]
+      gap: "Paper counts only — citation counts need CrossRef API"
+      reason: "Additional API integration, paper counts provide partial signal"
+      defer_to: M3
+      priority: LOW
+
+    - id: M2-OA-12
+      task: "Integration test template library"
+      tracks: [B]
+      steps: [step_07]
+      gap: "No reusable CRUD/auth/Stripe test templates"
+      reason: "Generative approach works, templates would improve consistency"
+      defer_to: M3
+      priority: MEDIUM
+
+    - id: M2-OA-13
+      task: "GA4 measurement ID injection"
+      tracks: [D]
+      steps: [step_11]
+      gap: "No GA4 injection code"
+      reason: "Part of one-click deploy — needs GA4 account setup first"
+      defer_to: M3
+      priority: LOW
+
+    - id: M2-OA-14
+      task: "Build error tracker + top 5 failure pattern analysis"
+      tracks: [B]
+      steps: [step_07]
+      gap: "No build_error_tracker.py in bv_check, no failure pattern analysis"
+      reason: "Needs build volume data to be meaningful"
+      defer_to: M3
+      priority: MEDIUM
+
+  # ----- VALIDATION GATES STATUS -----
+  validation_gates:
+    ensemble_accuracy:
+      target: "65% direction accuracy (walk-forward)"
+      current: "49.3%"
+      status: NOT_MET
+      gap: "15.7pp"
+    build_error_rate:
+      target: "≤20% over 20+ builds"
+      current: "NOT_MEASURED"
+      status: NOT_MET
+    exploitation_accuracy:
+      target: "60% over 30+ validated recommendations"
+      current: "NOT_MEASURED"
+      status: NOT_MET
+    one_click_deploy:
+      target: "Single button end-to-end"
+      current: "MOSTLY MET — build pipeline + GitHub auto push + Railway project creation. Missing: GA4 injection"
+      status: PARTIAL
+    data_volume:
+      target: "500GB (or 400GB+ with delays)"
+      current: "NOT_MEASURED"
+      status: NOT_MET
+    commercial_api:
+      target: ">50 deployment records via /api/commercial-intelligence"
+      current: "NOT_STARTED"
+      status: NOT_MET

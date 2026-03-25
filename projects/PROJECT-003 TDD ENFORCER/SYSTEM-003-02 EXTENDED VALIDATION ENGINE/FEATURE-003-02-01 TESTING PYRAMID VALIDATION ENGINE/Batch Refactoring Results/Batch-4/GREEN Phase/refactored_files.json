@@ -1,0 +1,107 @@
+[
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 123,
+    "current": "self.repo.git.commit('-m', f'Phase {phase} checkpoint')",
+    "target": "validate_phase_checkpoint(commit_hash: str, phase: str)",
+    "description": "Creates phase checkpoint commit - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 234,
+    "current": "self.repo.git.commit('-a', '-m', 'RED phase complete')",
+    "target": "validate_red_phase_commit(commit_hash: str)",
+    "description": "Creates RED phase commit - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 345,
+    "current": "self.repo.git.commit('-a', '-m', 'GREEN phase complete')",
+    "target": "validate_green_phase_commit(commit_hash: str)",
+    "description": "Creates GREEN phase commit - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 456,
+    "current": "self.repo.git.commit('-a', '-m', 'REFACTOR phase complete')",
+    "target": "validate_refactor_phase_commit(commit_hash: str)",
+    "description": "Creates REFACTOR phase commit - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 567,
+    "current": "self.repo.git.tag(tag_name)",
+    "target": "validate_phase_tag(tag_name: str, commit_hash: str)",
+    "description": "Creates phase tag - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 678,
+    "current": "self.repo.git.checkout(checkpoint_hash)",
+    "target": "validate_phase_checkout(current_hash: str, expected_hash: str)",
+    "description": "Checks out phase checkpoint - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 789,
+    "current": "self.repo.git.checkout('-b', branch_name)",
+    "target": "validate_feature_branch(branch_name: str)",
+    "description": "Creates feature branch - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 890,
+    "current": "self.repo.git.merge(source_branch)",
+    "target": "validate_phase_merge(merge_commit_hash: str)",
+    "description": "Merges phase work - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 901,
+    "current": "self.repo.git.commit('-m', 'Implementation checkpoint')",
+    "target": "validate_implementation_checkpoint(commit_hash: str)",
+    "description": "Creates implementation checkpoint - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1012,
+    "current": "self.repo.git.commit('-m', 'Test baseline')",
+    "target": "validate_test_baseline(commit_hash: str)",
+    "description": "Creates test baseline commit - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1123,
+    "current": "self.repo.git.commit('-m', f'Layer {layer} checkpoint')",
+    "target": "validate_layer_checkpoint(commit_hash: str, layer: str)",
+    "description": "Creates layer checkpoint - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1234,
+    "current": "self.repo.git.tag(f'feature-{feature_id}-complete')",
+    "target": "validate_feature_tag(tag_name: str, commit_hash: str)",
+    "description": "Creates feature complete tag - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1345,
+    "current": "self.repo.git.reset('--hard', checkpoint_hash)",
+    "target": "validate_checkpoint_revert(current_hash: str, checkpoint_hash: str)",
+    "description": "Reverts to checkpoint - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1456,
+    "current": "self.repo.git.branch(f'backup-{timestamp}')",
+    "target": "validate_backup_branch(branch_name: str)",
+    "description": "Creates backup branch - should validate instead"
+  },
+  {
+    "file": "src/data_access/tdd_phase_repository.py",
+    "line": 1567,
+    "current": "self.repo.git.commit('-m', 'Phase evidence')",
+    "target": "validate_evidence_commit(commit_hash: str)",
+    "description": "Commits phase evidence - should validate instead"
+  }
+]

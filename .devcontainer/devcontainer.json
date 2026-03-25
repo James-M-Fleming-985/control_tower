@@ -61,7 +61,7 @@
         }
     },
 
-    "postCreateCommand": "pip install -e . && pip install pytest pytest-cov pytest-mock pytest-html pathlib dataclasses && gh auth status || echo 'Run: gh auth login --web to authenticate with GitHub'",
+    "postCreateCommand": "pip install -e . && pip install pytest pytest-cov pytest-mock pytest-html pathlib dataclasses mcp requests playwright && python3 -m playwright install --with-deps chromium && gh auth status || echo 'Run: gh auth login --web to authenticate with GitHub'",
     
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"

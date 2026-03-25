@@ -1,0 +1,58 @@
+[
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 299,
+    "current": "test_file.write_text(test_content)",
+    "target": "validate_test_file(test_file_path: str)",
+    "description": "Creates test file - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 533,
+    "current": "impl_file.write_text(impl_content)",
+    "target": "validate_implementation_file(impl_file_path: str)",
+    "description": "Creates implementation file - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 574,
+    "current": "test_file.write_text(updated_content)",
+    "target": "validate_test_update(test_file_path: str)",
+    "description": "Updates test file - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 596,
+    "current": "py_file.write_text('\\n'.join(lines))",
+    "target": "validate_python_file(py_file_path: str)",
+    "description": "Writes Python file - should validate instead"
+  },
+  {
+    "file": "src/data_access/test_generation_data_access.py",
+    "line": 391,
+    "current": "demo_test.write_text(test_content)",
+    "target": "validate_demo_test(demo_test_path: str)",
+    "description": "Creates demo test - should validate instead"
+  },
+  {
+    "file": "src/business_logic/test_generation_verification_logic.py",
+    "line": 907,
+    "current": "demo_test.write_text(test_content)",
+    "target": "validate_generated_test(test_path: str)",
+    "description": "Generates test file - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 480,
+    "current": "f.write(parser_content)",
+    "target": "validate_parser_file(parser_file_path: str)",
+    "description": "Creates parser file - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 504,
+    "current": "f.write(generator_content)",
+    "target": "validate_generator_file(generator_file_path: str)",
+    "description": "Creates generator file - should validate instead"
+  }
+]

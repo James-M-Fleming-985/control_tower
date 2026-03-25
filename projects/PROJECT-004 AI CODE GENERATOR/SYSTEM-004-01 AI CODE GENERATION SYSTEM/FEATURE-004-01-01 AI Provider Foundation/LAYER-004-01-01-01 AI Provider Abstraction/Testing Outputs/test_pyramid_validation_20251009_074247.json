@@ -1,0 +1,7 @@
+{
+  "unit_tests": 15,
+  "integration_tests": 4,
+  "actual_ratio": 3.75,
+  "required_ratio": 2.0,
+  "status": "PASSED"
+}

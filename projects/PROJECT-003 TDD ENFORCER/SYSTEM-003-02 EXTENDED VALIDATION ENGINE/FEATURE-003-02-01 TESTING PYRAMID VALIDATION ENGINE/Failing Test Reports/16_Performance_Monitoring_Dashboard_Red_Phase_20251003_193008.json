@@ -1,0 +1,288 @@
+{
+  "report_metadata": {
+    "report_type": "TDD_RED_Phase_Output",
+    "iteration_number": 16,
+    "component_name": "Performance Monitoring Dashboard",
+    "layer": "User Interface Layer",
+    "phase": "RED",
+    "timestamp": "2025-10-03T19:30:08Z",
+    "generated_by": "TDD RED Phase Execution Engine",
+    "report_version": "1.0.0"
+  },
+  "executive_summary": {
+    "phase": "RED",
+    "status": "SUCCESS",
+    "achievement": "Created Performance Monitoring Dashboard foundation with NotImplementedError stubs",
+    "total_tests": 4,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "pass_rate": "100%",
+    "execution_time_seconds": 3.04,
+    "platform": "Linux - Python 3.12.11, pytest-8.4.2"
+  },
+  "code_metrics": {
+    "implementation_file": "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/performance_monitoring_dashboard.py",
+    "test_file": "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_performance_monitoring_dashboard.py",
+    "implementation_lines": 92,
+    "test_lines": 82,
+    "methods_created": 4,
+    "type_hints_coverage": "100%",
+    "docstring_coverage": "100%"
+  },
+  "method_signatures": {
+    "render_performance_overview": {
+      "signature": "def render_performance_overview(self, performance_data: Dict[str, Any]) -> Dict[str, Any]",
+      "purpose": "Render performance overview with system and component metrics",
+      "input_structure": {
+        "system_performance": {
+          "average_response_time_ms": "int",
+          "target_response_time_ms": "int",
+          "performance_score": "float",
+          "status": "str (healthy/warning/critical)"
+        },
+        "component_performance": {
+          "component_name": {
+            "response_time_ms": "int",
+            "status": "str"
+          }
+        }
+      },
+      "status": "NotImplementedError stub"
+    },
+    "display_performance_trends": {
+      "signature": "def display_performance_trends(self, trends_data: Dict[str, Any]) -> Dict[str, Any]",
+      "purpose": "Display performance trends over specified time range",
+      "input_structure": {
+        "time_range": "str (last_24_hours, etc.)",
+        "metrics": [
+          {
+            "timestamp": "str (ISO 8601)",
+            "response_time_ms": "int"
+          }
+        ],
+        "target_line": "int"
+      },
+      "status": "NotImplementedError stub"
+    },
+    "show_performance_alerts": {
+      "signature": "def show_performance_alerts(self, alerts_data: Dict[str, Any]) -> Dict[str, Any]",
+      "purpose": "Show performance alerts with active alerts and history",
+      "input_structure": {
+        "active_alerts": [
+          {
+            "component": "str",
+            "metric": "str",
+            "value": "int",
+            "threshold": "int"
+          }
+        ],
+        "alert_history": "list",
+        "alert_summary": {
+          "critical": "int",
+          "warning": "int",
+          "info": "int"
+        }
+      },
+      "status": "NotImplementedError stub"
+    },
+    "render_real_time_metrics": {
+      "signature": "def render_real_time_metrics(self, real_time_config: Dict[str, Any]) -> Dict[str, Any]",
+      "purpose": "Render real-time metrics with live updates",
+      "input_structure": {
+        "refresh_interval_seconds": "int",
+        "metrics_to_display": ["str"],
+        "visualization_type": "str"
+      },
+      "status": "NotImplementedError stub"
+    }
+  },
+  "test_results": {
+    "total_tests": 4,
+    "passed": 4,
+    "failed": 0,
+    "execution_time": 3.04,
+    "test_cases": [
+      {
+        "name": "test_render_performance_overview_fails_initially",
+        "status": "PASSED",
+        "purpose": "Verify render_performance_overview raises NotImplementedError",
+        "validation": "Method correctly raises NotImplementedError before implementation"
+      },
+      {
+        "name": "test_display_performance_trends_fails_initially",
+        "status": "PASSED",
+        "purpose": "Verify display_performance_trends raises NotImplementedError",
+        "validation": "Method correctly raises NotImplementedError before implementation"
+      },
+      {
+        "name": "test_show_performance_alerts_fails_initially",
+        "status": "PASSED",
+        "purpose": "Verify show_performance_alerts raises NotImplementedError",
+        "validation": "Method correctly raises NotImplementedError before implementation"
+      },
+      {
+        "name": "test_render_real_time_metrics_fails_initially",
+        "status": "PASSED",
+        "purpose": "Verify render_real_time_metrics raises NotImplementedError",
+        "validation": "Method correctly raises NotImplementedError before implementation"
+      }
+    ]
+  },
+  "performance_targets": {
+    "response_time_target_ms": 200,
+    "performance_score_range": "0.0 - 1.0",
+    "alert_thresholds": {
+      "critical": ">250ms (25% over target)",
+      "warning": ">200ms (over target)",
+      "info": ">180ms (90% of target)"
+    },
+    "real_time_monitoring": {
+      "refresh_interval_range_seconds": "1-60",
+      "default_refresh_seconds": 5,
+      "metrics_tracked": ["response_time", "throughput", "error_rate"]
+    }
+  },
+  "green_phase_requirements": {
+    "render_performance_overview": {
+      "must_implement": [
+        "Parse system_performance and component_performance data",
+        "Calculate performance score (0.0-1.0)",
+        "Determine system status (healthy/warning/critical)",
+        "Identify components exceeding thresholds",
+        "Format display data with visual indicators",
+        "Return overview_rendered flag and summary"
+      ],
+      "expected_return_fields": [
+        "overview_rendered",
+        "system_status",
+        "performance_score",
+        "average_response_time_ms",
+        "target_response_time_ms",
+        "components_count",
+        "components_over_threshold",
+        "display_data"
+      ]
+    },
+    "display_performance_trends": {
+      "must_implement": [
+        "Parse time_range and metrics data",
+        "Calculate trend direction (improving/stable/degrading)",
+        "Identify performance spikes and dips",
+        "Calculate min/max/avg response times",
+        "Format trend line data for visualization",
+        "Include target line for comparison",
+        "Return trends_displayed flag"
+      ],
+      "expected_return_fields": [
+        "trends_displayed",
+        "time_range",
+        "data_points",
+        "trend_direction",
+        "min_response_time_ms",
+        "max_response_time_ms",
+        "avg_response_time_ms",
+        "target_line",
+        "chart_data"
+      ]
+    },
+    "show_performance_alerts": {
+      "must_implement": [
+        "Parse active_alerts and alert_history",
+        "Categorize alerts by severity (critical/warning/info)",
+        "Sort alerts by severity and timestamp",
+        "Calculate alert statistics",
+        "Format alert display data",
+        "Include recommended actions",
+        "Return alerts_displayed flag"
+      ],
+      "expected_return_fields": [
+        "alerts_displayed",
+        "active_count",
+        "alert_summary",
+        "sorted_alerts",
+        "recommended_actions",
+        "alert_trend"
+      ]
+    },
+    "render_real_time_metrics": {
+      "must_implement": [
+        "Parse real_time_config",
+        "Validate refresh_interval (1-60 seconds)",
+        "Validate metrics_to_display list",
+        "Validate visualization_type",
+        "Initialize metrics configuration",
+        "Return metrics_rendered flag"
+      ],
+      "expected_return_fields": [
+        "metrics_rendered",
+        "refresh_interval_seconds",
+        "metrics_count",
+        "metrics_to_display",
+        "visualization_type",
+        "auto_refresh_enabled"
+      ]
+    }
+  },
+  "validation_requirements": {
+    "input_validation": [
+      "Type checking: Ensure input is Dict[str, Any]",
+      "Required fields: Verify all expected keys present",
+      "Value validation: Check data types and ranges",
+      "Raise ValueError: For invalid inputs with descriptive messages"
+    ],
+    "error_handling": [
+      "Clear error messages for missing fields",
+      "Type validation for all inputs",
+      "Range validation for numeric values",
+      "Graceful handling of edge cases"
+    ]
+  },
+  "files_created": {
+    "implementation": {
+      "path": "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/src/user_interface/performance_monitoring_dashboard.py",
+      "lines": 92,
+      "methods": 4,
+      "status": "RED phase complete (NotImplementedError stubs)"
+    },
+    "tests": {
+      "path": "/workspaces/control_tower/projects/PROJECT-003 TDD ENFORCER/tests/user_interface/test_performance_monitoring_dashboard.py",
+      "lines": 82,
+      "test_cases": 4,
+      "status": "All passing (4/4)"
+    }
+  },
+  "next_steps": {
+    "green_phase_goals": [
+      "Replace NotImplementedError with minimal working implementations",
+      "Add input validation (ValueError for invalid inputs)",
+      "Implement basic data parsing and formatting",
+      "Calculate performance metrics and scores",
+      "Format return dictionaries per specifications",
+      "Ensure all 4 tests pass with actual implementations"
+    ],
+    "green_phase_success_criteria": [
+      "All 4 tests passing with actual implementations",
+      "Input validation implemented (TypeError/ValueError)",
+      "Performance score calculations working",
+      "Alert categorization functional",
+      "Trend analysis operational",
+      "Real-time configuration validated"
+    ],
+    "estimated_duration": "60-75 minutes"
+  },
+  "conclusion": {
+    "red_phase_success": "Complete with 4/4 tests passing",
+    "pass_rate": "100%",
+    "code_quality": "Complete method signatures with type hints and docstrings",
+    "contracts_defined": "Clear input/output contracts for GREEN phase",
+    "production_focus": "Real-time performance tracking with <200ms targets",
+    "key_differentiators": [
+      "Performance-focused (<200ms targets)",
+      "Real-time monitoring with configurable refresh",
+      "Component-level granularity",
+      "Trend analysis capabilities",
+      "Multi-level severity alerts"
+    ],
+    "next_phase": "GREEN Phase Minimal Implementation"
+  }
+}

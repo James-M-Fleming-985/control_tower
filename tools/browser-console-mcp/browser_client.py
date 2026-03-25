@@ -107,6 +107,21 @@ async def check_page(
             viewport={"width": 1280, "height": 720},
             user_agent="ControlTower-BrowserMCP/1.0",
         )
+
+        # Inject CSP violation listener before any page loads
+        await context.add_init_script("""
+            window.__cspViolations = [];
+            document.addEventListener('securitypolicyviolation', function(e) {
+                window.__cspViolations.push({
+                    directive: e.violatedDirective,
+                    blocked: e.blockedURI,
+                    source: e.sourceFile || '',
+                    line: e.lineNumber || 0,
+                });
+                console.error('[CSP] Blocked ' + e.blockedURI + ' — violates ' + e.violatedDirective);
+            });
+        """)
+
         await _setup_auth(context, auth)
         page = await context.new_page()
 
@@ -118,7 +133,7 @@ async def check_page(
         # Collect JS exceptions
         page.on("pageerror", lambda exc: result.js_exceptions.append(str(exc)))
 
-        # Collect network failures
+        # Collect network failures (4xx/5xx responses)
         page.on("response", lambda resp: (
             result.network_failures.append(
                 NetworkFailure(
@@ -128,6 +143,16 @@ async def check_page(
                     status_text=resp.status_text,
                 )
             ) if resp.status >= 400 else None
+        ))
+
+        # Collect completely failed requests (DNS, CORS, timeout, connection refused)
+        page.on("requestfailed", lambda req: result.network_failures.append(
+            NetworkFailure(
+                url=req.url,
+                status=0,
+                method=req.method,
+                status_text=req.failure or "request failed",
+            )
         ))
 
         try:
@@ -141,6 +166,16 @@ async def check_page(
             # Wait extra time for async JS to fire
             if wait_seconds > 0:
                 await asyncio.sleep(wait_seconds)
+
+            # Collect CSP violations from injected listener
+            try:
+                csp = await page.evaluate("window.__cspViolations || []")
+                for v in csp:
+                    result.js_exceptions.append(
+                        f"[CSP] Blocked {v.get('blocked', '?')} — violates {v.get('directive', '?')}"
+                    )
+            except Exception:
+                pass
         except Exception as e:
             result.js_exceptions.append(f"Navigation error: {e}")
         finally:

@@ -1,0 +1,58 @@
+[
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 444,
+    "current": "test_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_test_directory(test_dir_path: str)",
+    "description": "Creates test directory - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 199,
+    "current": "workspace.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_workspace(workspace_path: str)",
+    "description": "Creates workspace directory - should validate instead"
+  },
+  {
+    "file": "src/user_interface/tdd_workflow_interface.py",
+    "line": 562,
+    "current": "output_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_output_directory(output_dir_path: str)",
+    "description": "Creates output directory - should validate instead"
+  },
+  {
+    "file": "src/user_interface/tdd_workflow_interface.py",
+    "line": 569,
+    "current": "report_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_report_directory(report_dir_path: str)",
+    "description": "Creates report directory - should validate instead"
+  },
+  {
+    "file": "src/data_access/test_generation_data_access.py",
+    "line": 125,
+    "current": "test_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_test_directory_structure(test_dir_path: str)",
+    "description": "Creates test directory - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_engine.py",
+    "line": 345,
+    "current": "impl_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_implementation_directory(impl_dir_path: str)",
+    "description": "Creates implementation directory - should validate instead"
+  },
+  {
+    "file": "src/business_logic/test_generation_verification_logic.py",
+    "line": 234,
+    "current": "workspace_dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_test_workspace(workspace_path: str)",
+    "description": "Creates workspace directory - should validate instead"
+  },
+  {
+    "file": "legacy/utilities/tdd_workflow_enforcer.py",
+    "line": 678,
+    "current": "for dir in dirs: dir.mkdir(parents=True, exist_ok=True)",
+    "target": "validate_output_structure(base_path: str, expected_dirs: List[str])",
+    "description": "Creates multiple directories - should validate instead"
+  }
+]

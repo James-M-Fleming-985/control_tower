@@ -12,7 +12,7 @@ from datetime import datetime
 import yaml
 import json
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 # Clean API key (remove whitespace/newlines)
 if 'ANTHROPIC_API_KEY' in os.environ:
