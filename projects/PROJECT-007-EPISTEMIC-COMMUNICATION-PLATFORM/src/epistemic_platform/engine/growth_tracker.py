@@ -50,6 +50,7 @@ class GrowthReport:
 
     # Stance journey
     all_stances_encountered: list[str] = field(default_factory=list)
+    stance_trend: list[dict[str, Any]] = field(default_factory=list)  # per-session primary stance
 
     # Streaks
     sessions_above_b: int = 0  # consecutive B+ sessions
@@ -83,6 +84,7 @@ class GrowthReport:
             "best_score": round(self.best_score, 1),
             "score_improvement": round(self.score_improvement, 1),
             "all_stances_encountered": self.all_stances_encountered,
+            "stance_trend": self.stance_trend,
             "sessions_above_b": self.sessions_above_b,
         }
 
@@ -132,6 +134,12 @@ class GrowthTracker:
 
             # Stances
             all_stances.update(a.stance.unique_stances)
+            if a.stance.primary_stance:
+                report.stance_trend.append({
+                    "session_id": sid,
+                    "primary_stance": a.stance.primary_stance,
+                    "unique_stances": a.stance.unique_stances,
+                })
 
             # B+ streak
             if s.grade in ("S", "A", "B"):

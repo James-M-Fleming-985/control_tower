@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGamificationProfile, useProficiency, useGrowth, useSessions } from '@/hooks/use-api';
+import { useGamificationProfile, useProficiency, useGrowth, useSessions, useUpdateProfile } from '@/hooks/use-api';
+import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { xpProgress } from '@/lib/utils';
-import { LEVEL_NAMES } from '@/lib/constants';
-import { BarChart3, Zap, Target, TrendingUp, ArrowRight, BookOpen, MessageSquare, CheckCircle2, Eye } from 'lucide-react';
+import { LEVEL_NAMES, LEVEL_DESCRIPTIONS } from '@/lib/constants';
+import { BarChart3, Zap, Target, TrendingUp, ArrowRight, BookOpen, MessageSquare, CheckCircle2, Eye, Crosshair } from 'lucide-react';
 import {
   RadarChart,
   PolarGrid,
@@ -22,6 +23,7 @@ import {
   YAxis,
   Tooltip as RechartsTooltip,
   CartesianGrid,
+  ReferenceLine,
 } from 'recharts';
 
 const PROFICIENCY_LABELS: Record<string, string> = {
@@ -43,6 +45,18 @@ const AXIS_TIPS: Record<string, string> = {
   overall: 'Keep practising across all dimensions. Aim for balanced growth rather than focusing on a single skill.',
 };
 
+/* Unified dimension colour palette — used by radar, growth chart, strengths, tooltips */
+const DIMENSION_COLORS: Record<string, string> = {
+  awareness: '#3b82f6',   // blue
+  quality: '#6264A7',     // indigo (brand)
+  flexibility: '#10b981', // green
+  composure: '#f59e0b',   // amber
+  overall: '#8b5cf6',     // violet
+  gricean: '#3b82f6',     // alias → awareness
+  trilemma: '#ef4444',    // red
+  engagement: '#ec4899',  // pink
+};
+
 const JOURNEY_STAGES = [
   { level: 0, label: 'Assessment', icon: BookOpen, desc: 'Complete the epistemological assessment to identify your starting perspective.' },
   { level: 1, label: 'Beginner', icon: MessageSquare, desc: 'Practice basic conversations. Learn to recognise trilemma horns and Gricean maxims.' },
@@ -52,6 +66,14 @@ const JOURNEY_STAGES = [
 ];
 
 const SCORE_GRADE = (v: number) => v >= 95 ? 'S' : v >= 80 ? 'A' : v >= 65 ? 'B' : v >= 50 ? 'C' : 'D';
+
+const GRADE_INFO: Record<string, { label: string; desc: string; tip: string }> = {
+  S: { label: 'S — Superb', desc: '≥95% — Exceptional mastery across all dimensions.', tip: 'You\'re performing at the highest level. Keep challenging yourself with harder scenarios.' },
+  A: { label: 'A — Advanced', desc: '80–94% — Strong, well-rounded performance.', tip: 'Excellent work. Polish your weakest dimension to push into S territory.' },
+  B: { label: 'B — Building', desc: '65–79% — Solid skills with room to grow.', tip: 'You\'re on a good trajectory. Focus on consistency across sessions.' },
+  C: { label: 'C — Capable', desc: '50–64% — Developing core abilities.', tip: 'You\'re getting the basics. Try to pause and reflect before responding in conversations.' },
+  D: { label: 'D — Developing', desc: 'Below 50% — Early stage of learning.', tip: 'Everyone starts here. Each conversation builds your skills — keep practising and review your debriefs.' },
+};
 
 const STANCE_COLORS: Record<string, string> = {
   foundationalist: '#ef4444',
@@ -93,6 +115,29 @@ export function DashboardPage() {
   const { data: proficiency, isLoading: profLoading } = useProficiency();
   const { data: growth, isLoading: growthLoading } = useGrowth();
   const { data: sessions } = useSessions();
+  const user = useAuthStore((s) => s.user);
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const updateProfile = useUpdateProfile();
+
+  // User targets from preferences
+  const userTargets = (user?.preferences?.targets ?? {}) as Record<string, number>;
+  const [editingTargets, setEditingTargets] = useState(false);
+  const [draftTargets, setDraftTargets] = useState<Record<string, number>>({});
+
+  const openTargetEditor = useCallback(() => {
+    setDraftTargets({ ...userTargets });
+    setEditingTargets(true);
+  }, [userTargets]);
+
+  const saveTargets = useCallback(() => {
+    const newPrefs = { ...(user?.preferences ?? {}), targets: draftTargets };
+    updateProfile.mutate({ preferences: newPrefs }, {
+      onSuccess: (updated) => {
+        updateUser({ preferences: updated.preferences });
+        setEditingTargets(false);
+      },
+    });
+  }, [draftTargets, user?.preferences, updateProfile, updateUser]);
 
   const loading = profileLoading || profLoading || growthLoading;
 
@@ -119,11 +164,14 @@ export function DashboardPage() {
           const raw = typeof v === 'object' && v !== null && 'value' in (v as Record<string, unknown>)
             ? (v as { value: number }).value
             : Number(v ?? 0);
-          return { axis: PROFICIENCY_LABELS[k] ?? k.replace(/_/g, ' '), key: k, value: Math.round(raw * 100) };
+          return { axis: PROFICIENCY_LABELS[k] ?? k.replace(/_/g, ' '), key: k, value: Math.round(raw * 100), target: userTargets[k] ?? undefined };
         })
     : [];
 
-  // Growth line data — merge all dimension trends by session index
+  const hasTargets = Object.keys(userTargets).length > 0;
+
+  // Growth line data — merge all dimension trends by session_id (not index)
+  // Composure only has data for voice sessions, so index-based mapping misaligns
   const growthData = (() => {
     const scoreTrend = (growth?.score_trend ?? []) as Array<{ session_id: number; value: number }>;
     const griceanTrend = (growth?.gricean_trend ?? []) as Array<{ session_id: number; value: number }>;
@@ -131,13 +179,20 @@ export function DashboardPage() {
     const flexTrend = (growth?.flexibility_trend ?? []) as Array<{ session_id: number; value: number }>;
     const compTrend = (growth?.composure_trend ?? []) as Array<{ session_id: number; value: number }>;
     if (!scoreTrend.length) return [];
+    // Build lookup maps keyed by session_id for sparse dimensions
+    const toMap = (arr: Array<{ session_id: number; value: number }>) =>
+      new Map(arr.map((e) => [e.session_id, e.value]));
+    const griceanMap = toMap(griceanTrend);
+    const trilemmaMap = toMap(trilemmaTrend);
+    const flexMap = toMap(flexTrend);
+    const compMap = toMap(compTrend);
     return scoreTrend.map((s, i) => ({
       session: `Session ${i + 1}`,
       score: Math.round(s.value * 10) / 10,
-      gricean: Math.round((griceanTrend[i]?.value ?? 0) * 10) / 10,
-      trilemma: Math.round((trilemmaTrend[i]?.value ?? 0) * 10) / 10,
-      flexibility: Math.round((flexTrend[i]?.value ?? 0) * 10) / 10,
-      composure: compTrend.length > 0 ? Math.round((compTrend[i]?.value ?? 0) * 10) / 10 : undefined,
+      gricean: Math.round((griceanMap.get(s.session_id) ?? 0) * 10) / 10,
+      trilemma: Math.round((trilemmaMap.get(s.session_id) ?? 0) * 10) / 10,
+      flexibility: Math.round((flexMap.get(s.session_id) ?? 0) * 10) / 10,
+      composure: compMap.has(s.session_id) ? Math.round((compMap.get(s.session_id)!) * 10) / 10 : undefined,
     }));
   })();
 
@@ -159,9 +214,14 @@ export function DashboardPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
               <Zap className="h-5 w-5 text-primary" />
             </div>
-            <div>
+            <div className="group relative">
               <p className="text-xs text-muted-foreground">Level</p>
               <p className="text-lg font-bold">{level} — {levelName}</p>
+              {LEVEL_DESCRIPTIONS[level] && (
+                <div className="absolute top-full left-0 mt-1 w-56 rounded-md bg-popover p-2 text-[10px] text-popover-foreground shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border">
+                  {LEVEL_DESCRIPTIONS[level]}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -208,7 +268,7 @@ export function DashboardPage() {
           <CardDescription className="text-xs">Progress through stages by completing conversations and earning XP</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-1 overflow-x-auto pb-2">
+          <div className="flex items-center gap-1 overflow-x-auto pb-14">
             {JOURNEY_STAGES.map((stage, i) => {
               const reached = level >= stage.level || (stage.level === 0 && (sessions?.length ?? 0) >= 0);
               const current = i < JOURNEY_STAGES.length - 1
@@ -217,22 +277,22 @@ export function DashboardPage() {
               const Icon = stage.icon;
               return (
                 <div key={stage.label} className="flex items-center group">
-                  <div className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-md min-w-[80px] ${
+                  <div className={`relative flex flex-col items-center gap-1 px-4 py-2.5 rounded-md min-w-[90px] ${
                     current ? 'bg-primary/20 ring-1 ring-primary' : reached ? 'opacity-100' : 'opacity-40'
                   }`}>
                     {reached ? (
-                      <CheckCircle2 className={`h-5 w-5 ${current ? 'text-primary' : 'text-green-400'}`} />
+                      <CheckCircle2 className={`h-6 w-6 shrink-0 ${current ? 'text-primary' : 'text-green-400'}`} />
                     ) : (
-                      <Icon className="h-5 w-5 text-muted-foreground" />
+                      <Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
                     )}
-                    <span className={`text-xs font-medium ${current ? 'text-primary' : ''}`}>{stage.label}</span>
+                    <span className={`text-xs font-medium whitespace-nowrap ${current ? 'text-primary' : ''}`}>{stage.label}</span>
                     {stage.level > 0 && <span className="text-[10px] text-muted-foreground">L{stage.level}+</span>}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 rounded-md bg-popover p-2 text-[10px] text-popover-foreground shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 border">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-md bg-popover p-2 text-[10px] text-popover-foreground shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border">
                       {stage.desc}
                     </div>
                   </div>
                   {i < JOURNEY_STAGES.length - 1 && (
-                    <ArrowRight className={`h-4 w-4 mx-1 ${reached ? 'text-primary' : 'text-muted-foreground/30'}`} />
+                    <ArrowRight className={`h-4 w-4 mx-1 shrink-0 ${reached ? 'text-primary' : 'text-muted-foreground/30'}`} />
                   )}
                 </div>
               );
@@ -248,14 +308,50 @@ export function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Proficiency Radar</CardTitle>
+              <CardDescription className="text-xs">Your current skill profile across key dimensions (0–100%)</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={280}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="#3b3b3b" />
-                  <PolarAngleAxis dataKey="axis" tick={{ fill: '#a0a0a0', fontSize: 11 }} />
+                  <PolarAngleAxis
+                    dataKey="axis"
+                    tick={({ x, y, payload }: { x: number; y: number; payload: { value: string; index: number } }) => {
+                      const item = radarData[payload.index];
+                      const color = DIMENSION_COLORS[item?.key] ?? '#a0a0a0';
+                      return (
+                        <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill={color} fontSize={11} fontWeight={500}>
+                          {payload.value}
+                        </text>
+                      );
+                    }}
+                  />
                   <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-                  <Radar dataKey="value" stroke="#6264A7" fill="#6264A7" fillOpacity={0.3} />
+                  {hasTargets && (
+                    <Radar dataKey="target" stroke="#ffffff" strokeWidth={1} strokeDasharray="4 3" fill="none" fillOpacity={0} dot={false} />
+                  )}
+                  <Radar dataKey="value" stroke="#6264A7" fill="url(#radarGrad)" fillOpacity={0.5} />
+                  <RechartsTooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const d = payload.find((p) => p.dataKey === 'value')?.payload as { axis: string; key: string; value: number; target?: number } | undefined;
+                      if (!d) return null;
+                      const tip = AXIS_TIPS[d.key];
+                      return (
+                        <div className="rounded-md bg-popover border p-2 text-xs shadow-md max-w-[220px]">
+                          <p className="font-medium" style={{ color: DIMENSION_COLORS[d.key] ?? '#a0a0a0' }}>{d.axis}: {d.value}%</p>
+                          {d.target != null && <p className="text-muted-foreground">Target: {d.target}%</p>}
+                          {tip && <p className="text-muted-foreground mt-1">{tip}</p>}
+                        </div>
+                      );
+                    }}
+                  />
+                  <defs>
+                    <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#6264A7" stopOpacity={0.8} />
+                      <stop offset="100%" stopColor="#6264A7" stopOpacity={0.15} />
+                    </radialGradient>
+                  </defs>
                 </RadarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -277,7 +373,7 @@ export function DashboardPage() {
 
         {/* Growth chart */}
         {growthData.length > 1 ? (
-          <ScoreGrowthChart data={growthData} hasComposure={!!growth?.composure_trend && (growth.composure_trend as unknown[]).length > 0} />
+          <ScoreGrowthChart data={growthData} hasComposure={!!growth?.composure_trend && (growth.composure_trend as unknown[]).length > 0} targetScore={userTargets.overall} />
         ) : (
           <Card>
             <CardHeader>
@@ -303,23 +399,63 @@ export function DashboardPage() {
         {radarData.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Strengths &amp; Areas to Improve</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Strengths &amp; Areas to Improve</CardTitle>
+                <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1" onClick={openTargetEditor}>
+                  <Crosshair className="h-3 w-3" /> {Object.keys(userTargets).length > 0 ? 'Edit targets' : 'Set targets'}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-3">
+              {editingTargets && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2 mb-2">
+                  <p className="text-xs font-medium">Set your target % for each dimension:</p>
+                  {radarData.map((d) => (
+                    <div key={d.key} className="flex items-center gap-2">
+                      <span className="text-xs w-24 truncate" style={{ color: DIMENSION_COLORS[d.key] ?? '#aaa' }}>{d.axis}</span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={draftTargets[d.key] ?? 50}
+                        onChange={(e) => setDraftTargets((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
+                        className="flex-1 h-1.5 accent-primary"
+                      />
+                      <span className="text-xs w-8 text-right">{draftTargets[d.key] ?? 50}%</span>
+                    </div>
+                  ))}
+                  <div className="flex gap-2 pt-1">
+                    <Button size="sm" className="h-6 text-[10px]" onClick={saveTargets} disabled={updateProfile.isPending}>Save</Button>
+                    <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setEditingTargets(false)}>Cancel</Button>
+                  </div>
+                </div>
+              )}
               {[...radarData].sort((a, b) => b.value - a.value).map((d, i) => {
                 const isStrength = i < 2 && d.value >= 40;
                 const isWeakness = i >= radarData.length - 1 || d.value < 30;
+                const barColor = DIMENSION_COLORS[d.key] ?? '#6264A7';
+                const target = userTargets[d.key];
                 return (
                   <div key={d.axis} className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">{d.axis}</span>
+                      <span className="text-sm" style={{ color: barColor }}>{d.axis}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">{d.value}%</span>
+                        {target != null && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {d.value >= target ? '✓ target met' : `${target - d.value}% to target`}
+                          </span>
+                        )}
+                        <span className="text-xs font-medium">{d.value}%</span>
                         {isStrength && <Badge variant="default" className="text-[10px] px-1.5 py-0">Strength</Badge>}
                         {isWeakness && <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500/50 text-amber-400">Improve</Badge>}
                       </div>
                     </div>
-                    <Progress value={d.value} className="h-1.5" />
+                    <div className="relative h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${d.value}%`, backgroundColor: barColor }} />
+                      {target != null && (
+                        <div className="absolute top-0 h-full w-0.5 bg-white/60" style={{ left: `${Math.min(target, 100)}%` }} title={`Target: ${target}%`} />
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -327,12 +463,43 @@ export function DashboardPage() {
           </Card>
         )}
 
-        {/* Recommended Next */}
+        {/* Recommended Next + Grade Explanation */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Recommended Next</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* Grade explanation */}
+            {growth?.average_score != null && (() => {
+              const avg = Number(growth.average_score) || 0;
+              const grade = SCORE_GRADE(avg);
+              const info = GRADE_INFO[grade];
+              return (
+                <div className="rounded-md border p-3 space-y-1" style={{ borderColor: grade === 'S' ? '#f59e0b' : grade === 'A' ? '#10b981' : grade === 'B' ? '#3b82f6' : grade === 'C' ? '#8b5cf6' : '#ef4444' }}>
+                  <p className="text-sm font-medium">Your Grade: {info?.label ?? grade}</p>
+                  <p className="text-[10px] text-muted-foreground">{info?.desc}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{info?.tip}</p>
+                </div>
+              );
+            })()}
+
+            {/* Target-aware motivation */}
+            {Object.keys(userTargets).length > 0 && radarData.length > 0 && (() => {
+              const met = radarData.filter((d) => userTargets[d.key] != null && d.value >= userTargets[d.key]);
+              const unmet = radarData.filter((d) => userTargets[d.key] != null && d.value < userTargets[d.key])
+                .sort((a, b) => (userTargets[a.key] - a.value) - (userTargets[b.key] - b.value));
+              return (
+                <div className="rounded-md border border-card-border p-3 space-y-1">
+                  {met.length > 0 && <p className="text-xs text-green-400">🎯 Targets met: {met.map((d) => d.axis).join(', ')}</p>}
+                  {unmet.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Closest target: {unmet[0].axis} — {userTargets[unmet[0].key] - unmet[0].value}% to go
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
             {(sessions?.length ?? 0) === 0 ? (
               <>
                 <p className="text-sm text-muted-foreground">Start your first practice conversation to get personalised recommendations.</p>
@@ -375,51 +542,11 @@ export function DashboardPage() {
 
       {/* Perspective Evolution */}
       {stancesEncountered.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Eye className="h-4 w-4" /> Your Epistemological Perspectives
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Stances detected across your conversations — as you practise, you&apos;ll explore more perspectives and become more epistemologically well-rounded.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {stancesEncountered.map((stance) => (
-                <Badge
-                  key={stance}
-                  variant="outline"
-                  className="text-xs px-2 py-1 border-2"
-                  style={{ borderColor: STANCE_COLORS[stance] ?? '#666', color: STANCE_COLORS[stance] ?? '#aaa' }}
-                >
-                  {stance.charAt(0).toUpperCase() + stance.slice(1)}
-                </Badge>
-              ))}
-              {stancesEncountered.length < 4 && (
-                <Badge variant="outline" className="text-xs px-2 py-1 opacity-40 border-dashed">
-                  + {10 - stancesEncountered.length} more to discover
-                </Badge>
-              )}
-            </div>
-            <div className="space-y-2">
-              {stancesEncountered.map((stance) => (
-                <div key={stance} className="rounded-md border p-2.5 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: STANCE_COLORS[stance] ?? '#666' }} />
-                    <span className="text-sm font-medium">{stance.charAt(0).toUpperCase() + stance.slice(1)}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{STANCE_DESCRIPTIONS[stance] ?? 'A unique epistemological perspective.'}</p>
-                </div>
-              ))}
-            </div>
-            {stancesEncountered.length < 3 && (
-              <p className="text-xs text-muted-foreground italic">
-                Tip: Try taking a different position in your next conversation. Deliberately argue from a perspective you wouldn&apos;t normally adopt.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <PerspectiveEvolutionCard
+          allStances={stancesEncountered}
+          stanceTrend={(growth?.stance_trend ?? []) as Array<{ session_id: number; primary_stance: string; unique_stances: string[] }>}
+          totalSessions={sessions?.length ?? 0}
+        />
       )}
 
       {/* Recent achievements */}
@@ -446,8 +573,14 @@ export function DashboardPage() {
 }
 
 /* ── Score Growth Chart with dimension toggle ── */
-function ScoreGrowthChart({ data, hasComposure }: { data: Array<Record<string, unknown>>; hasComposure: boolean }) {
-  const [visibleLines, setVisibleLines] = useState<Set<string>>(new Set(['score']));
+function ScoreGrowthChart({ data, hasComposure, targetScore }: { data: Array<Record<string, unknown>>; hasComposure: boolean; targetScore?: number }) {
+  const [visibleLines, setVisibleLines] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('growth-dims');
+      if (saved) return new Set(JSON.parse(saved) as string[]);
+    } catch { /* ignore */ }
+    return new Set(['score']);
+  });
 
   const toggle = (key: string) => {
     setVisibleLines((prev) => {
@@ -457,6 +590,7 @@ function ScoreGrowthChart({ data, hasComposure }: { data: Array<Record<string, u
       } else {
         next.add(key);
       }
+      localStorage.setItem('growth-dims', JSON.stringify([...next]));
       return next;
     });
   };
@@ -519,6 +653,9 @@ function ScoreGrowthChart({ data, hasComposure }: { data: Array<Record<string, u
             <XAxis dataKey="session" tick={{ fill: '#a0a0a0', fontSize: 10 }} />
             <YAxis domain={[0, 100]} tick={{ fill: '#a0a0a0', fontSize: 10 }} label={{ value: 'Score %', angle: -90, position: 'insideLeft', fill: '#666', fontSize: 10 }} />
             <RechartsTooltip content={<CustomTooltip />} />
+            {targetScore != null && (
+              <ReferenceLine y={targetScore} stroke="#ffffff" strokeDasharray="6 3" strokeWidth={1} label={{ value: `Target ${targetScore}%`, position: 'right', fill: '#888', fontSize: 9 }} />
+            )}
             {dims.map((d) =>
               visibleLines.has(d.key) ? (
                 <Line
@@ -534,6 +671,151 @@ function ScoreGrowthChart({ data, hasComposure }: { data: Array<Record<string, u
             )}
           </LineChart>
         </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ── Perspective Evolution Card with time-based filtering ── */
+type StanceTrendEntry = { session_id: number; primary_stance: string; unique_stances: string[] };
+type StanceFilter = 'all' | 'last5' | 'last10';
+
+const STANCE_FILTERS: { key: StanceFilter; label: string }[] = [
+  { key: 'all', label: 'All Time' },
+  { key: 'last5', label: 'Last 5' },
+  { key: 'last10', label: 'Last 10' },
+];
+
+function PerspectiveEvolutionCard({
+  allStances,
+  stanceTrend,
+  totalSessions,
+}: {
+  allStances: string[];
+  stanceTrend: StanceTrendEntry[];
+  totalSessions: number;
+}) {
+  const [filter, setFilter] = useState<StanceFilter>('all');
+
+  // Filter stance trend
+  const filteredTrend = (() => {
+    if (filter === 'all' || stanceTrend.length === 0) return stanceTrend;
+    const n = filter === 'last5' ? 5 : 10;
+    return stanceTrend.slice(-n);
+  })();
+
+  // Derive stances from filtered trend or fall back to allStances
+  const filteredStances = filteredTrend.length > 0
+    ? [...new Set(filteredTrend.flatMap((e) => [e.primary_stance, ...e.unique_stances]))].sort()
+    : allStances;
+
+  // Count occurrences as primary stance
+  const primaryCounts = new Map<string, number>();
+  filteredTrend.forEach((e) => {
+    primaryCounts.set(e.primary_stance, (primaryCounts.get(e.primary_stance) ?? 0) + 1);
+  });
+
+  // Generate narrative summary from stance data
+  const stanceSummary = (() => {
+    if (filteredTrend.length < 2) return null;
+    const sorted = [...primaryCounts.entries()].sort((a, b) => b[1] - a[1]);
+    const dominant = sorted[0]?.[0];
+    const dominantCount = sorted[0]?.[1] ?? 0;
+    const dominantPct = Math.round((dominantCount / filteredTrend.length) * 100);
+    const recent = filteredTrend.slice(-3).map((e) => e.primary_stance);
+    const recentUnique = [...new Set(recent)];
+    const diversity = filteredStances.length;
+
+    const parts: string[] = [];
+    if (dominant) {
+      parts.push(`Your dominant perspective is ${dominant} (${dominantPct}% of sessions).`);
+    }
+    if (diversity >= 4) {
+      parts.push(`You\'ve explored ${diversity} different stances — strong epistemic diversity.`);
+    } else if (diversity >= 2) {
+      parts.push(`You\'ve encountered ${diversity} stances so far — try exploring more perspectives to broaden your range.`);
+    }
+    if (recentUnique.length >= 2) {
+      parts.push(`Recently you\'ve been shifting between ${recentUnique.join(' and ')}, showing growing flexibility.`);
+    } else if (recentUnique.length === 1 && recentUnique[0] !== dominant) {
+      parts.push(`Your recent sessions show a shift toward ${recentUnique[0]}.`);
+    }
+    return parts.join(' ');
+  })();
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Eye className="h-4 w-4" /> Your Epistemological Perspectives
+          </CardTitle>
+          {stanceTrend.length > 0 && (
+            <div className="flex gap-1">
+              {STANCE_FILTERS.filter((f) => f.key === 'all' || (f.key === 'last5' && totalSessions >= 5) || (f.key === 'last10' && totalSessions >= 10)).map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setFilter(f.key)}
+                  className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${
+                    filter === f.key ? 'opacity-100 bg-primary/15 border-primary text-primary font-medium' : 'opacity-50 hover:opacity-80'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <CardDescription className="text-xs">
+          {filter === 'all'
+            ? 'Stances detected across all your conversations.'
+            : `Stances from your ${filter === 'last5' ? 'last 5' : 'last 10'} sessions.`}
+          {' '}As you practise, you&apos;ll explore more perspectives.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {stanceSummary && (
+          <div className="rounded-md bg-primary/5 border border-primary/20 p-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">{stanceSummary}</p>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {filteredStances.map((stance) => {
+            const count = primaryCounts.get(stance);
+            return (
+              <Badge
+                key={stance}
+                variant="outline"
+                className="text-xs px-2 py-1 border-2"
+                style={{ borderColor: STANCE_COLORS[stance] ?? '#666', color: STANCE_COLORS[stance] ?? '#aaa' }}
+              >
+                {stance.charAt(0).toUpperCase() + stance.slice(1)}
+                {count != null && count > 0 && <span className="ml-1 opacity-60">×{count}</span>}
+              </Badge>
+            );
+          })}
+          {filter === 'all' && filteredStances.length < 4 && (
+            <Badge variant="outline" className="text-xs px-2 py-1 opacity-40 border-dashed">
+              + {10 - filteredStances.length} more to discover
+            </Badge>
+          )}
+        </div>
+        <div className="space-y-2">
+          {filteredStances.map((stance) => (
+            <div key={stance} className="rounded-md border p-2.5 space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: STANCE_COLORS[stance] ?? '#666' }} />
+                <span className="text-sm font-medium">{stance.charAt(0).toUpperCase() + stance.slice(1)}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{STANCE_DESCRIPTIONS[stance] ?? 'A unique epistemological perspective.'}</p>
+            </div>
+          ))}
+        </div>
+        {filteredStances.length < 3 && (
+          <p className="text-xs text-muted-foreground italic">
+            Tip: Try taking a different position in your next conversation. Deliberately argue from a perspective you wouldn&apos;t normally adopt.
+          </p>
+        )}
       </CardContent>
     </Card>
   );

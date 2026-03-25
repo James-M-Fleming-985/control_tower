@@ -226,6 +226,9 @@ export function ConversationPage() {
         stopPlayback();
         break;
       case 'session_ended':
+        // Stop reconnect IMMEDIATELY (synchronous) before React state update
+        // to prevent race condition where server close arrives before cleanup effect
+        wsRef.current?.stopReconnect();
         setEnded(true);
         if ('reward' in data && data.reward) {
           setSessionReward(data.reward as Record<string, unknown>);

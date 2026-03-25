@@ -20,6 +20,7 @@ export class WebSocketManager {
   private maxReconnectAttempts = 5;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private intentionallyClosed = false;
+  private sessionEnded = false;
 
   constructor(url: string, options: WSOptions) {
     this.url = url;
@@ -91,7 +92,9 @@ export class WebSocketManager {
 
     this.ws.onclose = (event) => {
       this.options.onClose?.(event.code, event.reason);
-      if (!this.intentionallyClosed && this.reconnectAttempts < this.maxReconnectAttempts) {
+      // Don't reconnect if: intentionally closed, session ended, or server sent normal close (1000)
+      if (this.intentionallyClosed || this.sessionEnded || event.code === 1000) return;
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
         const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
         this.reconnectAttempts++;
         this.reconnectTimer = setTimeout(() => this.connect(), delay);
@@ -111,6 +114,13 @@ export class WebSocketManager {
 
   sendJSON(msg: Record<string, unknown>): void {
     this.send(JSON.stringify(msg));
+  }
+
+  /** Mark session as ended — prevents any further reconnect attempts. */
+  stopReconnect(): void {
+    this.sessionEnded = true;
+    this.intentionallyClosed = true;
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
   }
 
   close(): void {
