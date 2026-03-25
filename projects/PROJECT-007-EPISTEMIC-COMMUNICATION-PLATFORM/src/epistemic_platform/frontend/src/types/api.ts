@@ -209,7 +209,7 @@ export interface ProficiencyProfile {
 
 export interface GrowthReport {
   session_scores?: { session_id: number; score: number }[];
-  score_trend?: { session_id: number; score: number; date: string }[];
+  score_trend?: { session_id: number; value: number }[];
   improvement?: number;
   stance_journey?: string[];
   [key: string]: unknown;

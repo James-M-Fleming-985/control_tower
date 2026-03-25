@@ -24,10 +24,22 @@ import {
 } from 'recharts';
 
 const PROFICIENCY_LABELS: Record<string, string> = {
+  awareness: 'Awareness',
+  quality: 'Quality',
+  flexibility: 'Flexibility',
+  composure: 'Composure',
+  overall: 'Overall',
   gricean: 'Gricean Clarity',
   trilemma: 'Trilemma Navigation',
-  flexibility: 'Stance Flexibility',
   engagement: 'Engagement Depth',
+};
+
+const AXIS_TIPS: Record<string, string> = {
+  awareness: 'Practice noticing your own assumptions. Before responding, ask yourself: "What am I taking for granted here?" Try paraphrasing the other person\'s view before giving your own.',
+  quality: 'Focus on supporting your claims with reasons. Instead of stating opinions, explain *why* you hold them and invite the other person to challenge your reasoning.',
+  flexibility: 'When you disagree, try steelmanning — restate the strongest version of the other person\'s argument before responding. Look for partial truths in opposing views.',
+  composure: 'You\'re doing well staying calm under pressure. To go further, practise sitting with discomfort when your beliefs are challenged instead of deflecting.',
+  overall: 'Keep practising across all dimensions. Aim for balanced growth rather than focusing on a single skill.',
 };
 
 const JOURNEY_STAGES = [
@@ -70,15 +82,15 @@ export function DashboardPage() {
           const raw = typeof v === 'object' && v !== null && 'value' in (v as Record<string, unknown>)
             ? (v as { value: number }).value
             : Number(v ?? 0);
-          return { axis: k.replace(/_/g, ' '), value: Math.round(raw * 100) };
+          return { axis: PROFICIENCY_LABELS[k] ?? k.replace(/_/g, ' '), key: k, value: Math.round(raw * 100) };
         })
     : [];
 
   // Growth line data
-  const growthData = growth?.session_scores
-    ? (growth.session_scores as Array<{ session_id: number; score: number }>).map((s, i) => ({
+  const growthData = growth?.score_trend
+    ? (growth.score_trend as Array<{ session_id: number; value: number }>).map((s, i) => ({
         session: i + 1,
-        score: s.score,
+        score: Math.round(s.value * 10) / 10,
       }))
     : [];
 
@@ -267,7 +279,7 @@ export function DashboardPage() {
                 return (
                   <div key={d.axis} className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">{PROFICIENCY_LABELS[d.axis.replace(/ /g, '_')] ?? d.axis}</span>
+                      <span className="text-sm">{d.axis}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">{d.value}%</span>
                         {isStrength && <Badge variant="default" className="text-[10px] px-1.5 py-0">Strength</Badge>}
@@ -299,13 +311,13 @@ export function DashboardPage() {
               <>
                 {radarData.length > 0 && (() => {
                   const weakest = [...radarData].sort((a, b) => a.value - b.value)[0];
-                  const label = PROFICIENCY_LABELS[weakest.axis.replace(/ /g, '_')] ?? weakest.axis;
+                  const axisKey = weakest.key;
+                  const label = PROFICIENCY_LABELS[axisKey] ?? weakest.axis;
+                  const tip = AXIS_TIPS[axisKey] ?? 'Try a conversation that specifically challenges this skill.';
                   return (
                     <div className="rounded-md border border-card-border p-3 space-y-1">
-                      <p className="text-sm font-medium">Focus on: {label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Your {label.toLowerCase()} is at {weakest.value}%. Try a conversation specifically challenging this skill.
-                      </p>
+                      <p className="text-sm font-medium">Focus on: {label} ({weakest.value}%)</p>
+                      <p className="text-xs text-muted-foreground">{tip}</p>
                     </div>
                   );
                 })()}
