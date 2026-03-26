@@ -1411,13 +1411,114 @@ milestones:
     resources: null
     project: CA-SCALE
   - id: null
+    name: Build Portfolio Tab UI (sortable/paginated table of all MVP builds)
+    start_date: "2026-03-26"
+    target_date: "2026-06-21"
+    status: IN_PROGRESS
+    completion_date: null
+    completion_percentage: 0
+    notes:
+      "Track H: Build Portfolio & Iteration Loop. Dedicated Builds tab on dashboard showing all builds in a sortable,
+      paginated table with columns: Build#, Iteration, Recommendation, Status, Complexity, Duration, AI Cost, Files,
+      Errors, Railway URL, Engagement (placeholder), Revenue (placeholder), Created, Actions. Summary cards at top."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: Add iteration_number, parent_build_id, iterate_reason columns to MVPBuild model
+    start_date: "2026-03-26"
+    target_date: "2026-06-21"
+    status: IN_PROGRESS
+    completion_date: null
+    completion_percentage: 0
+    notes:
+      "Track H: Build Portfolio & Iteration Loop. Data model changes to support build iteration chains.
+      iteration_number (int, default 1), parent_build_id (FK self-referential, nullable), iterate_reason (string, nullable).
+      Alembic migration with safe nullable defaults so existing builds survive."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: Build iterate endpoint (POST /builds/{id}/iterate) with ML context enrichment
+    start_date: "2026-03-26"
+    target_date: "2026-06-21"
+    status: IN_PROGRESS
+    completion_date: null
+    completion_percentage: 0
+    notes:
+      "Track H: Build Portfolio & Iteration Loop. Iterate re-runs the automated build pipeline for an existing
+      LIVE or FAILED build, creating a child build with parent_build_id linked. Enriches spec with parent error
+      patterns, generated files, latest ensemble predictions for the signal pair, and engagement data (when available).
+      Concurrency guard: blocks if an active QUEUED/GENERATING sibling exists in the chain."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: Wire ML feedback into iteration prompt (ensemble predictions + error patterns)
+    start_date: "2026-03-26"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes:
+      "Track H: Build Portfolio & Iteration Loop. V1 passes parent error_breakdown + file list to AI prompt.
+      ML feedback (ensemble predictions, engagement metrics) wired but data-dependent on Track G completion.
+      Closes the observe→learn→iterate→deploy→observe loop."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: Add iteration history timeline and expandable row detail to Builds tab
+    start_date: "2026-03-26"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes:
+      "Track H: Build Portfolio & Iteration Loop. Expandable table rows showing build steps timeline, error
+      breakdown, iteration chain (v1→v2→v3), file list with View Code. Iterate button with reason selector
+      (Improve from errors / Update with ML insights / Grow engagement / Custom)."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
     name: "MILESTONE: M2: Intelligence Layer Complete"
     start_date: "2026-06-21"
     target_date: "2026-06-21"
     status: IN_PROGRESS
     completion_date: null
     completion_percentage: 50
-    notes: "AUDIT 2026-03-26: 13/21 tasks COMPLETE (added ensemble→exploitation scoring, build pipeline, plain-English reasoning). 5 PARTIAL, 3 NOT_STARTED. 49.3% accuracy (target 65%). Validation gates not yet met."
+    notes: "AUDIT 2026-03-26: 13/26 tasks COMPLETE (added ensemble→exploitation scoring, build pipeline, plain-English reasoning, Track H Build Portfolio added). 5 PARTIAL, 8 NOT_STARTED. 49.3% accuracy (target 65%). Validation gates not yet met."
     outline_level: 3
     parent_levels:
       "2": "M2: Intelligence Layer (Weeks 10-15)"
