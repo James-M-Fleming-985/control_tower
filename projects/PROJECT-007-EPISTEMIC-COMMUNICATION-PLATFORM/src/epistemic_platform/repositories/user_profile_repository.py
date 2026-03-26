@@ -44,6 +44,11 @@ class UserProfileRepository:
         if not user:
             return None
         updates = data.model_dump(exclude_unset=True)
+        # Deep-merge preferences to avoid wiping stored data (e.g. proficiency).
+        if "preferences" in updates and updates["preferences"] is not None:
+            existing = dict(user.preferences) if user.preferences else {}
+            existing.update(updates["preferences"])
+            updates["preferences"] = existing
         for field, value in updates.items():
             setattr(user, field, value)
         # SQLAlchemy doesn't detect in-place mutations on JSON columns;

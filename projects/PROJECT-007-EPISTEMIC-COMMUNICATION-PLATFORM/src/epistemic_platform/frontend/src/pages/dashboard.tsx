@@ -328,7 +328,7 @@ export function DashboardPage() {
                   />
                   <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
                   {hasTargets && (
-                    <Radar dataKey="target" stroke="#ffffff" strokeWidth={1} strokeDasharray="4 3" fill="none" fillOpacity={0} dot={false} />
+                    <Radar dataKey="target" stroke="#22c55e" strokeWidth={1.5} strokeDasharray="4 3" fill="#22c55e" fillOpacity={0.08} dot={false} />
                   )}
                   <Radar dataKey="value" stroke="#6264A7" fill="url(#radarGrad)" fillOpacity={0.5} />
                   <RechartsTooltip
@@ -654,7 +654,7 @@ function ScoreGrowthChart({ data, hasComposure, targetScore }: { data: Array<Rec
             <YAxis domain={[0, 100]} tick={{ fill: '#a0a0a0', fontSize: 10 }} label={{ value: 'Score %', angle: -90, position: 'insideLeft', fill: '#666', fontSize: 10 }} />
             <RechartsTooltip content={<CustomTooltip />} />
             {targetScore != null && (
-              <ReferenceLine y={targetScore} stroke="#ffffff" strokeDasharray="6 3" strokeWidth={1} label={{ value: `Target ${targetScore}%`, position: 'right', fill: '#888', fontSize: 9 }} />
+              <ReferenceLine y={targetScore} stroke="#22c55e" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Target ${targetScore}%`, position: 'right', fill: '#22c55e', fontSize: 9 }} />
             )}
             {dims.map((d) =>
               visibleLines.has(d.key) ? (
