@@ -584,7 +584,7 @@ export function ConversationPage() {
       </div>
 
       {/* Right panel — coaching + trilemma (hidden on mobile) */}
-      <div className="hidden lg:flex w-72 shrink-0 flex-col gap-4 border-l border-border pl-4 overflow-y-auto">
+      <div className="hidden lg:flex w-72 shrink-0 flex-col gap-4 border-l border-border pl-4 overflow-hidden">
         <TrilemmaVisual state={trilemmaState} lastHorn={lastHorn} />
         <CoachingPanel annotations={annotations} />
       </div>

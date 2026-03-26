@@ -128,8 +128,8 @@ class TurnTracker:
 
     def _parse_coaching_response(self, content: str) -> CoachingAnnotation:
         """Parse Opus JSON response into a CoachingAnnotation."""
-        try:
-            data = json.loads(content)
+        data = self._extract_json(content)
+        if data is not None:
             return CoachingAnnotation(
                 summary=data.get("summary", ""),
                 strengths=data.get("strengths", []),
@@ -144,9 +144,37 @@ class TurnTracker:
                 detected_stance=data.get("detected_stance", ""),
                 trilemma_horn=data.get("trilemma_horn", ""),
             )
-        except (json.JSONDecodeError, KeyError) as e:
-            logger.warning("Failed to parse coaching response: %s", e)
-            return CoachingAnnotation(
-                summary=content[:200],
-                turn_number=self._user_turn_count,
-            )
+        logger.warning("Failed to parse coaching response as JSON")
+        # Fallback: strip markdown/JSON noise from raw content for summary
+        import re as _re
+        clean = _re.sub(r"```(?:json)?\s*|```", "", content).strip()
+        return CoachingAnnotation(
+            summary=clean[:200],
+            turn_number=self._user_turn_count,
+        )
+
+    @staticmethod
+    def _extract_json(text: str) -> dict | None:
+        """Try to extract a JSON object from *text*, tolerating markdown fences."""
+        import re as _re
+        # 1. Direct parse
+        try:
+            return json.loads(text)
+        except (json.JSONDecodeError, ValueError):
+            pass
+        # 2. Strip markdown code fences
+        fenced = _re.search(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", text)
+        if fenced:
+            try:
+                return json.loads(fenced.group(1))
+            except (json.JSONDecodeError, ValueError):
+                pass
+        # 3. Find first { … last }
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end > start:
+            try:
+                return json.loads(text[start : end + 1])
+            except (json.JSONDecodeError, ValueError):
+                pass
+        return None

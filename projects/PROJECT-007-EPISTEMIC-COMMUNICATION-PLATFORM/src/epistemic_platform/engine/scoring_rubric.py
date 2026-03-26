@@ -98,10 +98,17 @@ class ScoringRubric:
         # 1. Gricean: average maxim score, scaled to 0–100 (raw is 1–10)
         s.gricean_score = min(analysis.gricean.average * 10, 100.0)
 
-        # 2. Trilemma: escape rate × 100, bonus for multiple unique horns
-        base_trilemma = analysis.trilemma.escape_rate * 100
-        horn_bonus = min(len(analysis.trilemma.unique_horns) * 10, 30)
-        s.trilemma_score = min(base_trilemma + horn_bonus, 100.0)
+        # 2. Trilemma: blend escape rate with engagement credit
+        #    Visiting horns shows awareness even without escaping them.
+        horns_visited = len(analysis.trilemma.unique_horns)
+        escape_component = analysis.trilemma.escape_rate * 100  # 0-100
+        engagement_component = min(horns_visited * 20, 60)  # up to 60 for 3+ horns
+        # 60% escape, 40% engagement — floor at 15 when any horn visited
+        if horns_visited > 0:
+            raw_trilemma = escape_component * 0.6 + engagement_component * 0.4
+            s.trilemma_score = min(max(raw_trilemma, 15.0), 100.0)
+        else:
+            s.trilemma_score = 0.0
 
         # 3. Flexibility: stance diversity → 0–100
         #    1 stance = 25, 2 = 50, 3 = 75, 4+ = 100

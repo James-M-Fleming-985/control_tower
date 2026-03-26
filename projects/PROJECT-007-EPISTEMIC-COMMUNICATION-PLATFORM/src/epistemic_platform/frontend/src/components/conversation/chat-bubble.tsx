@@ -11,6 +11,9 @@ interface ChatBubbleProps {
 export function ChatBubble({ role, content, timestamp, isStreaming, actorName }: ChatBubbleProps) {
   const isUser = role === 'user';
 
+  // Strip any |||META||| sentinel remnants that leaked through streaming
+  const cleanContent = content.replace(/\|{3}META\|{3}[\s\S]*/g, '').trim();
+
   return (
     <div className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}>
       {!isUser && (
@@ -27,7 +30,7 @@ export function ChatBubble({ role, content, timestamp, isStreaming, actorName }:
               : 'bg-card border border-card-border',
           )}
         >
-          {content}
+          {cleanContent}
           {isStreaming && <span className="streaming-cursor" />}
         </div>
         {timestamp && (

@@ -23,6 +23,7 @@ class TrendPoint:
     session_id: int
     value: float
     label: str = ""
+    timestamp: str = ""
 
 
 @dataclass
@@ -61,23 +62,23 @@ class GrowthReport:
             "total_sessions": self.total_sessions,
             "total_turns": self.total_turns,
             "score_trend": [
-                {"session_id": p.session_id, "value": round(p.value, 1)}
+                {"session_id": p.session_id, "value": round(p.value, 1), "timestamp": p.timestamp}
                 for p in self.score_trend
             ],
             "gricean_trend": [
-                {"session_id": p.session_id, "value": round(p.value, 1)}
+                {"session_id": p.session_id, "value": round(p.value, 1), "timestamp": p.timestamp}
                 for p in self.gricean_trend
             ],
             "trilemma_trend": [
-                {"session_id": p.session_id, "value": round(p.value, 1)}
+                {"session_id": p.session_id, "value": round(p.value, 1), "timestamp": p.timestamp}
                 for p in self.trilemma_trend
             ],
             "flexibility_trend": [
-                {"session_id": p.session_id, "value": round(p.value, 1)}
+                {"session_id": p.session_id, "value": round(p.value, 1), "timestamp": p.timestamp}
                 for p in self.flexibility_trend
             ],
             "composure_trend": [
-                {"session_id": p.session_id, "value": round(p.value, 1)}
+                {"session_id": p.session_id, "value": round(p.value, 1), "timestamp": p.timestamp}
                 for p in self.composure_trend
             ],
             "average_score": round(self.average_score, 1),
@@ -97,6 +98,7 @@ class GrowthTracker:
         user_id: int,
         analyses: list[DialogueAnalysis],
         scores: list[SessionScore],
+        timestamps: list[str] | None = None,
     ) -> GrowthReport:
         """Compute growth report from chronologically ordered analyses/scores.
 
@@ -119,17 +121,18 @@ class GrowthTracker:
 
         for i, (a, s) in enumerate(zip(analyses, scores)):
             sid = a.session_id
+            ts = timestamps[i] if timestamps and i < len(timestamps) else ""
             report.total_turns += a.total_turns
 
             # Score trend
-            report.score_trend.append(TrendPoint(session_id=sid, value=s.final_score))
-            report.gricean_trend.append(TrendPoint(session_id=sid, value=s.gricean_score))
-            report.trilemma_trend.append(TrendPoint(session_id=sid, value=s.trilemma_score))
-            report.flexibility_trend.append(TrendPoint(session_id=sid, value=s.flexibility_score))
+            report.score_trend.append(TrendPoint(session_id=sid, value=s.final_score, timestamp=ts))
+            report.gricean_trend.append(TrendPoint(session_id=sid, value=s.gricean_score, timestamp=ts))
+            report.trilemma_trend.append(TrendPoint(session_id=sid, value=s.trilemma_score, timestamp=ts))
+            report.flexibility_trend.append(TrendPoint(session_id=sid, value=s.flexibility_score, timestamp=ts))
 
             if s.composure_score is not None:
                 report.composure_trend.append(
-                    TrendPoint(session_id=sid, value=s.composure_score)
+                    TrendPoint(session_id=sid, value=s.composure_score, timestamp=ts)
                 )
 
             # Stances

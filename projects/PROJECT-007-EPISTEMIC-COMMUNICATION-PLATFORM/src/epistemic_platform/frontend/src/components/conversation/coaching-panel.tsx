@@ -13,11 +13,11 @@ export function CoachingPanel({ annotations }: Props) {
   if (!visible.length) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col flex-1 min-h-0 space-y-2">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
         <Lightbulb className="h-3 w-3" /> Coaching
       </h3>
-      <div className="space-y-2 max-h-60 overflow-y-auto">
+      <div className="space-y-2 flex-1 min-h-0 overflow-y-auto">
         {annotations.map((ann, i) => {
           if (dismissed.has(i)) return null;
           return (

@@ -173,7 +173,7 @@ export function DashboardPage() {
   // Growth line data — merge all dimension trends by session_id (not index)
   // Composure only has data for voice sessions, so index-based mapping misaligns
   const growthData = (() => {
-    const scoreTrend = (growth?.score_trend ?? []) as Array<{ session_id: number; value: number }>;
+    const scoreTrend = (growth?.score_trend ?? []) as Array<{ session_id: number; value: number; timestamp?: string }>;
     const griceanTrend = (growth?.gricean_trend ?? []) as Array<{ session_id: number; value: number }>;
     const trilemmaTrend = (growth?.trilemma_trend ?? []) as Array<{ session_id: number; value: number }>;
     const flexTrend = (growth?.flexibility_trend ?? []) as Array<{ session_id: number; value: number }>;
@@ -188,6 +188,7 @@ export function DashboardPage() {
     const compMap = toMap(compTrend);
     return scoreTrend.map((s, i) => ({
       session: `Session ${i + 1}`,
+      date: s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
       score: Math.round(s.value * 10) / 10,
       gricean: Math.round((griceanMap.get(s.session_id) ?? 0) * 10) / 10,
       trilemma: Math.round((trilemmaMap.get(s.session_id) ?? 0) * 10) / 10,
@@ -332,6 +333,8 @@ export function DashboardPage() {
                   )}
                   <Radar dataKey="value" stroke="#6264A7" fill="url(#radarGrad)" fillOpacity={0.5} />
                   <RechartsTooltip
+                    position={{ x: 0, y: -10 }}
+                    wrapperStyle={{ pointerEvents: 'none' }}
                     content={({ active, payload }) => {
                       if (!active || !payload?.length) return null;
                       const d = payload.find((p) => p.dataKey === 'value')?.payload as { axis: string; key: string; value: number; target?: number } | undefined;
@@ -602,9 +605,10 @@ function ScoreGrowthChart({ data, hasComposure, targetScore }: { data: Array<Rec
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
     const score = payload.find((p: { dataKey: string }) => p.dataKey === 'score')?.value ?? 0;
+    const date = payload[0]?.payload?.date;
     return (
       <div className="rounded-md bg-popover border p-2 text-xs shadow-md min-w-[140px]">
-        <p className="font-medium text-popover-foreground mb-1">{label} — Grade {SCORE_GRADE(score)}</p>
+        <p className="font-medium text-popover-foreground mb-1">{label}{date ? ` — ${date}` : ''} — Grade {SCORE_GRADE(score)}</p>
         {payload.map((entry: { dataKey: string; value: number; color: string }) => (
           <div key={entry.dataKey} className="flex items-center justify-between gap-3">
             <span style={{ color: entry.color }}>{dims.find((d) => d.key === entry.dataKey)?.label ?? entry.dataKey}</span>

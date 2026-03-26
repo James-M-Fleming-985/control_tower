@@ -124,6 +124,7 @@ async def get_growth_report(
 
     analyses = []
     scores = []
+    timestamps = []
     for s in sessions:
         session_data = {
             "id": s.id,
@@ -143,8 +144,10 @@ async def get_growth_report(
         a = analyser.analyse(session_data)
         analyses.append(a)
         scores.append(rubric.score(a))
+        ts = s.started_at.isoformat() if s.started_at else ""
+        timestamps.append(ts)
 
-    report = tracker.compute(user.id, analyses, scores)
+    report = tracker.compute(user.id, analyses, scores, timestamps=timestamps)
     return report.to_dict()
 
 
