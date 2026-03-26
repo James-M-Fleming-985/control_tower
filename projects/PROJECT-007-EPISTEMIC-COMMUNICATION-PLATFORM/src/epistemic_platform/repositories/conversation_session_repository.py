@@ -120,12 +120,18 @@ class ConversationSessionRepository:
     async def list_completed_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
     ) -> list[ConversationSession]:
-        """Return completed sessions for a user, oldest first (for growth tracking)."""
+        """Return completed sessions for a user, oldest first (for growth tracking).
+
+        Excludes debrief sessions (parent_session_id IS NOT NULL) because they
+        lack coaching annotations, trilemma state, and stance data, producing
+        near-zero scores that pollute growth charts.
+        """
         result = await self.db.execute(
             select(ConversationSession)
             .where(
                 ConversationSession.user_id == user_id,
                 ConversationSession.status == "completed",
+                ConversationSession.parent_session_id.is_(None),
             )
             .order_by(ConversationSession.started_at.asc())
             .offset(skip)

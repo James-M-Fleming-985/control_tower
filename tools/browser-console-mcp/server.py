@@ -248,7 +248,12 @@ async def browser_check_authenticated(
             await page.fill('input[name="email"]', APP_EMAIL)
             await page.fill('input[name="password"]', APP_PASSWORD)
             await page.click('button[type="submit"]')
-            await page.wait_for_load_state("networkidle")
+
+            # SPA login: wait for URL to change away from /login (client-side routing)
+            try:
+                await page.wait_for_url(lambda url: "/login" not in url, timeout=15000)
+            except Exception:
+                pass
 
             # Check if login succeeded (should redirect away from /login)
             if "/login" in page.url:
@@ -417,7 +422,12 @@ async def browser_check_authenticated_interactive(
             await page.fill('input[name="email"]', APP_EMAIL)
             await page.fill('input[name="password"]', APP_PASSWORD)
             await page.click('button[type="submit"]')
-            await page.wait_for_load_state("networkidle")
+
+            # SPA login: wait for URL to change away from /login (client-side routing)
+            try:
+                await page.wait_for_url(lambda url: "/login" not in url, timeout=15000)
+            except Exception:
+                pass
 
             if "/login" in page.url:
                 await browser.close()

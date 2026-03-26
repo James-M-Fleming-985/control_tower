@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 from epistemic_platform.models.user_profile import UserProfile
 from epistemic_platform.schemas.user_profile_schemas import UserProfileCreate, UserProfileUpdate
@@ -41,8 +42,13 @@ class UserProfileRepository:
         user = await self.get(user_id)
         if not user:
             return None
-        for field, value in data.model_dump(exclude_unset=True).items():
+        updates = data.model_dump(exclude_unset=True)
+        for field, value in updates.items():
             setattr(user, field, value)
+        # SQLAlchemy doesn't detect in-place mutations on JSON columns;
+        # explicitly flag them so flush() writes the change.
+        if "preferences" in updates:
+            flag_modified(user, "preferences")
         await self.db.flush()
         return user
 
