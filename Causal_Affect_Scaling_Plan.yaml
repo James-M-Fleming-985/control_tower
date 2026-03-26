@@ -1393,13 +1393,31 @@ milestones:
     resources: null
     project: CA-SCALE
   - id: null
+    name: Plain-English narrative reasoning on exploitation and BUILD cards
+    start_date: "2026-03-26"
+    target_date: "2026-03-26"
+    status: COMPLETE
+    completion_date: "2026-03-26"
+    completion_percentage: 100
+    notes:
+      "Track G: COMPLETE 2026-03-26. generate_reasoning() and generate_build_reasoning() produce two-part output: statistical summary + layman worked example with signal direction, relationship strength, lag explanation, ensemble confirmation, and category-specific BUILD suggestions. Ensemble confidence badge (AI: high/medium/low) added to card stats row. Multi-paragraph rendering via Alpine.js x-for template."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
     name: "MILESTONE: M2: Intelligence Layer Complete"
     start_date: "2026-06-21"
     target_date: "2026-06-21"
     status: IN_PROGRESS
     completion_date: null
     completion_percentage: 50
-    notes: "AUDIT 2026-03-24: 10/20 tasks COMPLETE, 5 PARTIAL, 5 NOT_STARTED. 49.3% accuracy (target 65%). Validation gates not yet met."
+    notes: "AUDIT 2026-03-26: 13/21 tasks COMPLETE (added ensemble→exploitation scoring, build pipeline, plain-English reasoning). 5 PARTIAL, 3 NOT_STARTED. 49.3% accuracy (target 65%). Validation gates not yet met."
     outline_level: 3
     parent_levels:
       "2": "M2: Intelligence Layer (Weeks 10-15)"
