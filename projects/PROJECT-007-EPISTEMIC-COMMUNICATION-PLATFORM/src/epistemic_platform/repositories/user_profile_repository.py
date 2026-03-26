@@ -36,6 +36,7 @@ class UserProfileRepository:
         )
         self.db.add(user)
         await self.db.flush()
+        await self.db.refresh(user)  # reload server-generated values (id, timestamps)
         return user
 
     async def update(self, user_id: int, data: UserProfileUpdate) -> UserProfile | None:
@@ -50,6 +51,7 @@ class UserProfileRepository:
         if "preferences" in updates:
             flag_modified(user, "preferences")
         await self.db.flush()
+        await self.db.refresh(user)  # reload server-generated values (updated_at)
         return user
 
     async def delete(self, user_id: int) -> bool:
