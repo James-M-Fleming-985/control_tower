@@ -328,7 +328,7 @@ export function DashboardPage() {
                   />
                   <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
                   {hasTargets && (
-                    <Radar dataKey="target" stroke="#22c55e" strokeWidth={1.5} strokeDasharray="4 3" fill="#22c55e" fillOpacity={0.08} dot={false} />
+                    <Radar dataKey="target" stroke="#22c55e" strokeWidth={1.5} strokeDasharray="4 3" fill="none" fillOpacity={0} dot={false} />
                   )}
                   <Radar dataKey="value" stroke="#6264A7" fill="url(#radarGrad)" fillOpacity={0.5} />
                   <RechartsTooltip
