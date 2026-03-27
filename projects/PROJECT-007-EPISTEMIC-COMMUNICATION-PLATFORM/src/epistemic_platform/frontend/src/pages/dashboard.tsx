@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGamificationProfile, useProficiency, useGrowth, useSessions, useUpdateProfile, useSyllabus } from '@/hooks/use-api';
+import { useGamificationProfile, useProficiency, useGrowth, useSessions, useUpdateProfile, useSyllabus, useActors } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -115,6 +115,7 @@ export function DashboardPage() {
   const { data: growth, isLoading: growthLoading } = useGrowth();
   const { data: sessions } = useSessions();
   const { data: syllabus } = useSyllabus();
+  const { data: actors } = useActors();
   const user = useAuthStore((s) => s.user);
   const updateUser = useAuthStore((s) => s.updateUser);
   const updateProfile = useUpdateProfile();
@@ -154,6 +155,19 @@ export function DashboardPage() {
       </div>
     );
   }
+
+  // Actor ID → name lookup for syllabus grid
+  const actorMap = new Map<string, string>();
+  actors?.forEach((a) => actorMap.set(String(a.id), a.name));
+
+  // Collect all unique actor IDs from syllabus items for grid columns
+  const syllabusActorIds: string[] = (() => {
+    const ids = new Set<string>();
+    syllabus?.items?.forEach((item) => {
+      Object.keys(item.actors).forEach((id) => ids.add(id));
+    });
+    return Array.from(ids);
+  })();
 
   // Proficiency radar data
   const radarData = proficiency
@@ -272,69 +286,118 @@ export function DashboardPage() {
           <CardDescription className="text-xs">Complete every scenario with all 6 actors at the required grade to advance</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          {/* Level progress bar — full width, equal segments */}
-          <div>
-            <div className="flex w-full">
-              {SYLLABUS_LEVELS.map((sl, i) => {
-                const reached = level > sl.level;
-                const current = level === sl.level;
-                const pct = current ? syllabusPercentage : reached ? 100 : 0;
-                return (
-                  <div key={sl.level} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="w-full px-0.5">
-                      <div className="h-3 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${reached ? 'bg-green-500' : current ? 'bg-primary' : ''}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-medium leading-tight text-center ${current ? 'text-primary' : reached ? 'text-green-400' : 'text-muted-foreground'}`}>
-                      {sl.label}
-                    </span>
-                    <span className="text-[9px] text-muted-foreground leading-none">min {sl.min}</span>
-                    {i < SYLLABUS_LEVELS.length - 1 && reached && (
-                      <CheckCircle2 className="h-3 w-3 text-green-400 -mt-0.5" />
+          {/* ── Stepper bar (Salesforce-style pipeline) ── */}
+          <div className="flex items-center">
+            {SYLLABUS_LEVELS.map((sl, i) => {
+              const reached = level > sl.level;
+              const current = level === sl.level;
+              return (
+                <div key={sl.level} className="flex items-center flex-1 last:flex-none">
+                  {/* Stage pill */}
+                  <div className={`
+                    relative flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap border transition-all
+                    ${reached
+                      ? 'bg-green-500/15 border-green-500/40 text-green-400'
+                      : current
+                        ? 'bg-primary/15 border-primary/50 text-primary ring-2 ring-primary/20'
+                        : 'bg-muted/50 border-border text-muted-foreground'
+                    }
+                  `}>
+                    {reached ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+                    ) : current ? (
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                      </span>
+                    ) : (
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
                     )}
+                    <span>{sl.label}</span>
+                    <span className="text-[9px] opacity-60">({sl.min})</span>
                   </div>
-                );
-              })}
-            </div>
-            {syllabus?.has_syllabus && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Level {level}: {levelName} — {syllabusCompleted} of {syllabusTotal} completions ({Math.round(syllabusPercentage)}%)
-              </p>
-            )}
+                  {/* Connector line */}
+                  {i < SYLLABUS_LEVELS.length - 1 && (
+                    <div className={`flex-1 h-px mx-1 ${reached ? 'bg-green-500/40' : 'bg-border'}`} />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {/* Scenario rows with actor pips */}
-          {syllabus?.has_syllabus && syllabus.scenarios && syllabus.scenarios.length > 0 ? (
-            <div className="space-y-3">
-              {syllabus.scenarios.map((sc) => (
-                <div key={sc.scenario_id} className="rounded-lg border p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{sc.scenario_title}</span>
-                    <span className="text-xs text-muted-foreground">{sc.completed}/{sc.total}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {Array.from({ length: sc.total }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-3 w-3 rounded-full border-2 transition-colors ${
-                            i < sc.completed
-                              ? 'bg-primary border-primary'
-                              : 'bg-transparent border-muted-foreground/30'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <Progress value={sc.total > 0 ? (sc.completed / sc.total) * 100 : 0} className="h-2 flex-1" />
-                  </div>
-                </div>
-              ))}
+          {/* Level summary */}
+          {syllabus?.has_syllabus && (
+            <p className="text-xs text-muted-foreground text-center">
+              Level {level}: {levelName} — {syllabusCompleted} of {syllabusTotal} completions ({Math.round(syllabusPercentage)}%)
+            </p>
+          )}
+
+          {/* ── Scenario × Actor grid table ── */}
+          {syllabus?.has_syllabus && syllabus.items && syllabus.items.length > 0 ? (
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 pr-3 font-medium text-muted-foreground whitespace-nowrap">Scenario</th>
+                    {syllabusActorIds.map((aid) => (
+                      <th key={aid} className="px-1.5 py-2 font-medium text-muted-foreground text-center whitespace-nowrap min-w-[56px]">
+                        {(actorMap.get(aid) ?? `#${aid}`).split(' ').pop()}
+                      </th>
+                    ))}
+                    <th className="pl-3 py-2 font-medium text-muted-foreground text-right whitespace-nowrap">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {syllabus.items.map((item) => {
+                    const actorEntries = syllabusActorIds.map((aid) => {
+                      const completion = item.actors[aid];
+                      const hasData = completion && 'grade' in completion;
+                      return { aid, completion: hasData ? completion : null };
+                    });
+                    const done = actorEntries.filter((e) => e.completion?.grade).length;
+                    const total = syllabusActorIds.length;
+                    const pct = total > 0 ? (done / total) * 100 : 0;
+                    return (
+                      <tr key={item.scenario_id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                        <td className="py-2.5 pr-3 font-medium whitespace-nowrap">{item.scenario_title}</td>
+                        {actorEntries.map(({ aid, completion }) => {
+                          if (!completion?.grade) {
+                            return (
+                              <td key={aid} className="px-1.5 py-2.5 text-center">
+                                <span className="text-muted-foreground/30">—</span>
+                              </td>
+                            );
+                          }
+                          const grade = completion.grade;
+                          const passing = grade <= (syllabus.min_grade ?? 'C');
+                          return (
+                            <td key={aid} className="px-1.5 py-2.5 text-center">
+                              <span className={`inline-flex items-center justify-center h-6 min-w-[28px] px-1 rounded text-[10px] font-bold ${
+                                passing
+                                  ? 'bg-green-500/15 text-green-400 border border-green-500/30'
+                                  : 'bg-red-500/10 text-red-400/70 border border-red-500/20'
+                              }`}>
+                                {grade}
+                              </span>
+                            </td>
+                          );
+                        })}
+                        <td className="pl-3 py-2.5">
+                          <div className="flex items-center gap-2 justify-end">
+                            <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                              <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-muted-foreground font-medium w-8 text-right">{done}/{total}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
               {syllabus.level_complete && (
-                <div className="rounded-lg bg-green-500/10 border border-green-500/30 p-4 text-center">
+                <div className="rounded-lg bg-green-500/10 border border-green-500/30 p-4 text-center mt-4">
                   <p className="text-sm font-medium text-green-400">Level Complete! 🎓</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {level < 5 ? 'Take a reassessment to advance to the next level.' : 'You have mastered all levels!'}
