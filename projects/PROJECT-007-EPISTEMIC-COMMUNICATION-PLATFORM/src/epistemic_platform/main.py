@@ -147,6 +147,12 @@ def create_app() -> FastAPI:
         async def favicon():
             return FileResponse(str(favicon_path))
 
+    manifest_path = _PACKAGE_DIR / "static" / "manifest.json"
+    if manifest_path.is_file():
+        @app.get("/manifest.json", include_in_schema=False)
+        async def manifest():
+            return FileResponse(str(manifest_path), media_type="application/manifest+json")
+
     _register_routers(app)
     _register_events(app)
 
@@ -162,7 +168,7 @@ def create_app() -> FastAPI:
         @app.get("/{full_path:path}", include_in_schema=False)
         async def spa_fallback(request: Request, full_path: str):
             # Don't catch API, WS, health, or static paths
-            if full_path.startswith(("api/", "ws/", "health", "static/", "favicon.ico")):
+            if full_path.startswith(("api/", "ws/", "health", "static/", "favicon.ico", "manifest.json")):
                 return JSONResponse(status_code=404, content={"detail": "Not found"})
             # Serve actual files from dist if they exist
             file_path = frontend_dist / full_path

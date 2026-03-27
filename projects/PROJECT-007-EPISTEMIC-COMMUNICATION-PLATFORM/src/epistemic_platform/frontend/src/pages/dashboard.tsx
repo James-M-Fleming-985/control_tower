@@ -287,7 +287,7 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent className="space-y-5">
           {/* ── Stepper bar (Salesforce-style pipeline) ── */}
-          <div className="flex items-center">
+          <div className="flex items-center overflow-x-auto">
             {SYLLABUS_LEVELS.map((sl, i) => {
               const reached = level > sl.level;
               const current = level === sl.level;
@@ -334,7 +334,7 @@ export function DashboardPage() {
 
           {/* ── Scenario × Actor grid table ── */}
           {syllabus?.has_syllabus && syllabus.items && syllabus.items.length > 0 ? (
-            <div className="overflow-x-auto -mx-6 px-6">
+            <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-border">
