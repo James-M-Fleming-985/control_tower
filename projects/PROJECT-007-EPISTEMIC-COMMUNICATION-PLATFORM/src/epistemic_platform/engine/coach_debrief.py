@@ -36,12 +36,12 @@ def build_debrief_system_prompt(
     analysis = reward.analysis
     score = reward.score
 
-    # Truncate transcript to last 20 messages
-    recent = messages[-20:]
+    # Truncate transcript to last 40 messages, 500 chars each
+    recent = messages[-40:]
     transcript_lines = []
     for m in recent:
         role = m.get("role", "unknown").upper()
-        content = m.get("content", "")[:300]
+        content = m.get("content", "")[:500]
         transcript_lines.append(f"{role}: {content}")
     transcript = "\n".join(transcript_lines)
 
@@ -74,12 +74,15 @@ def build_debrief_system_prompt(
         transcript,
         "",
         "## Coaching Guidelines",
-        "1. Start by highlighting one specific strength from the session",
+        "1. Start by highlighting one specific strength — cite a direct quote or moment from the transcript",
         "2. Ask reflective questions — don't lecture",
         "3. Connect observations to epistemological concepts (stances, trilemma, Gricean maxims)",
         "4. Suggest one concrete thing to try in the next session",
-        "5. Keep responses concise (2-4 paragraphs)",
+        "5. Keep responses concise — 2-3 short paragraphs maximum",
         "6. If the user wants to end, wrap up warmly with encouragement",
+        "7. NEVER repeat or paraphrase the same observation twice within a response",
+        "8. Each sentence must advance a new idea — no filler or restatement",
+        "9. Be specific: reference direct quotes or observable moments, not vague generalities",
     ])
 
     return "\n".join(sections)
@@ -93,11 +96,17 @@ class CoachDebrief:
         coaching_llm: CoachingLLM,
         reward: SessionReward,
         parent_messages: list[dict],
+        *,
+        existing_messages: list[dict] | None = None,
     ) -> None:
         self._llm = coaching_llm
         self._system_prompt = build_debrief_system_prompt(reward, parent_messages)
-        self._messages: list[dict] = []
-        self._turn_count = 0
+        if existing_messages:
+            self._messages = list(existing_messages)
+            self._turn_count = sum(1 for m in existing_messages if m.get("role") == "user")
+        else:
+            self._messages = []
+            self._turn_count = 0
 
     @property
     def turn_count(self) -> int:
@@ -126,6 +135,7 @@ class CoachDebrief:
         async for chunk in self._llm.analyse_stream(
             messages=llm_messages,
             system_prompt=self._system_prompt,
+            max_tokens=1024,
         ):
             if chunk.delta:
                 full_response += chunk.delta
@@ -142,8 +152,9 @@ class CoachDebrief:
         """
         opening_prompt = (
             "The user has just completed a conversation session. "
-            "Start the debrief by highlighting one specific strength "
-            "and asking a reflective question about their experience."
+            "Start the debrief by citing one specific moment from the transcript "
+            "where they demonstrated a strength, then ask a focused reflective "
+            "question about that moment. Keep your response to 2-3 short paragraphs."
         )
 
         llm_messages = [LLMMessage(role="user", content=opening_prompt)]
@@ -152,6 +163,7 @@ class CoachDebrief:
         async for chunk in self._llm.analyse_stream(
             messages=llm_messages,
             system_prompt=self._system_prompt,
+            max_tokens=1024,
         ):
             if chunk.delta:
                 full_response += chunk.delta

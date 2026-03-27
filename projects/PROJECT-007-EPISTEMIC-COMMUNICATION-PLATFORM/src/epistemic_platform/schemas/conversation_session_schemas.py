@@ -25,6 +25,7 @@ class ConversationSessionRead(BaseModel):
     user_id: int
     actor_id: int
     scenario_id: int | None
+    parent_session_id: int | None = None
     status: str
     mode: str
     messages: list[dict[str, Any]]
@@ -42,6 +43,7 @@ class ConversationSessionSummary(BaseModel):
 
     id: int
     actor_id: int
+    parent_session_id: int | None = None
     status: str
     mode: str
     turn_count: int

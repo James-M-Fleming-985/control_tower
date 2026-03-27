@@ -110,6 +110,7 @@ export interface ConversationSession {
 export interface ConversationSessionSummary {
   id: number;
   actor_id: number;
+  parent_session_id: number | null;
   status: string;
   mode: string;
   turn_count: number;
@@ -261,5 +262,6 @@ export type WSServerMessage =
   | { type: 'latency_report'; turn: number; stt_ms: number; llm_ms: number; tts_first_byte_ms: number; total_ms: number }
   | { type: 'pong'; server_ts: number; client_ts?: number }
   | { type: 'debrief_start'; session_id: number }
-  | { type: 'debrief_ended'; outcome?: Record<string, unknown>; reward?: Record<string, unknown> }
+  | { type: 'debrief_replay_message'; role: string; content: string }
+  | { type: 'debrief_ended'; outcome?: Record<string, unknown>; reward?: Record<string, unknown>; replay?: boolean }
   | { type: 'error'; detail: string };

@@ -1,5 +1,5 @@
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useSessionAnalysis, useSession, useActor } from '@/hooks/use-api';
+import { useSessionAnalysis, useSession, useActor, useSessions } from '@/hooks/use-api';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,12 @@ export function ResultsPage() {
 
   // Fall back to on-demand analytics API for historical sessions
   const { data, isLoading } = useSessionAnalysis(Number(sessionId) || 0);
+
+  // Check if a debrief already exists for this session
+  const { data: allSessions } = useSessions();
+  const existingDebrief = allSessions?.find(
+    (s) => s.parent_session_id === Number(sessionId),
+  );
 
   // Merge: prefer navigation reward, fall back to API data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -266,7 +272,12 @@ export function ResultsPage() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <Button onClick={() => navigate(`/debrief/${sessionId}`)}>
-          <GraduationCap className="mr-1 h-4 w-4" /> Start Coach Debrief
+          <GraduationCap className="mr-1 h-4 w-4" />{' '}
+          {existingDebrief
+            ? existingDebrief.status === 'completed'
+              ? 'View Debrief'
+              : 'Resume Debrief'
+            : 'Start Coach Debrief'}
         </Button>
         <Button variant="outline" onClick={() => navigate('/actors')}>
           New Conversation

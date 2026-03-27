@@ -117,6 +117,18 @@ class ConversationSessionRepository:
         await self.db.flush()
         return session
 
+    async def get_debrief_for_parent(
+        self, parent_session_id: int
+    ) -> ConversationSession | None:
+        """Return the most recent debrief session for a given parent session."""
+        result = await self.db.execute(
+            select(ConversationSession)
+            .where(ConversationSession.parent_session_id == parent_session_id)
+            .order_by(ConversationSession.started_at.desc())
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
     async def list_completed_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
     ) -> list[ConversationSession]:

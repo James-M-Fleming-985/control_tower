@@ -104,51 +104,106 @@ async def debrief_websocket(
         reward = await engine.process_session(parent_session, user)
         await db.commit()
 
-        # 5. Create debrief session in DB
-        debrief_session = ConversationSession(
-            user_id=user_id,
-            actor_id=parent_session.actor_id,
-            scenario_id=parent_session.scenario_id,
-            parent_session_id=parent_session.id,
-            status="active",
-            mode="text",
-            messages=[],
-            coaching_annotations=[],
-            trilemma_state={},
-            turn_count=0,
-            started_at=datetime.now(timezone.utc),
-        )
-        db.add(debrief_session)
-        await db.flush()
-
-        # 6. Create coach debrief engine
+        # 5. Check for existing debrief session
+        existing_debrief = await session_repo.get_debrief_for_parent(session_id)
         coaching_llm = ClaudeCoachingAdapter()
-        debrief = CoachDebrief(
-            coaching_llm=coaching_llm,
-            reward=reward,
-            parent_messages=parent_session.messages or [],
-        )
 
-        # 7. Send opening message
-        await websocket.send_json({"type": "debrief_start", "session_id": debrief_session.id})
-        await websocket.send_json({"type": "stream_start"})
-
-        opening_text = ""
-        async for chunk in debrief.get_opening_message():
-            if chunk.delta:
-                opening_text += chunk.delta
+        if existing_debrief and existing_debrief.status == "completed":
+            # ── Replay completed debrief (read-only) ──────────────────
+            await websocket.send_json({
+                "type": "debrief_start",
+                "session_id": existing_debrief.id,
+            })
+            for msg in existing_debrief.messages or []:
+                role = msg.get("role", "assistant")
+                content = msg.get("content", "")
                 await websocket.send_json({
-                    "type": "stream_delta",
-                    "content": chunk.delta,
+                    "type": "debrief_replay_message",
+                    "role": role,
+                    "content": content,
                 })
-        await websocket.send_json({"type": "stream_end"})
+            await websocket.send_json({
+                "type": "debrief_ended",
+                "reward": reward.to_dict(),
+                "replay": True,
+            })
+            try:
+                await websocket.close()
+            except Exception:
+                pass
+            return
 
-        # Store opening message
-        debrief_session.messages = [
-            *debrief_session.messages,
-            {"role": "assistant", "content": opening_text},
-        ]
-        await db.flush()
+        if existing_debrief and existing_debrief.status == "active":
+            # ── Resume active debrief ─────────────────────────────────
+            debrief_session = existing_debrief
+            stored_messages = debrief_session.messages or []
+
+            await websocket.send_json({
+                "type": "debrief_start",
+                "session_id": debrief_session.id,
+            })
+            # Replay stored messages so the client re-populates the chat
+            for msg in stored_messages:
+                role = msg.get("role", "assistant")
+                content = msg.get("content", "")
+                await websocket.send_json({
+                    "type": "debrief_replay_message",
+                    "role": role,
+                    "content": content,
+                })
+
+            # Rebuild coach engine with existing conversation
+            debrief = CoachDebrief(
+                coaching_llm=coaching_llm,
+                reward=reward,
+                parent_messages=parent_session.messages or [],
+                existing_messages=stored_messages,
+            )
+
+        else:
+            # ── Create new debrief session ────────────────────────────
+            debrief_session = ConversationSession(
+                user_id=user_id,
+                actor_id=parent_session.actor_id,
+                scenario_id=parent_session.scenario_id,
+                parent_session_id=parent_session.id,
+                status="active",
+                mode="text",
+                messages=[],
+                coaching_annotations=[],
+                trilemma_state={},
+                turn_count=0,
+                started_at=datetime.now(timezone.utc),
+            )
+            db.add(debrief_session)
+            await db.flush()
+
+            debrief = CoachDebrief(
+                coaching_llm=coaching_llm,
+                reward=reward,
+                parent_messages=parent_session.messages or [],
+            )
+
+            # Send opening message
+            await websocket.send_json({"type": "debrief_start", "session_id": debrief_session.id})
+            await websocket.send_json({"type": "stream_start"})
+
+            opening_text = ""
+            async for chunk in debrief.get_opening_message():
+                if chunk.delta:
+                    opening_text += chunk.delta
+                    await websocket.send_json({
+                        "type": "stream_delta",
+                        "content": chunk.delta,
+                    })
+            await websocket.send_json({"type": "stream_end"})
+
+            # Store opening message
+            debrief_session.messages = [
+                *debrief_session.messages,
+                {"role": "assistant", "content": opening_text},
+            ]
+            await db.flush()
 
         # 8. Message loop
         try:

@@ -25,6 +25,7 @@ export function DebriefPage() {
   const [streamBuf, setStreamBuf] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [reward, setReward] = useState<Record<string, any> | null>(null);
@@ -39,6 +40,15 @@ export function DebriefPage() {
       onMessage: (data: WSServerMessage) => {
         switch (data.type) {
           case 'debrief_start':
+            break;
+          case 'debrief_replay_message':
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: data.role === 'user' ? 'user' : 'coach',
+                content: data.content ?? '',
+              },
+            ]);
             break;
           case 'stream_start':
             setIsStreaming(true);
@@ -60,6 +70,9 @@ export function DebriefPage() {
           case 'debrief_ended':
             if ('reward' in data && data.reward) {
               setReward(data.reward as Record<string, unknown>);
+            }
+            if (data.type === 'debrief_ended' && data.replay) {
+              setReadOnly(true);
             }
             setEnded(true);
             break;
@@ -205,10 +218,13 @@ export function DebriefPage() {
       )}
 
       {/* Input */}
-      {!ended ? (
+      {!ended && !readOnly ? (
         <ChatInput onSend={sendMessage} disabled={isStreaming} placeholder="Ask your coach about your session…" />
       ) : (
         <div className="border-t border-border px-4 py-3 flex items-center justify-center gap-3">
+          {readOnly && (
+            <span className="text-xs text-muted-foreground mr-2">Debrief Complete (read-only)</span>
+          )}
           <Button size="sm" onClick={() => navigate('/dashboard')}>
             View Dashboard
           </Button>

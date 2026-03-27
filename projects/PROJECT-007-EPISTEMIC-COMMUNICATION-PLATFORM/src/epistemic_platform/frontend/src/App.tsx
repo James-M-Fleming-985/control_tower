@@ -10,6 +10,7 @@ import { ScenariosPage } from '@/pages/scenarios';
 import { ConversationPage } from '@/pages/conversation';
 import { ResultsPage } from '@/pages/results';
 import { DebriefPage } from '@/pages/debrief';
+import { SessionsPage } from '@/pages/sessions';
 import { DashboardPage } from '@/pages/dashboard';
 import { AchievementsPage } from '@/pages/achievements';
 import { SettingsPage } from '@/pages/settings';
@@ -38,6 +39,7 @@ export function App() {
             <Route path="/conversation/:sessionId" element={<ConversationPage />} />
             <Route path="/results/:sessionId" element={<ResultsPage />} />
             <Route path="/debrief/:sessionId" element={<DebriefPage />} />
+            <Route path="/sessions" element={<SessionsPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
