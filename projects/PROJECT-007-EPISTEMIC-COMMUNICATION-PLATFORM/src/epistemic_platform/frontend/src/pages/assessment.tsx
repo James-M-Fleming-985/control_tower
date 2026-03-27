@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAssessmentQuestions, useSubmitAssessment } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronRight, Brain } from 'lucide-react';
+import { ChevronRight, Brain, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -67,35 +67,90 @@ export function AssessmentPage() {
   if (result) {
     const stance = String(result.primary_stance ?? 'Unknown');
     const confidence = (Number(result.confidence) || 0) * 100;
+    const stanceExplanations = (result.stance_explanations ?? {}) as Record<string, { name: string; short: string; description: string }>;
+    const primaryInfo = stanceExplanations[stance] ?? null;
+    const stanceName = primaryInfo?.name ?? stance.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+    const answerDeductions = (result.answer_deductions ?? []) as Array<{ question: string; your_answer: string; stance_signal: string; stance_name: string }>;
+    const [showDeductions, setShowDeductions] = useState(false);
+
     return (
       <div className="mx-auto max-w-2xl space-y-6 pt-8">
         <div className="text-center space-y-2">
           <Brain className="mx-auto h-10 w-10 text-primary" />
-          <h1 className="text-2xl font-bold">Your Epistemological Profile</h1>
-          <p className="text-muted-foreground">Here's what we discovered about your reasoning style</p>
+          <h1 className="text-2xl font-bold">Your Reasoning Style</h1>
+          <p className="text-muted-foreground">Here's what we discovered about how you approach knowledge</p>
         </div>
-        <Card>
+
+        {/* Primary stance card */}
+        <Card className="border-primary/30">
           <CardContent className="pt-6 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold capitalize">{stance}</span>
-              <Badge>{Math.round(confidence)}% confidence</Badge>
+              <span className="text-xl font-bold">{stanceName}</span>
+              <Badge>{Math.round(confidence)}% match</Badge>
             </div>
-            {result.explanation ? (
-              <p className="text-sm text-muted-foreground">{String(result.explanation)}</p>
-            ) : null}
-            {result.stance_scores ? (
-              <div className="space-y-2 pt-2">
-                {Object.entries(result.stance_scores as Record<string, number>).map(([s, v]) => (
-                  <div key={s} className="flex items-center gap-3">
-                    <span className="w-28 text-xs capitalize text-muted-foreground">{s}</span>
-                    <Progress value={v * 100} className="h-2 flex-1" />
-                    <span className="text-xs text-muted-foreground w-10 text-right">{Math.round(v * 100)}%</span>
-                  </div>
-                ))}
+            {primaryInfo ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-primary">{primaryInfo.short}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{primaryInfo.description}</p>
               </div>
+            ) : result.explanation ? (
+              <p className="text-sm text-muted-foreground">{String(result.explanation)}</p>
             ) : null}
           </CardContent>
         </Card>
+
+        {/* How we deduced this — collapsible */}
+        {answerDeductions.length > 0 && (
+          <Card>
+            <CardHeader className="cursor-pointer" onClick={() => setShowDeductions(!showDeductions)}>
+              <CardTitle className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4" /> How We Determined Your Profile
+                </span>
+                {showDeductions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </CardTitle>
+              <CardDescription className="text-xs">See which answers shaped your result — this helps you be more accurate next time</CardDescription>
+            </CardHeader>
+            {showDeductions && (
+              <CardContent className="space-y-3 pt-0">
+                {answerDeductions.map((d, i) => (
+                  <div key={i} className="rounded-md border p-3 space-y-1">
+                    <p className="text-xs text-muted-foreground">{d.question}</p>
+                    <p className="text-sm">→ {d.your_answer}</p>
+                    <Badge variant="outline" className="text-[10px]">{d.stance_name}</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            )}
+          </Card>
+        )}
+
+        {/* Stance distribution */}
+        {result.stance_scores ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Your Stance Distribution</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {Object.entries(result.stance_scores as Record<string, number>)
+                .sort(([, a], [, b]) => b - a)
+                .map(([s, v]) => {
+                  const info = stanceExplanations[s];
+                  const label = info?.name ?? s.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+                  return (
+                    <div key={s} className="space-y-0.5">
+                      <div className="flex items-center gap-3">
+                        <span className="w-36 text-xs text-muted-foreground">{label}</span>
+                        <Progress value={v * 100} className="h-2 flex-1" />
+                        <span className="text-xs text-muted-foreground w-10 text-right">{Math.round(v * 100)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+            </CardContent>
+          </Card>
+        ) : null}
+
         <Button className="w-full" onClick={() => navigate('/actors')}>
           Continue to Actors <ChevronRight className="ml-1 h-4 w-4" />
         </Button>

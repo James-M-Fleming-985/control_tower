@@ -271,49 +271,70 @@ export function DashboardPage() {
           <CardTitle className="text-base">Syllabus Progress</CardTitle>
           <CardDescription className="text-xs">Complete every scenario with all 6 actors at the required grade to advance</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Level pills */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-2">
-            {SYLLABUS_LEVELS.map((sl, i) => {
-              const reached = level > sl.level;
-              const current = level === sl.level;
-              return (
-                <div key={sl.level} className="flex items-center">
-                  <div className={`flex flex-col items-center px-3 py-2 rounded-md min-w-[80px] ${
-                    current ? 'bg-primary/20 ring-1 ring-primary' : reached ? 'opacity-100' : 'opacity-40'
-                  }`}>
-                    {reached ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-400" />
-                    ) : current ? (
-                      <Zap className="h-5 w-5 text-primary" />
-                    ) : (
-                      <Target className="h-5 w-5 text-muted-foreground" />
+        <CardContent className="space-y-5">
+          {/* Level progress bar — full width, equal segments */}
+          <div>
+            <div className="flex w-full">
+              {SYLLABUS_LEVELS.map((sl, i) => {
+                const reached = level > sl.level;
+                const current = level === sl.level;
+                const pct = current ? syllabusPercentage : reached ? 100 : 0;
+                return (
+                  <div key={sl.level} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full px-0.5">
+                      <div className="h-3 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${reached ? 'bg-green-500' : current ? 'bg-primary' : ''}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-medium leading-tight text-center ${current ? 'text-primary' : reached ? 'text-green-400' : 'text-muted-foreground'}`}>
+                      {sl.label}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground leading-none">min {sl.min}</span>
+                    {i < SYLLABUS_LEVELS.length - 1 && reached && (
+                      <CheckCircle2 className="h-3 w-3 text-green-400 -mt-0.5" />
                     )}
-                    <span className={`text-xs font-medium mt-1 ${current ? 'text-primary' : ''}`}>{sl.label}</span>
-                    <span className="text-[10px] text-muted-foreground">min {sl.min}</span>
                   </div>
-                  {i < SYLLABUS_LEVELS.length - 1 && (
-                    <ArrowRight className={`h-3 w-3 mx-0.5 shrink-0 ${reached || current ? 'text-primary' : 'text-muted-foreground/30'}`} />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            {syllabus?.has_syllabus && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Level {level}: {levelName} — {syllabusCompleted} of {syllabusTotal} completions ({Math.round(syllabusPercentage)}%)
+              </p>
+            )}
           </div>
 
-          {/* Scenario × actor grid */}
+          {/* Scenario rows with actor pips */}
           {syllabus?.has_syllabus && syllabus.scenarios && syllabus.scenarios.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {syllabus.scenarios.map((sc) => (
-                <div key={sc.scenario_id} className="rounded-md border p-3 space-y-1.5">
+                <div key={sc.scenario_id} className="rounded-lg border p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{sc.scenario_title}</span>
-                    <span className="text-xs text-muted-foreground">{sc.completed}/{sc.total} actors</span>
+                    <span className="text-xs text-muted-foreground">{sc.completed}/{sc.total}</span>
                   </div>
-                  <Progress value={sc.total > 0 ? (sc.completed / sc.total) * 100 : 0} className="h-1.5" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      {Array.from({ length: sc.total }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-3 w-3 rounded-full border-2 transition-colors ${
+                            i < sc.completed
+                              ? 'bg-primary border-primary'
+                              : 'bg-transparent border-muted-foreground/30'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <Progress value={sc.total > 0 ? (sc.completed / sc.total) * 100 : 0} className="h-2 flex-1" />
+                  </div>
                 </div>
               ))}
               {syllabus.level_complete && (
-                <div className="rounded-md bg-green-500/10 border border-green-500/30 p-3 text-center">
+                <div className="rounded-lg bg-green-500/10 border border-green-500/30 p-4 text-center">
                   <p className="text-sm font-medium text-green-400">Level Complete! 🎓</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {level < 5 ? 'Take a reassessment to advance to the next level.' : 'You have mastered all levels!'}
@@ -322,9 +343,9 @@ export function DashboardPage() {
               )}
             </div>
           ) : (
-            <div className="text-center py-4">
+            <div className="text-center py-6">
               <p className="text-sm text-muted-foreground">No syllabus yet.</p>
-              <Button size="sm" className="mt-2" onClick={() => navigate('/assessment')}>
+              <Button size="sm" className="mt-3" onClick={() => navigate('/assessment')}>
                 Take Assessment <ArrowRight className="ml-1 h-3 w-3" />
               </Button>
             </div>

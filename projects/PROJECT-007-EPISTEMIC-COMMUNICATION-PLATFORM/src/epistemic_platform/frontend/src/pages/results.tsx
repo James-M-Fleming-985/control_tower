@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { hornLabel, stanceLabel, formatDuration } from '@/lib/utils';
+import { hornLabel, formatDuration } from '@/lib/utils';
 import { HORN_COLORS } from '@/lib/constants';
-import { ArrowLeft, Award, MessageSquare, Target, GraduationCap, TrendingUp, Sparkles } from 'lucide-react';
+import { ArrowLeft, Award, MessageSquare, Target, GraduationCap, TrendingUp } from 'lucide-react';
 
 const GRADE_COLORS: Record<string, string> = {
   S: 'bg-amber-400 text-black',
@@ -65,8 +65,6 @@ export function ResultsPage() {
   const analysis: any = navReward?.analysis ?? data?.analysis;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const score: any = navReward?.score ?? data?.score;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const xpAward: any = navReward?.xp_award ?? null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const milestones: any = navReward?.milestones ?? null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -136,20 +134,6 @@ export function ResultsPage() {
               )}
             </div>
 
-            {/* XP earned */}
-            {xpAward && (
-              <div className="flex items-center gap-3 text-sm">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="font-medium text-primary">+{xpAward.total} XP earned</span>
-                {xpAward.improvement_bonus > 0 && (
-                  <span className="text-xs text-muted-foreground">(includes +{xpAward.improvement_bonus} improvement bonus)</span>
-                )}
-                {xpAward.levelled_up && (
-                  <Badge className="bg-amber-400 text-black">Level Up!</Badge>
-                )}
-              </div>
-            )}
-
             {/* Dimension breakdown with tooltips */}
             {allDimensions.length > 0 && (
               <div className="space-y-3 pt-2">
@@ -185,7 +169,6 @@ export function ResultsPage() {
               {milestones.newly_unlocked.map((m: any) => (
                 <Badge key={m.id} variant="default" className="text-xs gap-1">
                   {m.icon ?? '🏆'} {m.name}
-                  {m.xp_reward > 0 && <span className="text-primary">+{m.xp_reward} XP</span>}
                 </Badge>
               ))}
             </div>
@@ -214,7 +197,7 @@ export function ResultsPage() {
               )}
               {analysis.dominant_stance && (
                 <p className="text-sm text-muted-foreground">
-                  Dominant stance: <span className="font-medium text-foreground capitalize">{stanceLabel(String(analysis.dominant_stance))}</span>
+                  Dominant stance: <span className="font-medium text-foreground capitalize">{String(analysis.dominant_stance).replace(/_/g, ' ')}</span>
                 </p>
               )}
               {analysis.turn_count !== undefined && (
