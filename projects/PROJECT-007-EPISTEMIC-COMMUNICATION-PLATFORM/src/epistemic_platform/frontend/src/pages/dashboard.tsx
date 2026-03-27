@@ -1,15 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGamificationProfile, useProficiency, useGrowth, useSessions, useUpdateProfile } from '@/hooks/use-api';
+import { useGamificationProfile, useProficiency, useGrowth, useSessions, useUpdateProfile, useSyllabus } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { xpProgress } from '@/lib/utils';
 import { LEVEL_NAMES, LEVEL_DESCRIPTIONS } from '@/lib/constants';
-import { BarChart3, Zap, Target, TrendingUp, ArrowRight, BookOpen, MessageSquare, CheckCircle2, Eye, Crosshair } from 'lucide-react';
+import { BarChart3, Zap, Target, TrendingUp, ArrowRight, CheckCircle2, Eye, Crosshair } from 'lucide-react';
 import {
   RadarChart,
   PolarGrid,
@@ -57,12 +56,12 @@ const DIMENSION_COLORS: Record<string, string> = {
   engagement: '#ec4899',  // pink
 };
 
-const JOURNEY_STAGES = [
-  { level: 0, label: 'Assessment', icon: BookOpen, desc: 'Complete the epistemological assessment to identify your starting perspective.' },
-  { level: 1, label: 'Beginner', icon: MessageSquare, desc: 'Practice basic conversations. Learn to recognise trilemma horns and Gricean maxims.' },
-  { level: 3, label: 'Intermediate', icon: Target, desc: 'Engage with diverse scenarios. Start shifting between epistemological stances.' },
-  { level: 5, label: 'Advanced', icon: TrendingUp, desc: 'Navigate complex dialogues. Demonstrate consistent flexibility and reasoned composure.' },
-  { level: 8, label: 'Expert', icon: Zap, desc: 'Master all dimensions. Fluently adopt and critique multiple epistemological perspectives.' },
+const SYLLABUS_LEVELS = [
+  { level: 1, label: 'Explorer', min: 'C' },
+  { level: 2, label: 'Practitioner', min: 'C+' },
+  { level: 3, label: 'Communicator', min: 'B' },
+  { level: 4, label: 'Advanced Thinker', min: 'B+' },
+  { level: 5, label: 'Expert', min: 'A' },
 ];
 
 const SCORE_GRADE = (v: number) => v >= 95 ? 'S' : v >= 80 ? 'A' : v >= 65 ? 'B' : v >= 50 ? 'C' : 'D';
@@ -115,6 +114,7 @@ export function DashboardPage() {
   const { data: proficiency, isLoading: profLoading } = useProficiency();
   const { data: growth, isLoading: growthLoading } = useGrowth();
   const { data: sessions } = useSessions();
+  const { data: syllabus } = useSyllabus();
   const user = useAuthStore((s) => s.user);
   const updateUser = useAuthStore((s) => s.updateUser);
   const updateProfile = useUpdateProfile();
@@ -199,10 +199,11 @@ export function DashboardPage() {
 
   const stancesEncountered = (growth?.all_stances_encountered ?? []) as string[];
 
-  const level = profile?.level ?? 1;
+  const level = syllabus?.current_level ?? profile?.level ?? 1;
   const levelName = LEVEL_NAMES[level] ?? `Level ${level}`;
-  const xp = profile?.xp ?? 0;
-  const progress = profile ? xpProgress(xp, level) : 0;
+  const syllabusCompleted = syllabus?.completed_completions ?? 0;
+  const syllabusTotal = syllabus?.total_completions ?? 0;
+  const syllabusPercentage = syllabus?.percentage ?? 0;
 
   return (
     <div className="space-y-6">
@@ -229,13 +230,15 @@ export function DashboardPage() {
         <Card>
           <CardContent className="pt-5 space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">XP Progress</p>
-              <span className="text-xs font-medium">{xp} XP</span>
+              <p className="text-xs text-muted-foreground">Syllabus Progress</p>
+              <span className="text-xs font-medium">{syllabusCompleted}/{syllabusTotal}</span>
             </div>
-            <Progress value={progress} className="h-2" />
-            {profile?.xp_needed && (
-              <p className="text-[10px] text-muted-foreground">{profile.xp_progress}/{profile.xp_needed} to next level</p>
-            )}
+            <Progress value={syllabusPercentage} className="h-2" />
+            <p className="text-[10px] text-muted-foreground">
+              {syllabus?.has_syllabus
+                ? `${Math.round(syllabusPercentage)}% — min grade ${syllabus?.min_grade ?? 'C'}`
+                : 'Complete assessment to generate your syllabus'}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -262,43 +265,70 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      {/* Learning Path */}
+      {/* Syllabus Progress */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Your Learning Journey</CardTitle>
-          <CardDescription className="text-xs">Progress through stages by completing conversations and earning XP</CardDescription>
+          <CardTitle className="text-base">Syllabus Progress</CardTitle>
+          <CardDescription className="text-xs">Complete every scenario with all 6 actors at the required grade to advance</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-1 overflow-x-auto pb-14">
-            {JOURNEY_STAGES.map((stage, i) => {
-              const reached = level >= stage.level || (stage.level === 0 && (sessions?.length ?? 0) >= 0);
-              const current = i < JOURNEY_STAGES.length - 1
-                ? level >= stage.level && level < JOURNEY_STAGES[i + 1].level
-                : level >= stage.level;
-              const Icon = stage.icon;
+        <CardContent className="space-y-4">
+          {/* Level pills */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-2">
+            {SYLLABUS_LEVELS.map((sl, i) => {
+              const reached = level > sl.level;
+              const current = level === sl.level;
               return (
-                <div key={stage.label} className="flex items-center group">
-                  <div className={`relative flex flex-col items-center gap-1 px-4 py-2.5 rounded-md min-w-[90px] ${
+                <div key={sl.level} className="flex items-center">
+                  <div className={`flex flex-col items-center px-3 py-2 rounded-md min-w-[80px] ${
                     current ? 'bg-primary/20 ring-1 ring-primary' : reached ? 'opacity-100' : 'opacity-40'
                   }`}>
                     {reached ? (
-                      <CheckCircle2 className={`h-6 w-6 shrink-0 ${current ? 'text-primary' : 'text-green-400'}`} />
+                      <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    ) : current ? (
+                      <Zap className="h-5 w-5 text-primary" />
                     ) : (
-                      <Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
+                      <Target className="h-5 w-5 text-muted-foreground" />
                     )}
-                    <span className={`text-xs font-medium whitespace-nowrap ${current ? 'text-primary' : ''}`}>{stage.label}</span>
-                    {stage.level > 0 && <span className="text-[10px] text-muted-foreground">L{stage.level}+</span>}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-md bg-popover p-2 text-[10px] text-popover-foreground shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border">
-                      {stage.desc}
-                    </div>
+                    <span className={`text-xs font-medium mt-1 ${current ? 'text-primary' : ''}`}>{sl.label}</span>
+                    <span className="text-[10px] text-muted-foreground">min {sl.min}</span>
                   </div>
-                  {i < JOURNEY_STAGES.length - 1 && (
-                    <ArrowRight className={`h-4 w-4 mx-1 shrink-0 ${reached ? 'text-primary' : 'text-muted-foreground/30'}`} />
+                  {i < SYLLABUS_LEVELS.length - 1 && (
+                    <ArrowRight className={`h-3 w-3 mx-0.5 shrink-0 ${reached || current ? 'text-primary' : 'text-muted-foreground/30'}`} />
                   )}
                 </div>
               );
             })}
           </div>
+
+          {/* Scenario × actor grid */}
+          {syllabus?.has_syllabus && syllabus.scenarios && syllabus.scenarios.length > 0 ? (
+            <div className="space-y-2">
+              {syllabus.scenarios.map((sc) => (
+                <div key={sc.scenario_id} className="rounded-md border p-3 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{sc.scenario_title}</span>
+                    <span className="text-xs text-muted-foreground">{sc.completed}/{sc.total} actors</span>
+                  </div>
+                  <Progress value={sc.total > 0 ? (sc.completed / sc.total) * 100 : 0} className="h-1.5" />
+                </div>
+              ))}
+              {syllabus.level_complete && (
+                <div className="rounded-md bg-green-500/10 border border-green-500/30 p-3 text-center">
+                  <p className="text-sm font-medium text-green-400">Level Complete! 🎓</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {level < 5 ? 'Take a reassessment to advance to the next level.' : 'You have mastered all levels!'}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">No syllabus yet.</p>
+              <Button size="sm" className="mt-2" onClick={() => navigate('/assessment')}>
+                Take Assessment <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

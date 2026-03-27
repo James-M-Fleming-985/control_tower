@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useActor, useScenarios, useCreateSession } from '@/hooks/use-api';
+import { useActor, useScenarios, useCreateSession, useSyllabus } from '@/hooks/use-api';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { stanceLabel, difficultyClass } from '@/lib/utils';
 import { STANCE_COLORS } from '@/lib/constants';
-import { ArrowLeft, MessageSquare, Mic } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Mic, CheckCircle2 } from 'lucide-react';
 
 export function ActorDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +14,19 @@ export function ActorDetailPage() {
   const { data: actor, isLoading: actorLoading } = useActor(Number(id));
   const { data: scenarios, isLoading: scenariosLoading } = useScenarios({ category: undefined, difficulty: undefined });
   const createSession = useCreateSession();
+  const { data: syllabus } = useSyllabus();
 
   const actorScenarios = scenarios?.filter((s) => s.actor_id === Number(id) || !s.actor_id) || [];
+
+  // Build a lookup: scenario_id → actor completion status for this actor
+  const syllabusItems = syllabus?.items ?? [];
+  const actorCompletionMap = Object.fromEntries(
+    syllabusItems.map((item) => {
+      const actorKey = String(id);
+      const completion = actorKey && item.actors?.[actorKey];
+      return [item.scenario_id, completion && 'grade' in completion ? completion : null];
+    }),
+  );
 
   const startSession = async (mode: 'text' | 'voice', scenarioId?: number) => {
     const session = await createSession.mutateAsync({
@@ -91,11 +102,16 @@ export function ActorDetailPage() {
           <p className="text-sm text-muted-foreground">No scenarios — start a free-form conversation above.</p>
         ) : (
           <div className="space-y-3">
-            {actorScenarios.map((s) => (
-              <Card key={s.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => startSession('text', s.id)}>
+            {actorScenarios.map((s) => {
+              const completion = actorCompletionMap[s.id];
+              return (
+              <Card key={s.id} className="hover:border-primary/50 transition-colors">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm">{s.title}</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-1.5">
+                      {completion && <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />}
+                      {s.title}
+                    </CardTitle>
                     <Badge className={difficultyClass(s.difficulty)}>{s.difficulty}</Badge>
                   </div>
                   {s.description && <CardDescription className="text-xs">{s.description}</CardDescription>}
@@ -103,13 +119,24 @@ export function ActorDetailPage() {
                 <CardContent className="pb-4">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">{s.category}</Badge>
-                    {s.objectives?.length > 0 && (
-                      <span className="text-xs text-muted-foreground">{s.objectives.length} objective{s.objectives.length > 1 ? 's' : ''}</span>
+                    {completion && (
+                      <Badge variant="outline" className="text-[10px] text-green-400 border-green-400/50">
+                        {completion.grade}
+                      </Badge>
                     )}
+                    <div className="flex gap-1.5 ml-auto">
+                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={createSession.isPending} onClick={() => startSession('text', s.id)}>
+                        <MessageSquare className="h-3 w-3 mr-1" /> Text
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={createSession.isPending} onClick={() => startSession('voice', s.id)}>
+                        <Mic className="h-3 w-3 mr-1" /> Voice
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -116,6 +116,8 @@ class AssessmentResult:
     recommended_actors: list[str] = field(default_factory=list)
     recommended_scenarios: list[str] = field(default_factory=list)
     reasoning: str = ""
+    explanation: str = ""
+    stance_scores: dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return {
@@ -126,6 +128,8 @@ class AssessmentResult:
             "recommended_actors": self.recommended_actors,
             "recommended_scenarios": self.recommended_scenarios,
             "reasoning": self.reasoning,
+            "explanation": self.explanation,
+            "stance_scores": self.stance_scores,
         }
 
 
@@ -185,6 +189,8 @@ class AssessmentEngine:
                 recommended_actors=data.get("recommended_actors", []),
                 recommended_scenarios=data.get("recommended_scenarios", []),
                 reasoning=data.get("reasoning", ""),
+                explanation=data.get("explanation", ""),
+                stance_scores=data.get("stance_scores", {}),
             )
         except Exception as e:
             logger.warning("Assessment evaluation failed: %s", e)
@@ -210,11 +216,52 @@ class AssessmentEngine:
         primary = self._parse_stance(sorted_stances[0][0])
         secondary = self._parse_stance(sorted_stances[1][0]) if len(sorted_stances) > 1 else None
 
+        # Build stance_scores as proportions
+        total = sum(stance_counts.values())
+        stance_scores = {k: round(v / total, 2) for k, v in stance_counts.items()}
+
+        # Stance → actor affinity for recommendations
+        _STANCE_ACTOR_MAP = {
+            "foundationalist": "Professor Axelrod",
+            "coherentist": "Dr Weaver",
+            "pragmatist": "Max Results",
+            "skeptic": "Zara Doubt",
+            "empiricist": "Dr Data",
+            "relativist": "Sage Perspective",
+        }
+        _STANCE_SCENARIO_MAP = {
+            "foundationalist": "Should We Trust Expert Consensus?",
+            "coherentist": "The Trolley Problem Revisited",
+            "pragmatist": "The Ethics of AI Art",
+            "skeptic": "Free Will vs Determinism",
+            "empiricist": "What Counts as Scientific Evidence?",
+            "relativist": "Can We Know Other Minds?",
+        }
+
+        # Recommend actors/scenarios for weak stances (not primary/secondary)
+        strong = {sorted_stances[0][0]}
+        if len(sorted_stances) > 1:
+            strong.add(sorted_stances[1][0])
+        rec_actors = [v for k, v in _STANCE_ACTOR_MAP.items() if k not in strong]
+        rec_scenarios = [v for k, v in _STANCE_SCENARIO_MAP.items() if k not in strong]
+
+        primary_name = primary.value if primary else "unknown"
+        secondary_name = secondary.value if secondary else "none"
+        explanation = (
+            f"Your responses indicate a primarily {primary_name} approach to knowledge, "
+            f"with {secondary_name} as a secondary tendency. "
+            f"Consider exploring perspectives that challenge your dominant stance."
+        )
+
         return AssessmentResult(
             primary_stance=primary,
             secondary_stance=secondary,
             confidence=sorted_stances[0][1] / len(CALIBRATION_QUESTIONS),
             reasoning="Heuristic classification from answer option mapping",
+            recommended_actors=rec_actors,
+            recommended_scenarios=rec_scenarios,
+            explanation=explanation,
+            stance_scores=stance_scores,
         )
 
     @staticmethod

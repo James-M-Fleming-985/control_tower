@@ -28,6 +28,7 @@ export interface UserProfile {
   xp: number;
   level: number;
   achievements: Achievement[];
+  syllabus: SyllabusData;
   subscription_tier: string;
   created_at: string;
   updated_at: string;
@@ -176,9 +177,18 @@ export interface AssessmentQuestion {
 }
 
 export interface AssessmentResult {
-  scores: Record<string, number>;
-  recommended_actors: number[];
-  timestamp: string;
+  primary_stance?: string;
+  secondary_stance?: string;
+  confidence?: number;
+  communication_style?: string;
+  recommended_actors: string[];
+  recommended_scenarios: string[];
+  reasoning?: string;
+  explanation?: string;
+  stance_scores?: Record<string, number>;
+  completed_at?: string;
+  scores?: Record<string, number>;
+  timestamp?: string;
   [key: string]: unknown;
 }
 
@@ -199,6 +209,52 @@ export interface GamificationProfile {
   xp_progress: number;
   xp_needed: number;
   achievements: Achievement[];
+  reassessment_due?: boolean;
+}
+
+// ─── Syllabus ────────────────────────────────────────────────────────────────
+export interface SyllabusActorCompletion {
+  grade: string;
+  score: number;
+  session_id: number;
+  completed_at: string;
+}
+
+export interface SyllabusItem {
+  scenario_id: number;
+  scenario_title: string;
+  scenario_difficulty: string;
+  min_grade: string;
+  actors: Record<string, SyllabusActorCompletion | Record<string, never>>;
+}
+
+export interface SyllabusData {
+  current_level?: number;
+  min_grade?: string;
+  items?: SyllabusItem[];
+  generated_at?: string;
+  assessment_ref?: {
+    primary_stance: string;
+    secondary_stance: string;
+  };
+}
+
+export interface SyllabusProgress {
+  has_syllabus: boolean;
+  current_level?: number;
+  min_grade?: string;
+  total_completions?: number;
+  completed_completions?: number;
+  percentage?: number;
+  level_complete?: boolean;
+  scenarios?: {
+    scenario_id: number;
+    scenario_title: string;
+    completed: number;
+    total: number;
+  }[];
+  items?: SyllabusItem[];
+  message?: string;
 }
 
 export interface ProficiencyProfile {

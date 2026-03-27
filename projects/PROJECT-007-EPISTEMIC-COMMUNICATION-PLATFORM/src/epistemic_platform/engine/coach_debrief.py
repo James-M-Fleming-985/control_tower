@@ -83,6 +83,7 @@ def build_debrief_system_prompt(
         "7. NEVER repeat or paraphrase the same observation twice within a response",
         "8. Each sentence must advance a new idea — no filler or restatement",
         "9. Be specific: reference direct quotes or observable moments, not vague generalities",
+        "10. Offer a brief real-world exercise the user can try outside the platform — e.g. 'This week, when someone disagrees with you at work, pause and steelman their view before responding.' Tailor the exercise to the specific weakness you identified in the session.",
     ])
 
     return "\n".join(sections)

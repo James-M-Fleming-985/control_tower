@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useScenarios, useActors, useCreateSession } from '@/hooks/use-api';
+import { useScenarios, useActors, useCreateSession, useSyllabus } from '@/hooks/use-api';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { difficultyClass } from '@/lib/utils';
-import { Search, Map, X } from 'lucide-react';
+import { Search, Map, X, CheckCircle2, MessageSquare, Mic } from 'lucide-react';
 import type { ScenarioDefinition } from '@/types/api';
 
 export function ScenariosPage() {
@@ -17,8 +17,13 @@ export function ScenariosPage() {
   const createSession = useCreateSession();
   const [filter, setFilter] = useState('');
   const [pickActorFor, setPickActorFor] = useState<ScenarioDefinition | null>(null);
+  const [sessionMode, setSessionMode] = useState<'text' | 'voice'>('text');
+  const { data: syllabus } = useSyllabus();
 
   const actorMap = Object.fromEntries((actors ?? []).map((a) => [a.id, a]));
+  const syllabusMap = Object.fromEntries(
+    (syllabus?.scenarios ?? []).map((s) => [s.scenario_id, s]),
+  );
 
   const filtered = (scenarios ?? []).filter(
     (s) =>
@@ -26,11 +31,11 @@ export function ScenariosPage() {
       s.category.toLowerCase().includes(filter.toLowerCase()),
   );
 
-  const startScenario = async (scenarioId: number, actorId: number) => {
+  const startScenario = async (scenarioId: number, actorId: number, mode: 'text' | 'voice' = 'text') => {
     const session = await createSession.mutateAsync({
       actor_id: actorId,
       scenario_id: scenarioId,
-      mode: 'text',
+      mode,
     });
     navigate(`/conversation/${session.id}`);
   };
@@ -96,9 +101,21 @@ export function ScenariosPage() {
                     {actor && (
                       <span className="text-xs text-muted-foreground">with {actor.name}</span>
                     )}
-                    {s.objectives?.length > 0 && (
-                      <span className="text-xs text-muted-foreground ml-auto">{s.objectives.length} objectives</span>
-                    )}
+                    {(() => {
+                      const sp = syllabusMap[s.id];
+                      if (sp) {
+                        const done = sp.completed === sp.total;
+                        return (
+                          <Badge variant={done ? 'default' : 'outline'} className={`text-[10px] ml-auto ${done ? 'bg-green-600' : ''}`}>
+                            {done && <CheckCircle2 className="h-3 w-3 mr-0.5" />}
+                            {sp.completed}/{sp.total} actors
+                          </Badge>
+                        );
+                      }
+                      return s.objectives?.length > 0 ? (
+                        <span className="text-xs text-muted-foreground ml-auto">{s.objectives.length} objectives</span>
+                      ) : null;
+                    })()}
                   </div>
                 </CardContent>
               </Card>
@@ -120,6 +137,14 @@ export function ScenariosPage() {
             <p className="text-sm text-muted-foreground">
               Pick an actor for <span className="font-medium text-foreground">{pickActorFor.title}</span>
             </p>
+            <div className="flex gap-2">
+              <Button size="sm" variant={sessionMode === 'text' ? 'default' : 'outline'} onClick={() => setSessionMode('text')}>
+                <MessageSquare className="h-3 w-3 mr-1" /> Text
+              </Button>
+              <Button size="sm" variant={sessionMode === 'voice' ? 'default' : 'outline'} onClick={() => setSessionMode('voice')}>
+                <Mic className="h-3 w-3 mr-1" /> Voice
+              </Button>
+            </div>
             <div className="grid gap-2 max-h-60 overflow-auto">
               {(actors ?? []).map((a) => (
                 <Button
@@ -127,7 +152,7 @@ export function ScenariosPage() {
                   variant="outline"
                   className="justify-start h-auto py-3"
                   disabled={createSession.isPending}
-                  onClick={() => startScenario(pickActorFor.id, a.id)}
+                  onClick={() => startScenario(pickActorFor.id, a.id, sessionMode)}
                 >
                   <div className="text-left">
                     <div className="font-medium">{a.name}</div>

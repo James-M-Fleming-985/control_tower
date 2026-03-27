@@ -18,11 +18,16 @@ from epistemic_platform.engine.growth_tracker import GrowthReport, GrowthTracker
 from epistemic_platform.engine.milestone_detector import MilestoneDetector, MilestoneResult
 from epistemic_platform.engine.proficiency_model import ProficiencyModel, ProficiencyProfile
 from epistemic_platform.engine.scoring_rubric import ScoringRubric, SessionScore
+from epistemic_platform.engine.syllabus_engine import SyllabusEngine, grade_from_score
 from epistemic_platform.engine.xp_system import XPAward, XPSystem
 from epistemic_platform.models.conversation_session import ConversationSession
 from epistemic_platform.models.user_profile import UserProfile
+from epistemic_platform.repositories.actor_profile_repository import ActorProfileRepository
 from epistemic_platform.repositories.conversation_session_repository import (
     ConversationSessionRepository,
+)
+from epistemic_platform.repositories.scenario_definition_repository import (
+    ScenarioDefinitionRepository,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,6 +43,8 @@ class SessionReward:
     milestones: MilestoneResult | None = None
     xp_award: XPAward | None = None
     proficiency: ProficiencyProfile | None = None
+    syllabus_completion: dict[str, Any] | None = None  # New: syllabus item completed
+    level_up: int | None = None  # New: if set, user levelled up to this level
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -47,6 +54,8 @@ class SessionReward:
             "milestones": self.milestones.to_dict() if self.milestones else None,
             "xp_award": self.xp_award.to_dict() if self.xp_award else None,
             "proficiency": self.proficiency.to_dict() if self.proficiency else None,
+            "syllabus_completion": self.syllabus_completion,
+            "level_up": self.level_up,
         }
 
 
@@ -167,15 +176,19 @@ class AchievementEngine:
             prefs["proficiency"] = reward.proficiency.to_dict()
             user.preferences = prefs
 
+            # 8. Syllabus completion check
+            await self._check_syllabus(session, user, reward)
+
             await self._db.flush()
 
             logger.info(
-                "Session %d rewards: grade=%s, xp=+%d (→L%d), milestones=%d",
+                "Session %d rewards: grade=%s, xp=+%d (→L%d), milestones=%d%s",
                 session.id,
                 reward.score.grade,
                 reward.xp_award.total,
                 reward.xp_award.new_level,
                 len(reward.milestones.newly_unlocked),
+                f", level_up=L{reward.level_up}" if reward.level_up else "",
             )
 
         return reward
@@ -198,3 +211,91 @@ class AchievementEngine:
                 else "beginner"
             ),
         }
+
+    async def _check_syllabus(
+        self,
+        session: ConversationSession,
+        user: UserProfile,
+        reward: SessionReward,
+    ) -> None:
+        """Check if this session completes a syllabus item and handle level-up."""
+        syllabus = user.syllabus
+        if not syllabus or not syllabus.get("items"):
+            return
+
+        # Only scenario sessions count toward syllabus
+        if not session.scenario_id:
+            return
+
+        score = reward.score
+        if not score:
+            return
+
+        # Use fine-grained grade (B+, C+) from final_score
+        grade = grade_from_score(score.final_score)
+
+        engine = SyllabusEngine()
+        updated_syllabus, is_new = engine.record_completion(
+            syllabus=syllabus,
+            scenario_id=session.scenario_id,
+            actor_id=session.actor_id,
+            grade=grade,
+            final_score=score.final_score,
+            session_id=session.id,
+        )
+
+        if is_new:
+            reward.syllabus_completion = {
+                "scenario_id": session.scenario_id,
+                "actor_id": session.actor_id,
+                "grade": grade,
+            }
+
+        # Check for level-up
+        if engine.check_level_complete(updated_syllabus):
+            current_level = updated_syllabus.get("current_level", 1)
+            new_level = current_level + 1
+
+            if new_level <= 5:
+                # Generate next level syllabus
+                scenario_repo = ScenarioDefinitionRepository(self._db)
+                actor_repo = ActorProfileRepository(self._db)
+                scenarios = await scenario_repo.list(active_only=True)
+                actors = await actor_repo.list(active_only=True)
+
+                scenario_dicts = [
+                    {
+                        "id": s.id,
+                        "title": s.title,
+                        "difficulty": s.difficulty,
+                        "category": s.category,
+                        "is_active": s.is_active,
+                    }
+                    for s in scenarios
+                ]
+                actor_ids = [a.id for a in actors]
+
+                # Get latest assessment for personalisation
+                assessment = {}
+                if user.assessment_history:
+                    assessment = user.assessment_history[-1]
+
+                updated_syllabus = engine.generate(
+                    assessment_result=assessment,
+                    current_level=new_level,
+                    all_scenarios=scenario_dicts,
+                    all_actor_ids=actor_ids,
+                )
+                reward.level_up = new_level
+                user.level = new_level
+
+                logger.info(
+                    "User %d levelled up to L%d — new syllabus generated",
+                    user.id, new_level,
+                )
+            else:
+                logger.info("User %d completed all 5 levels!", user.id)
+
+        user.syllabus = updated_syllabus
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(user, "syllabus")

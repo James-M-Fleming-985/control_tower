@@ -12,6 +12,7 @@ import type {
   GrowthReport,
   Milestone,
   SessionAnalysis,
+  SyllabusProgress,
   UserProfile,
   UserProfileUpdate,
 } from '@/types/api';
@@ -126,6 +127,13 @@ export function useMilestones() {
   return useQuery({
     queryKey: ['gamification', 'milestones'],
     queryFn: () => api.get<{ milestones: Milestone[] }>('/gamification/milestones').then((r) => r.data),
+  });
+}
+
+export function useSyllabus() {
+  return useQuery({
+    queryKey: ['gamification', 'syllabus'],
+    queryFn: () => api.get<SyllabusProgress>('/gamification/syllabus').then((r) => r.data),
   });
 }
 

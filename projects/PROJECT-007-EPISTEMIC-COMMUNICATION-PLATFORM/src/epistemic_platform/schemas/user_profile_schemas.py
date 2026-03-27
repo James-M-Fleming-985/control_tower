@@ -32,6 +32,7 @@ class UserProfileRead(UserProfileBase):
     xp: int
     level: int
     achievements: list[dict[str, Any]]
+    syllabus: dict[str, Any]
     subscription_tier: str
     created_at: datetime
     updated_at: datetime
