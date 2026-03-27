@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from epistemic_platform.config import get_settings
 from epistemic_platform.engine.context_manager import ConversationContext, summarise_overflow
+from epistemic_platform.engine.history_context import UserHistoryContext
 from epistemic_platform.engine.horn_detector import HornDetector, HornDetectionResult
 from epistemic_platform.engine.prompt_compositor import build_conversation_prompt
 from epistemic_platform.engine.stance_detector import StanceDetector, StanceDetectionResult, StanceHistory
@@ -46,6 +47,7 @@ class ConversationManager:
         conversation_llm: EpistemicActorLLM,
         coaching_llm: CoachingLLM,
         db: AsyncSession,
+        history: UserHistoryContext | None = None,
     ):
         self._session = session
         self._actor = actor
@@ -68,6 +70,7 @@ class ConversationManager:
             }
         self._system_prompt = build_conversation_prompt(
             self._ontology, scenario=scenario, mode=session.mode or "text",
+            history=history,
         )
 
         # Context window

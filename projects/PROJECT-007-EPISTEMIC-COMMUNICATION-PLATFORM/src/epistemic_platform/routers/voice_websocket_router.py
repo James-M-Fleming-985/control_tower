@@ -22,6 +22,7 @@ from epistemic_platform.config import get_settings
 from epistemic_platform.database import async_session_factory
 from epistemic_platform.engine.achievement_engine import AchievementEngine
 from epistemic_platform.engine.conversation_manager import ConversationManager
+from epistemic_platform.engine.history_context import build_history_context
 from epistemic_platform.llm.claude_adapter import ClaudeConversationAdapter, ClaudeCoachingAdapter
 from epistemic_platform.ontology.expressive_state import ExpressiveState
 from epistemic_platform.repositories.actor_profile_repository import ActorProfileRepository
@@ -263,12 +264,24 @@ async def voice_websocket(
                 model_id=settings.elevenlabs_model_id,
             )
 
+            # Build cross-session history context
+            prior_sessions = await session_repo.list_recent_completed_by_user(
+                user_id, exclude_session_id=session_id, limit=10,
+            )
+            prefs = (user.preferences or {}) if user else {}
+            history = build_history_context(
+                sessions=prior_sessions,
+                current_actor_id=session.actor_id,
+                proficiency=prefs.get("proficiency"),
+            )
+
             conv_manager = ConversationManager(
                 session=session,
                 actor=actor,
                 conversation_llm=ClaudeConversationAdapter(),
                 coaching_llm=ClaudeCoachingAdapter(),
                 db=db,
+                history=history,
             )
 
             audio_buffer = bytearray()

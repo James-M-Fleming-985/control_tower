@@ -17,6 +17,7 @@ from epistemic_platform.database import get_db, async_session_factory
 from epistemic_platform.engine.achievement_engine import AchievementEngine
 from epistemic_platform.engine.connection_manager import manager
 from epistemic_platform.engine.conversation_manager import ConversationManager
+from epistemic_platform.engine.history_context import build_history_context
 from epistemic_platform.llm.claude_adapter import ClaudeConversationAdapter, ClaudeCoachingAdapter
 from epistemic_platform.repositories.actor_profile_repository import ActorProfileRepository
 from epistemic_platform.repositories.conversation_session_repository import (
@@ -108,7 +109,18 @@ async def conversation_websocket(
             await manager.disconnect(session_id)
             return
 
-        # 4. Create conversation manager
+        # 4. Build cross-session history context
+        prior_sessions = await session_repo.list_recent_completed_by_user(
+            user_id, exclude_session_id=session_id, limit=10,
+        )
+        prefs = user.preferences or {}
+        history = build_history_context(
+            sessions=prior_sessions,
+            current_actor_id=session.actor_id,
+            proficiency=prefs.get("proficiency"),
+        )
+
+        # 5. Create conversation manager
         conversation_llm = ClaudeConversationAdapter()
         coaching_llm = ClaudeCoachingAdapter()
 
@@ -118,6 +130,7 @@ async def conversation_websocket(
             conversation_llm=conversation_llm,
             coaching_llm=coaching_llm,
             db=db,
+            history=history,
         )
 
         # 5. Message loop

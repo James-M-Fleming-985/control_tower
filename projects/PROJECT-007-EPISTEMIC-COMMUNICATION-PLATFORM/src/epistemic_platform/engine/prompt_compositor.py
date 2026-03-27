@@ -10,6 +10,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from epistemic_platform.engine.history_context import UserHistoryContext
 from epistemic_platform.ontology.actor_ontology import ActorOntology
 from epistemic_platform.ontology.gricean_maxims import ALL_MAXIMS
 
@@ -26,6 +27,7 @@ def build_conversation_prompt(
     *,
     scenario: dict | None = None,
     mode: str = "text",
+    history: UserHistoryContext | None = None,
 ) -> str:
     """Render the full conversation system prompt for the actor LLM (Sonnet).
 
@@ -38,6 +40,9 @@ def build_conversation_prompt(
         evaluation_criteria, difficulty, category.
     mode : str
         Conversation mode ('text' or 'voice'). Affects response style.
+    history : UserHistoryContext | None
+        Optional cross-session context: user proficiency + prior session
+        summaries (own + colleague actors).
     """
     tpl = _env.get_template("system_base.j2")
     return tpl.render(
@@ -53,6 +58,7 @@ def build_conversation_prompt(
         scenario_description=scenario.get("description", "") if scenario else "",
         scenario_objectives=scenario.get("objectives", []) if scenario else [],
         mode=mode,
+        history=history,
     )
 
 

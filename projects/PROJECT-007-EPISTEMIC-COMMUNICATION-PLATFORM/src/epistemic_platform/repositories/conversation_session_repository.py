@@ -139,6 +139,29 @@ class ConversationSessionRepository:
         )
         return list(result.scalars().all())
 
+    async def list_recent_completed_by_user(
+        self, user_id: int, *, exclude_session_id: int | None = None, limit: int = 10
+    ) -> list[ConversationSession]:
+        """Return recent completed sessions, newest first.
+
+        Used to build cross-session context for actor prompts.
+        Actor relationship is eager-loaded via selectin on the model.
+        """
+        q = (
+            select(ConversationSession)
+            .where(
+                ConversationSession.user_id == user_id,
+                ConversationSession.status == "completed",
+                ConversationSession.parent_session_id.is_(None),
+            )
+            .order_by(ConversationSession.started_at.desc())
+            .limit(limit)
+        )
+        if exclude_session_id is not None:
+            q = q.where(ConversationSession.id != exclude_session_id)
+        result = await self.db.execute(q)
+        return list(result.scalars().all())
+
     async def delete(self, session_id: int) -> bool:
         session = await self.get(session_id)
         if not session:
