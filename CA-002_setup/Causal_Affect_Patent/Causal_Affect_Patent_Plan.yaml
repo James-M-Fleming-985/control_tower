@@ -1,0 +1,356 @@
+# ============================================================================
+# CAUSAL AFFECT PATENT APPLICATION — MASTER PLAN
+# ============================================================================
+# Platform: Causal Affect — Level 5 Autonomous Company System
+# Jurisdiction: UK Patent Application
+# Template: Modelled on existing Communication Patent (31 claims, 14 figures)
+# Created: 2026-03-27
+# ============================================================================
+
+overview:
+  title: "Causal Affect Patent Application Plan"
+  description: >
+    Create a full UK patent application for the Causal Affect platform — a
+    Level 5 autonomous company system that discovers cross-domain causal
+    relationships, generates AI predictions, autonomously builds MVPs via TDD,
+    and deploys them without human intervention.
+  template_source: "CA-002_setup/Causal_Affect_Patent/ (Communication Patent PDFs)"
+  template_stats:
+    claims: 31
+    figures: 14
+    word_count: ~13500
+    independent_claims: 4
+  target_stats:
+    claims: 30-35
+    figures: 14
+    word_count: ~14000
+    independent_claims: 4
+
+# ============================================================================
+# 6 PATENTABLE INNOVATIONS
+# ============================================================================
+innovations:
+  - id: 1
+    symbol: "①"
+    title: "Variable-Level Cross-Domain Causal Discovery"
+    description: >
+      Discovers causal relationships at the individual variable level across
+      unrelated domains (e.g., Wikipedia page views → stock price), not
+      domain-level aggregates.
+    key_differentiator: "Granularity — variable-to-variable, not domain-to-domain"
+
+  - id: 2
+    symbol: "②"
+    title: "Three-Model Ensemble with Automatic Weight Calibration"
+    description: >
+      Combines Granger causality (40%), OLS regression (35%), and ARIMA
+      time-series (25%) into a single ensemble prediction with confidence
+      scoring derived from historical accuracy.
+    key_differentiator: "Weights calibrated from real outcome feedback, not fixed"
+
+  - id: 3
+    symbol: "③"
+    title: "Autonomous TDD-Driven MVP Generation from Statistical Signals"
+    description: >
+      Converts statistical causal signals directly into deployed web
+      applications via a 5-phase TDD pipeline (SPEC → RED → GREEN →
+      REFACTOR → VALIDATE) with AI-generated code.
+    key_differentiator: "Signal-to-software with no human coding"
+
+  - id: 4
+    symbol: "④"
+    title: "Closed-Loop Autonomous Business Pipeline"
+    description: >
+      Full cycle: data ingestion → correlation → causality → prediction →
+      MVP build → deployment → outcome measurement → weight recalibration.
+      Runs on APScheduler cron (01:00–05:00 UTC daily).
+    key_differentiator: "End-to-end autonomy with feedback loop"
+
+  - id: 5
+    symbol: "⑤"
+    title: "Cross-Layer Enforcement Architecture"
+    description: >
+      Enforces that Layer 1 (behavioural data: Wikipedia, Reddit) predicts
+      Layer 2 (exploitable outcomes: stocks, crypto). LAYER1_SOURCES
+      constraint prevents trivial same-domain correlations.
+    key_differentiator: "Architectural constraint ensuring cross-domain only"
+
+  - id: 6
+    symbol: "⑥"
+    title: "Build-Iterate Loop with Failure Diagnosis"
+    description: >
+      When a build fails any TDD phase, the system diagnoses the failure,
+      generates an iterate_reason, and spawns a child build with adjusted
+      parameters — no human intervention required.
+    key_differentiator: "Self-healing code generation pipeline"
+
+# ============================================================================
+# PHASE 1: DEEP CODE AUDIT & NOVELTY IDENTIFICATION
+# ============================================================================
+phase_1_code_audit:
+  purpose: >
+    Extract exact algorithms, formulas, and coefficients from the codebase
+    to ensure patent claims are precise and defensible.
+
+  tasks:
+    - id: "1.1"
+      title: "Audit all scoring formulas"
+      details:
+        - "Opportunity Score (5 weighted components) from exploitation logic"
+        - "Build Viability Score (5 weighted components)"
+        - "Ensemble confidence = sqrt(mean_historical_accuracy)"
+        - "Ensemble weights: Granger 40%, OLS 35%, ARIMA 25%"
+        - "Cross-layer rule: LAYER1_SOURCES = ('wikipedia', 'reddit')"
+        - "TDD pass-rate threshold (≥80%)"
+
+    - id: "1.2"
+      title: "Audit the autonomous loop"
+      details: >
+        Map APScheduler cron jobs from scheduled_tasks.py to document
+        the closed-loop cycle with precise timing and dependencies
+        (01:00 → 01:30 → 02:00 → 02:30 → 05:00 UTC daily).
+
+    - id: "1.3"
+      title: "Audit TDD pipeline"
+      details: >
+        Extract 5-phase spec: prompt templates, validation criteria,
+        retry logic, complexity tiers (LOW=4 AC, MEDIUM=7, HIGH=12).
+
+    - id: "1.4"
+      title: "Prior art identification"
+      contrasts:
+        - system: "Quantitative Trading (Alpaca, QuantConnect)"
+          limitation: "Predict but don't build products"
+        - system: "AI Code Generation (GitHub Copilot, Devin, Replit Agent)"
+          limitation: "Build but don't discover opportunities"
+        - system: "BI Platforms (Palantir, Tableau)"
+          limitation: "Correlate but don't act autonomously"
+        - system: "AutoML (H2O, DataRobot)"
+          limitation: "Model but don't deploy products"
+      gap: >
+        No existing system combines discovery → causality → prediction →
+        code generation → deployment → outcome measurement.
+
+    - id: "1.5"
+      title: "Confirm 6 patentable innovations"
+      reference: "See innovations section above"
+
+  key_files_to_audit:
+    - path: "services/ensemble_model.py"
+      purpose: "Ensemble algorithm, weights, LAYER1_SOURCES"
+    - path: "services/granger_causality_service.py"
+      purpose: "Bidirectional Granger, optimal lag selection"
+    - path: "services/correlation_analyzer.py"
+      purpose: "N×N cross-domain correlation engine"
+    - path: "services/ai_code_generator_orchestrator.py"
+      purpose: "5-phase TDD cycle orchestration"
+    - path: "services/spec_generator.py"
+      purpose: "AI-driven YAML spec generation"
+    - path: "services/mvp_builder_service.py"
+      purpose: "Build orchestration and viability scoring"
+    - path: "services/exploitation_backtester.py"
+      purpose: "Outcome measurement and accuracy tracking"
+    - path: "services/walk_forward_validator.py"
+      purpose: "Expanding-window backtesting"
+    - path: "services/github_service.py"
+      purpose: "Autonomous repo creation and push"
+    - path: "services/railway_service.py"
+      purpose: "GraphQL deployment pipeline"
+    - path: "scheduled_tasks.py"
+      purpose: "Cron job definitions for autonomous loop"
+    - path: "models.py"
+      purpose: "Full data schema"
+    - path: "routers/dashboard_real.py"
+      purpose: "Build/iterate/portfolio endpoints"
+    - path: "data_fetcher.py"
+      purpose: "Multi-source data ingestion"
+    - path: "data_ingestion_service.py"
+      purpose: "Data standardisation pipeline"
+
+# ============================================================================
+# PHASE 2: DRAFT PATENT DOCUMENTS (5 documents)
+# ============================================================================
+phase_2_draft_documents:
+  purpose: "Create all 5 patent documents in markdown format"
+
+  documents:
+    - id: "doc_1"
+      title: "Abstract"
+      filename: "01_Abstract.md"
+      target_words: 200
+      format: >
+        Single paragraph: "A computer-implemented system for autonomous
+        cross-domain causal discovery and business generation comprising..."
+        Problem → Solution → 6 innovations → Measurable advantages.
+
+    - id: "doc_2"
+      title: "Description"
+      filename: "02_Description.md"
+      target_words: 10000
+      sections:
+        - name: "TECHNICAL FIELD"
+          words: 100
+        - name: "BACKGROUND ART"
+          words: 600
+          notes: "4+ named competitors with explicit limitation statements"
+        - name: "SUMMARY OF INVENTION"
+          words: 700
+          notes: "6 innovations enumerated"
+        - name: "DETAILED DESCRIPTION"
+          words: 8000
+          subsections:
+            - "System Architecture Overview (9-phase autonomous loop)"
+            - "Multi-Source Data Ingestion Pipeline (10 APIs, standardisation grid)"
+            - "Cross-Domain Correlation Engine (N×N, significance, cross-domain enforcement)"
+            - "Bidirectional Granger Causality System (H0/H1, optimal lag, direction)"
+            - "Three-Model Ensemble Prediction Engine (weights, confidence scoring)"
+            - "Cross-Layer Architecture (L1 → L2 enforcement)"
+            - "Exploitation Recommendation Scoring (formulas with exact coefficients)"
+            - "Autonomous TDD Code Generation Pipeline (5-phase)"
+            - "Deployment Automation (GitHub → Railway → live endpoint)"
+            - "Outcome Measurement & Feedback Loop (validation, calibration)"
+            - "Build Iteration System (failure diagnosis → re-generation)"
+            - "Example Scenario: Wikipedia Signal → Stock Prediction → MVP Build"
+            - "Industrial Applicability"
+        - name: "BRIEF DESCRIPTION OF THE DRAWINGS"
+          notes: "14 figures described"
+
+    - id: "doc_3"
+      title: "Claims"
+      filename: "03_Claims.md"
+      target_words: 2500
+      target_claims: 30-35
+      independent_claims:
+        - number: 1
+          type: "System"
+          scope: "Full autonomous platform architecture"
+        - number: ~12
+          type: "Method"
+          scope: "Steps of the autonomous pipeline"
+        - number: ~18
+          type: "Computer-readable medium"
+          scope: "Non-transitory storage"
+        - number: ~28
+          type: "Iteration system"
+          scope: "Build-iterate loop"
+      dependent_claims: "26+ dependent claims covering: formulas, weights, layer enforcement, scoring, TDD phases, deployment, scheduling"
+
+    - id: "doc_4"
+      title: "Drawings Info"
+      filename: "04_Drawings_Info.md"
+      target_words: 1200
+      description: >
+        14 figure descriptions with innovation markers (①-⑥)
+        and claim cross-references.
+
+    - id: "doc_5"
+      title: "Figures"
+      filename: "05_Figures.md"
+      description: >
+        Simple flow diagrams for each figure, suitable for formal
+        patent drawing conversion.
+
+  figures:
+    - number: 1
+      title: "System Architecture Overview"
+      innovations: ["④"]
+    - number: 2
+      title: "Multi-Source Data Ingestion Pipeline"
+      innovations: ["①"]
+    - number: 3
+      title: "Cross-Domain Correlation Engine"
+      innovations: ["①", "⑤"]
+    - number: 4
+      title: "Bidirectional Granger Causality System"
+      innovations: ["①"]
+    - number: 5
+      title: "Three-Model Ensemble Architecture"
+      innovations: ["②"]
+    - number: 6
+      title: "Cross-Layer Enforcement"
+      innovations: ["⑤"]
+    - number: 7
+      title: "Exploitation Scoring Pipeline"
+      innovations: ["②", "④"]
+    - number: 8
+      title: "Autonomous TDD Code Generation"
+      innovations: ["③"]
+    - number: 9
+      title: "5-Phase TDD Pipeline Detail"
+      innovations: ["③"]
+    - number: 10
+      title: "Deployment Automation Flow"
+      innovations: ["③", "④"]
+    - number: 11
+      title: "Outcome Measurement & Feedback Loop"
+      innovations: ["②", "④"]
+    - number: 12
+      title: "Build-Iterate Loop"
+      innovations: ["⑥"]
+    - number: 13
+      title: "Autonomous Scheduling Timeline"
+      innovations: ["④"]
+    - number: 14
+      title: "End-to-End Example Scenario"
+      innovations: ["①", "②", "③", "④", "⑤", "⑥"]
+
+# ============================================================================
+# PHASE 3: CROSS-REFERENCE VALIDATION
+# ============================================================================
+phase_3_validation:
+  checks:
+    - "Every claim references ≥1 figure"
+    - "Every innovation (①-⑥) appears in claims + description + drawings"
+    - "All formulas match exact code coefficients"
+    - "Prior art contrasts each competitor on specific limitations"
+    - "Claim dependency chains valid (no circular references)"
+
+# ============================================================================
+# PHASE 4: FILE ORGANISATION
+# ============================================================================
+phase_4_file_organisation:
+  output_directory: "CA-002_setup/Causal_Affect_Patent/"
+  tasks:
+    - "Create folder with consistent naming"
+    - "Save 5 markdown documents"
+    - "Create STATUS.md tracking document"
+
+# ============================================================================
+# VERIFICATION CRITERIA
+# ============================================================================
+verification:
+  cross_reference: "Every claim number appears in description + drawings"
+  formula_accuracy: "Patent coefficients match source code exactly"
+  prior_art: "≥4 named systems with limitation statements"
+  claims_count: "30-35 total (4 independent + 26-31 dependent)"
+  word_counts:
+    abstract: ~200
+    description: ~10000
+    claims: ~2500
+    drawings_info: ~1200
+  innovation_coverage: "All 6 innovations referenced in ≥3 claims each"
+
+# ============================================================================
+# KEY DECISIONS
+# ============================================================================
+decisions:
+  jurisdiction: "UK patent application (matching existing template)"
+  claim_strategy: >
+    Anchor on integrated autonomous closed-loop — no single component
+    novel alone, but the system combination is unprecedented.
+  prior_art_approach: "Name commercial products (not academic papers) to show practical gap"
+  scope_in: "Full pipeline from data ingestion → deployed MVP → outcome measurement"
+  scope_out: "Individual API integrations, specific UI designs, database schema details"
+
+# ============================================================================
+# FURTHER CONSIDERATIONS
+# ============================================================================
+considerations:
+  - title: "Provisional filing recommended"
+    detail: "Establish priority date immediately, convert to full within 12 months"
+  - title: "PCT international filing"
+    detail: "UK gives 12-month priority for international application"
+  - title: "Trade secret vs patent for coefficients"
+    detail: >
+      Since weights are in codebase (public repo), patent protection
+      is stronger than trade secret.
