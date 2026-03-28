@@ -1,5 +1,7 @@
 # UK PATENT APPLICATION
 
+## SYSTEM AND METHOD FOR AUTONOMOUS CROSS-DOMAIN CAUSAL DISCOVERY AND BUSINESS GENERATION USING ENSEMBLE PREDICTION AND TEST-DRIVEN DEVELOPMENT
+
 ## DESCRIPTION
 
 ### TECHNICAL FIELD
@@ -18,6 +20,8 @@ The discovery of actionable relationships between disparate data domains and the
 
 **Automated Machine Learning Platforms** such as H2O.ai, DataRobot, and Google AutoML automate model selection and training for prediction tasks. These systems generate and evaluate statistical models but require human-defined target variables, do not discover which variables are worth predicting, do not generate deployable products from model outputs, and do not close the loop between prediction and outcome measurement. The fundamental limitation is dependence on human problem formulation and absence of end-to-end autonomy.
 
+In the patent literature, various publications describe components of the above systems in isolation. Patent publications relating to automated machine learning describe systems for model selection and hyperparameter tuning (see, for example, published applications by DataRobot, Inc. and H2O.ai, Inc.). Patent publications in the field of algorithmic trading describe signal-based trade execution systems confined to financial markets. Patent publications relating to AI-assisted software development describe code completion and generation tools that respond to human-authored specifications. Patent publications in the field of causal inference describe methods for identifying causal relationships within single datasets. However, no prior art patent publication or combination of publications discloses or suggests a system that integrates cross-domain causal discovery at individual variable granularity, multi-model ensemble prediction with empirical weight calibration, autonomous signal-to-software conversion via test-driven development, and closed-loop outcome measurement with model recalibration in a single autonomous pipeline.
+
 There exists a need for a computer-implemented system that integrates the following capabilities absent from all prior art: (1) variable-level cross-domain causal discovery across heterogeneous data sources, (2) multi-model ensemble prediction with empirical weight calibration, (3) autonomous conversion of statistical signals into deployed software products, (4) closed-loop outcome measurement and system recalibration, and (5) architectural enforcement preventing trivial same-domain correlations from consuming system resources.
 
 ### SUMMARY OF INVENTION
@@ -35,6 +39,36 @@ The present invention provides a computer-implemented system for autonomous cros
 **Innovation ⑤: Cross-Layer Enforcement Architecture.** The system enforces that behavioural signal variables (Layer 1: Wikipedia pageviews, Reddit activity) predict exploitable macroeconomic target variables (Layer 2: Federal Reserve economic indicators, stock prices, academic output, geopolitical events). This architectural constraint is enforced at the database query level, preventing same-layer correlations from entering the prediction pipeline and ensuring all predictions represent genuine cross-domain causal hypotheses.
 
 **Innovation ⑥: Build-Iterate Loop with Failure Diagnosis.** When a generated application fails any test-driven development phase, the system diagnoses the failure mode, categorises errors across seven error categories (syntax, test, frontend, import, wiring, configuration, runtime), generates an iteration reason, and spawns a child build with adjusted parameters—closing the loop between build failure and corrective action without human intervention.
+
+### BRIEF DESCRIPTION OF THE DRAWINGS
+
+**Figure 1:** System Architecture Overview diagram showing the complete autonomous pipeline from data ingestion through deployment and outcome measurement with nine processing stages connected by data flow arrows per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (closed-loop autonomous business pipeline).
+
+**Figure 2:** Multi-Source Data Ingestion Pipeline diagram showing six external data sources (Wikipedia, Reddit, FRED, Stock, ArXiv, GDELT) feeding into a standardisation layer that produces unified TimeSeriesData records per Claims 1, 2, 11, with numbered annotation indicating Innovation ① (variable-level cross-domain data collection).
+
+**Figure 3:** Cross-Domain Correlation Engine diagram showing N×N pairwise correlation computation with Pearson, Spearman, and Kendall coefficients, significance filtering at p < 0.05, and cross-domain enforcement excluding same-source pairs per Claims 1, 3, 11, with numbered annotations indicating Innovation ① (variable-level discovery) and Innovation ⑤ (cross-layer enforcement).
+
+**Figure 4:** Bidirectional Granger Causality System diagram showing forward test (X→Y) and reverse test (Y→X) with frequency-adaptive lag selection, direction assignment logic (x_to_y, y_to_x, bidirectional, none), and minimum thirty-point sample requirement per Claims 1, 4, 11, with numbered annotation indicating Innovation ① (causal direction determination).
+
+**Figure 5:** Three-Model Ensemble Architecture diagram showing Granger predictor (weight 0.40), OLS predictor (weight 0.35), and ARIMA predictor (weight 0.25) feeding into weighted voting combination with up_score and down_score computation, feature engineering block (rolling windows 7, 30, 90), and weight calibration feedback arrow per Claims 1, 5, 6, 11, 12, with numbered annotation indicating Innovation ② (ensemble with automatic calibration).
+
+**Figure 6:** Cross-Layer Enforcement diagram showing Layer 1 sources (Wikipedia, Reddit) constrained to predict Layer 2 targets (FRED, Stock, ArXiv, GDELT) with SQL-level JOIN filter preventing same-layer pairs, directional arrow indicating signal→target assignment per Claims 1, 7, 11, with numbered annotation indicating Innovation ⑤ (architectural enforcement).
+
+**Figure 7:** Exploitation Scoring Pipeline diagram showing five weighted components (Demand 30, Growth 25, Timing 20, Evidence 15, Competition 10) feeding into opportunity_score calculation, with action type classification (BUY, SELL, BUILD, MONITOR) and build viability threshold per Claims 1, 8, 11, with numbered annotations indicating Innovation ② (scoring) and Innovation ④ (autonomous action).
+
+**Figure 8:** Autonomous TDD Code Generation Overview diagram showing specification input flowing through five phases (SPEC→RED→GREEN→REFACTOR→VALIDATE) with AI language model interaction at RED, GREEN, and REFACTOR stages, eighty percent pass rate threshold at GREEN, and LIVE/FAILED output per Claims 1, 9, 11, 13, 16, 28, with numbered annotation indicating Innovation ③ (signal-to-software).
+
+**Figure 9:** Five-Phase TDD Pipeline Detail diagram showing SPEC phase (YAML generation with complexity tiers LOW/MEDIUM/HIGH), RED phase (test creation with stub module), GREEN phase (AI implementation with five-retry loop and pass rate computation), REFACTOR phase (quality improvement with regression check), and VALIDATE phase (AST parsing, compilation, final test run) per Claims 9, 10, 13, 14, 28, with numbered annotation indicating Innovation ③ (TDD pipeline specifics).
+
+**Figure 10:** Deployment Automation Flow diagram showing GitHub repository creation (PyGithub, Git Tree API, commit SHA verification) and Railway cloud deployment (GraphQL mutations: projectCreate→serviceCreate→serviceInstanceDeploy) with status polling and stale-build detection at six hundred seconds per Claims 1, 9, 11, 15, 16, with numbered annotations indicating Innovation ③ (autonomous deployment) and Innovation ④ (no human intervention).
+
+**Figure 11:** Outcome Measurement and Feedback Loop diagram showing prediction validation (pending→validated status transition, direction correctness, percentage error), walk-forward backtesting (expanding window OLS), exploitation backtesting (opportunity window measurement), and weight recalibration arrow feeding back to ensemble engine per Claims 1, 5, 6, 11, 12, 16, with numbered annotations indicating Innovation ② (weight calibration) and Innovation ④ (closed-loop validation).
+
+**Figure 12:** Build-Iterate Loop diagram showing failure diagnosis (seven error categories: syntax, test, frontend, import, wiring, config, runtime), iteration context generation (error patterns + parent files + ensemble data), child build spawning (parent_build_id linkage, iteration_number increment), and concurrency guard (block if active build in chain) per Claims 28, 29, 30, 31, with numbered annotation indicating Innovation ⑥ (self-healing pipeline).
+
+**Figure 13:** Autonomous Scheduling Timeline diagram showing daily (01:00 Wikipedia, 01:30 Reddit, 02:00 GDELT, 02:30 update actuals, 05:00 ensemble predictions) and weekly (Sunday 03:00 baselines, Monday 04:00 walk-forward) cron schedule with data dependency arrows showing ingestion→validation→prediction ordering per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (autonomous scheduling).
+
+**Figure 14:** End-to-End Example Scenario diagram showing Wikipedia "Artificial_intelligence" pageviews (Layer 1) → correlation r=0.72 → Granger p=0.03 at lag 3 → ensemble prediction "up" confidence 0.765 → exploitation score 72 → TDD build → GitHub push → Railway deploy → three-month outcome validation, illustrating all six innovations (①②③④⑤⑥) operating in sequence per Claims 1, 11, 16.
 
 ### DETAILED DESCRIPTION
 
@@ -660,36 +694,20 @@ Referring to Figure 14, the following example illustrates the complete autonomou
 
 **Step 8: Outcome Measurement.** Three months later (matching the Granger lag), the prediction validation task compares the predicted NASDAQ direction ("up") against the actual movement. If correct, the direction_correct field is set to True and the Granger sub-model's track record improves, increasing its calibrated weight for this pair in future predictions.
 
+#### Alternative Embodiments
+
+Those skilled in the art will appreciate that the present invention may be implemented in various alternative forms without departing from the scope of the claims.
+
+**Alternative Data Sources.** While the preferred embodiment ingests data from Wikipedia, Reddit, FRED, stock markets, ArXiv, and GDELT, the system architecture supports any combination of heterogeneous time-series data sources. Alternative behavioural signal sources include Google Trends search volume data, Twitter/X social media engagement metrics, YouTube view counts, App Store download statistics, and web traffic analytics. Alternative outcome sources include commodity prices, cryptocurrency exchange data, real estate indices, labour market statistics, patent filing volumes, and clinical trial registries. The cross-layer enforcement mechanism operates on source category labels and is agnostic to the specific data sources employed.
+
+**Alternative Ensemble Configurations.** While the preferred embodiment employs three sub-models (Granger, OLS, ARIMA), the ensemble architecture supports any number of statistical sub-models with weighted voting. Alternative sub-models include vector autoregression (VAR), exponential smoothing (ETS), Prophet time-series decomposition, gradient-boosted tree regressors, long short-term memory (LSTM) neural networks, and Bayesian structural time-series models. The weight calibration mechanism operates identically regardless of the number or type of sub-models, requiring only that each sub-model produce a direction and confidence score.
+
+**Alternative Deployment Targets.** While the preferred embodiment deploys to GitHub for code hosting and Railway for cloud deployment, the system supports alternative platforms including Amazon Web Services (AWS Lambda, Elastic Beanstalk), Google Cloud Platform (Cloud Run, App Engine), Microsoft Azure (Azure Functions, App Service), Heroku, Vercel, and Netlify. The deployment automation module requires only API access for repository creation and application deployment, and may be extended to support containerised deployment via Docker and Kubernetes.
+
+**Alternative Test Frameworks and Languages.** While the preferred embodiment generates Python code tested with pytest, the test-driven development pipeline supports alternative programming languages and test frameworks including JavaScript with Jest or Mocha, TypeScript with Vitest, Ruby with RSpec, and Go with the standard testing package. The pipeline's contract enforcement mechanism (requiring all imported symbols to be defined) is language-agnostic in principle.
+
+**Alternative AI Language Models.** While the preferred embodiment uses Anthropic Claude for code generation, the pipeline supports alternative large language models including OpenAI GPT models, Google Gemini, Meta Llama, and Mistral. The AI interaction interface requires only a text-in, text-out API and is not coupled to any specific model provider.
+
 ### INDUSTRIAL APPLICABILITY
 
 The present invention has industrial applicability in financial technology, market research, product development automation, and autonomous business operations. The system enables organisations to systematically discover actionable cross-domain relationships and automatically exploit them through generated software products—reducing the time from insight discovery to product deployment from weeks or months to hours. The autonomous feedback loop enables continuous improvement without manual intervention, making the system suitable for deployment in environments requiring twenty-four-hour-a-day, seven-day-a-week autonomous operation such as financial markets, real-time demand forecasting, and autonomous portfolio management.
-
-### BRIEF DESCRIPTION OF THE DRAWINGS
-
-**Figure 1:** System Architecture Overview diagram showing the complete autonomous pipeline from data ingestion through deployment and outcome measurement with nine processing stages connected by data flow arrows per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (closed-loop autonomous business pipeline).
-
-**Figure 2:** Multi-Source Data Ingestion Pipeline diagram showing six external data sources (Wikipedia, Reddit, FRED, Stock, ArXiv, GDELT) feeding into a standardisation layer that produces unified TimeSeriesData records per Claims 1, 2, 11, with numbered annotation indicating Innovation ① (variable-level cross-domain data collection).
-
-**Figure 3:** Cross-Domain Correlation Engine diagram showing N×N pairwise correlation computation with Pearson, Spearman, and Kendall coefficients, significance filtering at p < 0.05, and cross-domain enforcement excluding same-source pairs per Claims 1, 3, 11, with numbered annotations indicating Innovation ① (variable-level discovery) and Innovation ⑤ (cross-layer enforcement).
-
-**Figure 4:** Bidirectional Granger Causality System diagram showing forward test (X→Y) and reverse test (Y→X) with frequency-adaptive lag selection, direction assignment logic (x_to_y, y_to_x, bidirectional, none), and minimum thirty-point sample requirement per Claims 1, 4, 11, with numbered annotation indicating Innovation ① (causal direction determination).
-
-**Figure 5:** Three-Model Ensemble Architecture diagram showing Granger predictor (weight 0.40), OLS predictor (weight 0.35), and ARIMA predictor (weight 0.25) feeding into weighted voting combination with up_score and down_score computation, feature engineering block (rolling windows 7, 30, 90), and weight calibration feedback arrow per Claims 1, 5, 6, 11, 12, with numbered annotation indicating Innovation ② (ensemble with automatic calibration).
-
-**Figure 6:** Cross-Layer Enforcement diagram showing Layer 1 sources (Wikipedia, Reddit) constrained to predict Layer 2 targets (FRED, Stock, ArXiv, GDELT) with SQL-level JOIN filter preventing same-layer pairs, directional arrow indicating signal→target assignment per Claims 1, 7, 11, with numbered annotation indicating Innovation ⑤ (architectural enforcement).
-
-**Figure 7:** Exploitation Scoring Pipeline diagram showing five weighted components (Demand 30, Growth 25, Timing 20, Evidence 15, Competition 10) feeding into opportunity_score calculation, with action type classification (BUY, SELL, BUILD, MONITOR) and build viability threshold per Claims 1, 8, 11, with numbered annotations indicating Innovation ② (scoring) and Innovation ④ (autonomous action).
-
-**Figure 8:** Autonomous TDD Code Generation Overview diagram showing specification input flowing through five phases (SPEC→RED→GREEN→REFACTOR→VALIDATE) with AI language model interaction at RED, GREEN, and REFACTOR stages, eighty percent pass rate threshold at GREEN, and LIVE/FAILED output per Claims 1, 9, 11, 13, 16, 28, with numbered annotation indicating Innovation ③ (signal-to-software).
-
-**Figure 9:** Five-Phase TDD Pipeline Detail diagram showing SPEC phase (YAML generation with complexity tiers LOW/MEDIUM/HIGH), RED phase (test creation with stub module), GREEN phase (AI implementation with five-retry loop and pass rate computation), REFACTOR phase (quality improvement with regression check), and VALIDATE phase (AST parsing, compilation, final test run) per Claims 9, 10, 13, 14, 28, with numbered annotation indicating Innovation ③ (TDD pipeline specifics).
-
-**Figure 10:** Deployment Automation Flow diagram showing GitHub repository creation (PyGithub, Git Tree API, commit SHA verification) and Railway cloud deployment (GraphQL mutations: projectCreate→serviceCreate→serviceInstanceDeploy) with status polling and stale-build detection at six hundred seconds per Claims 1, 9, 11, 15, 16, with numbered annotations indicating Innovation ③ (autonomous deployment) and Innovation ④ (no human intervention).
-
-**Figure 11:** Outcome Measurement and Feedback Loop diagram showing prediction validation (pending→validated status transition, direction correctness, percentage error), walk-forward backtesting (expanding window OLS), exploitation backtesting (opportunity window measurement), and weight recalibration arrow feeding back to ensemble engine per Claims 1, 5, 6, 11, 12, 16, with numbered annotations indicating Innovation ② (weight calibration) and Innovation ④ (closed-loop validation).
-
-**Figure 12:** Build-Iterate Loop diagram showing failure diagnosis (seven error categories: syntax, test, frontend, import, wiring, config, runtime), iteration context generation (error patterns + parent files + ensemble data), child build spawning (parent_build_id linkage, iteration_number increment), and concurrency guard (block if active build in chain) per Claims 28, 29, 30, 31, with numbered annotation indicating Innovation ⑥ (self-healing pipeline).
-
-**Figure 13:** Autonomous Scheduling Timeline diagram showing daily (01:00 Wikipedia, 01:30 Reddit, 02:00 GDELT, 02:30 update actuals, 05:00 ensemble predictions) and weekly (Sunday 03:00 baselines, Monday 04:00 walk-forward) cron schedule with data dependency arrows showing ingestion→validation→prediction ordering per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (autonomous scheduling).
-
-**Figure 14:** End-to-End Example Scenario diagram showing Wikipedia "Artificial_intelligence" pageviews (Layer 1) → correlation r=0.72 → Granger p=0.03 at lag 3 → ensemble prediction "up" confidence 0.765 → exploitation score 72 → TDD build → GitHub push → Railway deploy → three-month outcome validation, illustrating all six innovations (①②③④⑤⑥) operating in sequence per Claims 1, 11, 16.
