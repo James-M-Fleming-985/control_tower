@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { History, GraduationCap, BarChart3, MessageSquare, ScrollText, X } from 'lucide-react';
+import { History, GraduationCap, BarChart3, MessageSquare, ScrollText, X, Play } from 'lucide-react';
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -158,25 +158,33 @@ export function SessionsPage() {
                       </div>
 
                       <div className="flex items-center gap-2 pt-1">
+                        {session.status === 'active' && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            className="h-7 text-xs"
+                            onClick={() => navigate(`/conversation/${session.id}`)}
+                          >
+                            <Play className="mr-1 h-3 w-3" /> Resume
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant={isSelected ? 'default' : 'outline'}
+                          className="h-7 text-xs"
+                          onClick={() => setTranscriptId(isSelected ? null : session.id)}
+                        >
+                          <ScrollText className="mr-1 h-3 w-3" /> Transcript
+                        </Button>
                         {session.status === 'completed' && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant={isSelected ? 'default' : 'outline'}
-                              className="h-7 text-xs"
-                              onClick={() => setTranscriptId(isSelected ? null : session.id)}
-                            >
-                              <ScrollText className="mr-1 h-3 w-3" /> Transcript
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs"
-                              onClick={() => navigate(`/results/${session.id}`)}
-                            >
-                              <BarChart3 className="mr-1 h-3 w-3" /> Results
-                            </Button>
-                          </>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={() => navigate(`/results/${session.id}`)}
+                          >
+                            <BarChart3 className="mr-1 h-3 w-3" /> Results
+                          </Button>
                         )}
                         {debrief ? (
                           <Button
@@ -261,11 +269,15 @@ export function SessionsPage() {
             <span className="text-[10px] text-muted-foreground">
               {transcriptSession?.messages?.length ?? 0} messages · {transcriptSession?.turn_count ?? 0} turns
             </span>
-            {transcriptSession?.status === 'completed' && (
+            {transcriptSession?.status === 'active' ? (
+              <Button size="sm" variant="default" className="h-6 text-[10px]" onClick={() => navigate(`/conversation/${transcriptId}`)}>
+                <Play className="mr-1 h-3 w-3" /> Resume
+              </Button>
+            ) : transcriptSession?.status === 'completed' ? (
               <Button size="sm" variant="outline" className="h-6 text-[10px]" onClick={() => navigate(`/debrief/${transcriptId}`)}>
                 Open Debrief
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       )}
