@@ -15,7 +15,7 @@ import os
 from datetime import datetime
 
 # Timestamp for file versioning (DDMMYY)
-TIMESTAMP = datetime.now().strftime("%d%m%y")
+TIMESTAMP = "300326"
 
 # Patent title
 PATENT_TITLE = ("SYSTEM AND METHOD FOR AUTONOMOUS CROSS-DOMAIN CAUSAL DISCOVERY "
@@ -125,6 +125,11 @@ def clean_text_for_pdf(text):
     text = text.replace('◇', '*')
     text = text.replace('✗', 'X')
     text = text.replace('●', '*')
+    text = text.replace('█', '#')
+    text = text.replace('░', '.')
+    text = text.replace('↑', '^')
+    text = text.replace('✓', 'Y')
+    text = text.replace('•', '*')
     text = text.replace('²', '2')
     text = text.replace('₀', '0')
     text = text.replace('₁', '1')

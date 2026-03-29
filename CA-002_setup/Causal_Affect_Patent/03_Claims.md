@@ -157,3 +157,39 @@ a concurrency guard configured to prevent spawning a new iteration if an active 
 **Claim 33.** The system of claim 1 wherein the deployment automation module further comprises a stale-build detection mechanism configured to monitor all builds in an active processing state and to mark as failed any build that has remained in state QUEUED, GENERATING, UPLOADING, or DEPLOYING for longer than a configurable timeout period, preventing indefinite resource consumption.
 
 **Claim 34.** The method of claim 11 wherein the bidirectional Granger causality testing assigns causal direction categories as follows: x_to_y when the forward test is significant and the reverse test is not significant, y_to_x when the reverse test is significant and the forward test is not significant, bidirectional when both tests are significant, and none when neither test is significant, at a significance threshold of p < 0.05.
+
+**Claim 35.** A computer-implemented commercial intelligence system for optimising autonomous code generation in the system of claim 1, the system further comprising:
+
+a product deployment tracking module configured to automatically create a deployment record upon successful completion of each build, the deployment record comprising a build identifier, a recommendation identifier, a product name, an application identifier, a technology stack snapshot, a pricing model, a market category, a target demographic, a deployment URL, and a deployment status;
+
+a revenue aggregation module configured to receive payment processor webhook events comprising checkout completions, subscription updates, subscription cancellations, and invoice payments, and to aggregate the events into periodic metrics records comprising monthly recurring revenue in cents and net subscriber count per deployment;
+
+an engagement aggregation module configured to periodically query an analytics service for page views, unique visitors, and average session duration per deployed product hostname, and to store the results as periodic metrics records per deployment;
+
+a commercial ranking engine configured to compute a composite commercial score for each active deployment on a zero-to-one-hundred scale by calculating a weighted sum of four normalised dimensions comprising revenue at forty percent weight, engagement at thirty percent weight, conversion rate at twenty percent weight, and retention at ten percent weight;
+
+a winning configuration analyser configured to group deployments by technology stack, pricing model, market category, and target demographic, and to compute per-group average commercial scores identifying which configurations correlate with commercial success; and
+
+a specification enrichment module configured to inject the commercial intelligence context into the artificial intelligence language model prompt during specification generation, the context comprising top-performing deployments, best-performing configurations, and market-specific insights.
+
+**Claim 36.** The commercial intelligence system of claim 35 wherein the revenue aggregation module further comprises an idempotency guard that checks for existing aggregation records before creating new records, preventing duplicate aggregation from repeated webhook events.
+
+**Claim 37.** The commercial intelligence system of claim 35 wherein the product deployment tracking module creates the deployment record within the same database transaction as the build completion, ensuring no successful build exists without a corresponding deployment entry.
+
+**Claim 38.** The commercial intelligence system of claim 35 further comprising a configuration confidence scoring module configured to compute, for a proposed build configuration, a confidence score on a zero-to-one-hundred scale by:
+
+inspecting each dimension of the proposed configuration against the winning configuration database;
+
+for each dimension where the proposed value matches a historically successful configuration, deriving a per-dimension confidence from the historical average commercial score boosted by an evidence multiplier of five percentage points per prior deployment capped at twenty percentage points;
+
+for each dimension with no historical precedent, assigning a baseline confidence of thirty;
+
+averaging the per-dimension confidences to produce an overall confidence score; and
+
+generating a plain-English recommendation selected from the group consisting of: "High confidence" when overall confidence is at least seventy-five, "Moderate confidence" when overall confidence is between fifty and seventy-four, and "Low confidence" when overall confidence is below fifty.
+
+**Claim 39.** The commercial intelligence system of claim 35 further comprising a demographic pattern mapping module configured to group ranked deployments by target demographic segment and to compute, for each segment, the deployment count, average commercial score, most common technology stack, most common pricing model, and most common market category.
+
+**Claim 40.** The commercial intelligence system of claim 35 wherein the specification enrichment module injects into the AI language model prompt a context block comprising: the top five commercially successful deployments with their composite scores and configuration details, the three highest-scoring technology stacks and pricing models, market-specific insights for the target market category if historical data exists, demographic-specific insights for the target demographic if historical data exists, and the configuration confidence score with plain-English recommendation.
+
+**Claim 41.** The commercial intelligence system of claim 35 wherein the commercial ranking, winning configuration analysis, revenue aggregation, and engagement aggregation are executed on a scheduled daily cycle, and wherein the specification enrichment is performed synchronously during each specification generation request, ensuring the AI language model receives the most recent commercial intelligence data available at the time of build initiation.

@@ -40,6 +40,8 @@ The present invention provides a computer-implemented system for autonomous cros
 
 **Innovation ⑥: Build-Iterate Loop with Failure Diagnosis.** When a generated application fails any test-driven development phase, the system diagnoses the failure mode, categorises errors across seven error categories (syntax, test, frontend, import, wiring, configuration, runtime), generates an iteration reason, and spawns a child build with adjusted parameters—closing the loop between build failure and corrective action without human intervention.
 
+**Innovation ⑦: ML-Driven Commercial Intelligence Feedback Loop.** The system aggregates post-deployment commercial performance metrics—monthly recurring revenue from payment processor webhooks, subscriber counts, engagement data from analytics integrations (page views, unique visitors, average session duration), conversion rates, and churn rates—per deployed product. A commercial intelligence service ranks deployments by a composite commercial score (revenue forty percent, engagement thirty percent, conversion twenty percent, retention ten percent), identifies winning configurations (tech stacks, pricing models, market categories, target demographics), and produces configuration confidence scores for proposed new builds. Before generating each new build specification, the autonomous code generation pipeline consults the commercial intelligence module to inject historical deployment performance context into the AI prompt, enriching the specification with data-driven insights about which configurations correlate with commercial success. This closes a second feedback loop: not only does the system self-correct failing builds (Innovation ⑥), it also steers future builds toward commercially proven configurations based on aggregated deployment outcome data.
+
 ### BRIEF DESCRIPTION OF THE DRAWINGS
 
 **Figure 1:** System Architecture Overview diagram showing the complete autonomous pipeline from data ingestion through deployment and outcome measurement with nine processing stages connected by data flow arrows per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (closed-loop autonomous business pipeline).
@@ -68,7 +70,11 @@ The present invention provides a computer-implemented system for autonomous cros
 
 **Figure 13:** Autonomous Scheduling Timeline diagram showing daily (01:00 Wikipedia, 01:30 Reddit, 02:00 GDELT, 02:30 update actuals, 05:00 ensemble predictions) and weekly (Sunday 03:00 baselines, Monday 04:00 walk-forward) cron schedule with data dependency arrows showing ingestion→validation→prediction ordering per Claims 1, 11, 16, with numbered annotation indicating Innovation ④ (autonomous scheduling).
 
-**Figure 14:** End-to-End Example Scenario diagram showing Wikipedia "Artificial_intelligence" pageviews (Layer 1) → correlation r=0.72 → Granger p=0.03 at lag 3 → ensemble prediction "up" confidence 0.765 → exploitation score 72 → TDD build → GitHub push → Railway deploy → three-month outcome validation, illustrating all six innovations (①②③④⑤⑥) operating in sequence per Claims 1, 11, 16.
+**Figure 14:** End-to-End Example Scenario diagram showing Wikipedia "Artificial_intelligence" pageviews (Layer 1) → correlation r=0.72 → Granger p=0.03 at lag 3 → ensemble prediction "up" confidence 0.765 → exploitation score 72 → TDD build → GitHub push → Railway deploy → three-month outcome validation, illustrating all seven innovations (①②③④⑤⑥⑦) operating in sequence per Claims 1, 11, 16, 35.
+
+**Figure 15:** Commercial Intelligence Architecture diagram showing pipeline from deployed products → revenue aggregation (Stripe webhooks) and engagement aggregation (GA4 pulls) → ProductMetrics table → commercial ranking (composite score 40% revenue + 30% engagement + 20% conversion + 10% retention) → winning configurations analysis (tech stack, pricing, market, demographic) → configuration confidence scoring → spec generator consultation, with feedback arrow from specification output to new builds per Claims 35, 36, 37, 38, 39, 40, 41. Innovation ⑦ (ML-Driven Commercial Intelligence Feedback Loop).
+
+**Figure 16:** Demographic Pattern Mapping and Confidence Scoring diagram showing target demographics grouped by segment, each segment's top tech stack, pricing model, and average commercial score, feeding into a configuration confidence calculator that produces per-dimension and overall confidence scores (0-100) with evidence count and plain-English recommendation, connected to the spec generator prompt enrichment per Claims 38, 39, 40, 41. Innovation ⑦ (demographic-to-configuration mapping).
 
 ### DETAILED DESCRIPTION
 
@@ -693,6 +699,51 @@ Referring to Figure 14, the following example illustrates the complete autonomou
 **Step 7: Deployment.** The deployment module creates a GitHub repository "ai-stock-predictor-mvp," pushes the generated code, creates a Railway project, and deploys the application. The build record is updated with status LIVE and the public URL.
 
 **Step 8: Outcome Measurement.** Three months later (matching the Granger lag), the prediction validation task compares the predicted NASDAQ direction ("up") against the actual movement. If correct, the direction_correct field is set to True and the Granger sub-model's track record improves, increasing its calibrated weight for this pair in future predictions.
+
+### Commercial Intelligence Feedback Loop (Innovation ⑦)
+
+#### Overview
+
+The commercial intelligence module operates as a second closed-loop feedback mechanism complementary to the outcome measurement loop (Innovation ④) and the build-iterate loop (Innovation ⑥). While Innovation ④ recalibrates prediction weights based on statistical accuracy and Innovation ⑥ self-corrects individual build failures, Innovation ⑦ optimises the configuration of future builds based on aggregated commercial performance data across all deployed products.
+
+#### Data Collection Architecture
+
+The commercial intelligence module comprises two data ingestion pathways:
+
+**Revenue Pipeline.** When a payment processor webhook fires (checkout completion, subscription update, subscription cancellation, or invoice payment), the webhook handler first logs the raw event to a revenue events table (existing behaviour) and then triggers a revenue aggregation function. This function looks up the ProductDeployment record by application identifier, sums payment-succeeded events for the period, counts net active subscriptions (created plus updated minus cancelled), and upserts a ProductMetrics row containing monthly recurring revenue in cents, subscriber count, and source identifier "stripe." The aggregation runs both on each webhook event and on a daily scheduled job for all active deployments.
+
+**Engagement Pipeline.** A scheduled daily job iterates all active ProductDeployment records, extracts the deployment hostname from the domain or railway URL field, and queries an analytics service (Google Analytics 4 Data API) for page views, unique visitors, and average session duration over a thirty-day window. The results are upserted into ProductMetrics rows with source identifier "ga4." When analytics credentials are not configured, the service returns zero-valued placeholders, allowing the platform to function without external dependencies.
+
+#### ProductDeployment Auto-Creation
+
+Upon successful completion of a build (status LIVE or DEPLOYING), the build pipeline automatically creates a ProductDeployment record linked to the originating MVPBuild and ExploitationRecommendation. The deployment record captures a configuration snapshot comprising the tech stack (framework, language, hosting provider), pricing model, market category (derived from the signal display name), target demographic (derived from the target display name), and deployment URL. This eliminates manual registration and ensures every successful build enters the commercial intelligence dataset.
+
+#### Commercial Ranking and Scoring
+
+The commercial intelligence service ranks all active deployments by a composite commercial score on a zero-to-one-hundred scale, computed as a weighted sum of four normalised dimensions:
+
+- Revenue (forty percent weight): latest monthly recurring revenue normalised to the maximum MRR across all deployments.
+- Engagement (thirty percent weight): total unique visitors normalised to the maximum visitor count.
+- Conversion (twenty percent weight): average conversion rate (visitors to subscribers) capped at one hundred percent.
+- Retention (ten percent weight): one minus average churn rate, representing subscriber retention.
+
+The service then analyses winning configurations by bucketing deployments by tech stack framework, pricing model, market category, and target demographic, computing per-bucket average commercial scores. This identifies which configurations correlate with commercial success—for example, that FastAPI applications with freemium pricing targeting developers achieve higher commercial scores than Django applications with subscription-only pricing targeting enterprise clients.
+
+#### Configuration Confidence Scoring
+
+Before a user initiates a new build, the system can compute a configuration confidence score (zero to one hundred) for a proposed set of parameters. The scoring inspects each dimension (tech stack, pricing model, market category, target demographic) against the winning configurations database. For each dimension where the proposed value matches a historically successful configuration, the confidence is derived from the historical average score boosted by an evidence multiplier (five percentage points per prior deployment, capped at twenty). Dimensions with no prior evidence receive a baseline confidence of thirty. The four dimension confidences are averaged to produce an overall score, accompanied by a plain-English recommendation ("High confidence—this configuration mirrors successful past deployments" or "Low confidence—this is a novel configuration with little historical precedent").
+
+#### Demographic Pattern Mapping
+
+The commercial intelligence module maps target demographics to their most successful configurations by grouping ranked deployments by demographic segment and computing per-segment statistics: deployment count, average commercial score, most common tech stack, most common pricing model, and most common market category. This enables the system to recommend configurations tailored to specific audience segments—for example, "For the 'small_business' demographic, subscription pricing and FastAPI tech stack yield the highest average score of 68."
+
+#### Specification Generator Enrichment (Track G — M3)
+
+The critical integration point is the specification generation phase of the TDD pipeline. When generating a YAML specification for a new build, the spec generator queries the commercial intelligence module for a context block comprising: the top five commercially successful deployments with their scores and configurations, the best-performing tech stacks and pricing models, any market-specific or demographic-specific insights relevant to the current recommendation, and the configuration confidence assessment.
+
+This context block is injected directly into the AI language model prompt, appearing between the business requirement and the structural specification template. The AI language model can therefore generate specifications informed by empirical deployment performance data—for example, favouring a subscription model over one-time pricing if historical data shows subscription deployments achieve thirty percent higher commercial scores in the target market category.
+
+This closes a second autonomous feedback loop: deployed products generate revenue and engagement data → the commercial intelligence module identifies successful patterns → the specification generator consults those patterns when creating new builds → new builds are more likely to succeed commercially → generating more data that further refines the patterns. Unlike the build-iterate loop (Innovation ⑥) which operates within a single build chain, the commercial intelligence loop operates across the entire portfolio of deployed products, enabling cross-product learning.
 
 #### Alternative Embodiments
 

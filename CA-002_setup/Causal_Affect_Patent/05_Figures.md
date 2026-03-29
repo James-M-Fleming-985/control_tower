@@ -615,8 +615,8 @@ The following simple flow diagrams describe the content of each figure for forma
 ---
 
 ### FIGURE 14: End-to-End Example Scenario
-**All Innovations: ①②③④⑤⑥**
-**Claims: 1, 11, 16**
+**All Innovations: ①②③④⑤⑥⑦**
+**Claims: 1, 11, 16, 35**
 
 ```
    STEP 1: DATA INGESTION ①
@@ -692,5 +692,195 @@ The following simple flow diagrams describe the content of each figure for forma
    │ Actual NASDAQ: +8.3%  Direction: UP ✓        │
    │ direction_correct = True                     │
    │ Granger weight recalibrated: 0.40 → 0.42    │
+   └──────────────────────┬───────────────────────┘
+                          │
+                          ▼
+   STEP 9: COMMERCIAL INTELLIGENCE ⑦
+   ┌──────────────────────────────────────────────┐
+   │ Stripe webhook: 3 subscriptions → $45 MRR    │
+   │ GA4 pull: 1,240 unique visitors, 3.2m avg    │
+   │ Composite score: 78/100                      │
+   │   Revenue: 82 × 0.40 = 32.8                 │
+   │   Engagement: 75 × 0.30 = 22.5              │
+   │   Conversion: 68 × 0.20 = 13.6              │
+   │   Retention: 90 × 0.10 =  9.0               │
+   │ Winning config: React + freemium + technology│
+   │ Confidence for next build: 82%               │
+   │ → Injected into spec generator prompt        │
    └──────────────────────────────────────────────┘
+```
+
+
+### FIGURE 15: Commercial Intelligence Architecture
+**Innovation: ⑦ (ML-Driven Commercial Intelligence Feedback Loop)**
+**Claims: 35, 36, 37, 38, 39, 40**
+
+```
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │                    COMMERCIAL INTELLIGENCE ARCHITECTURE                         │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+   INPUT PIPELINE 1: REVENUE                INPUT PIPELINE 2: ENGAGEMENT
+   ┌──────────────────────────┐             ┌──────────────────────────┐
+   │ Stripe Webhooks          │             │ GA4 BetaAnalyticsData    │
+   │ ├─ checkout.completed    │             │ Client (Daily Job)       │
+   │ ├─ subscription.updated  │             │ ├─ page_views            │
+   │ ├─ subscription.deleted  │             │ ├─ unique_visitors       │
+   │ └─ payment.succeeded     │             │ └─ avg_session_duration  │
+   └───────────┬──────────────┘             └───────────┬──────────────┘
+               │                                        │
+               ▼                                        ▼
+   ┌──────────────────────────┐             ┌──────────────────────────┐
+   │ RevenueEvent Logger      │             │ fetch_engagement_metrics │
+   │ (per-event recording)    │             │ (per-hostname query)     │
+   └───────────┬──────────────┘             └───────────┬──────────────┘
+               │                                        │
+               ▼                                        ▼
+   ┌──────────────────────────┐             ┌──────────────────────────┐
+   │ aggregate_revenue_to_    │             │ Upsert ProductMetrics    │
+   │ metrics()                │             │ source="ga4"             │
+   │ ├─ Idempotency guard     │             │ ├─ page_views            │
+   │ ├─ Upsert ProductMetrics │             │ ├─ unique_visitors       │
+   │ │  mrr_cents, subscribers│             │ └─ avg_session_seconds   │
+   │ └─ Monthly period bucket │             └───────────┬──────────────┘
+   └───────────┬──────────────┘                         │
+               │                                        │
+               └──────────────┬─────────────────────────┘
+                              │
+   INPUT PIPELINE 3:          │
+   DEPLOYMENT TRACKING        │
+   ┌──────────────────────┐   │
+   │ MVPBuilder on_build_ │   │
+   │ complete() trigger    │   │
+   │ ├─ Same DB txn        │   │
+   │ ├─ tech_stack snapshot│   │
+   │ ├─ pricing_model      │   │
+   │ ├─ market_category    │   │
+   │ └─ target_demographic │   │
+   └──────────┬───────────┘   │
+              │               │
+              └───────┬───────┘
+                      │
+                      ▼
+   ┌─────────────────────────────────────────────────────────────────────┐
+   │              COMMERCIAL INTELLIGENCE ENGINE                        │
+   │                                                                    │
+   │  ┌─────────────────────┐    ┌─────────────────────────────┐       │
+   │  │ (A) RANKING         │    │ (B) WINNING CONFIGS          │       │
+   │  │ composite_score =   │    │ GROUP BY:                    │       │
+   │  │  0.40 × revenue     │    │  tech_stack, pricing_model,  │       │
+   │  │ +0.30 × engagement  │    │  market_category,            │       │
+   │  │ +0.20 × conversion  │    │  target_demographic          │       │
+   │  │ +0.10 × retention   │    │ → avg_score per group        │       │
+   │  └─────────────────────┘    └─────────────────────────────┘       │
+   │                                                                    │
+   │  ┌─────────────────────┐    ┌─────────────────────────────┐       │
+   │  │ (C) CONFIDENCE      │    │ (D) DEMOGRAPHICS             │       │
+   │  │ Per-dimension match │    │ GROUP BY target_demographic  │       │
+   │  │ vs winning configs  │    │ → count, avg_score,          │       │
+   │  │ → 0-100 score       │    │   top_stack, top_pricing,    │       │
+   │  │ + recommendation    │    │   top_market per segment     │       │
+   │  └─────────────────────┘    └─────────────────────────────┘       │
+   └──────────────────────────────┬────────────────────────────────────┘
+                                  │
+              ┌───────────────────┼───────────────────┐
+              │                   │                   │
+              ▼                   ▼                   ▼
+   ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+   │ Dashboard Panel  │ │ Spec Generator   │ │ REST API         │
+   │ ├─ Confidence %  │ │ ├─ Top 5 deploys │ │ /api/commercial- │
+   │ ├─ Progress bar  │ │ ├─ Best configs  │ │  intelligence/*  │
+   │ └─ Recommendation│ │ ├─ Market tips   │ │ 7 endpoints      │
+   └──────────────────┘ │ └─ Confidence    │ └──────────────────┘
+                        │    note           │
+                        └──────────────────┘
+```
+
+
+### FIGURE 16: Demographic Pattern Mapping and Confidence Scoring
+**Innovation: ⑦ (ML-Driven Commercial Intelligence Feedback Loop)**
+**Claims: 38, 39, 40**
+
+```
+   ┌─────────────────────────────────────────────────────────────────────────────────┐
+   │           DEMOGRAPHIC PATTERN MAPPING AND CONFIDENCE SCORING                    │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+
+   LEFT PANEL: DEMOGRAPHIC PATTERN MAPPING
+   ════════════════════════════════════════════════════════════════════
+
+   Ranked Deployments (from Commercial Ranking Engine)
+               │
+               ▼
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ GROUP BY target_demographic                                      │
+   ├────────────────────┬───────┬────────┬──────────┬─────────┬──────┤
+   │ Demographic        │ Count │ Avg    │ Top      │ Top     │ Top  │
+   │ Segment            │       │ Score  │ Stack    │ Pricing │ Mkt  │
+   ├────────────────────┼───────┼────────┼──────────┼─────────┼──────┤
+   │ 18-25 tech         │  12   │  71    │ React    │freemium │ tech │
+   │ enthusiasts        │       │        │          │         │      │
+   ├────────────────────┼───────┼────────┼──────────┼─────────┼──────┤
+   │ 35-50 professionals│   8   │  64    │ Next.js  │ subscr. │ fin. │
+   ├────────────────────┼───────┼────────┼──────────┼─────────┼──────┤
+   │ 25-35 urban        │   6   │  58    │ React    │freemium │life. │
+   │ millennials        │       │        │          │         │      │
+   └────────────────────┴───────┴────────┴──────────┴─────────┴──────┘
+               │
+               ▼
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ Segment Insights Generator                                       │
+   │ "For tech enthusiasts: React + freemium performs 22% above avg"  │
+   │ "For professionals: Next.js + subscription dominates finance"    │
+   └──────────────────────────────────────────────────────────────────┘
+
+
+   RIGHT PANEL: CONFIGURATION CONFIDENCE SCORING
+   ════════════════════════════════════════════════════════════════════
+
+   Proposed Configuration Input:
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ { tech_stack: "Vue.js", pricing: "one-time",                    │
+   │   market: "health", demographic: "seniors" }                    │
+   └──────────────────────┬───────────────────────────────────────────┘
+                          │
+                          ▼
+   STEP 1: Query winning configs for each dimension
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ tech_stack="Vue.js"   → 2 matches found (avg score 55)         │
+   │ pricing="one-time"    → 0 matches found (no precedent)         │
+   │ market="health"       → 3 matches found (avg score 48)         │
+   │ demographic="seniors" → 0 matches found (no precedent)         │
+   └──────────────────────┬───────────────────────────────────────────┘
+                          │
+                          ▼
+   STEP 2: Compute per-dimension confidence
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ tech_stack:   55 + min(5×2, 20) = 55 + 10 = 65                 │
+   │ pricing:      30 (baseline — no historical data)                │
+   │ market:       48 + min(5×3, 20) = 48 + 15 = 63                 │
+   │ demographic:  30 (baseline — no historical data)                │
+   └──────────────────────┬───────────────────────────────────────────┘
+                          │
+                          ▼
+   STEP 3: Average → Overall Confidence
+   ┌──────────────────────────────────────────────────────────────────┐
+   │ overall = (65 + 30 + 63 + 30) / 4 = 47                         │
+   └──────────────────────┬───────────────────────────────────────────┘
+                          │
+                          ▼
+   STEP 4: Classification
+   ┌──────────────────────────────────────────────────────────────────┐
+   │                                                                  │
+   │  ██████████████████░░░░░░░░░░░░░░░░░░░░  47/100                 │
+   │  ├─── RED ───┤├── AMBER ──┤├── GREEN ──┤                        │
+   │  0          40           70           100                        │
+   │                  ↑                                               │
+   │                  47 = AMBER                                      │
+   │                                                                  │
+   │  Recommendation: "Moderate confidence — some supporting data,   │
+   │   but limited precedent for one-time pricing and seniors         │
+   │   demographic. Consider freemium pricing based on similar        │
+   │   market performance."                                           │
+   └──────────────────────────────────────────────────────────────────┘
 ```
