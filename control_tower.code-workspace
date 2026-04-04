@@ -16,10 +16,13 @@
       "**/node_modules/**": true,
       "**/.git/**": true
     },
-    "python.analysis.exclude": ["**/cloned_repos/**"],
+    "python.analysis.exclude": [
+      "**/cloned_repos/**"
+    ],
     "python.analysis.indexing": false,
     "python.analysis.diagnosticMode": "openFilesOnly",
     "pylint.enabled": false,
-    "flake8.enabled": false
+    "flake8.enabled": false,
+    "remote.autoForwardPortsFallback": 0
   }
 }

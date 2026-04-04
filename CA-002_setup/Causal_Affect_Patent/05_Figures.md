@@ -41,32 +41,52 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 2: Multi-Source Data Ingestion Pipeline
 **Innovation ① — Variable-Level Cross-Domain Causal Discovery**
-**Claims: 1, 2, 11**
+**Claims: 1, 2, 11, 42, 43**
 
 ```
-  LAYER 1 (Behavioural)          LAYER 2 (Outcomes)
-  ┌────────────┐                 ┌────────────┐
-  │ Wikipedia  │                 │    FRED    │
-  │ Pageviews  │                 │ (Economic) │
+  LAYER 1 (Behavioural/FAST)     LAYER 2 (Outcomes)
+  ┌────────────┐                 MEDIUM TIER
+  │ Wikipedia  │                 ┌────────────┐
+  │ Pageviews  │                 │    FRED    │
+  └─────┬──────┘                 │ (56 series)│
+        │                        └─────┬──────┘
+  ┌─────┴──────┐                       │
+  │   Reddit   │                 ┌─────┴──────┐
+  │  Activity  │                 │   Stock    │
+  └─────┬──────┘                 │  (Alpha V) │
+        │                        └─────┬──────┘
+  ┌─────┴──────┐                       │
+  │  GitHub   │                 ┌─────┴──────┐
+  │ Trending  │                 │   ArXiv    │
   └─────┬──────┘                 └─────┬──────┘
         │                              │
   ┌─────┴──────┐                 ┌─────┴──────┐
-  │   Reddit   │                 │   Stock    │
-  │  Activity  │                 │   Market   │
+  │  Google  │                 │   GDELT    │
+  │  Trends  │                 │(20 themes) │
   └─────┬──────┘                 └─────┬──────┘
         │                              │
         │                        ┌─────┴──────┐
-        │                        │   ArXiv    │
-        │                        │Publications│
+        │                        │ ClinTrials │
+        │                        └─────┬──────┘
+        │                        ┌─────┴──────┐
+        │                        │   USGS     │
+        │                        └─────┬──────┘
+        │                        ┌─────┴──────┐
+        │                        │   NASA     │
         │                        └─────┬──────┘
         │                              │
-        │                        ┌─────┴──────┐
-        │                        │   GDELT    │
-        │                        │ Geopolitics│
+        │                        SLOW TIER
+        │                        ┌────────────┐
+        │                        │ World Bank │
         │                        └─────┬──────┘
         │                              │
         ▼                              ▼
   ┌──────────────────────────────────────────┐
+  │   PLUGGABLE DATA SOURCE REGISTRY           │
+  │   (source, layer, freq, fill, rate_limit)   │
+  └────────────────────┬─────────────────────┘
+                     │
+  ┌────────────────────┴─────────────────────┐
   │         STANDARDISATION MODULE           │
   │  variable_id | source | timestamp | value│
   └──────────────────┬───────────────────────┘
@@ -78,8 +98,12 @@ The following simple flow diagrams describe the content of each figure for forma
               ║ Variable     ║
               ║ Metadata     ║
               ╚══════════════╝
-              61 variables
-              3,721 pairs
+              13 sources
+              3 speed tiers
+              ┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+              + new sources
+              (no pipeline
+               changes)
 ```
 
 ---
@@ -174,9 +198,9 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ---
 
-### FIGURE 5: Three-Model Ensemble Architecture
+### FIGURE 5: Extensible Multi-Model Ensemble Architecture
 **Innovation ②**
-**Claims: 1, 5, 6, 11, 12, 21, 24**
+**Claims: 1, 5, 6, 11, 12, 21, 24, 44**
 
 ```
                 ┌──────────────────┐
@@ -191,18 +215,18 @@ The following simple flow diagrams describe the content of each figure for forma
                          │
           ┌──────────────┼──────────────┐
           ▼              ▼              ▼
-   ┌────────────┐ ┌────────────┐ ┌────────────┐
-   │  GRANGER   │ │    OLS     │ │   ARIMA    │
-   │ Weight:0.40│ │ Weight:0.35│ │ Weight:0.25│
-   │            │ │            │ │            │
-   │ Conf: 1-p  │ │ Conf: R²   │ │ Order:     │
-   │ Uses: lag, │ │ Min: 6 mo  │ │ (1,1,1)    │
-   │ direction  │ │ Expanding  │ │ Min: 24 pts│
-   │            │ │ window     │ │            │
-   │ dir, conf  │ │ dir, conf  │ │ dir, conf  │
-   └─────┬──────┘ └─────┬──────┘ └─────┬──────┘
-         │              │              │
-         └──────────────┼──────────────┘
+   ┌────────────┐ ┌────────────┐ ┌────────────┐ ┎┄┄┄┄┄┄┄┄┄┄┄┄┓
+   │  GRANGER   │ │    OLS     │ │   ARIMA    │ ┇ +Model N  ┇
+   │ Weight:0.40│ │ Weight:0.35│ │ Weight:0.25│ ┇ (VAR, ETS,┇
+   │            │ │            │ │            │ ┇  Prophet, ┇
+   │ Conf: 1-p  │ │ Conf: R²   │ │ Order:     │ ┇  LSTM...) ┇
+   │ Uses: lag, │ │ Min: 6 mo  │ │ (1,1,1)    │ ┇           ┇
+   │ direction  │ │ Expanding  │ │ Min: 24 pts│ ┇ dir, conf ┇
+   │            │ │ window     │ │            │ ┗┄┄┄┄┫┄┄┄┄┄┄┛
+   │ dir, conf  │ │ dir, conf  │ │ dir, conf  │       │
+   └─────┬──────┘ └─────┬──────┘ └─────┬──────┘       │
+         │              │              │              │
+         └──────────────┼──────────────┴──────────────┘
                         ▼
          ┌──────────────────────────────┐
          │     WEIGHTED VOTING          │
@@ -226,6 +250,18 @@ The following simple flow diagrams describe the content of each figure for forma
            ║  ≥10 validated predictions ║
            ║  accuracy_i / Σ(accuracy)  ║
            ╚════════════════════════════╝
+
+  PER-MODEL ACCURACY TRACKING (Inset)
+  ┌──────────────────────────────┐
+  │ Accuracy %                       │
+  │ 80│───────────────── granger_v1│
+  │ 70│     .--'·······    ols_v1    │
+  │ 60│  .-'  ───────    arima_v1  │
+  │ 50│-'                            │
+  │   └──────────────────────     │
+  │     Validated Predictions →      │
+  │   model_version tracking         │
+  └──────────────────────────────┘
 ```
 
 ---
@@ -361,7 +397,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 9: Five-Phase TDD Pipeline Detail
 **Innovation ③**
-**Claims: 9, 10, 13, 14, 22, 28**
+**Claims: 9, 10, 13, 14, 22, 28, 45**
 
 ```
    SPEC PHASE                          RED PHASE
@@ -384,28 +420,40 @@ The following simple flow diagrams describe the content of each figure for forma
    │  LOW:    4 AC        │            │                       │
    │  MEDIUM: 7 AC        │            │ Submit to AI:         │
    │  HIGH:  12 AC        │            │  • test code          │
-   └──────────────────────┘            │  • symbol list        │
-                                       │  • prev failure (if   │
-   REFACTOR PHASE                      │    retry attempt)     │
-   ┌──────────────────────┐            │                       │
-   │ AI improves quality  │            │ pass_rate ≥ 80%?      │
-   │                      │            │  Yes → REFACTOR       │
-   │ Regression guard:    │            │  No  → retry (max 5)  │
-   │ If new tests fail,   │            └──────────────────────┘
-   │ keep pre-refactor    │
-   │ version              │            VALIDATE PHASE
-   └──────────────────────┘            ┌──────────────────────┐
-                                       │ 1. ast.parse (syntax)│
-   ERROR CATEGORIES                    │ 2. py_compile (all   │
-   ┌──────────────────────┐            │    files)            │
-   │ ● syntax             │            │ 3. Final pytest run  │
-   │ ● test               │            │ 4. Record metrics:   │
-   │ ● frontend           │            │    file_count,       │
-   │ ● import             │            │    line_count        │
-   │ ● wiring             │            │ 5. Status: LIVE or   │
-   │ ● config             │            │    FAILED + error    │
-   │ ● runtime            │            │    breakdown JSON    │
-   └──────────────────────┘            └──────────────────────┘
+   │                      │            │  • symbol list        │
+   │ Commercial Intel.    │            │  • prev failure (if   │
+   │ Consultation ⑧:      │            │    retry attempt)     │
+   │  • Top 5 deploys     │            │                       │
+   │  • Best configs      │            │ pass_rate ≥ 80%?      │
+   │  • Confidence score  │            │  Yes → REFACTOR       │
+   └──────────────────────┘            │  No  → retry (max 5)  │
+                                       └──────────────────────┘
+   REFACTOR PHASE
+   ┌──────────────────────┐            VALIDATE PHASE
+   │ AI improves quality  │            ┌──────────────────────┐
+   │                      │            │ 1. ast.parse (syntax)│
+   │ Regression guard:    │            │ 2. py_compile (all   │
+   │ If new tests fail,   │            │    files)            │
+   │ keep pre-refactor    │            │ 3. Final pytest run  │
+   │ version              │            │ 4. Record metrics:   │
+   └──────────────────────┘            │    file_count,       │
+                                       │    line_count        │
+   ERROR CATEGORIES                    │ 5. Status: LIVE or   │
+   ┌──────────────────────┐            │    FAILED + error    │
+   │ ● syntax             │            │    breakdown JSON    │
+   │ ● test               │            └──────────┬───────────┘
+   │ ● frontend           │                       │
+   │ ● import             │            VERIFICATION ARTEFACTS
+   │ ● wiring             │            ┌──────────┴───────────┐
+   │ ● config             │            │ Syntactic Correctness│
+   │ ● runtime            │            │ (AST + bytecode      │
+   └──────────────────────┘            │  compilation pass)   │
+                                       │                      │
+                                       │ Functional Compliance│
+                                       │ (YAML AC → test      │
+                                       │  per-criterion       │
+                                       │  pass/fail status)   │
+                                       └──────────────────────┘
 ```
 
 ---
