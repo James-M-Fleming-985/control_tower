@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     stance_detection_interval: int = 3  # Run stance detection every N user turns
     horn_detection_llm_fallback: bool = True  # Use LLM when heuristics are uncertain
 
+    # Avatar Service (MuseTalk on Dell workstation via Cloudflare Tunnel)
+    avatar_service_url: str = ""  # e.g. wss://your-tunnel.trycloudflare.com/ws/avatar
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

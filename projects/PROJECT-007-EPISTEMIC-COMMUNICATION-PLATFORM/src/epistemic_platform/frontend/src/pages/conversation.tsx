@@ -10,6 +10,7 @@ import { TrilemmaVisual } from '@/components/conversation/trilemma-visual';
 import { VoiceOrb } from '@/components/voice/voice-orb';
 import { AudioWaveform } from '@/components/voice/audio-waveform';
 import { MeetingLayout } from '@/components/meeting/meeting-layout';
+import { ActorAvatar } from '@/components/avatar/actor-avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -569,12 +570,13 @@ export function ConversationPage() {
         header={headerContent}
         centerContent={
           <div className="flex flex-col items-center gap-4">
-            {/* Actor identity */}
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-primary/10 border-2 border-primary/30">
-              <span className="text-3xl font-bold text-primary">
-                {(actor?.name ?? 'A').slice(0, 2).toUpperCase()}
-              </span>
-            </div>
+            {/* Actor avatar */}
+            <ActorAvatar
+              portraitUrl={(actor?.avatar_config as Record<string, unknown>)?.portrait_url as string | undefined}
+              name={actor?.name ?? 'Actor'}
+              size="lg"
+              speaking={voiceState === 'speaking'}
+            />
             <span className="text-sm font-medium">{actor?.name ?? 'Actor'}</span>
             {!ended && (
               <>

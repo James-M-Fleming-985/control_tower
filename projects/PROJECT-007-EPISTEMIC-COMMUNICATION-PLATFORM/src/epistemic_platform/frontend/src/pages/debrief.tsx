@@ -8,6 +8,7 @@ import { ChatInput } from '@/components/conversation/chat-input';
 import { VoiceOrb } from '@/components/voice/voice-orb';
 import { AudioWaveform } from '@/components/voice/audio-waveform';
 import { MeetingLayout } from '@/components/meeting/meeting-layout';
+import { ActorAvatar } from '@/components/avatar/actor-avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -568,9 +569,11 @@ export function DebriefPage() {
         }
         centerContent={
           <div className="flex flex-col items-center gap-4">
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-emerald-500/10 border-2 border-emerald-500/30">
-              <GraduationCap className="h-12 w-12 text-emerald-500" />
-            </div>
+            <ActorAvatar
+              name="Coach"
+              size="lg"
+              speaking={voiceState === 'speaking'}
+            />
             <span className="text-sm font-medium">Coach</span>
             {!ended && !readOnly && (
               <>

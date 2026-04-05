@@ -2,6 +2,9 @@ from __future__ import annotations
 
 """ActorProfile router."""
 
+import logging
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +17,8 @@ from epistemic_platform.schemas.actor_profile_schemas import (
     ActorProfileRead,
     ActorProfileUpdate,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -87,3 +92,77 @@ async def delete_actor(
     deleted = await repo.delete(actor_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Actor not found")
+
+
+@router.post("/{actor_id}/generate-portrait", response_model=ActorProfileRead)
+async def generate_actor_portrait(
+    actor_id: int,
+    db: AsyncSession = Depends(get_db),
+    _user: UserProfile = Depends(get_current_user),
+):
+    """Generate a DALL-E 3 portrait for this actor and store in avatar_config."""
+    from epistemic_platform.engine.portrait_generator import generate_portrait
+
+    repo = ActorProfileRepository(db)
+    actor = await repo.get(actor_id)
+    if not actor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Actor not found")
+
+    # Save to static/portraits/
+    static_dir = Path(__file__).parent.parent / "static" / "portraits"
+
+    try:
+        avatar_config = await generate_portrait(
+            actor_name=actor.name,
+            description=actor.description or "",
+            archetype=actor.archetype,
+            save_dir=static_dir,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+    except Exception:
+        logger.exception("Portrait generation failed for actor %d", actor_id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Portrait generation failed",
+        )
+
+    update_data = ActorProfileUpdate(avatar_config=avatar_config)
+    updated = await repo.update(actor_id, update_data)
+    await db.commit()
+    return updated
+
+
+@router.post("/generate-all-portraits")
+async def generate_all_actor_portraits(
+    db: AsyncSession = Depends(get_db),
+    _user: UserProfile = Depends(get_current_user),
+):
+    """Generate portraits for all actors that don't have one yet."""
+    from epistemic_platform.engine.portrait_generator import generate_portrait
+
+    repo = ActorProfileRepository(db)
+    actors = await repo.list(active_only=True)
+    static_dir = Path(__file__).parent.parent / "static" / "portraits"
+
+    results = []
+    for actor in actors:
+        if actor.avatar_config and actor.avatar_config.get("portrait_url"):
+            results.append({"actor": actor.name, "status": "skipped", "reason": "already has portrait"})
+            continue
+        try:
+            avatar_config = await generate_portrait(
+                actor_name=actor.name,
+                description=actor.description or "",
+                archetype=actor.archetype,
+                save_dir=static_dir,
+            )
+            update_data = ActorProfileUpdate(avatar_config=avatar_config)
+            await repo.update(actor.id, update_data)
+            results.append({"actor": actor.name, "status": "generated", "url": avatar_config.get("portrait_url")})
+        except Exception as e:
+            logger.exception("Portrait generation failed for %s", actor.name)
+            results.append({"actor": actor.name, "status": "error", "detail": str(e)})
+
+    await db.commit()
+    return {"results": results}

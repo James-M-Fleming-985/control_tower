@@ -94,6 +94,13 @@ def create_app() -> FastAPI:
             "app": settings.app_name,
         }
 
+    @app.get(f"{settings.api_prefix}/client-config", tags=["config"])
+    async def client_config():
+        """Public config values the frontend needs at runtime."""
+        return {
+            "avatar_service_url": settings.avatar_service_url or None,
+        }
+
     @app.get("/health/db", tags=["health"])
     async def db_health_check():
         """Diagnostic: check DB connection, migration status, and schema."""
