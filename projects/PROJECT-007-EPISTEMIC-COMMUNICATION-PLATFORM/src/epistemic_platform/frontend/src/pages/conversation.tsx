@@ -9,6 +9,7 @@ import { CoachingPanel } from '@/components/conversation/coaching-panel';
 import { TrilemmaVisual } from '@/components/conversation/trilemma-visual';
 import { VoiceOrb } from '@/components/voice/voice-orb';
 import { AudioWaveform } from '@/components/voice/audio-waveform';
+import { MeetingLayout } from '@/components/meeting/meeting-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -451,49 +452,178 @@ export function ConversationPage() {
     );
   }
 
+  // --- Shared elements ---
+  const headerContent = (
+    <>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate('/actors')}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <span className="font-semibold text-sm">{actor?.name ?? 'Actor'}</span>
+        {lastStance && (
+          <Badge variant="outline" className="text-xs capitalize">
+            {lastStance.stance}
+          </Badge>
+        )}
+        {isVoice && (
+          <Badge variant="default" className="text-xs">
+            <Mic className="mr-1 h-3 w-3" /> Voice
+          </Badge>
+        )}
+        {isVoice && recording && (
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {!ended && (
+          <Button size="sm" variant="destructive" onClick={endSession}>
+            <StopCircle className="mr-1 h-3 w-3" /> End
+          </Button>
+        )}
+        {ended && (
+          <Button size="sm" onClick={() => navigate(`/results/${sessionId}`, { state: { reward: sessionReward } })}>
+            View Results
+          </Button>
+        )}
+      </div>
+    </>
+  );
+
+  const transcriptContent = (
+    <>
+      {errorMsg && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {errorMsg}
+        </div>
+      )}
+      {messages.map((m, i) => (
+        <ChatBubble
+          key={i}
+          role={m.role}
+          content={m.content}
+          timestamp={m.timestamp}
+          actorName={actor?.name}
+        />
+      ))}
+      {isStreaming && streamBuf && (
+        <ChatBubble
+          role="actor"
+          content={streamBuf}
+          actorName={actor?.name}
+          isStreaming
+        />
+      )}
+    </>
+  );
+
+  const endedBanner = ended && sessionReward?.score && (
+    <div className="rounded-lg bg-primary/10 border border-primary/30 px-4 py-3 text-center space-y-1">
+      <p className="text-lg font-bold text-primary">Session Complete!</p>
+      <div className="flex items-center justify-center gap-4 text-sm">
+        {sessionReward.score.grade && (
+          <span className="font-semibold">Grade: {sessionReward.score.grade}</span>
+        )}
+        {sessionReward.score.final_score != null && (
+          <span>Score: {Math.round(sessionReward.score.final_score)}/100</span>
+        )}
+        {sessionReward.xp_award?.total != null && (
+          <span className="text-primary font-medium">+{sessionReward.xp_award.total} XP</span>
+        )}
+        {sessionReward.xp_award?.levelled_up && (
+          <span className="font-bold text-amber-400">Level Up!</span>
+        )}
+      </div>
+      {sessionReward.milestones?.newly_unlocked?.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          🏆 {sessionReward.milestones.newly_unlocked.length} new achievement{sessionReward.milestones.newly_unlocked.length > 1 ? 's' : ''} unlocked!
+        </p>
+      )}
+    </div>
+  );
+
+  const sideTabsContent = (
+    <>
+      <TrilemmaVisual state={trilemmaState} lastHorn={lastHorn} />
+      <CoachingPanel annotations={annotations} />
+    </>
+  );
+
+  // --- Voice mode: Teams-style MeetingLayout ---
+  if (isVoice) {
+    const voiceStatusText = (() => {
+      if (ended) return 'Session ended';
+      if (voiceState === 'processing') return 'Processing…';
+      if (voiceState === 'speaking') return `${actor?.name ?? 'Actor'} is speaking…`;
+      if (recording) return 'Listening…';
+      return 'Tap the mic to speak';
+    })();
+
+    return (
+      <MeetingLayout
+        header={headerContent}
+        centerContent={
+          <div className="flex flex-col items-center gap-4">
+            {/* Actor identity */}
+            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-primary/10 border-2 border-primary/30">
+              <span className="text-3xl font-bold text-primary">
+                {(actor?.name ?? 'A').slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+            <span className="text-sm font-medium">{actor?.name ?? 'Actor'}</span>
+            {!ended && (
+              <>
+                <VoiceOrb
+                  state={voiceState}
+                  recording={recording}
+                  onToggle={toggleRecording}
+                  actorName={actor?.name}
+                />
+                <AudioWaveform analyser={analyserNode} isActive={recording} />
+              </>
+            )}
+            {endedBanner}
+            {ended && (
+              <div className="flex items-center gap-3 mt-2">
+                <Button size="sm" onClick={() => navigate(`/results/${sessionId}`, { state: { reward: sessionReward } })}>
+                  View Results
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => navigate('/actors')}>
+                  New Conversation
+                </Button>
+              </div>
+            )}
+          </div>
+        }
+        statusText={voiceStatusText}
+        toolbar={
+          <>
+            {!ended && (
+              <Button size="sm" variant="destructive" onClick={endSession}>
+                <StopCircle className="mr-1 h-3 w-3" /> End
+              </Button>
+            )}
+          </>
+        }
+        transcript={transcriptContent}
+        sideTabs={sideTabsContent}
+      />
+    );
+  }
+
+  // --- Text mode: existing chat-first layout ---
   return (
     <div className="flex h-full gap-4">
       {/* Chat area */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Header bar */}
         <div className="flex items-center justify-between border-b border-border px-4 py-2">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/actors')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
-            <span className="font-semibold text-sm">{actor?.name ?? 'Actor'}</span>
-            {lastStance && (
-              <Badge variant="outline" className="text-xs capitalize">
-                {lastStance.stance}
-              </Badge>
-            )}
-            {isVoice && (
-              <Badge variant="default" className="text-xs">
-                <Mic className="mr-1 h-3 w-3" /> Voice
-              </Badge>
-            )}
-            {isVoice && recording && (
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {!ended && (
-              <Button size="sm" variant="destructive" onClick={endSession}>
-                <StopCircle className="mr-1 h-3 w-3" /> End
-              </Button>
-            )}
-            {ended && (
-              <Button size="sm" onClick={() => navigate(`/results/${sessionId}`, { state: { reward: sessionReward } })}>
-                View Results
-              </Button>
-            )}
-          </div>
+          {headerContent}
         </div>
 
         {/* Messages */}
@@ -522,48 +652,11 @@ export function ConversationPage() {
           )}
         </div>
 
-        {/* Voice controls or text input */}
-        {!ended && isVoice && (
-          <div className="flex flex-col items-center gap-3 border-t border-border px-4 py-6">
-            <VoiceOrb
-              state={voiceState}
-              recording={recording}
-              onToggle={toggleRecording}
-              actorName={actor?.name}
-            />
-            <AudioWaveform analyser={analyserNode} isActive={recording} />
-          </div>
-        )}
-        {!ended && !isVoice && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
+        {/* Text input or ended state */}
+        {!ended && <ChatInput onSend={sendMessage} disabled={isStreaming} />}
         {ended && (
           <div className="border-t border-border px-4 py-4 space-y-3">
-            {/* Celebration banner when reward data is available */}
-            {sessionReward?.score && (
-              <div className="rounded-lg bg-primary/10 border border-primary/30 px-4 py-3 text-center space-y-1">
-                <p className="text-lg font-bold text-primary">
-                  Session Complete!
-                </p>
-                <div className="flex items-center justify-center gap-4 text-sm">
-                  {sessionReward.score.grade && (
-                    <span className="font-semibold">Grade: {sessionReward.score.grade}</span>
-                  )}
-                  {sessionReward.score.final_score != null && (
-                    <span>Score: {Math.round(sessionReward.score.final_score)}/100</span>
-                  )}
-                  {sessionReward.xp_award?.total != null && (
-                    <span className="text-primary font-medium">+{sessionReward.xp_award.total} XP</span>
-                  )}
-                  {sessionReward.xp_award?.levelled_up && (
-                    <span className="font-bold text-amber-400">Level Up!</span>
-                  )}
-                </div>
-                {sessionReward.milestones?.newly_unlocked?.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    🏆 {sessionReward.milestones.newly_unlocked.length} new achievement{sessionReward.milestones.newly_unlocked.length > 1 ? 's' : ''} unlocked!
-                  </p>
-                )}
-              </div>
-            )}
+            {endedBanner}
             <div className="flex items-center justify-center gap-3">
               <Button
                 size="sm"
@@ -585,8 +678,7 @@ export function ConversationPage() {
 
       {/* Right panel — coaching + trilemma (hidden on mobile) */}
       <div className="hidden lg:flex w-72 shrink-0 flex-col gap-4 border-l border-border pl-4 overflow-hidden">
-        <TrilemmaVisual state={trilemmaState} lastHorn={lastHorn} />
-        <CoachingPanel annotations={annotations} />
+        {sideTabsContent}
       </div>
     </div>
   );

@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     # ElevenLabs (TTS)
     elevenlabs_api_key: str = ""
     elevenlabs_default_voice_id: str = ""
+    elevenlabs_coach_voice_id: str = ""  # Distinct voice for the debrief coach
     elevenlabs_model_id: str = "eleven_turbo_v2_5"
 
     # Voice

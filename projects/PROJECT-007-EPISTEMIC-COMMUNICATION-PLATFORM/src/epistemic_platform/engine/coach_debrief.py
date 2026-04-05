@@ -16,6 +16,7 @@ import logging
 from typing import Any, AsyncIterator
 
 from epistemic_platform.engine.achievement_engine import SessionReward
+from epistemic_platform.engine.speech_quality import analyse_speech_quality
 from epistemic_platform.llm.protocol import CoachingLLM, LLMMessage, LLMStreamChunk
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,12 @@ def build_debrief_system_prompt(
         if analysis.avg_composure is not None:
             sections.append(f"- Average composure: {analysis.avg_composure:.0%}")
 
+    # Speech quality analysis
+    speech_report = analyse_speech_quality(messages)
+    speech_section = speech_report.to_prompt_section()
+    if speech_section:
+        sections.extend(["", speech_section])
+
     sections.extend([
         "",
         "## Recent Transcript",
@@ -84,6 +91,8 @@ def build_debrief_system_prompt(
         "8. Each sentence must advance a new idea — no filler or restatement",
         "9. Be specific: reference direct quotes or observable moments, not vague generalities",
         "10. Offer a brief real-world exercise the user can try outside the platform — e.g. 'This week, when someone disagrees with you at work, pause and steelman their view before responding.' Tailor the exercise to the specific weakness you identified in the session.",
+        "11. When the Communication Quality Analysis shows filler words, address the specific fillers by name with counts. Suggest concrete replacement strategies: pausing silently instead of saying 'um', restructuring sentences to eliminate 'you know', or replacing 'like' with precise language.",
+        "12. Comment on response cadence — if turns vary wildly in length, suggest aiming for consistent 2-3 sentence responses. If turns are consistently too short, encourage elaboration. If too long, suggest structuring thoughts before speaking.",
     ])
 
     return "\n".join(sections)

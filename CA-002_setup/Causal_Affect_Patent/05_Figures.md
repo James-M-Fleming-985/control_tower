@@ -10,7 +10,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 1: System Architecture Overview
 **Innovation ④ — Closed-Loop Autonomous Business Pipeline**
-**Claims: 1, 11, 16**
+**Claims: 1, 14**
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -41,7 +41,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 2: Multi-Source Data Ingestion Pipeline
 **Innovation ① — Variable-Level Cross-Domain Causal Discovery**
-**Claims: 1, 2, 11, 42, 43**
+**Claims: 1, 11, 14, 25**
 
 ```
   LAYER 1 (Behavioural/FAST)     LAYER 2 (Outcomes)
@@ -110,7 +110,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 3: Cross-Domain Correlation Engine
 **Innovations ① and ⑤**
-**Claims: 1, 3, 11**
+**Claims: 1, 2, 14**
 
 ```
       ┌─────────────────────────────────┐
@@ -155,7 +155,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 4: Bidirectional Granger Causality System
 **Innovation ①**
-**Claims: 1, 4, 11, 34**
+**Claims: 1, 14, 16**
 
 ```
     ┌──────────────────────────────────────────┐
@@ -200,7 +200,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 5: Extensible Multi-Model Ensemble Architecture
 **Innovation ②**
-**Claims: 1, 5, 6, 11, 12, 21, 24, 44**
+**Claims: 1, 3, 4, 12, 14**
 
 ```
                 ┌──────────────────┐
@@ -268,7 +268,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 6: Cross-Layer Enforcement
 **Innovation ⑤**
-**Claims: 1, 7, 11, 20**
+**Claims: 1, 5, 14**
 
 ```
    ┌─────────────────┐              ┌─────────────────┐
@@ -299,7 +299,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 7: Exploitation Scoring Pipeline
 **Innovations ② and ④**
-**Claims: 1, 8, 11, 17, 26**
+**Claims: 1, 6, 10, 14**
 
 ```
    ┌──────────────────────────────────────────┐
@@ -338,7 +338,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 8: Autonomous TDD Code Generation Overview
 **Innovation ③**
-**Claims: 1, 9, 11, 13, 16, 28**
+**Claims: 1, 7, 14, 19**
 
 ```
    ┌─────────────────┐
@@ -397,7 +397,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 9: Five-Phase TDD Pipeline Detail
 **Innovation ③**
-**Claims: 9, 10, 13, 14, 22, 28, 45**
+**Claims: 7, 8, 13, 15, 19**
 
 ```
    SPEC PHASE                          RED PHASE
@@ -460,7 +460,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 10: Deployment Automation Flow
 **Innovations ③ and ④**
-**Claims: 1, 9, 11, 15, 16, 33**
+**Claims: 1, 7, 14**
 
 ```
    ┌──────────────────────────────────────────────────────┐
@@ -503,7 +503,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 11: Outcome Measurement and Feedback Loop
 **Innovations ② and ④**
-**Claims: 1, 5, 6, 11, 12, 16, 17, 25**
+**Claims: 1, 3, 4, 9, 14**
 
 ```
    ┌──────────────────────────────────────────────────────┐
@@ -554,7 +554,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 12: Build-Iterate Loop
 **Innovation ⑥**
-**Claims: 28, 29, 30, 31**
+**Claims: 19, 20**
 
 ```
    ┌─────────────┐
@@ -629,7 +629,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 13: Autonomous Scheduling Timeline
 **Innovation ④**
-**Claims: 1, 11, 16, 23, 27**
+**Claims: 1, 14, 18**
 
 ```
    UTC    DAILY                          WEEKLY
@@ -664,7 +664,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 14: End-to-End Example Scenario
 **All Innovations: ①②③④⑤⑥⑦**
-**Claims: 1, 11, 16, 35**
+**Claims: 1, 14, 21**
 
 ```
    STEP 1: DATA INGESTION ①
@@ -761,7 +761,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 15: Commercial Intelligence Architecture
 **Innovation: ⑦ (ML-Driven Commercial Intelligence Feedback Loop)**
-**Claims: 35, 36, 37, 38, 39, 40**
+**Claims: 21, 22, 23, 24**
 
 ```
    ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -847,7 +847,7 @@ The following simple flow diagrams describe the content of each figure for forma
 
 ### FIGURE 16: Demographic Pattern Mapping and Confidence Scoring
 **Innovation: ⑦ (ML-Driven Commercial Intelligence Feedback Loop)**
-**Claims: 38, 39, 40**
+**Claims: 22, 23, 24**
 
 ```
    ┌─────────────────────────────────────────────────────────────────────────────────┐
