@@ -43,6 +43,18 @@ class HeyGenClient:
             headers={"x-api-key": self._api_key, "Content-Type": "application/json"},
         )
 
+    async def list_avatars(self) -> list[dict[str, Any]]:
+        """List all available avatars (stock + custom).
+
+        Returns list of dicts with avatar_id, avatar_name, gender, preview_url, etc.
+        """
+        resp = await self._client.get(f"{self._base}/v1/avatar.list")
+        resp.raise_for_status()
+        data = resp.json().get("data", {})
+        avatars = data.get("avatars", [])
+        logger.info("HeyGen: fetched %d avatars", len(avatars))
+        return avatars
+
     async def create_token(self) -> str:
         """Get a one-time access token for streaming session."""
         resp = await self._client.post(f"{self._base}/v1/streaming.create_token")

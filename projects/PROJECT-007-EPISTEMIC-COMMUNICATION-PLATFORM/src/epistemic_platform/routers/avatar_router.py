@@ -163,3 +163,64 @@ async def stop_avatar_session(
         raise HTTPException(status_code=502, detail=f"HeyGen stop failed: {e}")
     finally:
         await client.close()
+
+
+@router.post("/assign")
+async def reassign_avatars(
+    user: UserProfile = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Re-run automatic HeyGen avatar assignment for all actors.
+
+    Clears existing auto-assigned avatars and re-matches.
+    Manually assigned avatars (auto_assigned=false) are preserved.
+    """
+    settings = get_settings()
+    if not settings.heygen_api_key:
+        raise HTTPException(status_code=503, detail="HeyGen API key not configured")
+
+    from sqlalchemy import select
+    from epistemic_platform.models.actor_profile import ActorProfile
+    from epistemic_platform.engine.avatar_assigner import assign_heygen_avatars
+
+    async with async_session_factory() as db:
+        # Clear only auto-assigned avatars so they get re-matched
+        result = await db.execute(
+            select(ActorProfile).where(ActorProfile.is_active.is_(True))
+        )
+        for actor in result.scalars().all():
+            cfg = actor.avatar_config or {}
+            if cfg.get("auto_assigned"):
+                actor.avatar_config = {
+                    k: v for k, v in cfg.items()
+                    if k not in ("heygen_avatar_id", "heygen_avatar_name", "heygen_preview_url", "auto_assigned")
+                }
+        await db.commit()
+
+        count = await assign_heygen_avatars(db)
+        return {"status": "ok", "actors_updated": count}
+
+
+@router.get("/assignments")
+async def list_avatar_assignments(
+    user: UserProfile = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+    """List current HeyGen avatar assignments for all actors."""
+    from sqlalchemy import select
+    from epistemic_platform.models.actor_profile import ActorProfile
+
+    async with async_session_factory() as db:
+        result = await db.execute(
+            select(ActorProfile).where(ActorProfile.is_active.is_(True))
+        )
+        assignments = []
+        for actor in result.scalars().all():
+            cfg = actor.avatar_config or {}
+            assignments.append({
+                "actor_id": actor.id,
+                "actor_name": actor.name,
+                "heygen_avatar_id": cfg.get("heygen_avatar_id"),
+                "heygen_avatar_name": cfg.get("heygen_avatar_name"),
+                "heygen_preview_url": cfg.get("heygen_preview_url"),
+                "auto_assigned": cfg.get("auto_assigned", False),
+            })
+        return assignments

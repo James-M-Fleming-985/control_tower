@@ -262,6 +262,18 @@ def _register_events(app: FastAPI) -> None:
                 await load_seed_scenarios(session)
                 await session.commit()
             logger.info("Database initialized and seed data loaded")
+
+            # Auto-assign HeyGen stock avatars if configured
+            settings = get_settings()
+            if settings.avatar_mode == "heygen" and settings.heygen_api_key:
+                try:
+                    from epistemic_platform.engine.avatar_assigner import assign_heygen_avatars
+                    async with async_session_factory() as session:
+                        count = await assign_heygen_avatars(session)
+                        if count:
+                            logger.info("Auto-assigned HeyGen avatars to %d actors", count)
+                except Exception as e:
+                    logger.warning("HeyGen avatar auto-assignment failed (non-fatal): %s", e)
         except Exception as e:
             logger.error(f"Startup DB initialization failed: {e}")
             logger.error("App will start but database features may not work")
