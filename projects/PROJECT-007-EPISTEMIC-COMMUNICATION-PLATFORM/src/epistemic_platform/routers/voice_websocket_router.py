@@ -41,6 +41,15 @@ router = APIRouter()
 _META_RE = re.compile(r"\|\|\|META\|\|\|(\{.*\})\s*$", re.DOTALL)
 _META_SENTINEL = "|||META|||"
 
+# End-session detection
+_END_SESSION_TOKEN = "[END_SESSION]"
+_FAREWELL_RE = re.compile(
+    r"\b(goodbye|good bye|bye bye|bye for now|see you later|see you soon"
+    r"|thanks bye|that'?s all|end session|i'?m done|gotta go|take care"
+    r"|until next time|cheers|farewell|nice talking|talk later)\b",
+    re.IGNORECASE,
+)
+
 
 # ---------------------------------------------------------------------------
 # State machine & metrics
@@ -516,6 +525,9 @@ async def voice_websocket(
                         {"type": "transcription", "text": transcription.text}
                     )
 
+                    # Check for user farewell phrases
+                    user_farewell = bool(_FAREWELL_RE.search(transcription.text))
+
                     # Push vocal state
                     vocal_dict = None
                     if vocal_state:
@@ -543,9 +555,11 @@ async def voice_websocket(
                             _mi = _pending.find(_META_SENTINEL)
                             if _mi >= 0:
                                 if _mi > 0:
-                                    await websocket.send_json(
-                                        {"type": "stream_delta", "content": _pending[:_mi]}
-                                    )
+                                    clean_delta = _pending[:_mi].replace(_END_SESSION_TOKEN, "")
+                                    if clean_delta:
+                                        await websocket.send_json(
+                                            {"type": "stream_delta", "content": clean_delta}
+                                        )
                                 _pending = ""
                                 _meta_found = True
                                 continue
@@ -555,15 +569,19 @@ async def voice_websocket(
                                     _flush = len(_pending) - _i
                                     break
                             if _flush > 0:
-                                await websocket.send_json(
-                                    {"type": "stream_delta", "content": _pending[:_flush]}
-                                )
+                                _delta_text = _pending[:_flush].replace(_END_SESSION_TOKEN, "")
+                                if _delta_text:
+                                    await websocket.send_json(
+                                        {"type": "stream_delta", "content": _delta_text}
+                                    )
                                 _pending = _pending[_flush:]
 
                     if _pending and not _meta_found:
-                        await websocket.send_json(
-                            {"type": "stream_delta", "content": _pending}
-                        )
+                        _final_text = _pending.replace(_END_SESSION_TOKEN, "")
+                        if _final_text:
+                            await websocket.send_json(
+                                {"type": "stream_delta", "content": _final_text}
+                            )
 
                     await websocket.send_json({"type": "stream_end"})
                     t_llm = time.monotonic()
@@ -571,46 +589,75 @@ async def voice_websocket(
                     # Parse ExpressiveState for TTS voice params
                     clean_text, expressive_state = _strip_meta(raw_response)
 
+                    # Check for actor-initiated end (LLM includes [END_SESSION])
+                    actor_farewell = _END_SESSION_TOKEN in clean_text
+                    if actor_farewell:
+                        clean_text = clean_text.replace(_END_SESSION_TOKEN, "").strip()
+
+                    # Determine if session should end after this turn
+                    should_end_session = user_farewell or actor_farewell
+
                     # --- Start TTS IMMEDIATELY (don't wait for horn/stance/coaching) ---
                     tts_first_byte_ms = 0.0
+                    use_heygen = settings.avatar_mode == "heygen" and settings.heygen_api_key
                     if clean_text.strip():
-                        voice_params = (
-                            expressive_state.to_voice_params()
-                            if expressive_state
-                            else {
-                                "stability": 0.5,
-                                "similarity_boost": 0.75,
-                                "style": 0.0,
-                            }
-                        )
-                        barge_in.clear()
-                        tts_first_byte.clear()
-                        t_tts_start = time.monotonic()
-                        tts_task = asyncio.create_task(
-                            _stream_tts(
-                                websocket,
-                                tts,
-                                clean_text,
-                                voice_params,
-                                barge_in,
-                                first_byte_event=tts_first_byte,
+                        if use_heygen:
+                            # HeyGen mode: send text to frontend, which forwards to HeyGen API
+                            # HeyGen does its own TTS + facial animation via LiveKit
+                            mood = (
+                                expressive_state.mood
+                                if expressive_state and expressive_state.mood
+                                else None
                             )
-                        )
-                        state = VoiceState.SPEAKING
-                        await websocket.send_json(
-                            {"type": "state_change", "state": state.value}
-                        )
+                            await websocket.send_json(
+                                {
+                                    "type": "heygen_speak",
+                                    "text": clean_text,
+                                    **({"mood": mood} if mood else {}),
+                                }
+                            )
+                            state = VoiceState.SPEAKING
+                            await websocket.send_json(
+                                {"type": "state_change", "state": state.value}
+                            )
+                        else:
+                            voice_params = (
+                                expressive_state.to_voice_params()
+                                if expressive_state
+                                else {
+                                    "stability": 0.5,
+                                    "similarity_boost": 0.75,
+                                    "style": 0.0,
+                                }
+                            )
+                            barge_in.clear()
+                            tts_first_byte.clear()
+                            t_tts_start = time.monotonic()
+                            tts_task = asyncio.create_task(
+                                _stream_tts(
+                                    websocket,
+                                    tts,
+                                    clean_text,
+                                    voice_params,
+                                    barge_in,
+                                    first_byte_event=tts_first_byte,
+                                )
+                            )
+                            state = VoiceState.SPEAKING
+                            await websocket.send_json(
+                                {"type": "state_change", "state": state.value}
+                            )
 
-                        # Wait briefly for first TTS byte (non-blocking cap)
-                        try:
-                            await asyncio.wait_for(
-                                tts_first_byte.wait(), timeout=5.0
-                            )
-                            tts_first_byte_ms = (
-                                time.monotonic() - t_tts_start
-                            ) * 1000
-                        except asyncio.TimeoutError:
-                            tts_first_byte_ms = 5000.0
+                            # Wait briefly for first TTS byte (non-blocking cap)
+                            try:
+                                await asyncio.wait_for(
+                                    tts_first_byte.wait(), timeout=5.0
+                                )
+                                tts_first_byte_ms = (
+                                    time.monotonic() - t_tts_start
+                                ) * 1000
+                            except asyncio.TimeoutError:
+                                tts_first_byte_ms = 5000.0
 
                     # --- Post-processing in background (horn/stance/coaching/DB) ---
                     # This runs while TTS is streaming, so user hears the
@@ -698,6 +745,69 @@ async def voice_websocket(
                             "total_ms": round(total_ms),
                         }
                     )
+
+                    # Auto-end session after farewell TTS plays
+                    if should_end_session:
+                        logger.info(
+                            "Auto-ending session %d (user_farewell=%s, actor_farewell=%s)",
+                            session_id, user_farewell, actor_farewell,
+                        )
+                        # Wait for TTS to finish playing before ending
+                        if tts_task and not tts_task.done():
+                            try:
+                                await asyncio.wait_for(tts_task, timeout=30.0)
+                            except (asyncio.TimeoutError, asyncio.CancelledError):
+                                pass
+                        # Wait for post-processing
+                        if post_task and not post_task.done():
+                            try:
+                                await asyncio.wait_for(post_task, timeout=15.0)
+                            except (asyncio.TimeoutError, Exception):
+                                pass
+
+                        # Aggregate composure metrics
+                        composure_metrics = None
+                        if vocal_states:
+                            scores = [v["composure_score"] for v in vocal_states]
+                            composure_metrics = {
+                                "avg_composure": round(sum(scores) / len(scores), 4),
+                                "min_composure": round(min(scores), 4),
+                                "max_composure": round(max(scores), 4),
+                                "turn_count_voice": len(scores),
+                            }
+                            if len(scores) >= 2:
+                                composure_metrics["composure_trend"] = round(
+                                    scores[-1] - scores[0], 4
+                                )
+
+                        extra = {**metrics.summary()}
+                        if composure_metrics:
+                            extra.update(composure_metrics)
+
+                        outcome = await conv_manager.end_session(
+                            extra_metrics=extra if extra else None
+                        )
+
+                        reward_data = None
+                        try:
+                            engine = AchievementEngine(db)
+                            reward = await engine.process_session(session, user)
+                            session.trilemma_state = {
+                                **(session.trilemma_state or {}),
+                                "reward_processed": True,
+                            }
+                            await db.commit()
+                            reward_data = reward.to_dict()
+                        except Exception:
+                            logger.exception(
+                                "AchievementEngine failed for session %d", session_id
+                            )
+
+                        end_msg: dict = {"type": "session_ended", "outcome": outcome}
+                        if reward_data:
+                            end_msg["reward"] = reward_data
+                        await websocket.send_json(end_msg)
+                        break
 
                     continue
 

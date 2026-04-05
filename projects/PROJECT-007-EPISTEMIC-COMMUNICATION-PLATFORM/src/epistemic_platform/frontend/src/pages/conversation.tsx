@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSession, useActor } from '@/hooks/use-api';
+import { useSession, useActor, useClientConfig } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { WebSocketManager } from '@/lib/ws';
 import { ChatBubble } from '@/components/conversation/chat-bubble';
 import { ChatInput } from '@/components/conversation/chat-input';
 import { CoachingPanel } from '@/components/conversation/coaching-panel';
 import { TrilemmaVisual } from '@/components/conversation/trilemma-visual';
-import { VoiceOrb } from '@/components/voice/voice-orb';
 import { AudioWaveform } from '@/components/voice/audio-waveform';
 import { MeetingLayout } from '@/components/meeting/meeting-layout';
 import { ActorAvatar } from '@/components/avatar/actor-avatar';
+import { HeyGenAvatar, useHeyGenSpeech } from '@/components/avatar/heygen-avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Mic, StopCircle } from 'lucide-react';
+import { ArrowLeft, Mic, StopCircle, Loader2, Volume2 } from 'lucide-react';
 import type { ChatMessage, CoachingAnnotation, TrilemmaState, HornDetection, StanceDetection, WSServerMessage } from '@/types/api';
 
 interface LocalMessage {
@@ -32,7 +32,9 @@ export function ConversationPage() {
   const { data: session, isLoading: sessionLoading } = useSession(Number(sessionId) || 0);
   const sessionReady = !!session;
   const { data: actor } = useActor(session?.actor_id ?? 0);
+  const { data: clientConfig } = useClientConfig();
   const isVoice = session?.mode === 'voice';
+  const isHeyGen = clientConfig?.avatar_mode === 'heygen' && clientConfig?.heygen_available;
 
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [streamBuf, setStreamBuf] = useState('');
@@ -69,6 +71,14 @@ export function ConversationPage() {
   const recordingStartTimeRef = useRef<number>(0);
   const speechDetectedRef = useRef(false);
   const lastErrorTimeRef = useRef<number>(0);
+
+  // Auto-start: track whether mic has been auto-launched
+  const autoStartedRef = useRef(false);
+  const [wsConnected, setWsConnected] = useState(false);
+
+  // HeyGen avatar speech control
+  const [heygenSessionId, setHeygenSessionId] = useState<string | null>(null);
+  const { speak: heygenSpeak } = useHeyGenSpeech(heygenSessionId);
 
   const SILENCE_THRESHOLD = 0.02; // RMS below this = silence
   const SPEECH_THRESHOLD = 0.03; // RMS above this = speech detected
@@ -224,6 +234,22 @@ export function ConversationPage() {
         // All TTS chunks arrived — play the accumulated audio blob
         playAccumulatedAudio();
         break;
+      case 'heygen_speak':
+        // HeyGen mode: backend skipped TTS, sends text for avatar to speak
+        if ('text' in data && data.text) {
+          setVoiceState('speaking');
+          const mood = ('mood' in data ? (data.mood as string) : undefined);
+          heygenSpeak(data.text as string, mood).then(() => {
+            setVoiceState('idle');
+            // Auto-restart mic for next turn
+            if (handsFreeRef.current && Date.now() - lastErrorTimeRef.current > ERROR_COOLDOWN_MS) {
+              startRecordingRef.current();
+            }
+          }).catch(() => {
+            setVoiceState('idle');
+          });
+        }
+        break;
       case 'barge_in':
         stopPlayback();
         break;
@@ -246,7 +272,7 @@ export function ConversationPage() {
         setTimeout(() => setErrorMsg(null), 6000);
         break;
     }
-  }, [stopPlayback]);
+  }, [stopPlayback, heygenSpeak]);
 
   // --- Connect WebSocket ---
   // NOTE: Use `sessionReady` (boolean) instead of `session` (object) in deps
@@ -261,6 +287,7 @@ export function ConversationPage() {
     const ws = new WebSocketManager(wsPath, {
       onMessage: handleWsMessage,
       onBinary: isVoice ? enqueueAudio : undefined,
+      onOpen: () => setWsConnected(true),
     });
 
     ws.connect();
@@ -269,8 +296,20 @@ export function ConversationPage() {
     return () => {
       ws.close();
       wsRef.current = null;
+      setWsConnected(false);
     };
   }, [sessionId, accessToken, ended, isVoice, sessionReady, handleWsMessage, enqueueAudio]);
+
+  // Auto-start mic after WebSocket connects (voice mode only)
+  useEffect(() => {
+    if (!isVoice || !wsConnected || ended || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    // Brief delay so user sees "Connecting..." before mic activates
+    const timer = setTimeout(() => {
+      startRecordingRef.current();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [isVoice, wsConnected, ended]);
 
   // Cleanup audio context on unmount
   useEffect(() => {
@@ -422,14 +461,6 @@ export function ConversationPage() {
   const startRecordingRef = useRef(startRecording);
   startRecordingRef.current = startRecording;
 
-  const toggleRecording = useCallback(() => {
-    if (recording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  }, [recording, startRecording, stopRecording]);
-
   const sendMessage = useCallback(
     (text: string) => {
       if (!wsRef.current || ended) return;
@@ -562,7 +593,17 @@ export function ConversationPage() {
       if (voiceState === 'processing') return 'Processing…';
       if (voiceState === 'speaking') return `${actor?.name ?? 'Actor'} is speaking…`;
       if (recording) return 'Listening…';
-      return 'Tap the mic to speak';
+      if (!wsConnected) return 'Connecting…';
+      return 'Starting…';
+    })();
+
+    // Small state indicator icon (no button — mic auto-starts)
+    const stateIndicator = (() => {
+      if (ended || !wsConnected) return <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />;
+      if (voiceState === 'processing') return <Loader2 className="h-5 w-5 text-amber-500 animate-spin" />;
+      if (voiceState === 'speaking') return <Volume2 className="h-5 w-5 text-green-500" />;
+      if (recording) return <Mic className="h-5 w-5 text-primary animate-pulse" />;
+      return <Mic className="h-5 w-5 text-muted-foreground" />;
     })();
 
     return (
@@ -570,22 +611,37 @@ export function ConversationPage() {
         header={headerContent}
         centerContent={
           <div className="flex flex-col items-center gap-4">
-            {/* Actor avatar */}
-            <ActorAvatar
-              portraitUrl={(actor?.avatar_config as Record<string, unknown>)?.portrait_url as string | undefined}
-              name={actor?.name ?? 'Actor'}
-              size="lg"
-              speaking={voiceState === 'speaking'}
-            />
+            {/* Actor avatar — HeyGen streaming or static */}
+            {isHeyGen ? (
+              <HeyGenAvatar
+                actorId={session?.actor_id ?? 0}
+                actorName={actor?.name ?? 'Actor'}
+                portraitUrl={(actor?.avatar_config as Record<string, unknown>)?.portrait_url as string | undefined}
+                speaking={voiceState === 'speaking'}
+                size="lg"
+                onSessionReady={setHeygenSessionId}
+              />
+            ) : (
+              <ActorAvatar
+                portraitUrl={(actor?.avatar_config as Record<string, unknown>)?.portrait_url as string | undefined}
+                name={actor?.name ?? 'Actor'}
+                size="lg"
+                speaking={voiceState === 'speaking'}
+              />
+            )}
             <span className="text-sm font-medium">{actor?.name ?? 'Actor'}</span>
             {!ended && (
               <>
-                <VoiceOrb
-                  state={voiceState}
-                  recording={recording}
-                  onToggle={toggleRecording}
-                  actorName={actor?.name}
-                />
+                {/* Subtle state indicator — no tap-to-talk button */}
+                <div className="flex items-center gap-2">
+                  {stateIndicator}
+                  {recording && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                    </span>
+                  )}
+                </div>
                 <AudioWaveform analyser={analyserNode} isActive={recording} />
               </>
             )}

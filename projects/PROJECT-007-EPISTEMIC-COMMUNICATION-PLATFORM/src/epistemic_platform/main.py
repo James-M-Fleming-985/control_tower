@@ -99,6 +99,8 @@ def create_app() -> FastAPI:
         """Public config values the frontend needs at runtime."""
         return {
             "avatar_service_url": settings.avatar_service_url or None,
+            "avatar_mode": settings.avatar_mode,
+            "heygen_available": bool(settings.heygen_api_key),
         }
 
     @app.get("/health/db", tags=["health"])
@@ -211,6 +213,7 @@ def _register_routers(app: FastAPI) -> None:
         gamification_router,
         analytics_router,
         debrief_websocket_router,
+        avatar_router,
     )
 
     prefix = get_settings().api_prefix
@@ -236,6 +239,8 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(websocket_router.router, tags=["websocket"])
     app.include_router(voice_websocket_router.router, tags=["voice-websocket"])
     app.include_router(debrief_websocket_router.router, tags=["debrief-websocket"])
+    # Avatar (HeyGen control plane)
+    app.include_router(avatar_router.router, tags=["avatar"])
 
 
 def _register_events(app: FastAPI) -> None:

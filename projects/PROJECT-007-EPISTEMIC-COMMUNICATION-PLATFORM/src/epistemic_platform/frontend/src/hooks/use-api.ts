@@ -17,6 +17,21 @@ import type {
   UserProfileUpdate,
 } from '@/types/api';
 
+// ─── Client Config ───────────────────────────────────────────────────────────
+interface ClientConfig {
+  avatar_service_url: string | null;
+  avatar_mode: 'static' | 'heygen' | 'self_hosted';
+  heygen_available: boolean;
+}
+
+export function useClientConfig() {
+  return useQuery({
+    queryKey: ['client-config'],
+    queryFn: () => api.get<ClientConfig>('/client-config').then((r) => r.data),
+    staleTime: 5 * 60 * 1000, // 5 min — config rarely changes
+  });
+}
+
 // ─── Actors ──────────────────────────────────────────────────────────────────
 export function useActors() {
   return useQuery({

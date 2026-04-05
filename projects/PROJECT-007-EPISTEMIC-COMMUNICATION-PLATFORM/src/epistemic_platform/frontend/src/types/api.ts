@@ -315,6 +315,7 @@ export type WSServerMessage =
   | { type: 'transcription'; text: string }
   | { type: 'vocal_state'; composure_score: number; [key: string]: unknown }
   | { type: 'audio_end' }
+  | { type: 'heygen_speak'; text: string; mood?: string }
   | { type: 'latency_report'; turn: number; stt_ms: number; llm_ms: number; tts_first_byte_ms: number; total_ms: number }
   | { type: 'pong'; server_ts: number; client_ts?: number }
   | { type: 'debrief_start'; session_id: number }

@@ -65,6 +65,11 @@ class Settings(BaseSettings):
     # Avatar Service (MuseTalk on Dell workstation via Cloudflare Tunnel)
     avatar_service_url: str = ""  # e.g. wss://your-tunnel.trycloudflare.com/ws/avatar
 
+    # HeyGen Streaming Avatar API
+    heygen_api_key: str = ""
+    heygen_api_base: str = "https://api.heygen.com"
+    avatar_mode: str = "static"  # "static" | "heygen" | "self_hosted"
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

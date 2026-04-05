@@ -8,6 +8,7 @@ export type WSBinaryHandler = (data: ArrayBuffer) => void;
 interface WSOptions {
   onMessage: WSMessageHandler;
   onBinary?: WSBinaryHandler;
+  onOpen?: () => void;
   onClose?: (code: number, reason: string) => void;
   onError?: (event: Event) => void;
 }
@@ -75,6 +76,7 @@ export class WebSocketManager {
 
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
+      this.options.onOpen?.();
     };
 
     this.ws.onmessage = (event) => {
