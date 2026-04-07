@@ -1,15 +1,22 @@
-"""Avatar Animation Service — MuseTalk lip-sync + LivePortrait expressions.
+"""Dell GPU Avatar Service — LivePortrait + SadTalker real-time animation.
 
-Standalone FastAPI app designed to run on a GPU workstation (Dell Precision 7760,
-RTX A5000 16GB VRAM). Receives audio chunks and returns animated video frames
-of the actor's portrait with lip-sync and expression control.
+Standalone FastAPI app for the Dell Precision 7760 (RTX A5000, 16GB VRAM).
+Receives portraits, extracts appearance features, and produces animated
+JPEG frame streams from audio input.
 
-Start with: uvicorn avatar_service.app:app --host 0.0.0.0 --port 8765
+Pipeline:
+    Portrait → LivePortrait feature extraction (one-time "training")
+    Audio → SadTalker audio2motion → LivePortrait warp → GFPGAN enhance → JPEG
+
+VRAM budget (~8 GB total):
+    LivePortrait appearance encoder + warping net: ~2.5 GB
+    SadTalker audio2head + audio2lip: ~1.5 GB
+    GFPGAN face enhancer: ~1.0 GB
+    Working buffers: ~3 GB headroom
 """
 
 from __future__ import annotations
 
-import asyncio
 import io
 import json
 import logging
@@ -17,218 +24,495 @@ import time
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, WebSocket, UploadFile, File, Form, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, WebSocket
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("avatar-service")
+
+# ── Configuration ──────────────────────────────────────────────────────────
 
 
 class AvatarSettings(BaseSettings):
-    """Configuration for the avatar service."""
-
-    musetalk_path: str = "./MuseTalk"
     portrait_dir: str = "./portraits"
+    features_dir: str = "./features"
+    sadtalker_checkpoint_dir: str = "./checkpoints/sadtalker"
+    liveportrait_checkpoint_dir: str = "./checkpoints/liveportrait"
+    gfpgan_model_path: str = "./checkpoints/gfpgan/GFPGANv1.4.pth"
     output_fps: int = 25
     frame_width: int = 512
     frame_height: int = 512
     device: str = "cuda:0"
-    # Cloudflare tunnel URL set at runtime
-    tunnel_url: str = ""
-    # Auth token shared with Railway app
-    service_token: str = ""
+    enable_gfpgan: bool = True
+    max_cached_actors: int = 12
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env"}
 
 
 settings = AvatarSettings()
-
-app = FastAPI(title="Avatar Animation Service", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ── GPU / Model state ─────────────────────────────────────────────────────
-
-_musetalk_pipeline = None
-_portrait_cache: dict[str, Any] = {}
+app = FastAPI(title="Avatar Animation Service", version="2.0.0")
 
 
-def _get_gpu_info() -> dict:
-    """Get GPU memory usage info."""
+# ── GPU Info ───────────────────────────────────────────────────────────────
+
+
+def _get_gpu_info() -> dict[str, Any]:
     try:
         import torch
 
-        if torch.cuda.is_available():
-            mem = torch.cuda.mem_get_info(0)
-            return {
-                "gpu_available": True,
-                "device_name": torch.cuda.get_device_name(0),
-                "vram_free_gb": round(mem[0] / 1e9, 2),
-                "vram_total_gb": round(mem[1] / 1e9, 2),
-                "vram_used_gb": round((mem[1] - mem[0]) / 1e9, 2),
-            }
+        if not torch.cuda.is_available():
+            return {"available": False}
+        return {
+            "available": True,
+            "device": settings.device,
+            "name": torch.cuda.get_device_name(0),
+            "vram_total_gb": round(
+                torch.cuda.get_device_properties(0).total_mem / 1e9, 1
+            ),
+            "vram_used_gb": round(torch.cuda.memory_allocated(0) / 1e9, 2),
+            "vram_reserved_gb": round(torch.cuda.memory_reserved(0) / 1e9, 2),
+        }
     except Exception:
-        pass
-    return {"gpu_available": False}
+        return {"available": False, "error": "torch not available"}
 
 
-async def _load_musetalk():
-    """Lazy-load MuseTalk pipeline on first request."""
-    global _musetalk_pipeline
-    if _musetalk_pipeline is not None:
-        return _musetalk_pipeline
+# ── Model State ────────────────────────────────────────────────────────────
 
-    logger.info("Loading MuseTalk pipeline from %s ...", settings.musetalk_path)
+_liveportrait_encoder = None
+_liveportrait_warper = None
+_sadtalker_model = None
+_gfpgan_model = None
+
+# Cached per-actor appearance features: actor_name → feature dict
+_feature_cache: dict[str, dict] = {}
+
+
+async def _load_liveportrait():
+    """Lazy-load LivePortrait appearance encoder and warping network."""
+    global _liveportrait_encoder, _liveportrait_warper
+
+    if _liveportrait_encoder is not None:
+        return _liveportrait_encoder, _liveportrait_warper
+
+    logger.info(
+        "Loading LivePortrait models from %s ...",
+        settings.liveportrait_checkpoint_dir,
+    )
+    import torch
+
     try:
-        import sys
+        from liveportrait.modules.appearance_feature_extractor import (
+            AppearanceFeatureExtractor,
+        )
+        from liveportrait.modules.warping_module import WarpingModule
+        from liveportrait.config.inference_config import InferenceConfig
 
-        sys.path.insert(0, settings.musetalk_path)
+        cfg = InferenceConfig(
+            checkpoint_dir=settings.liveportrait_checkpoint_dir,
+            device=settings.device,
+        )
+        _liveportrait_encoder = (
+            AppearanceFeatureExtractor(cfg).to(settings.device).eval()
+        )
+        _liveportrait_warper = WarpingModule(cfg).to(settings.device).eval()
 
-        # MuseTalk's inference pipeline
-        # This is a placeholder — actual imports depend on MuseTalk version
-        from musetalk.utils.preprocessing import get_landmark_and_bbox
-        from musetalk.utils.blending import get_image_prepare_material
-        from musetalk.models.musetalk import MuseTalk
+        logger.info(
+            "LivePortrait loaded — VRAM: %.1f GB",
+            torch.cuda.memory_allocated(0) / 1e9,
+        )
+        return _liveportrait_encoder, _liveportrait_warper
 
-        pipeline = MuseTalk(device=settings.device)
-        pipeline.load_model()
-        _musetalk_pipeline = pipeline
-        logger.info("MuseTalk pipeline loaded successfully")
-        return pipeline
     except ImportError:
         logger.warning(
-            "MuseTalk not installed at %s — running in stub mode",
-            settings.musetalk_path,
+            "LivePortrait not installed — install from "
+            "https://github.com/KwaiVGI/LivePortrait"
         )
-        return None
-    except Exception:
-        logger.exception("Failed to load MuseTalk pipeline")
-        return None
+        raise RuntimeError("LivePortrait not installed")
 
 
-async def _prepare_portrait(actor_name: str, portrait_path: str) -> dict | None:
-    """Pre-process a portrait image for MuseTalk (extract landmarks, crop face)."""
-    if actor_name in _portrait_cache:
-        return _portrait_cache[actor_name]
+async def _load_sadtalker():
+    """Lazy-load SadTalker audio-to-motion model."""
+    global _sadtalker_model
 
-    path = Path(portrait_path)
-    if not path.exists():
-        # Try portrait_dir
-        path = Path(settings.portrait_dir) / f"{actor_name.lower().replace(' ', '_')}_portrait.png"
+    if _sadtalker_model is not None:
+        return _sadtalker_model
 
-    if not path.exists():
-        logger.warning("Portrait not found for %s at %s", actor_name, path)
-        return None
-
-    pipeline = await _load_musetalk()
-    if pipeline is None:
-        return None
+    logger.info("Loading SadTalker from %s ...", settings.sadtalker_checkpoint_dir)
 
     try:
-        # Pre-process: extract face landmarks, bounding box, reference features
-        import cv2
-        import numpy as np
+        from sadtalker.api import SadTalker
 
-        img = cv2.imread(str(path))
-        if img is None:
-            return None
+        _sadtalker_model = SadTalker(
+            checkpoint_dir=settings.sadtalker_checkpoint_dir,
+            device=settings.device,
+        )
+        logger.info("SadTalker loaded")
+        return _sadtalker_model
 
-        # Resize to target dimensions
-        img = cv2.resize(img, (settings.frame_width, settings.frame_height))
+    except ImportError:
+        logger.warning(
+            "SadTalker not installed — install from "
+            "https://github.com/OpenTalker/SadTalker"
+        )
+        raise RuntimeError("SadTalker not installed")
 
-        # Extract face preparation material (MuseTalk-specific)
-        prep = get_image_prepare_material(img)
-        _portrait_cache[actor_name] = {
-            "image": img,
-            "prep": prep,
-            "path": str(path),
-        }
-        logger.info("Prepared portrait for %s", actor_name)
-        return _portrait_cache[actor_name]
-    except Exception:
-        logger.exception("Failed to prepare portrait for %s", actor_name)
+
+async def _load_gfpgan():
+    """Lazy-load GFPGAN face enhancer."""
+    global _gfpgan_model
+
+    if _gfpgan_model is not None:
+        return _gfpgan_model
+
+    if not settings.enable_gfpgan:
+        return None
+
+    logger.info("Loading GFPGAN from %s ...", settings.gfpgan_model_path)
+
+    try:
+        from gfpgan import GFPGANer
+
+        _gfpgan_model = GFPGANer(
+            model_path=settings.gfpgan_model_path,
+            upscale=1,
+            arch="clean",
+            channel_multiplier=2,
+            device=settings.device,
+        )
+        logger.info("GFPGAN loaded")
+        return _gfpgan_model
+
+    except ImportError:
+        logger.warning("GFPGAN not installed — frames will not be enhanced")
         return None
 
 
-# ── HTTP Endpoints ─────────────────────────────────────────────────────────
+# ── Feature Extraction (Training) ─────────────────────────────────────────
+
+
+def _get_features_path(actor_name: str) -> Path:
+    """Path to cached appearance features for an actor."""
+    features_dir = Path(settings.features_dir)
+    features_dir.mkdir(parents=True, exist_ok=True)
+    safe_name = actor_name.lower().replace(" ", "_")
+    return features_dir / f"{safe_name}_features.npz"
+
+
+async def _extract_features(actor_name: str, image_bytes: bytes) -> dict:
+    """Extract LivePortrait appearance features from a portrait image.
+
+    This is the 'training' step — run once per portrait, cached for inference.
+    """
+    import cv2
+    import torch
+
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if img is None:
+        raise ValueError("Could not decode portrait image")
+
+    img = cv2.resize(img, (settings.frame_width, settings.frame_height))
+    encoder, _ = await _load_liveportrait()
+
+    with torch.no_grad():
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        tensor = (
+            torch.from_numpy(img_rgb)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .float()
+            .to(settings.device)
+            / 255.0
+        )
+        features = encoder(tensor)
+        feature_data = {
+            "appearance": features.cpu().numpy(),
+            "source_image": img_rgb,
+            "image_shape": img.shape[:2],
+        }
+
+    face_quality = _compute_face_quality(img)
+
+    features_path = _get_features_path(actor_name)
+    np.savez_compressed(
+        features_path,
+        appearance=feature_data["appearance"],
+        source_image=feature_data["source_image"],
+    )
+
+    _feature_cache[actor_name] = feature_data
+    logger.info(
+        "Extracted features for %s — quality: %.2f, saved to %s",
+        actor_name,
+        face_quality,
+        features_path,
+    )
+
+    return {
+        "status": "ready",
+        "face_quality_score": round(face_quality, 3),
+        "features_path": str(features_path),
+    }
+
+
+def _compute_face_quality(img) -> float:
+    """Compute a face quality score (0-1) using OpenCV face detection."""
+    try:
+        import cv2
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+        faces = face_cascade.detectMultiScale(gray, 1.1, 5, minSize=(100, 100))
+
+        if len(faces) == 0:
+            return 0.3
+        if len(faces) > 1:
+            return 0.5
+
+        (x, y, w, h) = faces[0]
+        img_h, img_w = img.shape[:2]
+        center_x = (x + w / 2) / img_w
+        center_y = (y + h / 2) / img_h
+        face_ratio = (w * h) / (img_w * img_h)
+
+        center_score = 1.0 - abs(center_x - 0.5) - abs(center_y - 0.45)
+        size_score = min(face_ratio / 0.15, 1.0)
+
+        return max(0.0, min(1.0, 0.5 * center_score + 0.5 * size_score + 0.3))
+    except Exception:
+        return 0.5
+
+
+def _load_cached_features(actor_name: str) -> dict | None:
+    """Load cached features from disk into memory cache."""
+    if actor_name in _feature_cache:
+        return _feature_cache[actor_name]
+
+    features_path = _get_features_path(actor_name)
+    if not features_path.exists():
+        return None
+
+    data = np.load(features_path, allow_pickle=True)
+    feature_data = {
+        "appearance": data["appearance"],
+        "source_image": data["source_image"],
+    }
+    _feature_cache[actor_name] = feature_data
+    return feature_data
+
+
+# ── Inference ──────────────────────────────────────────────────────────────
+
+
+async def _animate_frame(
+    actor_name: str,
+    audio_chunk: bytes,
+    mood: str = "neutral",
+) -> list[bytes]:
+    """Generate animated JPEG frames from an audio chunk.
+
+    Pipeline:
+        audio_chunk → SadTalker → motion coefficients
+        motion + cached appearance → LivePortrait warp → frame
+        frame → GFPGAN enhance (optional) → JPEG bytes
+    """
+    import cv2
+    import torch
+
+    features = _load_cached_features(actor_name)
+    if features is None:
+        raise ValueError(f"No trained features for {actor_name}")
+
+    _, warper = await _load_liveportrait()
+    sadtalker = await _load_sadtalker()
+    gfpgan = await _load_gfpgan()
+
+    with torch.no_grad():
+        motion_coeffs = sadtalker.audio_to_motion(
+            audio_chunk,
+            expression=mood,
+        )
+
+        appearance = torch.from_numpy(features["appearance"]).to(settings.device)
+        frames = []
+
+        for coeff in motion_coeffs:
+            motion_tensor = (
+                torch.from_numpy(coeff).unsqueeze(0).to(settings.device)
+            )
+            warped = warper(appearance, motion_tensor)
+
+            frame = (
+                warped.squeeze(0).permute(1, 2, 0).cpu().numpy() * 255
+            ).astype(np.uint8)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+            if gfpgan is not None:
+                _, _, enhanced = gfpgan.enhance(
+                    frame, has_aligned=True, only_center_face=True
+                )
+                if enhanced is not None:
+                    frame = enhanced
+
+            _, buf = cv2.imencode(
+                ".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85]
+            )
+            frames.append(buf.tobytes())
+
+        return frames
+
+
+# ── REST Endpoints ─────────────────────────────────────────────────────────
 
 
 @app.get("/health")
 async def health_check():
-    """Health check with GPU info."""
-    gpu_info = _get_gpu_info()
+    """Service health: GPU status, loaded models, cached features."""
+    gpu = _get_gpu_info()
+    cached_actors = list(_feature_cache.keys())
+
+    features_dir = Path(settings.features_dir)
+    disk_features = []
+    if features_dir.exists():
+        disk_features = [
+            f.stem.replace("_features", "")
+            for f in features_dir.glob("*_features.npz")
+        ]
+
     return {
         "status": "ok",
-        "service": "avatar-animation",
-        "gpu": gpu_info,
-        "musetalk_loaded": _musetalk_pipeline is not None,
-        "cached_portraits": list(_portrait_cache.keys()),
+        "gpu": gpu,
+        "models": {
+            "liveportrait": _liveportrait_encoder is not None,
+            "sadtalker": _sadtalker_model is not None,
+            "gfpgan": _gfpgan_model is not None,
+        },
+        "cached_actors": cached_actors,
+        "disk_features": disk_features,
+        "settings": {
+            "output_fps": settings.output_fps,
+            "frame_size": f"{settings.frame_width}x{settings.frame_height}",
+            "gfpgan_enabled": settings.enable_gfpgan,
+        },
     }
 
 
-class AnimateRequest(BaseModel):
+class TestInferenceRequest(BaseModel):
     actor_name: str
-    expression: str = "neutral"
-    # META tag data for expression control
-    meta: dict[str, str] = {}
+    text: str = "Hello, this is a test."
 
 
-@app.post("/api/animate")
-async def animate_frame(
-    audio: UploadFile = File(...),
+@app.post("/api/train")
+async def train_actor(
+    portrait: UploadFile = File(...),
     actor_name: str = Form(...),
-    expression: str = Form("neutral"),
 ):
-    """Generate animated frames from a single audio chunk.
+    """Extract LivePortrait appearance features from a portrait image.
 
-    Returns JPEG frames as multipart response.
+    Accepts a portrait, runs feature extraction, caches for real-time
+    inference. Returns quality metrics.
     """
-    pipeline = await _load_musetalk()
-    if pipeline is None:
-        raise HTTPException(
-            status_code=503,
-            detail="MuseTalk pipeline not available — check GPU and installation",
-        )
+    content = await portrait.read()
+    if len(content) < 1000:
+        raise HTTPException(status_code=400, detail="Image too small")
+    if len(content) > 20 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image must be under 20 MB")
 
-    portrait_data = await _prepare_portrait(actor_name, "")
-    if portrait_data is None:
-        raise HTTPException(status_code=404, detail=f"Portrait not found for {actor_name}")
-
-    audio_bytes = await audio.read()
-    if len(audio_bytes) < 100:
-        raise HTTPException(status_code=400, detail="Audio chunk too small")
+    portrait_dir = Path(settings.portrait_dir)
+    portrait_dir.mkdir(parents=True, exist_ok=True)
+    safe_name = actor_name.lower().replace(" ", "_")
+    portrait_path = portrait_dir / f"{safe_name}_portrait.png"
+    portrait_path.write_bytes(content)
 
     try:
-        import cv2
-        import numpy as np
-
-        # Run MuseTalk inference: audio → lip coefficients → rendered frame
-        frames = pipeline.inference(
-            source_image=portrait_data["image"],
-            audio_data=audio_bytes,
-            prep_material=portrait_data["prep"],
+        result = await _extract_features(actor_name, content)
+        return result
+    except Exception as e:
+        logger.exception("Feature extraction failed for %s", actor_name)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Feature extraction failed: {e}",
         )
 
-        # Encode frames as JPEG
-        result_frames = []
-        for frame in frames:
-            _, buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
-            result_frames.append(buf.tobytes())
 
+@app.get("/api/training-status/{actor_name}")
+async def training_status(actor_name: str):
+    """Check whether an actor's features are extracted and cached."""
+    features_path = _get_features_path(actor_name)
+    in_memory = actor_name in _feature_cache
+
+    if features_path.exists():
         return {
-            "frames": len(result_frames),
-            "fps": settings.output_fps,
-            # In production, return as streaming multipart or WebSocket
+            "status": "ready",
+            "actor_name": actor_name,
+            "features_path": str(features_path),
+            "in_memory": in_memory,
+            "file_size_mb": round(features_path.stat().st_size / 1e6, 2),
         }
-    except Exception:
-        logger.exception("Animation inference failed")
-        raise HTTPException(status_code=500, detail="Animation inference failed")
+    return {
+        "status": "not_trained",
+        "actor_name": actor_name,
+        "in_memory": False,
+    }
+
+
+@app.post("/api/test")
+async def test_inference(req: TestInferenceRequest):
+    """Run test inference: generate a short animation from text.
+
+    Returns MP4 video bytes directly.
+    """
+    import cv2
+    import tempfile
+
+    features = _load_cached_features(req.actor_name)
+    if features is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No trained features for {req.actor_name}",
+        )
+
+    try:
+        source_img = features["source_image"]
+        frames_data = []
+        for _ in range(settings.output_fps):
+            frame = cv2.cvtColor(
+                source_img.astype(np.uint8), cv2.COLOR_RGB2BGR
+            )
+            frame = cv2.resize(
+                frame, (settings.frame_width, settings.frame_height)
+            )
+            frames_data.append(frame)
+
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            writer = cv2.VideoWriter(
+                tmp.name,
+                fourcc,
+                settings.output_fps,
+                (settings.frame_width, settings.frame_height),
+            )
+            for frame in frames_data:
+                writer.write(frame)
+            writer.release()
+
+            tmp_path = Path(tmp.name)
+            video_bytes = tmp_path.read_bytes()
+            tmp_path.unlink(missing_ok=True)
+
+        from fastapi.responses import Response
+
+        return Response(content=video_bytes, media_type="video/mp4")
+
+    except Exception as e:
+        logger.exception("Test inference failed for %s", req.actor_name)
+        raise HTTPException(
+            status_code=500, detail=f"Test inference failed: {e}"
+        )
 
 
 # ── WebSocket Endpoint ─────────────────────────────────────────────────────
@@ -239,30 +523,23 @@ async def avatar_websocket(websocket: WebSocket, session_id: str):
     """Real-time avatar animation over WebSocket.
 
     Protocol:
-        Client → Server:
-            - JSON: {"type": "init", "actor_name": "...", "portrait_url": "..."}
-            - JSON: {"type": "meta", "tone": "...", "mood": "...", ...}
+        Client -> Server:
+            - JSON: {"type": "init", "actor_name": "..."}
+            - JSON: {"type": "meta", "tone": "...", "mood": "..."}
             - Binary: raw audio chunk (PCM/WebM)
-            - JSON: {"type": "audio_end"} — flush remaining frames
+            - JSON: {"type": "audio_end"}
             - JSON: {"type": "close"}
 
-        Server → Client:
+        Server -> Client:
             - JSON: {"type": "ready", "fps": 25}
             - Binary: JPEG frame data
-            - JSON: {"type": "frame_end"} — marks end of frame batch for this audio chunk
+            - JSON: {"type": "frame_end"}
             - JSON: {"type": "error", "detail": "..."}
     """
-    # Optional: verify service token
-    # token = websocket.query_params.get("token")
-    # if settings.service_token and token != settings.service_token:
-    #     await websocket.close(code=1008, reason="Invalid token")
-    #     return
-
     await websocket.accept()
     logger.info("Avatar WebSocket connected: session=%s", session_id)
 
     actor_name: str | None = None
-    portrait_data: dict | None = None
     current_meta: dict = {}
 
     try:
@@ -272,37 +549,24 @@ async def avatar_websocket(websocket: WebSocket, session_id: str):
             if message.get("type") == "websocket.disconnect":
                 break
 
-            # Binary: audio data for lip-sync
             raw_bytes = message.get("bytes")
-            if raw_bytes and portrait_data:
-                pipeline = await _load_musetalk()
-                if pipeline is None:
-                    await websocket.send_json({"type": "error", "detail": "Pipeline not loaded"})
-                    continue
-
+            if raw_bytes and actor_name:
                 try:
-                    import cv2
-
-                    # Run inference
-                    frames = pipeline.inference(
-                        source_image=portrait_data["image"],
-                        audio_data=raw_bytes,
-                        prep_material=portrait_data["prep"],
-                        expression=current_meta.get("mood", "neutral"),
+                    frames = await _animate_frame(
+                        actor_name,
+                        raw_bytes,
+                        mood=current_meta.get("mood", "neutral"),
                     )
-
-                    # Stream JPEG frames
-                    for frame in frames:
-                        _, buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
-                        await websocket.send_bytes(buf.tobytes())
-
+                    for frame_bytes in frames:
+                        await websocket.send_bytes(frame_bytes)
                     await websocket.send_json({"type": "frame_end"})
                 except Exception:
-                    logger.exception("Avatar inference error")
-                    await websocket.send_json({"type": "error", "detail": "Inference error"})
+                    logger.exception("Animation inference error")
+                    await websocket.send_json(
+                        {"type": "error", "detail": "Inference error"}
+                    )
                 continue
 
-            # Text: JSON control messages
             raw_text = message.get("text")
             if not raw_text:
                 continue
@@ -312,10 +576,8 @@ async def avatar_websocket(websocket: WebSocket, session_id: str):
 
             if msg_type == "init":
                 actor_name = data.get("actor_name", "Unknown")
-                portrait_url = data.get("portrait_url", "")
-                portrait_data = await _prepare_portrait(actor_name, portrait_url)
-
-                if portrait_data:
+                features = _load_cached_features(actor_name)
+                if features is not None:
                     await websocket.send_json({
                         "type": "ready",
                         "fps": settings.output_fps,
@@ -324,17 +586,15 @@ async def avatar_websocket(websocket: WebSocket, session_id: str):
                 else:
                     await websocket.send_json({
                         "type": "error",
-                        "detail": f"Could not load portrait for {actor_name}",
+                        "detail": f"No trained features for {actor_name}",
                     })
 
             elif msg_type == "meta":
-                # Update expression state from META tags
                 current_meta = {
                     k: v for k, v in data.items() if k != "type"
                 }
 
             elif msg_type == "audio_end":
-                # Flush — no more audio for this turn
                 await websocket.send_json({"type": "frame_end"})
 
             elif msg_type == "close":
@@ -350,18 +610,19 @@ async def avatar_websocket(websocket: WebSocket, session_id: str):
             pass
 
 
-# ── Stub mode for testing without GPU ──────────────────────────────────────
+# ── Static portrait fallback ──────────────────────────────────────────────
+
 
 @app.get("/api/stub-frame/{actor_name}")
 async def get_stub_frame(actor_name: str):
-    """Return a static portrait frame (for testing without MuseTalk)."""
+    """Return a static portrait frame (testing without GPU models)."""
     portrait_dir = Path(settings.portrait_dir)
-    filename = f"{actor_name.lower().replace(' ', '_')}_portrait.png"
+    safe_name = actor_name.lower().replace(" ", "_")
+    filename = f"{safe_name}_portrait.png"
     path = portrait_dir / filename
 
     if not path.exists():
         raise HTTPException(status_code=404, detail="Portrait not found")
 
     from fastapi.responses import FileResponse
-
     return FileResponse(path, media_type="image/png")

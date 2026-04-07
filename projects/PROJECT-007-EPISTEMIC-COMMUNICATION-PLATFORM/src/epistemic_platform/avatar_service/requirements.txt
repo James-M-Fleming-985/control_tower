@@ -5,6 +5,15 @@ httpx>=0.27.0
 python-multipart>=0.0.6
 opencv-python-headless>=4.8.0
 numpy>=1.24.0
+
 # GPU dependencies (install separately based on CUDA version):
-# torch>=2.1.0 --index-url https://download.pytorch.org/whl/cu121
-# MuseTalk dependencies are installed from MuseTalk/requirements.txt
+# pip install torch>=2.1.0 --index-url https://download.pytorch.org/whl/cu121
+
+# LivePortrait (appearance feature extraction + warping):
+# git clone https://github.com/KwaiVGI/LivePortrait && cd LivePortrait && pip install -e .
+
+# SadTalker (audio-to-motion):
+# git clone https://github.com/OpenTalker/SadTalker && cd SadTalker && pip install -e .
+
+# GFPGAN (face enhancement, optional):
+# pip install gfpgan>=1.3.8

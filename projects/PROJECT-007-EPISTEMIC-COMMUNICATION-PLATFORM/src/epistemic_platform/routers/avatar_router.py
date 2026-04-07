@@ -3,14 +3,19 @@
 Provides endpoints to create/start/speak/interrupt/stop avatar sessions.
 The frontend connects to HeyGen's LiveKit server directly for video;
 these endpoints handle the control plane.
+
+Admin-only training pipeline endpoints let admins generate portraits,
+trigger feature extraction on the Dell GPU service, and preview results.
 """
 
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from epistemic_platform.auth.dependencies import get_current_user
@@ -24,6 +29,9 @@ from epistemic_platform.repositories.actor_profile_repository import ActorProfil
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/avatar", tags=["avatar"])
+
+# Package root for /static/portraits
+_PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 class CreateSessionRequest(BaseModel):
@@ -391,3 +399,314 @@ async def preview_avatar(
         raise HTTPException(status_code=502, detail=f"HeyGen preview failed: {e}")
     finally:
         await client.close()
+
+
+# ─── Training Pipeline (Self-Hosted Avatar) ──────────────────────────────────
+
+
+class GeneratePortraitRequest(BaseModel):
+    model: str = "dalle3"  # "dalle3" | "flux1"
+
+
+class TrainRequest(BaseModel):
+    force: bool = False  # Re-extract even if features already cached
+
+
+class TestRequest(BaseModel):
+    text: str = "Hello, this is a test of my animated avatar."
+
+
+@router.post("/{actor_id}/generate-portrait")
+async def generate_actor_portrait(
+    actor_id: int,
+    req: GeneratePortraitRequest,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Generate a new AI portrait for an actor (DALL-E 3 or Flux.1 Dev)."""
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        # Update training status
+        cfg = dict(actor.avatar_config or {})
+        cfg["training_status"] = "generating_portrait"
+        actor.avatar_config = cfg
+        await db.commit()
+
+        save_dir = _PACKAGE_DIR / "static" / "portraits"
+        try:
+            if req.model == "flux1":
+                from epistemic_platform.engine.portrait_generator import (
+                    generate_portrait_flux1,
+                )
+
+                result = await generate_portrait_flux1(
+                    actor_name=actor.name,
+                    description=actor.description or "",
+                    archetype=actor.archetype,
+                    save_dir=save_dir,
+                )
+            else:
+                from epistemic_platform.engine.portrait_generator import (
+                    generate_portrait,
+                )
+
+                result = await generate_portrait(
+                    actor_name=actor.name,
+                    description=actor.description or "",
+                    archetype=actor.archetype,
+                    save_dir=save_dir,
+                )
+
+            # Update avatar_config with portrait info
+            cfg["portrait_url"] = result.get("portrait_url", "")
+            cfg["portrait_source"] = result.get("portrait_source", req.model)
+            cfg["portrait_generated_at"] = datetime.now(timezone.utc).isoformat()
+            cfg["training_status"] = "portrait_ready"
+            actor.avatar_config = cfg
+            await db.commit()
+
+            return {
+                "status": "ok",
+                "actor_name": actor.name,
+                "portrait_url": cfg["portrait_url"],
+                "portrait_source": cfg["portrait_source"],
+            }
+
+        except Exception as e:
+            cfg["training_status"] = "failed"
+            cfg["training_error"] = str(e)
+            actor.avatar_config = cfg
+            await db.commit()
+            logger.exception("Portrait generation failed for actor %d", actor_id)
+            raise HTTPException(
+                status_code=502,
+                detail=f"Portrait generation failed: {e}",
+            )
+
+
+@router.post("/{actor_id}/upload-portrait")
+async def upload_actor_portrait(
+    actor_id: int,
+    portrait: UploadFile = File(...),
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Upload a custom portrait image for an actor."""
+    if not portrait.content_type or not portrait.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    content = await portrait.read()
+    if len(content) > 10 * 1024 * 1024:  # 10 MB max
+        raise HTTPException(status_code=400, detail="Image must be under 10 MB")
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        # Save to static/portraits
+        save_dir = _PACKAGE_DIR / "static" / "portraits"
+        save_dir.mkdir(parents=True, exist_ok=True)
+        ext = portrait.filename.rsplit(".", 1)[-1] if portrait.filename and "." in portrait.filename else "png"
+        filename = f"{actor.name.lower().replace(' ', '_')}_portrait.{ext}"
+        filepath = save_dir / filename
+        filepath.write_bytes(content)
+
+        # Update avatar_config
+        cfg = dict(actor.avatar_config or {})
+        cfg["portrait_url"] = f"/static/portraits/{filename}"
+        cfg["portrait_source"] = "uploaded"
+        cfg["portrait_generated_at"] = datetime.now(timezone.utc).isoformat()
+        cfg["training_status"] = "portrait_ready"
+        # Clear any previous training state
+        cfg.pop("training_error", None)
+        actor.avatar_config = cfg
+        await db.commit()
+
+        return {
+            "status": "ok",
+            "actor_name": actor.name,
+            "portrait_url": cfg["portrait_url"],
+        }
+
+
+@router.post("/{actor_id}/train")
+async def train_actor_avatar(
+    actor_id: int,
+    req: TrainRequest,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Trigger LivePortrait feature extraction on the Dell GPU service.
+
+    Sends the actor's portrait to the Dell service which:
+    1. Extracts appearance features via LivePortrait
+    2. Caches features for real-time inference
+    3. Reports face quality score
+    """
+    from epistemic_platform.engine.training_pipeline import train_actor
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        cfg = dict(actor.avatar_config or {})
+        portrait_url = cfg.get("portrait_url")
+        if not portrait_url:
+            raise HTTPException(
+                status_code=400,
+                detail="No portrait available — generate or upload one first",
+            )
+
+        # Skip if already trained (unless force)
+        if cfg.get("self_hosted_ready") and not req.force:
+            return {
+                "status": "already_trained",
+                "actor_name": actor.name,
+                "face_quality_score": cfg.get("face_quality_score"),
+            }
+
+        # Load portrait bytes
+        portrait_path = _PACKAGE_DIR / portrait_url.lstrip("/")
+        if not portrait_path.exists():
+            raise HTTPException(status_code=400, detail="Portrait file not found on disk")
+
+        cfg["training_status"] = "extracting_features"
+        cfg["training_started_at"] = datetime.now(timezone.utc).isoformat()
+        cfg.pop("training_error", None)
+        actor.avatar_config = cfg
+        await db.commit()
+
+    # Send to Dell service (outside DB session to avoid long-held connections)
+    try:
+        result = await train_actor(actor.name, portrait_path.read_bytes())
+    except Exception as e:
+        async with async_session_factory() as db:
+            actor_repo = ActorProfileRepository(db)
+            actor = await actor_repo.get(actor_id)
+            cfg = dict(actor.avatar_config or {})
+            cfg["training_status"] = "failed"
+            cfg["training_error"] = str(e)
+            actor.avatar_config = cfg
+            await db.commit()
+        logger.exception("Training failed for actor %d", actor_id)
+        raise HTTPException(status_code=502, detail=f"Training failed: {e}")
+
+    # Update with results from Dell service
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        cfg = dict(actor.avatar_config or {})
+        cfg["training_status"] = "ready"
+        cfg["training_completed_at"] = datetime.now(timezone.utc).isoformat()
+        cfg["face_quality_score"] = result.get("face_quality_score")
+        cfg["self_hosted_ready"] = True
+        cfg["avatar_source"] = "self_hosted"
+        actor.avatar_config = cfg
+        await db.commit()
+
+    return {
+        "status": "ok",
+        "actor_name": actor.name,
+        "face_quality_score": result.get("face_quality_score"),
+        "training_completed_at": cfg["training_completed_at"],
+    }
+
+
+@router.get("/{actor_id}/training-status")
+async def get_training_status(
+    actor_id: int,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Get training pipeline status for an actor."""
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        cfg = actor.avatar_config or {}
+        return {
+            "actor_id": actor.id,
+            "actor_name": actor.name,
+            "training_status": cfg.get("training_status", "idle"),
+            "portrait_url": cfg.get("portrait_url"),
+            "portrait_source": cfg.get("portrait_source"),
+            "portrait_generated_at": cfg.get("portrait_generated_at"),
+            "training_started_at": cfg.get("training_started_at"),
+            "training_completed_at": cfg.get("training_completed_at"),
+            "training_error": cfg.get("training_error"),
+            "face_quality_score": cfg.get("face_quality_score"),
+            "self_hosted_ready": cfg.get("self_hosted_ready", False),
+            "avatar_source": cfg.get("avatar_source", "static"),
+        }
+
+
+@router.post("/{actor_id}/test")
+async def test_actor_avatar(
+    actor_id: int,
+    req: TestRequest,
+    user: UserProfile = Depends(require_admin),
+) -> Any:
+    """Run test inference on Dell service — returns MP4 preview video."""
+    from fastapi.responses import Response
+    from epistemic_platform.engine.training_pipeline import run_test_inference
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        cfg = actor.avatar_config or {}
+        if not cfg.get("self_hosted_ready"):
+            raise HTTPException(
+                status_code=400,
+                detail="Actor not trained yet — run training first",
+            )
+
+    try:
+        video_bytes = await run_test_inference(actor.name, req.text)
+        return Response(
+            content=video_bytes,
+            media_type="video/mp4",
+            headers={"Content-Disposition": f"inline; filename={actor.name}_test.mp4"},
+        )
+    except Exception as e:
+        logger.exception("Test inference failed for actor %d", actor_id)
+        raise HTTPException(status_code=502, detail=f"Test inference failed: {e}")
+
+
+@router.get("/{actor_id}/quality-report")
+async def get_quality_report(
+    actor_id: int,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Get quality metrics for a trained self-hosted avatar."""
+    from epistemic_platform.engine.training_pipeline import get_service_health
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        cfg = actor.avatar_config or {}
+
+        # Also get Dell service health
+        service_health = await get_service_health()
+
+        return {
+            "actor_id": actor.id,
+            "actor_name": actor.name,
+            "self_hosted_ready": cfg.get("self_hosted_ready", False),
+            "portrait_source": cfg.get("portrait_source"),
+            "face_quality_score": cfg.get("face_quality_score"),
+            "training_completed_at": cfg.get("training_completed_at"),
+            "avatar_source": cfg.get("avatar_source", "static"),
+            "service_health": service_health,
+        }

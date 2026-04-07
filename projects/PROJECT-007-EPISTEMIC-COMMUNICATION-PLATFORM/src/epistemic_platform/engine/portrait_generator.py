@@ -1,4 +1,4 @@
-"""Portrait generation — uses OpenAI DALL-E 3 to create actor headshots.
+"""Portrait generation — DALL-E 3 or Flux.1 Dev (via Replicate) actor headshots.
 
 Generates a professional, consistent portrait for an actor based on their
 description and archetype, then stores the URL in avatar_config.
@@ -6,6 +6,7 @@ description and archetype, then stores the URL in avatar_config.
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 from pathlib import Path
@@ -148,3 +149,104 @@ async def generate_all_portraits(save_dir: Path | None = None) -> dict[str, dict
         except Exception:
             logger.exception("Failed to generate portrait for %s", name)
     return results
+
+
+# ── Flux.1 Dev via Replicate API ───────────────────────────────────────────
+
+
+def _build_flux1_prompt(actor_name: str, description: str) -> str:
+    """Build a Flux.1 portrait prompt (more descriptive works better)."""
+    appearance = ACTOR_APPEARANCE.get(actor_name, "")
+    if not appearance:
+        appearance = f"Professional person matching: {description}"
+
+    return (
+        f"Professional headshot portrait photograph, studio lighting, "
+        f"f/2.8 shallow depth of field, photorealistic, 8k resolution. "
+        f"{appearance}. "
+        f"Neutral friendly expression, looking slightly off-camera. "
+        f"Clean background, no text, no watermarks."
+    )
+
+
+async def generate_portrait_flux1(
+    actor_name: str,
+    description: str,
+    archetype: str | None = None,
+    save_dir: Path | None = None,
+) -> dict:
+    """Generate a portrait using Flux.1 Dev via Replicate API.
+
+    Returns dict with portrait_url, portrait_prompt, and generation metadata.
+    """
+    settings = get_settings()
+    if not settings.replicate_api_token:
+        raise RuntimeError("REPLICATE_API_TOKEN required for Flux.1 portrait generation")
+
+    prompt = _build_flux1_prompt(actor_name, description)
+    headers = {
+        "Authorization": f"Bearer {settings.replicate_api_token}",
+        "Content-Type": "application/json",
+    }
+
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        # Create prediction
+        resp = await client.post(
+            "https://api.replicate.com/v1/predictions",
+            headers=headers,
+            json={
+                "model": "black-forest-labs/flux-1.1-pro",
+                "input": {
+                    "prompt": prompt,
+                    "aspect_ratio": "1:1",
+                    "output_format": "png",
+                    "output_quality": 100,
+                },
+            },
+        )
+        resp.raise_for_status()
+        prediction = resp.json()
+
+        # Poll for completion (max ~2 min)
+        poll_url = prediction["urls"]["get"]
+        image_url: str | None = None
+        for _ in range(60):
+            await asyncio.sleep(2)
+            poll_resp = await client.get(poll_url, headers=headers)
+            poll_resp.raise_for_status()
+            status = poll_resp.json()
+
+            if status["status"] == "succeeded":
+                output = status["output"]
+                image_url = output[0] if isinstance(output, list) else output
+                break
+            elif status["status"] == "failed":
+                raise RuntimeError(
+                    f"Flux.1 generation failed: {status.get('error', 'unknown')}"
+                )
+        else:
+            raise RuntimeError("Flux.1 generation timed out after 120s")
+
+        # Download image
+        img_resp = await client.get(image_url)
+        img_resp.raise_for_status()
+        image_bytes = img_resp.content
+
+    result: dict = {
+        "portrait_prompt": prompt,
+        "portrait_source": "flux1",
+        "generated": True,
+    }
+
+    if save_dir:
+        save_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"{actor_name.lower().replace(' ', '_')}_portrait.png"
+        filepath = save_dir / filename
+        filepath.write_bytes(image_bytes)
+        result["local_path"] = str(filepath)
+        result["portrait_url"] = f"/static/portraits/{filename}"
+        logger.info("Saved Flux.1 portrait for %s to %s", actor_name, filepath)
+    else:
+        result["portrait_data_b64"] = base64.b64encode(image_bytes).decode()
+
+    return result

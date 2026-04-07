@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     heygen_api_base: str = "https://api.heygen.com"
     avatar_mode: str = "static"  # "static" | "heygen" | "self_hosted"
 
+    # Replicate API (Flux.1 Dev portrait generation)
+    replicate_api_token: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 

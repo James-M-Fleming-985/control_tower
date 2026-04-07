@@ -236,3 +236,104 @@ export function useReassignAllAvatars() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['avatar', 'assignments'] }),
   });
 }
+
+// ─── Avatar Training Pipeline ────────────────────────────────────────────────
+
+export interface TrainingStatus {
+  actor_id: number;
+  actor_name: string;
+  training_status: string; // idle, generating_portrait, portrait_ready, extracting_features, ready, failed
+  portrait_url: string | null;
+  portrait_source: string | null; // dalle3, flux1, uploaded
+  portrait_generated_at: string | null;
+  training_started_at: string | null;
+  training_completed_at: string | null;
+  training_error: string | null;
+  face_quality_score: number | null;
+  self_hosted_ready: boolean;
+  avatar_source: string; // static, heygen, self_hosted
+}
+
+export function useTrainingStatus(actorId: number) {
+  return useQuery({
+    queryKey: ['avatar', 'training', actorId],
+    queryFn: () =>
+      api.get<TrainingStatus>(`/avatar/${actorId}/training-status`).then((r) => r.data),
+    refetchInterval: (query) => {
+      const status = query.state.data?.training_status;
+      // Poll while in-progress states
+      if (status === 'generating_portrait' || status === 'extracting_features') {
+        return 3000;
+      }
+      return false;
+    },
+  });
+}
+
+export function useAllTrainingStatuses() {
+  const { data: assignments } = useAvatarAssignments();
+  const actorIds = assignments?.map((a) => a.actor_id) || [];
+
+  return useQuery({
+    queryKey: ['avatar', 'training', 'all', actorIds],
+    queryFn: async () => {
+      const results = await Promise.all(
+        actorIds.map((id) =>
+          api.get<TrainingStatus>(`/avatar/${id}/training-status`).then((r) => r.data),
+        ),
+      );
+      return results;
+    },
+    enabled: actorIds.length > 0,
+  });
+}
+
+export function useGeneratePortrait() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ actorId, model }: { actorId: number; model: 'dalle3' | 'flux1' }) =>
+      api.post(`/avatar/${actorId}/generate-portrait`, { model }).then((r) => r.data),
+    onSuccess: (_, { actorId }) =>
+      queryClient.invalidateQueries({ queryKey: ['avatar', 'training', actorId] }),
+  });
+}
+
+export function useUploadPortrait() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ actorId, file }: { actorId: number; file: File }) => {
+      const form = new FormData();
+      form.append('portrait', file);
+      return api.post(`/avatar/${actorId}/upload-portrait`, form).then((r) => r.data);
+    },
+    onSuccess: (_, { actorId }) =>
+      queryClient.invalidateQueries({ queryKey: ['avatar', 'training', actorId] }),
+  });
+}
+
+export function useTrainActor() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ actorId, force }: { actorId: number; force?: boolean }) =>
+      api.post(`/avatar/${actorId}/train`, { force: force || false }).then((r) => r.data),
+    onSuccess: (_, { actorId }) =>
+      queryClient.invalidateQueries({ queryKey: ['avatar', 'training', actorId] }),
+  });
+}
+
+export function useTestAvatar() {
+  return useMutation({
+    mutationFn: ({ actorId, text }: { actorId: number; text?: string }) =>
+      api
+        .post(`/avatar/${actorId}/test`, { text: text || 'Hello, this is a test of my animated avatar.' }, { responseType: 'blob' })
+        .then((r) => URL.createObjectURL(r.data)),
+  });
+}
+
+export function useQualityReport(actorId: number) {
+  return useQuery({
+    queryKey: ['avatar', 'quality', actorId],
+    queryFn: () => api.get(`/avatar/${actorId}/quality-report`).then((r) => r.data),
+    enabled: false, // manual fetch
+  });
+}
