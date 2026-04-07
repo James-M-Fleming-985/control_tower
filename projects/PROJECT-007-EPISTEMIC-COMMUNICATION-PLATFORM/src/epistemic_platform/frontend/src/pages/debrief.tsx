@@ -591,7 +591,7 @@ export function DebriefPage() {
             {(ended || readOnly) && endedButtons}
           </div>
         }
-        statusText={voiceStatusText}
+        statusText={(ended || readOnly) ? voiceStatusText : undefined}
         toolbar={
           <>
             {!ended && !readOnly && (

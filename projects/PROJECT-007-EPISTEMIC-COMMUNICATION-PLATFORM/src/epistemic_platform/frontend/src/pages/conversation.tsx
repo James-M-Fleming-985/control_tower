@@ -237,6 +237,9 @@ export function ConversationPage() {
       case 'heygen_speak':
         // HeyGen mode: backend skipped TTS, sends text for avatar to speak
         if ('text' in data && data.text) {
+          if (!heygenSessionId) {
+            console.warn('heygen_speak received but no HeyGen session — audio will be silent');
+          }
           setVoiceState('speaking');
           const mood = ('mood' in data ? (data.mood as string) : undefined);
           heygenSpeak(data.text as string, mood).then(() => {

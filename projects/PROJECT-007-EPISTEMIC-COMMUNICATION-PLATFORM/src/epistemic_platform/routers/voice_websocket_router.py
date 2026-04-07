@@ -599,7 +599,11 @@ async def voice_websocket(
 
                     # --- Start TTS IMMEDIATELY (don't wait for horn/stance/coaching) ---
                     tts_first_byte_ms = 0.0
-                    use_heygen = settings.avatar_mode == "heygen" and settings.heygen_api_key
+                    use_heygen = (
+                        settings.avatar_mode == "heygen"
+                        and settings.heygen_api_key
+                        and (actor.avatar_config or {}).get("heygen_avatar_id")
+                    )
                     if clean_text.strip():
                         if use_heygen:
                             # HeyGen mode: send text to frontend, which forwards to HeyGen API
