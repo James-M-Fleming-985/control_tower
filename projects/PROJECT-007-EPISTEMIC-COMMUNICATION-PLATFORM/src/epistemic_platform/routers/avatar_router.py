@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from epistemic_platform.auth.dependencies import get_current_user
+from epistemic_platform.auth.admin_guard import require_admin
 from epistemic_platform.config import get_settings
 from epistemic_platform.database import async_session_factory
 from epistemic_platform.engine.heygen_client import HeyGenClient
@@ -224,3 +225,169 @@ async def list_avatar_assignments(
                 "auto_assigned": cfg.get("auto_assigned", False),
             })
         return assignments
+
+
+# ─── Admin-only Avatar Lab endpoints ─────────────────────────────────────────
+
+
+class ManualAssignRequest(BaseModel):
+    heygen_avatar_id: str
+
+
+@router.get("/stock-library")
+async def list_stock_library(
+    user: UserProfile = Depends(require_admin),
+) -> list[dict[str, Any]]:
+    """Return full HeyGen stock avatar catalogue with previews (admin only)."""
+    settings = get_settings()
+    if not settings.heygen_api_key:
+        raise HTTPException(status_code=503, detail="HeyGen API key not configured")
+
+    client = HeyGenClient()
+    try:
+        avatars = await client.list_avatars()
+        # Return a simplified view for the frontend grid
+        return [
+            {
+                "avatar_id": a.get("avatar_id", ""),
+                "avatar_name": a.get("avatar_name", ""),
+                "gender": a.get("gender", ""),
+                "preview_image_url": (
+                    a.get("preview_image_url")
+                    or a.get("preview_url")
+                    or ""
+                ),
+            }
+            for a in avatars
+        ]
+    except Exception as e:
+        logger.exception("Failed to list HeyGen avatars")
+        raise HTTPException(status_code=502, detail=f"HeyGen avatar listing failed: {e}")
+    finally:
+        await client.close()
+
+
+@router.put("/{actor_id}/assign")
+async def manual_assign_avatar(
+    actor_id: int,
+    req: ManualAssignRequest,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Manually assign a specific HeyGen avatar to an actor (admin only)."""
+    settings = get_settings()
+    if not settings.heygen_api_key:
+        raise HTTPException(status_code=503, detail="HeyGen API key not configured")
+
+    # Verify avatar exists in HeyGen library
+    client = HeyGenClient()
+    try:
+        all_avatars = await client.list_avatars()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"HeyGen API error: {e}")
+    finally:
+        await client.close()
+
+    target = next((a for a in all_avatars if a.get("avatar_id") == req.heygen_avatar_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Avatar '{req.heygen_avatar_id}' not found in HeyGen library")
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        new_config = {
+            **(actor.avatar_config or {}),
+            "heygen_avatar_id": req.heygen_avatar_id,
+            "heygen_avatar_name": target.get("avatar_name", ""),
+            "heygen_preview_url": (
+                target.get("preview_image_url")
+                or target.get("preview_url")
+                or ""
+            ),
+            "auto_assigned": False,
+        }
+        actor.avatar_config = new_config
+        await db.commit()
+
+        return {
+            "status": "ok",
+            "actor_id": actor_id,
+            "actor_name": actor.name,
+            "heygen_avatar_id": req.heygen_avatar_id,
+            "heygen_avatar_name": target.get("avatar_name", ""),
+        }
+
+
+@router.delete("/{actor_id}/assign")
+async def remove_avatar_assignment(
+    actor_id: int,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, str]:
+    """Remove HeyGen avatar assignment from an actor (reverts to static)."""
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        cfg = actor.avatar_config or {}
+        actor.avatar_config = {
+            k: v for k, v in cfg.items()
+            if k not in ("heygen_avatar_id", "heygen_avatar_name", "heygen_preview_url", "auto_assigned")
+        }
+        await db.commit()
+        return {"status": "ok", "actor_name": actor.name}
+
+
+@router.post("/{actor_id}/preview")
+async def preview_avatar(
+    actor_id: int,
+    user: UserProfile = Depends(require_admin),
+) -> dict[str, Any]:
+    """Start a short preview session for an actor's assigned avatar (admin only).
+
+    Returns LiveKit session details for the frontend to render a 10-sec sample.
+    """
+    settings = get_settings()
+    if not settings.heygen_api_key:
+        raise HTTPException(status_code=503, detail="HeyGen API key not configured")
+
+    async with async_session_factory() as db:
+        actor_repo = ActorProfileRepository(db)
+        actor = await actor_repo.get(actor_id)
+        if not actor:
+            raise HTTPException(status_code=404, detail="Actor not found")
+
+        avatar_config = actor.avatar_config or {}
+        heygen_avatar_id = avatar_config.get("heygen_avatar_id")
+        if not heygen_avatar_id:
+            raise HTTPException(status_code=400, detail=f"Actor '{actor.name}' has no avatar assigned")
+
+        voice_id = (actor.ontology_config or {}).get("voice_id") or settings.elevenlabs_default_voice_id
+
+    client = HeyGenClient()
+    try:
+        session_data = await client.create_session(
+            avatar_id=heygen_avatar_id,
+            voice_id=voice_id,
+            quality="medium",
+        )
+        await client.start_session(session_data["session_id"])
+
+        # Queue a short sample utterance
+        sample_text = f"Hello, I am {actor.name}. This is a preview of my avatar."
+        await client.speak(session_data["session_id"], sample_text)
+
+        return {
+            **session_data,
+            "avatar_id": heygen_avatar_id,
+            "actor_name": actor.name,
+            "sample_text": sample_text,
+        }
+    except Exception as e:
+        logger.exception("Failed to create preview session for actor %d", actor_id)
+        raise HTTPException(status_code=502, detail=f"HeyGen preview failed: {e}")
+    finally:
+        await client.close()

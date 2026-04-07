@@ -177,3 +177,62 @@ export function useUpdateProfile() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
   });
 }
+
+// ─── Avatar Lab (Admin) ──────────────────────────────────────────────────────
+
+export interface AvatarAssignment {
+  actor_id: number;
+  actor_name: string;
+  heygen_avatar_id: string | null;
+  heygen_avatar_name: string | null;
+  heygen_preview_url: string | null;
+  auto_assigned: boolean;
+}
+
+export interface StockAvatar {
+  avatar_id: string;
+  avatar_name: string;
+  gender: string;
+  preview_image_url: string;
+}
+
+export function useAvatarAssignments() {
+  return useQuery({
+    queryKey: ['avatar', 'assignments'],
+    queryFn: () => api.get<AvatarAssignment[]>('/avatar/assignments').then((r) => r.data),
+  });
+}
+
+export function useStockLibrary() {
+  return useQuery({
+    queryKey: ['avatar', 'stock-library'],
+    queryFn: () => api.get<StockAvatar[]>('/avatar/stock-library').then((r) => r.data),
+    enabled: false, // manual fetch only
+  });
+}
+
+export function useManualAssignAvatar() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ actorId, avatarId }: { actorId: number; avatarId: string }) =>
+      api.put(`/avatar/${actorId}/assign`, { heygen_avatar_id: avatarId }).then((r) => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['avatar', 'assignments'] }),
+  });
+}
+
+export function useRemoveAvatarAssignment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (actorId: number) =>
+      api.delete(`/avatar/${actorId}/assign`).then((r) => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['avatar', 'assignments'] }),
+  });
+}
+
+export function useReassignAllAvatars() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post('/avatar/assign').then((r) => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['avatar', 'assignments'] }),
+  });
+}

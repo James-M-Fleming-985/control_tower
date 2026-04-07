@@ -30,6 +30,7 @@ export interface UserProfile {
   achievements: Achievement[];
   syllabus: SyllabusData;
   subscription_tier: string;
+  role: string;
   created_at: string;
   updated_at: string;
 }

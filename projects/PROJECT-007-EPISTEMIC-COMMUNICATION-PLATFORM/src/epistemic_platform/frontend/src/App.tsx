@@ -14,6 +14,7 @@ import { SessionsPage } from '@/pages/sessions';
 import { DashboardPage } from '@/pages/dashboard';
 import { AchievementsPage } from '@/pages/achievements';
 import { SettingsPage } from '@/pages/settings';
+import { AvatarLabPage } from '@/pages/admin/avatar-lab';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ export function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/admin/avatar-lab" element={<AvatarLabPage />} />
           </Route>
 
           {/* Fallback */}

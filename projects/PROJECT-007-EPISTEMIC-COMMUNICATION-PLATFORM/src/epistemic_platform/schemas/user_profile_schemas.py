@@ -34,5 +34,6 @@ class UserProfileRead(UserProfileBase):
     achievements: list[dict[str, Any]]
     syllabus: dict[str, Any]
     subscription_tier: str
+    role: str = "user"
     created_at: datetime
     updated_at: datetime
