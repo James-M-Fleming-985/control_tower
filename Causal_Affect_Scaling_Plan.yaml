@@ -3575,5 +3575,53 @@ milestones:
     owner: null
     resources: null
     project: CA-SCALE
+
+# ---------------------------------------------------------------------------
+# MVP Lifecycle Hygiene (added 2026-04-21)
+# ---------------------------------------------------------------------------
+# As the autonomous loop ships MVPs continuously, GitHub repos and Railway
+# services accumulate. GitHub is effectively free at scale, but Railway bills
+# ~$5/mo per idle service. With ~30+ builds shipping per day, an unmanaged
+# fleet of dormant MVPs becomes the single largest cost-of-scale risk.
+# Pro plan absorbs near-term cost; hygiene is still required to keep the
+# fleet observable, attributable, and reversible.
+mvp_lifecycle_hygiene:
+  status: PLANNED
+  rationale: >
+    Prevent unbounded growth of GitHub repos and Railway services produced by
+    the autonomous build loop. Engagement-gate deployments and auto-archive
+    dormant MVPs so cost scales with value, not with build volume.
+  lifecycle_states:
+    - building     # generation + verification in progress
+    - active       # deployed, within engagement window
+    - dormant      # no engagement for N days (warning state)
+    - archived     # Railway service deleted, GitHub repo archived (read-only)
+    - deleted      # GitHub repo + DB rows purged (after retention window)
+  thresholds:
+    dormant_after_days: 7
+    archive_after_days: 30
+    delete_after_days: 90
+    deploy_engagement_gate:
+      description: >
+        Builds with Discover score below threshold do NOT auto-deploy to
+        Railway; they remain `built` in the registry only. Removes the
+        biggest source of idle Railway services.
+      min_discover_score: 0.5
+  automation:
+    - Daily 04:00 UTC scheduler job evaluates each MVPBuild against thresholds
+    - Auto-archive calls Railway API to delete the service + GitHub API to
+      archive the repo (preserves git history, removes from active list)
+    - All transitions emit a RevenueEvent-style audit row for traceability
+  observability:
+    - Add `mvp_lifecycle_state` column to MVPBuild
+    - Surface fleet summary on the Exploitation dashboard (counts per state)
+    - Railway billing alerts at $50 / $100 / $200 thresholds
+  organisational:
+    - Move generated MVP repos to a dedicated GitHub org (e.g.
+      `systems-cubed-mvps`) so the main org stays signal-only
+  out_of_scope:
+    - Manual approval gate before archive (must remain autonomous)
+    - User-editable lifecycle thresholds via UI (config only)
+
 risks: []
 changes: []
