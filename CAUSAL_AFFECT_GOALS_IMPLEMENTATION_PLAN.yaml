@@ -18,18 +18,58 @@ metadata:
     significance. This is NOT a demo dashboard - it's a production tool used to identify data-driven
     opportunities for MVP creation. Mock data would cause developers to build MVPs on inaccurate
     information, making real API data integration absolutely critical.
-  
-  use_case_description: |
-    The application performs heavy data analysis across ALL available variables to discover the
-    strongest correlations. Users need to see:
-    1. TOP correlations ranked by absolute strength (not predetermined variable pairs)
-    2. Time series showing SELECTED correlation relationship evolution over time
-    3. Drift forecast predicting SELECTED relationship forward
-    4. Network graph of correlation clusters above configurable threshold
-    5. Leaderboard of strongest correlations with statistical significance
-    
-    Key requirement: NO MOCK DATA - all analysis must use real API data to ensure MVP developers
-    build on accurate, actionable insights.
+
+# ====================================================================================
+# FOUNDATIONAL ARCHITECTURE: THE AUTONOMOUS BUSINESS LOOP
+# ====================================================================================
+# All goals below serve a single self-correcting loop. The system operates this loop
+# without human intervention; user input is restricted to read-only audit and
+# program-level configuration. See Causal_Affect_Scaling_Plan.yaml for canonical
+# definitions.
+autonomous_loop:
+  stages:
+    - discovery   # opportunities from causal models / trends / market data (sole origin)
+    - adapt       # spec + ACs + impl plan generated automatically per opportunity
+    - exploit     # build, verify, deploy the MVP; emit verification artifacts
+    - monitor     # beacon + GA4 (engagement) + Stripe (revenue), keyed by build_id
+    - learn       # correlate verification + telemetry + prompt versions to predict outcomes
+    - optimize    # feedback into prompts, signal weighting, allocation
+  principle: >
+    When build quality is poor, the fix is to improve the loop's learning,
+    never to insert a human gate.
+
+# ====================================================================================
+# OUT-OF-SCOPE GUARDRAILS (ANTI-DRIFT)
+# ====================================================================================
+out_of_scope:
+  must_not:
+    - Accept manually-entered ideas or recommendations from the user
+    - Require user approval of specifications, ACs, or generated code before building
+    - Allow editing of specs, ACs, or generated code via the UI
+    - Treat verification artifacts as a user-facing approval gate
+    - Interrupt the autonomous loop with synchronous user steps
+    - Use mock, synthetic, or placeholder data anywhere in production
+  must:
+    - Originate every build from a Discovery-sourced recommendation
+    - Verify every build against its acceptance criteria with PROJECT-004-style traceability artifacts
+    - Bind every build to telemetry (GA4 engagement, Stripe revenue) keyed by build_id
+    - Use telemetry plus verification status to learn and improve future builds
+    - Expose all evidence (specs, ACs, verification reports, telemetry) as a read-only audit trail
+  reframing_rule: >
+    Any feature request that would violate a MUST_NOT must be re-framed as either
+    (a) a system-learning improvement, or (b) a read-only audit improvement.
+
+use_case_description: |
+  The application performs heavy data analysis across ALL available variables to discover the
+  strongest correlations. Users need to see:
+  1. TOP correlations ranked by absolute strength (not predetermined variable pairs)
+  2. Time series showing SELECTED correlation relationship evolution over time
+  3. Drift forecast predicting SELECTED relationship forward
+  4. Network graph of correlation clusters above configurable threshold
+  5. Leaderboard of strongest correlations with statistical significance
+
+  Key requirement: NO MOCK DATA - all analysis must use real API data to ensure MVP developers
+  build on accurate, actionable insights.
 
 # ====================================================================================
 # DATA SOURCES AND VARIABLE INVENTORY

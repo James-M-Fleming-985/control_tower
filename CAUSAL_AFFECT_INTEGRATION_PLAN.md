@@ -498,6 +498,18 @@ integration_scenarios:
 - ✅ **User Flow:** Intuitive navigation
 - ✅ **Error Handling:** Graceful degradation
 
+### Verification Artifacts (PROJECT-004 port — Track I)
+
+The `Requirements Verification/` artifact bundle generated per build is **internal learning evidence**, not a user-facing approval gate. Specifically:
+
+- The system MUST NOT require user approval of specs, ACs, or generated code before building.
+- The system MUST display verification status as a **read-only badge** ("X/N verified") on each build card.
+- The system MUST expose the artifact bundle via a **read-only "View Build Evidence" link** that opens the GitHub `Requirements Verification/` folder for that build.
+- Failed verifications trigger an automatic REFACTOR loop (max 2 retries). If still failing, the build is BLOCKED from deployment, the build log row shows "—" instead of a URL, and the failure reason is persisted for telemetry/learning.
+- Verification status is bound to telemetry (GA4 engagement + Stripe revenue, keyed by `build_id`) so the system can learn which spec/prompt patterns produce better outcomes.
+
+This preserves the autonomous Discovery → Adapt → Exploit → Monitor → Learn → Optimize loop. See `Causal_Affect_Scaling_Plan.yaml#autonomous_loop` for canonical definitions.
+
 ---
 
 ## Next Steps

@@ -4,6 +4,72 @@ status: IN_PROGRESS
 start_date: "2026-03-09"
 target_completion: "2027-03-08"
 completion_percentage: 0
+
+# ---------------------------------------------------------------------------
+# Foundational Architecture: The Autonomous Business Loop
+# ---------------------------------------------------------------------------
+# Every capability in this programme exists to serve a single self-correcting
+# loop. The system MUST operate this loop without human intervention; user
+# input is restricted to read-only audit and program-level configuration.
+autonomous_loop:
+  principle: >
+    When build quality is poor, the fix is to improve the loop's learning,
+    never to insert a human gate.
+  stages:
+    - id: discovery
+      definition: >
+        Identify opportunities from external signals (causal models, trends,
+        market data). Recommendations originate ONLY here.
+    - id: adapt
+      definition: >
+        For each Discovery-sourced opportunity, generate a specification,
+        acceptance criteria, and implementation plan. No human approval gate.
+    - id: exploit
+      definition: >
+        Build, verify, and deploy the MVP from the spec. Verification
+        artifacts (REQ traceability, AC pass/fail) are produced as internal
+        evidence.
+    - id: monitor
+      definition: >
+        The deployed MVP emits a beacon identifying its build_id. Engagement
+        is collected via GA4 (system of record); revenue via Stripe; both
+        joined back to the build_id.
+    - id: learn
+      definition: >
+        Correlate verification status, telemetry outcomes, prompt versions,
+        and spec attributes to identify what predicts engagement and revenue.
+    - id: optimize
+      definition: >
+        Findings feed back into prompt selection, discovery signal weighting,
+        and resource allocation. Initially surfaces recommendations (M3);
+        auto-rotation deferred to M5+.
+
+# ---------------------------------------------------------------------------
+# Out-of-Scope Guardrails (Anti-Drift)
+# ---------------------------------------------------------------------------
+# To preserve the autonomous loop, the following are explicitly out of scope.
+# Feature requests violating MUST_NOT items must be re-framed as either
+# (a) a system-learning improvement, or (b) a read-only audit improvement.
+out_of_scope:
+  must_not:
+    - Accept manually-entered ideas or recommendations from the user
+    - Require user approval of specifications, acceptance criteria, or
+      generated code before building
+    - Allow editing of specs, ACs, or generated code via the UI
+    - Treat verification artifacts as a user-facing approval gate
+    - Interrupt the Discovery → Adapt → Exploit → Monitor → Learn → Optimize
+      loop with synchronous user steps
+    - Use mock, synthetic, or placeholder data anywhere in production
+  must:
+    - Originate every build from a Discovery-sourced recommendation
+    - Verify every build against its acceptance criteria with PROJECT-004-style
+      traceability artifacts
+    - Bind every build to telemetry (GA4 engagement, Stripe revenue) keyed by
+      build_id
+    - Use telemetry plus verification status to learn and improve future builds
+    - Expose all evidence (specs, ACs, verification reports, telemetry) as a
+      read-only audit trail
+
 milestones:
   - id: null
     name: "M0: Instrument & Measure (Weeks 1-3)"
@@ -1512,6 +1578,108 @@ milestones:
     resources: null
     project: CA-SCALE
   - id: null
+    name: "Track I: Remove all manual idea-injection paths (button, modal, endpoint); hard-delete source='manual' rows"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: Autonomous Loop Closure. Discovery becomes the sole origin of recommendations. Reflow recommendation card grid so removed UI leaves no orphan whitespace."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Port PROJECT-004 verification engine; inject REQ-AC tags into spec/test/impl prompts"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: Create services/verification_engine.py based on PROJECT-004 execute_layer.py traceability logic. Generate 5-file Requirements Verification/ artifact bundle per build."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Persist verification_status + verification_artifacts_url on MVPBuild; add read-only 'View Build Evidence' link"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: Display 'X/N verified' badge and GitHub-folder link on each build card. Read-only audit trail; not an approval gate."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Auto-REFACTOR loop on FAILED ACs (max 2 retries); BLOCK deployment if still failing"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: System self-corrects without user intervention. Blocked builds show '—' instead of URL on the build log; failure reason persisted for telemetry/learning."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Beacon binding (Monitor stage) — inject GA4 snippet with build_id custom dim; Stripe metadata; BuildTelemetry table"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: GA4 is the system of record for engagement. On-demand fetch initially (not nightly job, not BigQuery stream). Stripe metadata carries build_id for revenue join."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Program Baseline panel additions — quality × engagement × revenue scatter and correlation summary"
+    start_date: "2026-04-21"
+    target_date: "2026-06-21"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I: Lives within the existing Program Baseline tab. Read-only Learn-stage surface; not an actionable control."
+    outline_level: 3
+    parent_levels:
+      "2": "M2: Intelligence Layer (Weeks 10-15)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M2: Intelligence Layer (Weeks 10-15)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
     name: "MILESTONE: M2: Intelligence Layer Complete"
     start_date: "2026-06-21"
     target_date: "2026-06-21"
@@ -1966,6 +2134,40 @@ milestones:
     notes:
       "Track G: Commercial Intelligence Integration. Maps demographic segments to UI patterns,
       colour schemes, layout preferences, and content tone based on ProductDeployment outcomes."
+    outline_level: 3
+    parent_levels:
+      "2": "M3: Self-Learning Foundation (Weeks 16-21)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M3: Self-Learning Foundation (Weeks 16-21)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Move all generation prompts (spec/test/impl/wrapper) to versioned prompts/*.md files; record prompt_path + git SHA per build"
+    start_date: "2026-06-22"
+    target_date: "2026-08-02"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I (Optimize stage M3): Prompt versioning foundation. Each MVPBuild stores which prompt files (with git SHA) were used."
+    outline_level: 3
+    parent_levels:
+      "2": "M3: Self-Learning Foundation (Weeks 16-21)"
+      "1": "Causal Affect Scaling: Baseline to 10TB / 90% Accuracy (2026-2027)"
+    parent_project: "M3: Self-Learning Foundation (Weeks 16-21)"
+    is_true_milestone: false
+    owner: null
+    resources: null
+    project: CA-SCALE
+  - id: null
+    name: "Track I: Background analysis job — correlate {prompt_version, verification_status, telemetry, spec_attributes}; surface findings in Program Baseline"
+    start_date: "2026-06-22"
+    target_date: "2026-08-02"
+    status: NOT_STARTED
+    completion_date: null
+    completion_percentage: 0
+    notes: "Track I (Optimize stage M3): Surface findings only (read-only). e.g. 'impl_prompt_v3.2 reduced facade endpoints from 40% to 12%'. Auto-rotation of prompts deferred to M5+."
     outline_level: 3
     parent_levels:
       "2": "M3: Self-Learning Foundation (Weeks 16-21)"

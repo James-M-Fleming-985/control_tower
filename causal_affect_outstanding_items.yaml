@@ -671,13 +671,22 @@ m2_outstanding_actions:
   # ----- QUICK WINS: Complete now before M3 -----
   quick_wins:
     - id: M2-OA-02
-      task: "Wire VERIFICATION phase in AI code generator"
-      tracks: [B]
+      task: "Wire VERIFICATION phase in AI code generator (PROJECT-004 port)"
+      tracks: [B, I]
       steps: [step_05]
       gap: "execute_verification_phase() not implemented — phase defined in VALID_PHASES"
       file: "services/ai_code_generator_orchestrator.py"
-      effort: SMALL
+      effort: MEDIUM
       priority: HIGH
+      status: IN_PROGRESS
+      plan: |
+        TRUE PORT of PROJECT-004 verification engine. Inject # REQ-AC-NNN tags into spec/test/impl
+        prompts. Generate 5-file Requirements Verification/ artifact bundle per build:
+        traceability_matrix.yaml, requirements_verification.yaml, execution_evidence.json,
+        quality_gates_report.yaml, README_VERIFICATION.md. Push artifacts to build's GitHub repo.
+        Persist verification_status + verification_artifacts_url on MVPBuild. Read-only "View
+        Build Evidence" link on build card (NOT an approval gate).
+      reference: "/workspaces/control_tower/projects/PROJECT-004 AI CODE GENERATOR/SYSTEM-004-01 AI CODE GENERATION SYSTEM/scripts/execute_layer.py"
 
     - id: M2-OA-03
       task: "Add build-completion trigger for ProductDeployment"
@@ -714,6 +723,64 @@ m2_outstanding_actions:
       gap: "Trends data ingesting but no cross-reference with viability scores"
       effort: MEDIUM
       priority: MEDIUM
+
+    # ----- Track I: Autonomous Loop Closure -----
+    - id: M2-OA-15
+      task: "Track I: Remove all manual idea-injection paths; hard-delete source='manual' rows; reflow card grid"
+      tracks: [I]
+      gap: "Dashboard 'Add Your Own Idea' button + modal + POST endpoint bypasses Discovery"
+      files:
+        - "templates/dashboard.html (button + modal)"
+        - "static/js/dashboard.js (handler)"
+        - "routers/dashboard_real.py (POST recommendations endpoint where source='manual')"
+      effort: SMALL
+      priority: HIGHEST
+      status: NOT_STARTED
+      verification: "Zero manual-entry paths in UI; reflowed card grid leaves no orphan whitespace; existing source='manual' rows hard-deleted from DB"
+
+    - id: M2-OA-16
+      task: "Track I: Beacon binding (Monitor stage) — GA4 build_id custom dim, Stripe build_id metadata, BuildTelemetry table"
+      tracks: [I, E]
+      depends_on: [M2-OA-02]
+      gap: "No build_id binding between deployed MVP, GA4 engagement, Stripe revenue"
+      files:
+        - "services/ai_code_generator_orchestrator.py (inject GA4 snippet into AI-generated main.py)"
+        - "services/stripe_service.py (add build_id to Stripe metadata)"
+        - "services/build_telemetry.py (NEW — GA4 + Stripe joiner keyed by build_id)"
+        - "models.py (NEW BuildTelemetry table)"
+      effort: MEDIUM
+      priority: HIGH
+      status: NOT_STARTED
+      decision: "GA4 = system of record for engagement (not custom collector). On-demand fetch when Program Baseline opened (not nightly job, not BigQuery stream)."
+      verification: "Every new build emits beacon with build_id; opening Program Baseline panel returns engagement+revenue per build"
+
+    - id: M2-OA-17
+      task: "Track I: Program Baseline panel additions — quality × engagement × revenue scatter + correlation summary"
+      tracks: [I]
+      depends_on: [M2-OA-02, M2-OA-16]
+      gap: "No surface showing relationship between verification status and outcomes"
+      files:
+        - "templates/dashboard.html (extend existing Program Baseline tab)"
+        - "static/js/program_baseline.js (NEW — scatter + correlation render)"
+        - "routers/dashboard_real.py (NEW endpoint /baselines/quality-outcomes)"
+      effort: MEDIUM
+      priority: HIGH
+      status: NOT_STARTED
+      verification: "Program Baseline tab shows scatter (quality vs engagement, quality vs revenue) and correlation summary; read-only"
+
+    - id: M2-OA-18
+      task: "Track I: Auto-REFACTOR loop on FAILED ACs (max 2 retries); BLOCK deployment if still failing"
+      tracks: [I, B]
+      depends_on: [M2-OA-02]
+      gap: "No automatic remediation when verification fails; nothing to block bad deploys"
+      files:
+        - "services/ai_code_generator_orchestrator.py (add refactor retry loop)"
+        - "services/mvp_builder_service.py (deployment-gating logic)"
+        - "templates/dashboard.html (build log shows '—' instead of URL when blocked)"
+      effort: MEDIUM
+      priority: HIGH
+      status: NOT_STARTED
+      verification: "Failing AC triggers up to 2 REFACTOR retries; if still failing, build_log row shows blocked status with no URL; failure_reason persisted for telemetry"
 
   # ----- DEFER TO M3 OR LATER -----
   deferred:
@@ -787,6 +854,33 @@ m2_outstanding_actions:
       reason: "Needs build volume data to be meaningful"
       defer_to: M3
       priority: MEDIUM
+
+    # ----- Track I: Loop Optimize Stage (M3) -----
+    - id: M3-OA-PV1
+      task: "Track I: Move generation prompts to versioned prompts/*.md files; record prompt_path + git SHA per build"
+      tracks: [I]
+      depends_on: [M2-OA-02]
+      gap: "Prompts are inline strings; no per-build version traceability"
+      files:
+        - "prompts/spec_v*.md, prompts/test_v*.md, prompts/impl_v*.md, prompts/wrapper_v*.md (NEW)"
+        - "services/ai_code_generator_orchestrator.py (load prompts from files; record path+SHA)"
+        - "models.py (MVPBuild: add prompt_versions JSON field)"
+      effort: MEDIUM
+      priority: MEDIUM
+      defer_to: M3
+      status: NOT_STARTED
+
+    - id: M3-OA-PV2
+      task: "Track I: Background job — correlate {prompt_version, verification_status, telemetry, spec_attributes}; surface findings in Program Baseline"
+      tracks: [I]
+      depends_on: [M3-OA-PV1, M2-OA-17]
+      gap: "No mechanism to learn which prompts produce better outcomes"
+      effort: MEDIUM
+      priority: MEDIUM
+      defer_to: M3
+      status: NOT_STARTED
+      decision: "Surface findings only (read-only). Auto-rotation of prompts deferred to M5+."
+      verification: "Program Baseline displays prompt-version performance breakdown (e.g. 'impl_prompt_v3.2: 12% facade rate vs v3.1: 40%')"
 
   # ----- VALIDATION GATES STATUS -----
   validation_gates:
