@@ -1,0 +1,218 @@
+# ============================================================
+# BASELINE-0 AUDIT - Read-only diagnosis of the autonomous loop
+# ============================================================
+# Answers one question: does a recommendation survive all the way round the
+# loop - build, test, ship, deploy, measure, score, iterate, learn?
+#
+# This workflow NEVER writes to production. Stripe is touched in TEST mode only.
+# It applies no fixes; blockers are the deliverable, not a failure.
+#
+# OPTIONAL SECRETS (each missing one downgrades a stage to "NOT TESTED"):
+#   - CROSS_REPO_PAT           read business_ventures (without it, results are unreliable)
+#   - DATABASE_URL             row counts for engagement/revenue tables
+#   - STRIPE_TEST_SECRET_KEY   must be sk_test_*; a live key is refused
+#   - GA4_PROPERTY_ID          GA4 Realtime API property
+#   - GA4_CREDENTIALS_JSON     GA4 service-account JSON
+#
+# Progress is posted to a tracking issue so it reaches the GitHub mobile app.
+# Enable: GitHub Mobile -> Settings -> Notifications -> Actions.
+
+name: "🔍 Baseline-0 Audit"
+
+on:
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Which test do you want to run?'
+        required: true
+        type: choice
+        options:
+          - 'Everything (the full audit)'
+          - 'Quick check (2 min, no internet needed)'
+          - 'What is actually built vs what the docs claim'
+          - 'Recommendations: can a user see them and pick one?'
+          - 'Building: can it build, test and ship an app safely?'
+          - 'Live site: is GA4, Stripe and SEO actually working?'
+          - 'Data: is engagement and revenue being collected?'
+          - 'Maths: is the scoring and learning correct?'
+          - 'Where does the whole loop break?'
+        default: 'Everything (the full audit)'
+
+      prod_url:
+        description: 'Live site to test against'
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+
+      issue_number:
+        description: 'Post to an existing tracking issue (leave blank to open a new one)'
+        required: false
+        type: string
+
+env:
+  PYTHON_VERSION: '3.12'
+  BUSINESS_VENTURES_REPO: 'James-M-Fleming-985/business_ventures'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: "Audit Baseline 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: "📥 Checkout control_tower"
+        uses: actions/checkout@v4
+        with:
+          path: control_tower
+
+      # Without this, every "not implemented" finding is meaningless - the code
+      # may simply live in the other repo. The audit reports that caveat loudly.
+      - name: "📥 Checkout business_ventures (read-only)"
+        id: checkout_bv
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.BUSINESS_VENTURES_REPO }}
+          token: ${{ secrets.CROSS_REPO_PAT }}
+          path: business_ventures
+          fetch-depth: 1
+
+      - name: "⚠️ Warn if business_ventures is unavailable"
+        if: steps.checkout_bv.outcome != 'success'
+        run: |
+          echo "::warning title=Single-repo audit::business_ventures could not be checked out." \
+               "Absence findings will be marked unreliable. Check the CROSS_REPO_PAT secret."
+
+      - name: "🐍 Set up Python ${{ env.PYTHON_VERSION }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: "📦 Install audit dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml psycopg2-binary google-analytics-data
+
+      - name: "📝 Open or reuse the tracking issue"
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.issue_number }}" ]; then
+            NUMBER="${{ inputs.issue_number }}"
+          else
+            # The title is what you see on the phone lock screen, so name the test.
+            TITLE="${{ inputs.test }} — $(date -u '+%d %b %H:%M') UTC"
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            BODY_FILE=$(mktemp)
+            {
+              echo "Running: **${{ inputs.test }}**"
+              echo ""
+              echo "You'll get one comment here when it finishes, saying plainly whether"
+              echo "anything is broken. No news until then means it's still running."
+              echo ""
+              echo "**Live run:** $RUN_URL"
+            } > "$BODY_FILE"
+            URL=$(gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "$TITLE" \
+              --body-file "$BODY_FILE")
+            NUMBER="${URL##*/}"
+          fi
+
+          # The issue is opened by github-actions[bot], so the human is NOT subscribed
+          # by default and would receive no progress alerts. Assigning them subscribes them.
+          if [ -n "${{ inputs.notify_user }}" ]; then
+            gh issue edit "$NUMBER" --repo "${{ github.repository }}" \
+              --add-assignee "${{ inputs.notify_user }}" \
+              || echo "::warning title=No phone alerts::Could not assign ${{ inputs.notify_user }} — progress comments will not notify anyone."
+          fi
+
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "Tracking issue #$NUMBER"
+
+      - name: "🔍 Run the audit"
+        working-directory: control_tower
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_CREDENTIALS_JSON: ${{ secrets.GA4_CREDENTIALS_JSON }}
+        run: |
+          # Translate the plain-English choice into audit arguments.
+          OFFLINE_ARG=""
+          case "${{ inputs.test }}" in
+            "Quick check"*)        SELECT="--module discovery"; OFFLINE_ARG="--offline" ;;
+            "What is actually"*)   SELECT="--module discovery" ;;
+            "Recommendations:"*)   SELECT="--module recommendation-engine" ;;
+            "Building:"*)          SELECT="--module build-pipeline" ;;
+            "Live site:"*)         SELECT="--module integrations" ;;
+            "Data:"*)              SELECT="--module measurement" ;;
+            "Maths:"*)             SELECT="--module learning" ;;
+            "Where does"*)         SELECT="--module canary" ;;
+            *)                     SELECT="--module everything" ;;
+          esac
+
+          PYTHONPATH=scripts python -m baseline0_audit \
+            --control-tower . \
+            --business-ventures ../business_ventures \
+            --prod-url "${{ inputs.prod_url }}" \
+            --output "$GITHUB_WORKSPACE/audit_results" \
+            --report "$GITHUB_WORKSPACE/BASELINE0_AUDIT_REPORT.md" \
+            --issue "${{ steps.issue.outputs.number }}" \
+            --label "${{ inputs.test }}" \
+            $SELECT $OFFLINE_ARG
+
+      - name: "📊 Publish the report to the run summary"
+        if: always()
+        run: |
+          if [ -f BASELINE0_AUDIT_REPORT.md ]; then
+            cat BASELINE0_AUDIT_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Audit produced no report — see the job log" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: "📎 Upload report and per-stage results"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline0-audit-${{ github.run_id }}
+          path: |
+            BASELINE0_AUDIT_REPORT.md
+            audit_results/
+          retention-days: 30
+          if-no-files-found: warn
+
+      # The audit posts its own plain-English verdict when it finishes. This step is
+      # the safety net for the case where it never got that far (timeout, crash,
+      # cancellation) - otherwise the phone would stay silent and you'd learn nothing.
+      - name: "🔔 Tell me if the audit never finished"
+        if: always() && hashFiles('BASELINE0_AUDIT_REPORT.md') == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY_FILE=$(mktemp)
+          {
+            echo "## ⚠️ Needs you — the audit stopped before finishing"
+            echo ""
+            echo "No report was produced, so it was cut short (timeout, crash or cancellation)"
+            echo "rather than finding problems. Nothing was changed."
+            echo ""
+            echo "[Open the run log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$BODY_FILE"
+          gh issue comment "${{ steps.issue.outputs.number }}" \
+            --repo "${{ github.repository }}" --body-file "$BODY_FILE"
