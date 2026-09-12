@@ -109,7 +109,7 @@ def _claim_ledger(ctx: AuditContext) -> StageResult:
         control / "Causal_Affect_Scaling_Plan.yaml",
         control / "CAUSAL_AFFECT_GOALS_IMPLEMENTATION_PLAN.yaml",
     ]
-    claims: list[tuple[str, str]] = []  # (identifier, source file)
+    claims: list[tuple[str, object, str]] = []  # (identifier, node, source file)
     for src in sources:
         if not src.is_file():
             continue
@@ -118,8 +118,8 @@ def _claim_ledger(ctx: AuditContext) -> StageResult:
         except yaml.YAMLError as exc:
             result.evidence.append(f"Could not parse {src.name}: {exc}")
             continue
-        for ident in _walk_claims(data):
-            claims.append((ident, src.name))
+        for ident, node in _walk_claims(data):
+            claims.append((ident, node, src.name))
 
     if not claims:
         result.status = Status.SKIPPED
@@ -127,15 +127,15 @@ def _claim_ledger(ctx: AuditContext) -> StageResult:
         return result
 
     verified, unverified = [], []
-    for ident, source in claims[:60]:
-        token = re.escape(ident.strip())
-        if len(token) < 4:
-            continue
-        found = ctx.search(token, max_per_repo=2)
-        if found.of_kind("code", "test"):
-            verified.append(f"{ident} ({source}) → code found in {', '.join(found.repos_with_hits)}")
+    for ident, node, source in claims[:60]:
+        detail = _verify_claim(ctx, ident, node)
+        if detail:
+            verified.append(f"{ident} ({source}) → {detail}")
         else:
-            unverified.append(f"{ident} ({source}) → claimed COMPLETE, no code found in either repo")
+            unverified.append(
+                f"{ident} ({source}) → could not be confirmed automatically; "
+                f"no named file and no distinctive keyword found in code"
+            )
 
     result.evidence.append(f"{len(verified)} of {len(verified) + len(unverified)} claims backed by code")
     if len(claims) > len(verified) + len(unverified):
@@ -146,11 +146,85 @@ def _claim_ledger(ctx: AuditContext) -> StageResult:
     result.evidence.extend(verified)
     result.missing.extend(unverified)
     if unverified:
-        result.status = Status.PARTIAL if verified else Status.FAIL
+        # Never FAIL here. Not finding a phrase is not evidence of absence, and this
+        # stage gates the phases — a weak signal must not block a whole run.
+        result.status = Status.PARTIAL
         result.summary = (
-            f"{len(unverified)} item(s) marked COMPLETE have no corresponding code in either repo."
+            f"{len(unverified)} item(s) marked COMPLETE could not be confirmed automatically. "
+            f"Treat these as unproven, not as missing — check them by hand before acting."
         )
     return result
+
+
+# Words too generic to prove anything if they appear in source.
+_CLAIM_STOPWORDS = {
+    "add", "auto", "automatic", "build", "complete", "create", "data", "done",
+    "engine", "feature", "framework", "from", "generate", "implement", "integrate",
+    "integration", "into", "layer", "main", "make", "model", "module", "phase",
+    "pipeline", "project", "scaffold", "service", "setup", "support", "system",
+    "test", "tests", "that", "this", "update", "upgrade", "via", "with", "wire",
+    "wiring", "work", "trigger", "class", "method", "function", "config",
+}
+
+
+def _claim_keywords(*texts: str) -> list[str]:
+    """Proper nouns and acronyms only — FRED, GDELT, Railway, Granger, ARIMA.
+
+    Plans capitalise the things that name real components. Lowercase words like
+    "economic" or "change" match some file somewhere in any large repo, so accepting
+    them would confirm every claim regardless of the truth.
+    """
+    seen: list[str] = []
+    for text in texts:
+        for token in re.split(r"[^A-Za-z0-9_]+", text or ""):
+            low = token.lower()
+            if len(low) < 4 or low in _CLAIM_STOPWORDS or low in seen:
+                continue
+            if token.islower():
+                continue
+            seen.append(low)
+    return seen[:5]
+
+
+def _verify_claim(ctx: AuditContext, ident: str, node) -> str | None:
+    """Verify by the files a claim names, or by a keyword matching a real filename.
+
+    The old check searched source for the claim's own identifier — planning IDs and
+    prose that by definition never appear in code — so everything looked unbacked.
+    Searching file *contents* for keywords replaces that with the opposite error:
+    generic words like "rate" or "repo" match everywhere and prove nothing. Only two
+    signals are worth acting on, and both are structural.
+    """
+    declared: list[str] = []
+    if isinstance(node, dict):
+        for key in ("file", "files", "reference", "entry_point"):
+            value = node.get(key)
+            if isinstance(value, str):
+                declared.append(value)
+            elif isinstance(value, list):
+                declared.extend(str(v) for v in value)
+
+    for raw in declared:
+        # Entries look like "services/stripe_service.py (add build_id)" — take the path.
+        candidate = raw.split("(")[0].strip().strip("`")
+        name = Path(candidate).name
+        if not name or "." not in name:
+            continue
+        hits = ctx.find_files(re.escape(name) + r"$")
+        if hits:
+            return f"named file `{name}` exists in {', '.join(sorted({h.repo for h in hits}))}"
+
+    task = node.get("task", "") if isinstance(node, dict) else ""
+    for keyword in _claim_keywords(ident, task):
+        hits = ctx.find_files(rf"[^a-z0-9]{re.escape(keyword)}[^a-z0-9]")
+        code_hits = [h for h in hits if h.kind in ("code", "test")]
+        if code_hits:
+            example = code_hits[0]
+            return (
+                f"`{keyword}` names real code — {example.path} in {example.repo}"
+                + (f" (+{len(code_hits) - 1} more)" if len(code_hits) > 1 else "")
+            )
+    return None
 
 
 def _walk_claims(node, depth: int = 0):
@@ -171,7 +245,7 @@ def _walk_claims(node, depth: int = 0):
                 None,
             )
             if ident:
-                yield ident
+                yield ident, node
         for value in node.values():
             yield from _walk_claims(value, depth + 1)
     elif isinstance(node, list):
