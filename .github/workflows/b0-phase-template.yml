@@ -118,6 +118,7 @@ jobs:
           echo "Committed to ${{ steps.setup.outputs.branch }}"
 
       - name: "⚖️ Test, gate, merge, verify and report"
+        id: gate
         uses: ./.github/actions/b0-gate
         with:
           phase: ${{ inputs.phase }}
@@ -137,10 +138,10 @@ jobs:
           ga4_property_id: ${{ secrets.GA4_PROPERTY_ID }}
           ga4_credentials_json: ${{ secrets.GA4_CREDENTIALS_JSON }}
 
-      # The gate posts its own verdict. This is the safety net for the case where the
-      # job died before reaching it — otherwise the phone stays silent.
+      # Only for a crash outside the gate. A failed gate has already published a
+      # full report, and a second "it never finished" alert would contradict it.
       - name: "🔔 Tell me if the phase never finished"
-        if: failure()
+        if: failure() && steps.gate.outcome != 'failure'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

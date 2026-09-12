@@ -49,6 +49,7 @@ EXCLUDE_DIRS = {
     ".git", ".github/workflows/cache", "node_modules", "__pycache__", ".venv", "venv",
     "env", "dist", "build", ".pytest_cache", ".mypy_cache", "site-packages",
     ".next", "coverage", "htmlcov", ".ruff_cache", "vendor", ".cache",
+    "baseline0_audit",  # the audit tool itself: its own detection patterns are not findings
 }
 
 CODE_EXT = {".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".sql", ".go", ".rb", ".java"}

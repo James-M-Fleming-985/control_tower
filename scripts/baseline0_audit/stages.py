@@ -84,6 +84,11 @@ def _repo_inventory(ctx: AuditContext) -> StageResult:
 _COMPLETE_WORDS = {"complete", "completed", "done", "implemented", "shipped", "✅"}
 _STATUS_KEYS = {"status", "state", "completion", "progress"}
 
+# Paths whose whole purpose is to carry a placeholder — flagging them is noise.
+_PLACEHOLDER_BY_DESIGN = re.compile(
+    r"(^|/)(templates?|specs?|examples?|fixtures?|generated-mvp|docs?)/", re.IGNORECASE
+)
+
 
 def _claim_ledger(ctx: AuditContext) -> StageResult:
     """Every 'COMPLETE' claim in the planning YAML is verified against code."""
@@ -186,12 +191,31 @@ def _static_health(ctx: AuditContext) -> StageResult:
         r"G-XXXXXXXXXX", r"G-ABC123DEF4", r"your[-_]api[-_]key", r"REPLACE[-_]ME",
         r"sk_live_[A-Za-z0-9]", max_per_repo=30,
     )
-    if placeholders.all_hits:
+
+    # Baseline 0 says "no placeholders in PRODUCTION". Three things legitimately
+    # contain them and are not defects: the tooling repo, files whose job is to
+    # document the format, and prose describing the rule itself.
+    defects = [
+        h for h in placeholders.all_hits
+        if h.repo != "control_tower"
+        and h.kind == "code"
+        and not _PLACEHOLDER_BY_DESIGN.search(h.path)
+    ]
+    excused = len(placeholders.all_hits) - len(defects)
+
+    if defects:
         result.status = Status.FAIL
-        result.missing = [h.render() for h in placeholders.all_hits]
-        result.summary = f"{len(placeholders.all_hits)} placeholder/secret-shaped value(s) found in source."
+        result.missing = [h.render() for h in defects]
+        result.summary = (
+            f"{len(defects)} placeholder/secret-shaped value(s) found in production code."
+        )
     else:
-        result.evidence.append("No placeholder analytics IDs or live-key literals found")
+        result.evidence.append("No placeholder analytics IDs or live-key literals in production code")
+    if excused:
+        result.evidence.append(
+            f"{excused} match(es) ignored: templates, specs, docs or the tooling repo, "
+            f"where a placeholder is the intended content"
+        )
     return result
 
 

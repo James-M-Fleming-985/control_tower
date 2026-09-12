@@ -199,6 +199,7 @@ jobs:
 
       # ---------------------------------------------------------------- gate
       - name: "⚖️ Test, gate, merge, verify and report"
+        id: gate
         uses: ./.github/actions/b0-gate
         with:
           phase: W0
@@ -216,8 +217,10 @@ jobs:
           ga4_property_id: ${{ secrets.GA4_PROPERTY_ID }}
           ga4_credentials_json: ${{ secrets.GA4_CREDENTIALS_JSON }}
 
+      # Only for a crash outside the gate. A failed gate has already published a
+      # full report, and a second "it never finished" alert would contradict it.
       - name: "🔔 Tell me if W0 never finished"
-        if: failure()
+        if: failure() && steps.gate.outcome != 'failure'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

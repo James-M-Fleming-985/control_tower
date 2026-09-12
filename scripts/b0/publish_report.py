@@ -145,12 +145,12 @@ def post_comment(repo: str, issue: str, body: str) -> None:
 
 
 def create_gist(report: Path, name: str, description: str) -> tuple[str, str]:
-    """Secret gist — unlisted URL, renders on mobile, no length cap."""
+    """Gists are secret unless --public is passed: unlisted URL, renders on mobile."""
     tmpdir = Path(tempfile.mkdtemp())
     try:
         staged = tmpdir / name
         shutil.copyfile(report, staged)
-        url = gh("gist", "create", str(staged), "--secret", "--desc", description)
+        url = gh("gist", "create", str(staged), "--desc", description)
         url = url.splitlines()[-1].strip()
         return url, url.rsplit("/", 1)[-1]
     finally:

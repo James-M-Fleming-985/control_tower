@@ -91,14 +91,28 @@ runs:
       working-directory: target_repo
       run: |
         set +e
-        if [ ! -d "${{ inputs.test_path }}" ]; then
-          echo "::warning title=No tests::${{ inputs.test_path }} not found in target repo"
-          echo '{"run":0,"passed":0,"failed":0,"failures":[],"note":"no test directory"}' \
-            > "$GITHUB_WORKSPACE/test_facts.json"
-          echo "result=skipped" >> "$GITHUB_OUTPUT"
-          exit 0
+        # business_ventures keeps tests at the root, not under tests/, so fall back
+        # to letting pytest discover them rather than reporting "no tests".
+        TARGET="${{ inputs.test_path }}"
+        if [ ! -d "$TARGET" ]; then
+          for candidate in tests test src/tests; do
+            if [ -d "$candidate" ]; then TARGET="$candidate"; break; fi
+          done
         fi
-        python -m pytest "${{ inputs.test_path }}" -q \
+        if [ ! -d "$TARGET" ]; then
+          if ls test_*.py *_test.py >/dev/null 2>&1 || [ -f pytest.ini ] || [ -f setup.cfg ]; then
+            TARGET="."
+            echo "No test directory; discovering tests from the repository root"
+          else
+            echo "::warning title=No tests::no tests found anywhere in the target repo"
+            echo '{"run":0,"passed":0,"failed":0,"failures":[],"note":"no tests found in target repo"}' \
+              > "$GITHUB_WORKSPACE/test_facts.json"
+            echo "result=skipped" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+        fi
+        echo "Running pytest against: $TARGET"
+        python -m pytest "$TARGET" -q \
           --json-report --json-report-file="$GITHUB_WORKSPACE/pytest.json"
         CODE=$?
         python - <<'PY'
