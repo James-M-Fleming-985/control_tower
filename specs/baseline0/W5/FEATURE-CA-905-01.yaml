@@ -1,0 +1,88 @@
+# ====================================================================================
+# FEATURE: Performance Dashboard and Scoring
+# ====================================================================================
+# Baseline-0 phase W5. Links B12 and B13. Outstanding item M2-OA-17.
+#
+# Shows how each deployed app is doing, and gets the arithmetic right. Read-only
+# throughout: evidence is exposed, never turned into an approval gate.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-905-01"
+  requirement_id: "FEATURE-CA-905-01"
+  feature_name: "Performance Dashboard and Scoring"
+  requirement_name: "Performance Dashboard and Scoring"
+  feature_code: "CA-905-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B12", "B13"]
+  outstanding_items: ["M2-OA-17"]
+
+overview:
+  description: |
+    Implement the performance score — revenue 40, engagement 30, conversion 20,
+    retention 10 — with its edge cases properly handled, surface a per-app performance
+    view, and extend the Program Baseline panel with the quality against engagement and
+    revenue scatter plus a correlation summary.
+
+  business_value:
+    - "A single comparable number per app, so the winner is unambiguous"
+    - "Edge cases tested, so early builds with no traffic do not distort the ranking"
+    - "Shows whether build quality actually predicts commercial outcome"
+
+  user_story: |
+    As the owner, I want to see which deployed app is performing best and why, so that
+    I can iterate the right one.
+
+  acceptance_criteria:
+    - "The score uses weights of 40, 30, 20 and 10 and they sum to 100"
+    - "Zero traffic, zero revenue and missing telemetry all produce a defined score"
+    - "No division by zero is possible in any component"
+    - "Each deployed app has a performance view showing its components"
+    - "The Program Baseline panel shows quality against engagement and revenue"
+    - "Every surface is read-only and introduces no approval step"
+
+layers:
+  - layer_id: "LAYER-CA-905-01-01"
+    name: "Performance Scorer"
+    folder: "LAYER_CA_905_01_01_Performance_Scorer"
+    responsibility: "The weighted score and its edge cases"
+    technology: "Python"
+    requirement_file: "LAYER-CA-905-01-01_performance_scorer.yaml"
+    requirements:
+      - "LAYER-CA-905-01-01"
+
+  - layer_id: "LAYER-CA-905-01-02"
+    name: "Program Baseline Panel"
+    folder: "LAYER_CA_905_01_02_Program_Baseline_Panel"
+    responsibility: "Per-app performance view and the quality-outcome scatter"
+    technology: "FastAPI, Jinja2, vanilla JS"
+    requirement_file: "LAYER-CA-905-01-02_program_baseline_panel.yaml"
+    requirements:
+      - "LAYER-CA-905-01-02"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "performance"
+  module_name: "performance_service"
+  endpoint_prefix: "/api/performance"
+  operations:
+    - name: "get_app_performance"
+      http_method: "get"
+      path: "/apps/{build_id}"
+      orchestrator_method: "get_app_performance"
+      description: "Score and components for one deployed app"
+    - name: "get_quality_outcomes"
+      http_method: "get"
+      path: "/baselines/quality-outcomes"
+      orchestrator_method: "get_quality_outcomes"
+      description: "Quality against engagement and revenue, with correlation summary"
+
+integration_scenarios:
+  - "An app with telemetry shows a score and its four components"
+  - "An app with no telemetry shows a defined score and a clear reason"
+
+e2e_scenarios:
+  - "Open the Performance tab and rank deployed apps by score"

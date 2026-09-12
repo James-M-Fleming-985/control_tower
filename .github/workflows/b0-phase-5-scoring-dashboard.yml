@@ -1,0 +1,59 @@
+# ============================================================
+# W5 — PERFORMANCE DASHBOARD & SCORING  (Baseline-0 links B12, B13)
+# ============================================================
+# Shows the user how each deployed app is doing, and gets the maths right.
+#
+# Adds the per-app performance surface, implements the scoring weights the CA-002
+# spec requires — revenue 40, engagement 30, conversion 20, retention 10 — with the
+# edge cases actually tested (no traffic, no revenue, missing telemetry, division by
+# zero), and extends the Program Baseline panel with the quality against engagement
+# and revenue scatter (M2-OA-17). Read-only: no approval gates.
+#
+# Requires W4: a dashboard with no telemetry behind it shows zeroes.
+
+name: "🅆5 Baseline-0 · Performance Dashboard & Scoring"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate specs, no AI generation, no changes'
+        required: false
+        type: boolean
+        default: true
+      budget_minutes:
+        description: 'Soft time budget in minutes'
+        required: false
+        type: number
+        default: 35
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  phase:
+    uses: ./.github/workflows/b0-phase-template.yml
+    secrets: inherit
+    with:
+      phase: W5
+      title: "Performance Dashboard & Scoring"
+      module: phase-5
+      budget_minutes: ${{ inputs.budget_minutes }}
+      prod_url: ${{ inputs.prod_url }}
+      dry_run: ${{ inputs.dry_run }}
+      notify_user: ${{ inputs.notify_user }}
+      issue_number: ${{ inputs.issue_number }}

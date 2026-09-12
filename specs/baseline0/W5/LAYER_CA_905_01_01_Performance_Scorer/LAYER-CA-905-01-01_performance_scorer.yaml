@@ -1,0 +1,108 @@
+# ================================================================================
+# LAYER: Performance Scorer   (LAYER-CA-905-01-01)
+# Feature: FEATURE-CA-905-01 Performance Dashboard and Scoring
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-905-01-01"
+  requirement_title: "Performance Scorer"
+  layer: "LAYER_CA_905_01_01_Performance_Scorer"
+  feature: "FEATURE-CA-905-01_performance_dashboard_and_scoring"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Performance Scorer"
+
+  description: |
+    Compute a single performance score per deployed app from four normalised
+    components — revenue at 40 percent, engagement at 30, conversion at 20 and
+    retention at 10 — returning both the score and the components that produced it.
+
+  rationale: |
+    The weights are fixed by specification, so the risk is not the formula but the
+    inputs: early builds routinely have zero sessions, zero revenue or no telemetry at
+    all, and every one of those is a division waiting to happen. A score that silently
+    becomes NaN or infinity ranks a dead app above a working one, which then gets
+    iterated. Returning the components alongside the total is what makes a surprising
+    ranking explainable rather than merely surprising.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Use weights of exactly 40, 30, 20 and 10, asserted to sum to 100"
+    - "Guard every denominator before dividing"
+    - "Return the component values alongside the total"
+    - "Treat missing telemetry as a defined zero-score state, flagged as such"
+  must_not:
+    - "Return NaN, infinity or None as a score"
+    - "Silently substitute a default when a component is genuinely unknown"
+    - "Change the weights at runtime"
+
+specification:
+  structure:
+    entry_point: "services/performance_service.py"
+    modules:
+      - "services/performance_service.py — scoring"
+      - "tests/test_performance_scorer.py — unit tests including every edge case"
+
+  implementation_details:
+    libraries: []
+    patterns: ["Pure function scoring", "Explicit guard clauses"]
+    error_handling:
+      - error_type: "MissingTelemetry"
+        handling: "Return a zero score flagged as unmeasured, not an error"
+      - error_type: "ZeroDenominator"
+        handling: "Return zero for that component and record why"
+
+  inputs:
+    - name: "telemetry"
+      type: "dict"
+      description: "One build's engagement and revenue"
+      example: '{"sessions": 120, "revenue_gbp": 27.0, "conversions": 3, "returning": 18}'
+
+  outputs:
+    - name: "score"
+      type: "dict"
+      description: "Total score and its four components"
+      example: '{"total": 61.4, "revenue": 24.0, "engagement": 21.0, "conversion": 12.4, "retention": 4.0}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "The weights are 40, 30, 20 and 10 and sum to 100"
+  - criterion_id: "AC-002"
+    description: "Zero sessions produce a defined score with no division by zero"
+  - criterion_id: "AC-003"
+    description: "Zero revenue produces a defined score"
+  - criterion_id: "AC-004"
+    description: "Missing telemetry returns a zero score flagged as unmeasured"
+  - criterion_id: "AC-005"
+    description: "The score is never NaN, infinity or None"
+  - criterion_id: "AC-006"
+    description: "Component values are returned with the total"
+  - criterion_id: "AC-007"
+    description: "Identical inputs always produce an identical score"
+
+test_scenarios:
+  - name: "weights_sum_to_one_hundred"
+    given: "The scorer configuration"
+    when: "The weights are summed"
+    then: "The total is exactly 100"
+  - name: "zero_traffic_is_safe"
+    given: "A build with zero sessions and zero revenue"
+    when: "The score is computed"
+    then: "It returns zero without raising or producing NaN"
+  - name: "missing_telemetry_is_flagged"
+    given: "A build with no telemetry row"
+    when: "The score is computed"
+    then: "A zero score is returned, flagged as unmeasured"
+  - name: "scoring_is_deterministic"
+    given: "The same telemetry twice"
+    when: "The score is computed twice"
+    then: "Both results are identical"

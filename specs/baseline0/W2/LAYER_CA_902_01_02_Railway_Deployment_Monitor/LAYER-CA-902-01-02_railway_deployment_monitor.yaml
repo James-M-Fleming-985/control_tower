@@ -1,0 +1,102 @@
+# ================================================================================
+# LAYER: Railway Deployment Monitor   (LAYER-CA-902-01-02)
+# Feature: FEATURE-CA-902-01 Ship and Deploy
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-902-01-02"
+  requirement_title: "Railway Deployment Monitor"
+  layer: "LAYER_CA_902_01_02_Railway_Deployment_Monitor"
+  feature: "FEATURE-CA-902-01_ship_and_deploy"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Railway Deployment Monitor"
+
+  description: |
+    Create the Railway project and service for a pushed build, then poll the deploy
+    until it reaches a terminal state. Probe the resulting URL and record it on the
+    ProductDeployment row only once it responds successfully. Record failures as
+    failures, with no URL.
+
+  rationale: |
+    The current flow provisions Railway and assumes the rest. A URL recorded without
+    ever being fetched is the most expensive kind of wrong: every downstream stage
+    treats the app as live, and the first thing to notice is a revenue report full of
+    zeroes with no explanation. Verifying once at the source prevents that.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Poll the Railway deployment until SUCCESS, FAILED or a timeout"
+    - "Probe the deployed URL and require a 2xx or 3xx before recording it"
+    - "Record a failed deploy with its status and no URL"
+    - "Use RAILWAY_TOKEN from the environment, never a literal"
+  must_not:
+    - "Record a deployment URL that was never fetched"
+    - "Poll forever — apply a bounded timeout"
+    - "Write to the Causal Affect production project"
+
+specification:
+  structure:
+    entry_point: "services/railway_service.py"
+    modules:
+      - "services/railway_service.py — provisioning and deploy polling"
+      - "models.py — ProductDeployment status and verified_at fields"
+      - "tests/test_railway_deployment_monitor.py — unit tests with a stubbed API"
+
+  implementation_details:
+    libraries: ["requests"]
+    patterns: ["Polling with bounded backoff", "Service Layer Pattern"]
+    error_handling:
+      - error_type: "DeploymentTimeout"
+        handling: "Mark the deployment failed, record elapsed time, record no URL"
+      - error_type: "RailwayAPIError"
+        handling: "Retry a bounded number of times, then record failure"
+
+  inputs:
+    - name: "build"
+      type: "dict"
+      description: "A build already pushed to GitHub"
+      example: '{"build_id": 42, "repository_url": "https://github.com/owner/mvp-42"}'
+
+  outputs:
+    - name: "deployment"
+      type: "dict"
+      description: "Deployment state and the verified URL, if any"
+      example: '{"status": "LIVE", "url": "https://mvp-42.up.railway.app", "verified_at": "2026-09-12T10:00:00Z"}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "The Railway project and service are created for a pushed build"
+  - criterion_id: "AC-002"
+    description: "The deploy is polled to a terminal state within a bounded timeout"
+  - criterion_id: "AC-003"
+    description: "A URL is recorded only after it returns a successful response"
+  - criterion_id: "AC-004"
+    description: "A failed deploy is recorded as failed with no URL"
+  - criterion_id: "AC-005"
+    description: "The Railway token is read from the environment only"
+  - criterion_id: "AC-006"
+    description: "ProductDeployment is created automatically on a live deploy"
+
+test_scenarios:
+  - name: "live_deploy_records_verified_url"
+    given: "A deploy that succeeds and serves traffic"
+    when: "The monitor polls it"
+    then: "The URL is recorded with a verification timestamp"
+  - name: "failed_deploy_records_no_url"
+    given: "A deploy that ends in FAILED"
+    when: "The monitor polls it"
+    then: "The deployment is marked failed and no URL is stored"
+  - name: "timeout_is_bounded"
+    given: "A deploy that never reaches a terminal state"
+    when: "The monitor polls it"
+    then: "Polling stops at the timeout and the deployment is marked failed"

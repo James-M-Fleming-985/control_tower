@@ -1,0 +1,97 @@
+# ================================================================================
+# LAYER: SEO Metadata Emitter   (LAYER-CA-903-01-03)
+# Feature: FEATURE-CA-903-01 GA4, Stripe and SEO
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-903-01-03"
+  requirement_title: "SEO Metadata Emitter"
+  layer: "LAYER_CA_903_01_03_SEO_Metadata_Emitter"
+  feature: "FEATURE-CA-903-01_ga4_stripe_and_seo"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "SEO Metadata Emitter"
+
+  description: |
+    Emit the search metadata block in every generated application: a descriptive title
+    and meta description derived from the originating recommendation, canonical URL,
+    Open Graph and Twitter card tags, JSON-LD structured data, a lang attribute, a
+    viewport tag, robots.txt and sitemap.xml.
+
+  rationale: |
+    The opportunity score that justified building the app assumes people can find it.
+    Generated apps get no organic traffic by default, which makes the engagement half
+    of the scoring model measure nothing but luck. Deriving the copy from the
+    recommendation keeps it specific rather than boilerplate.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Derive title and description from the originating recommendation"
+    - "Emit canonical, Open Graph, Twitter card and JSON-LD tags"
+    - "Serve robots.txt and sitemap.xml"
+    - "Set the html lang attribute and a viewport meta tag"
+  must_not:
+    - "Emit generic placeholder copy such as 'My App'"
+    - "Block indexing in robots.txt"
+
+specification:
+  structure:
+    entry_point: "services/seo_service.py"
+    modules:
+      - "services/seo_service.py — metadata construction"
+      - "services/ai_code_generator_orchestrator.py — template injection"
+      - "tests/test_seo_metadata.py — unit tests"
+
+  implementation_details:
+    libraries: ["Jinja2"]
+    patterns: ["Template injection at generation time"]
+    error_handling:
+      - error_type: "MissingRecommendationCopy"
+        handling: "Fall back to the spec title; never emit placeholder copy"
+
+  inputs:
+    - name: "recommendation"
+      type: "dict"
+      description: "The recommendation that caused the build"
+      example: '{"title": "Regional energy price tracker", "market": "UK SME"}'
+
+  outputs:
+    - name: "seo_block"
+      type: "str"
+      description: "Head metadata plus structured data for the generated app"
+      example: "<title>…</title><meta name=\"description\" …><script type=\"application/ld+json\">"
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Title and meta description are present and derived from the recommendation"
+  - criterion_id: "AC-002"
+    description: "Canonical, Open Graph and Twitter card tags are present"
+  - criterion_id: "AC-003"
+    description: "JSON-LD structured data is present and parses"
+  - criterion_id: "AC-004"
+    description: "robots.txt and sitemap.xml are served and permit indexing"
+  - criterion_id: "AC-005"
+    description: "The html lang attribute and viewport meta tag are present"
+
+test_scenarios:
+  - name: "metadata_is_specific"
+    given: "A recommendation with a title"
+    when: "The SEO block is generated"
+    then: "The title and description reflect it, not a placeholder"
+  - name: "structured_data_parses"
+    given: "A generated page"
+    when: "The JSON-LD block is parsed"
+    then: "It is valid JSON with a recognised type"
+  - name: "indexing_is_allowed"
+    given: "A deployed app"
+    when: "robots.txt is fetched"
+    then: "It exists and does not disallow crawling"

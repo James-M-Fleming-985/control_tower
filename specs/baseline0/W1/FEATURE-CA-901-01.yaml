@@ -1,0 +1,89 @@
+# ====================================================================================
+# FEATURE: Test Gate and Verification
+# ====================================================================================
+# Baseline-0 phase W1. Links B3 and B4. Outstanding items M2-OA-02 and M2-OA-18.
+#
+# B4 is the link the audit currently reports as broken: the shipping workflow pushes
+# generated code without proving it passes its own tests first. Everything downstream
+# — deployment, telemetry, scoring, learning — is measuring noise until this holds.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-901-01"
+  requirement_id: "FEATURE-CA-901-01"
+  feature_name: "Test Gate and Verification"
+  requirement_name: "Test Gate and Verification"
+  feature_code: "CA-901-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B3", "B4"]
+  outstanding_items: ["M2-OA-02", "M2-OA-18"]
+
+overview:
+  description: |
+    Implement the VERIFICATION phase of the AI code generator and make the MVP builder
+    refuse to ship code that fails its acceptance criteria. Generated builds carry a
+    traceability bundle; builds whose criteria still fail after two automatic REFACTOR
+    attempts are blocked from deployment rather than shipped and hoped for.
+
+  business_value:
+    - "Stops broken apps reaching production, where they poison every downstream metric"
+    - "Produces read-only evidence per build, without inserting a human approval gate"
+    - "Records failure reasons, which the learning loop needs to improve prompts"
+
+  user_story: |
+    As the owner, I want the pipeline to refuse to ship code that fails its own tests,
+    so that a live URL means something.
+
+  acceptance_criteria:
+    - "Tests execute before the GitHub push, and a failing test suite prevents the push"
+    - "Every build emits a five-file verification bundle with REQ-AC traceability"
+    - "Failing acceptance criteria trigger up to two REFACTOR retries automatically"
+    - "A build still failing after retries is marked blocked, with no deployment URL"
+    - "verification_status, verification_artifacts_url and failure_reason persist on MVPBuild"
+    - "A deliberately failing generated app produces no push and no deployment"
+
+layers:
+  - layer_id: "LAYER-CA-901-01-01"
+    name: "Verification Engine"
+    folder: "LAYER_CA_901_01_01_Verification_Engine"
+    responsibility: "Run the VERIFICATION phase and emit the traceability bundle"
+    technology: "Python, PyYAML, pytest"
+    requirement_file: "LAYER-CA-901-01-01_verification_engine.yaml"
+    requirements:
+      - "LAYER-CA-901-01-01"
+
+  - layer_id: "LAYER-CA-901-01-02"
+    name: "Pre Push Test Gate"
+    folder: "LAYER_CA_901_01_02_Pre_Push_Test_Gate"
+    responsibility: "Block push and deployment when tests or criteria fail"
+    technology: "Python, GitHub API"
+    requirement_file: "LAYER-CA-901-01-02_pre_push_test_gate.yaml"
+    requirements:
+      - "LAYER-CA-901-01-02"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "verification"
+  module_name: "verification_engine"
+  endpoint_prefix: "/api/builds"
+  operations:
+    - name: "get_build_evidence"
+      http_method: "get"
+      path: "/{build_id}/evidence"
+      orchestrator_method: "get_verification_artifacts"
+      description: "Read-only evidence bundle for a build — a link, never an approval gate"
+    - name: "get_build_status"
+      http_method: "get"
+      path: "/{build_id}/verification"
+      orchestrator_method: "get_verification_status"
+      description: "Verification status and failure reason for a build"
+
+integration_scenarios:
+  - "A passing build produces artefacts and a repository URL"
+  - "A failing build produces artefacts, a blocked status and no repository URL"
+
+e2e_scenarios:
+  - "Generate an app whose tests fail, and confirm nothing is pushed or deployed"

@@ -173,15 +173,53 @@ jobs:
             --prod-url "${{ inputs.prod_url }}" \
             --output "$GITHUB_WORKSPACE/audit_results" \
             --report "$GITHUB_WORKSPACE/BASELINE0_AUDIT_REPORT.md" \
+            --verdict-out "$GITHUB_WORKSPACE/VERDICT.md" \
+            --no-verdict-comment \
             --issue "${{ steps.issue.outputs.number }}" \
             --label "${{ inputs.test }}" \
             $SELECT $OFFLINE_ARG
+
+      # The verdict alone used to be all that reached the issue, which is why reports
+      # looked half-finished. This posts the whole thing and fails if any of it is lost.
+      - name: "📣 Publish the report in full"
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ ! -f BASELINE0_AUDIT_REPORT.md ]; then
+            echo "No report to publish"
+            exit 0
+          fi
+          if grep -q '❌\|💥' VERDICT.md 2>/dev/null; then
+            HEADLINE="🔴 ${{ inputs.test }} — something is broken, needs you"
+            FAILED="--failed"
+          else
+            HEADLINE="✅ ${{ inputs.test }} — nothing broken, nothing needs you"
+            FAILED=""
+          fi
+          PYTHONPATH=control_tower/scripts python -m b0.publish_report \
+            --report BASELINE0_AUDIT_REPORT.md \
+            --repo "${{ github.repository }}" \
+            --issue "${{ steps.issue.outputs.number }}" \
+            --headline "$HEADLINE" \
+            --verdict VERDICT.md \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --gist-name "baseline0-audit-report.md" \
+            --chunk-mode always \
+            $FAILED
 
       - name: "📊 Publish the report to the run summary"
         if: always()
         run: |
           if [ -f BASELINE0_AUDIT_REPORT.md ]; then
-            cat BASELINE0_AUDIT_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+            # Over 1 MiB GitHub drops the summary entirely, so link out instead.
+            SIZE=$(wc -c < BASELINE0_AUDIT_REPORT.md)
+            if [ "$SIZE" -lt 1000000 ]; then
+              cat BASELINE0_AUDIT_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "### Report is ${SIZE} bytes — too large for this page. See the gist link in the tracking issue." >> "$GITHUB_STEP_SUMMARY"
+            fi
           else
             echo "### Audit produced no report — see the job log" >> "$GITHUB_STEP_SUMMARY"
           fi

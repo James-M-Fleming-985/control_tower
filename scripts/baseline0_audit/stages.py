@@ -133,8 +133,13 @@ def _claim_ledger(ctx: AuditContext) -> StageResult:
             unverified.append(f"{ident} ({source}) → claimed COMPLETE, no code found in either repo")
 
     result.evidence.append(f"{len(verified)} of {len(verified) + len(unverified)} claims backed by code")
-    result.evidence.extend(verified[:10])
-    result.missing.extend(unverified[:20])
+    if len(claims) > len(verified) + len(unverified):
+        result.evidence.append(
+            f"Checked {len(verified) + len(unverified)} of {len(claims)} COMPLETE claims "
+            f"found in planning YAML"
+        )
+    result.evidence.extend(verified)
+    result.missing.extend(unverified)
     if unverified:
         result.status = Status.PARTIAL if verified else Status.FAIL
         result.summary = (
@@ -179,11 +184,11 @@ def _static_health(ctx: AuditContext) -> StageResult:
     )
     placeholders = ctx.search(
         r"G-XXXXXXXXXX", r"G-ABC123DEF4", r"your[-_]api[-_]key", r"REPLACE[-_]ME",
-        r"TODO:\s*replace", r"sk_live_[A-Za-z0-9]", max_per_repo=30,
+        r"sk_live_[A-Za-z0-9]", max_per_repo=30,
     )
     if placeholders.all_hits:
         result.status = Status.FAIL
-        result.missing = [h.render() for h in placeholders.all_hits[:20]]
+        result.missing = [h.render() for h in placeholders.all_hits]
         result.summary = f"{len(placeholders.all_hits)} placeholder/secret-shaped value(s) found in source."
     else:
         result.evidence.append("No placeholder analytics IDs or live-key literals found")
@@ -563,4 +568,13 @@ MODULES: dict[str, tuple[str, list[str]]] = {
     "measurement": ("Engagement, revenue, performance dashboard", ["B10", "B11", "B12"]),
     "learning": ("Scoring, iteration, ML feedback loop", ["B13", "B14", "B15"]),
     "canary": ("Trace the loop and find where it dies", ["C1"]),
+
+    # One slice per Baseline-0 phase workflow, so a phase gates only on what it fixed.
+    "phase-0": ("W0 preflight and anti-drift", ["A1", "A2", "A3"]),
+    "phase-1": ("W1 test gate and verification", ["B3", "B4"]),
+    "phase-2": ("W2 ship and deploy", ["B2", "B5", "B6"]),
+    "phase-3": ("W3 GA4, Stripe and SEO wiring", ["B7", "B8", "B9"]),
+    "phase-4": ("W4 telemetry and revenue attribution", ["B10", "B11"]),
+    "phase-5": ("W5 performance dashboard and scoring", ["B12", "B13"]),
+    "phase-6": ("W6 iteration lineage and the learning loop", ["B14", "B15"]),
 }

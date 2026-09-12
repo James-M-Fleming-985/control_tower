@@ -1,0 +1,87 @@
+# ====================================================================================
+# FEATURE: Ship and Deploy
+# ====================================================================================
+# Baseline-0 phase W2. Links B2, B5 and B6.
+#
+# The path from "the user picks a recommendation" to "a live URL exists". Depends on
+# W1: without the test gate this phase simply ships broken apps faster.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-902-01"
+  requirement_id: "FEATURE-CA-902-01"
+  feature_name: "Ship and Deploy"
+  requirement_name: "Ship and Deploy"
+  feature_code: "CA-902-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B2", "B5", "B6"]
+
+overview:
+  description: |
+    Harden the select-to-build trigger so a build can only start from a Discovery
+    recommendation, and make deployment observable: create the Railway project, poll
+    the deploy until it reaches a terminal state, and record the resulting URL against
+    the build rather than assuming success.
+
+  business_value:
+    - "A recorded deployment URL that was never checked is worse than none at all"
+    - "Guarantees provenance: every build carries the recommendation that caused it"
+    - "Gives the telemetry stage something real to attach to"
+
+  user_story: |
+    As the owner, I want selecting a recommendation to produce a live, verified URL,
+    so that the rest of the loop has a real product to measure.
+
+  acceptance_criteria:
+    - "A build can only be started from an existing Discovery recommendation"
+    - "Attempting to start a build without a recommendation id is rejected"
+    - "The generated app is pushed to a new GitHub repository"
+    - "A Railway project is created and the deploy is polled to a terminal state"
+    - "The deployment URL is recorded only after it returns a successful response"
+    - "A failed deploy is recorded as failed, with no URL"
+
+layers:
+  - layer_id: "LAYER-CA-902-01-01"
+    name: "Select To Build Trigger"
+    folder: "LAYER_CA_902_01_01_Select_To_Build_Trigger"
+    responsibility: "Start builds only from Discovery recommendations, with provenance"
+    technology: "FastAPI, SQLAlchemy"
+    requirement_file: "LAYER-CA-902-01-01_select_to_build_trigger.yaml"
+    requirements:
+      - "LAYER-CA-902-01-01"
+
+  - layer_id: "LAYER-CA-902-01-02"
+    name: "Railway Deployment Monitor"
+    folder: "LAYER_CA_902_01_02_Railway_Deployment_Monitor"
+    responsibility: "Provision Railway, poll the deploy, verify the URL before recording it"
+    technology: "Python, Railway API"
+    requirement_file: "LAYER-CA-902-01-02_railway_deployment_monitor.yaml"
+    requirements:
+      - "LAYER-CA-902-01-02"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "deployments"
+  module_name: "deployment_service"
+  endpoint_prefix: "/api/builds"
+  operations:
+    - name: "start_build"
+      http_method: "post"
+      path: "/from-recommendation/{recommendation_id}"
+      orchestrator_method: "start_build_from_recommendation"
+      description: "The only way to start a build — provenance is mandatory"
+    - name: "get_deployment"
+      http_method: "get"
+      path: "/{build_id}/deployment"
+      orchestrator_method: "get_deployment_status"
+      description: "Deployment state and verified URL for a build"
+
+integration_scenarios:
+  - "Selecting a recommendation creates a build carrying its recommendation id"
+  - "A deploy that never becomes healthy is recorded as failed with no URL"
+
+e2e_scenarios:
+  - "Pick a BUILD recommendation, watch it reach a live URL that returns 200"

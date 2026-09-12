@@ -1,0 +1,58 @@
+# ============================================================
+# W4 — TELEMETRY & REVENUE ATTRIBUTION  (Baseline-0 links B10, B11)
+# ============================================================
+# Brings the numbers back. Adds the BuildTelemetry table and the joiner that keys
+# GA4 engagement and Stripe revenue to the build that earned them (M2-OA-16), and
+# attributes webhook payments to a build_id rather than leaving them unlinked.
+#
+# Engagement is fetched on demand when the Program Baseline panel opens — GA4 stays
+# the system of record, as the M2-OA-16 decision requires.
+#
+# Requires W3: without the beacon there is nothing to join.
+
+name: "🅆4 Baseline-0 · Telemetry & Revenue Attribution"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate specs, no AI generation, no changes'
+        required: false
+        type: boolean
+        default: true
+      budget_minutes:
+        description: 'Soft time budget in minutes'
+        required: false
+        type: number
+        default: 35
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  phase:
+    uses: ./.github/workflows/b0-phase-template.yml
+    secrets: inherit
+    with:
+      phase: W4
+      title: "Telemetry & Revenue Attribution"
+      module: phase-4
+      budget_minutes: ${{ inputs.budget_minutes }}
+      prod_url: ${{ inputs.prod_url }}
+      dry_run: ${{ inputs.dry_run }}
+      notify_user: ${{ inputs.notify_user }}
+      issue_number: ${{ inputs.issue_number }}

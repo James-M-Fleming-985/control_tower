@@ -1,0 +1,103 @@
+# ================================================================================
+# LAYER: Pre Push Test Gate   (LAYER-CA-901-01-02)
+# Feature: FEATURE-CA-901-01 Test Gate and Verification
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-901-01-02"
+  requirement_title: "Pre Push Test Gate"
+  layer: "LAYER_CA_901_01_02_Pre_Push_Test_Gate"
+  feature: "FEATURE-CA-901-01_test_gate_and_verification"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Pre Push Test Gate"
+
+  description: |
+    Reorder the MVP builder so the generated application's tests run before the push
+    to GitHub, and add the automatic REFACTOR loop: when acceptance criteria fail,
+    retry generation up to twice, and if they still fail, block the build. A blocked
+    build records its failure reason and shows no deployment URL.
+
+  rationale: |
+    A test suite that runs after the push is not a gate, however comprehensive it is —
+    the broken code is already public and already deploying. The fix is ordering, not
+    more tests. Blocking rather than gating keeps the loop autonomous: the system
+    retries itself and records why it failed, instead of waiting for a human.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Run the generated test suite to completion before any git push"
+    - "Abort the push when the suite fails or coverage of criteria is incomplete"
+    - "Retry REFACTOR at most twice on failing acceptance criteria"
+    - "Persist failure_reason on the build row when blocked"
+    - "Show '—' rather than a URL in the build log for a blocked build"
+  must_not:
+    - "Push first and evaluate afterwards"
+    - "Retry indefinitely"
+    - "Ask a human whether to proceed"
+
+specification:
+  structure:
+    entry_point: "services/mvp_builder_service.py"
+    modules:
+      - "services/mvp_builder_service.py — phase ordering and deployment gating"
+      - "services/ai_code_generator_orchestrator.py — REFACTOR retry loop"
+      - "tests/test_pre_push_gate.py — negative tests"
+
+  implementation_details:
+    libraries: ["pytest", "PyGithub"]
+    patterns: ["Guard clause before side effects", "Bounded retry"]
+    error_handling:
+      - error_type: "TestSuiteFailure"
+        handling: "Block the push, record failure_reason, return a blocked result"
+      - error_type: "MaxRetriesExceeded"
+        handling: "Mark the build blocked and stop; never ship"
+
+  inputs:
+    - name: "generated_build"
+      type: "dict"
+      description: "Generated sources, tests and criteria for one build"
+      example: '{"build_id": 42, "criteria_failed": ["REQ-AC-003"], "attempt": 1}'
+
+  outputs:
+    - name: "gate_decision"
+      type: "dict"
+      description: "Whether the build may be pushed and deployed, and why not"
+      example: '{"push": false, "blocked": true, "failure_reason": "REQ-AC-003 unmet after 2 retries"}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Tests run before the push in every code path that ships a build"
+  - criterion_id: "AC-002"
+    description: "A failing suite results in no push and no repository being created"
+  - criterion_id: "AC-003"
+    description: "Failing criteria trigger at most two REFACTOR retries"
+  - criterion_id: "AC-004"
+    description: "A build blocked after retries has no deployment URL"
+  - criterion_id: "AC-005"
+    description: "failure_reason is persisted and readable by the learning loop"
+  - criterion_id: "AC-006"
+    description: "No human approval step exists anywhere in the gate"
+
+test_scenarios:
+  - name: "failing_tests_block_the_push"
+    given: "A generated app whose tests fail"
+    when: "The build pipeline runs"
+    then: "No push occurs and the build is marked blocked"
+  - name: "passing_tests_allow_the_push"
+    given: "A generated app whose tests pass"
+    when: "The build pipeline runs"
+    then: "The push occurs and a repository URL is recorded"
+  - name: "refactor_retries_are_bounded"
+    given: "A criterion that never passes"
+    when: "The REFACTOR loop runs"
+    then: "Exactly two retries occur and the build is then blocked"

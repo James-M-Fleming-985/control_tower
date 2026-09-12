@@ -1,0 +1,98 @@
+# ================================================================================
+# LAYER: Select To Build Trigger   (LAYER-CA-902-01-01)
+# Feature: FEATURE-CA-902-01 Ship and Deploy
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-902-01-01"
+  requirement_title: "Select To Build Trigger"
+  layer: "LAYER_CA_902_01_01_Select_To_Build_Trigger"
+  feature: "FEATURE-CA-902-01_ship_and_deploy"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Select To Build Trigger"
+
+  description: |
+    Make the recommendation id a required, validated input to starting a build, and
+    persist it on the build row. Selecting a card on the Exploitation Board queues the
+    build; no other entry point may create one.
+
+  rationale: |
+    Provenance is what makes the learning loop possible: without the originating
+    recommendation stored on the build, you cannot later ask which kinds of signal
+    produce apps that earn money. It is also the anti-drift guarantee in structural
+    form — if a build cannot exist without a recommendation, manual injection cannot
+    creep back in through a side door.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Require a recommendation_id and verify the row exists before queueing"
+    - "Persist recommendation_id on the build record"
+    - "Return 404 for an unknown recommendation and 422 for a missing one"
+  must_not:
+    - "Provide any build entry point that omits the recommendation"
+    - "Accept a recommendation whose source is not Discovery"
+
+specification:
+  structure:
+    entry_point: "services/build_queue_service.py"
+    modules:
+      - "services/build_queue_service.py — validation and queueing"
+      - "routers/dashboard_real.py — the single build entry point"
+      - "tests/test_build_provenance.py — unit tests"
+
+  implementation_details:
+    libraries: ["SQLAlchemy", "FastAPI"]
+    patterns: ["Guard clause", "Service Layer Pattern"]
+    error_handling:
+      - error_type: "RecommendationNotFound"
+        handling: "Return 404 without queueing anything"
+      - error_type: "InvalidSource"
+        handling: "Refuse the build and record why"
+
+  inputs:
+    - name: "recommendation_id"
+      type: "int"
+      description: "Identifier of an existing Discovery recommendation"
+      example: "1043"
+
+  outputs:
+    - name: "build"
+      type: "dict"
+      description: "The queued build, carrying its originating recommendation"
+      example: '{"build_id": 42, "recommendation_id": 1043, "status": "QUEUED"}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "A build cannot be created without a valid recommendation id"
+  - criterion_id: "AC-002"
+    description: "recommendation_id is persisted on the build row"
+  - criterion_id: "AC-003"
+    description: "An unknown recommendation returns 404 and queues nothing"
+  - criterion_id: "AC-004"
+    description: "A recommendation not produced by Discovery is refused"
+  - criterion_id: "AC-005"
+    description: "Selecting a card on the Exploitation Board queues exactly one build"
+
+test_scenarios:
+  - name: "build_requires_recommendation"
+    given: "No recommendation id is supplied"
+    when: "A build is requested"
+    then: "The request is rejected and nothing is queued"
+  - name: "provenance_is_persisted"
+    given: "A valid recommendation"
+    when: "A build is queued from it"
+    then: "The build row carries that recommendation id"
+  - name: "unknown_recommendation_is_rejected"
+    given: "A recommendation id that does not exist"
+    when: "A build is requested"
+    then: "404 is returned and no build exists"

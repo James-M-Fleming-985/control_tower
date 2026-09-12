@@ -1,0 +1,88 @@
+# ====================================================================================
+# FEATURE: Telemetry and Revenue Attribution
+# ====================================================================================
+# Baseline-0 phase W4. Links B10 and B11. Completes M2-OA-16.
+#
+# Brings the numbers back and binds them to a build. Requires W3: without the beacon
+# and the Stripe metadata there is nothing to join on.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-904-01"
+  requirement_id: "FEATURE-CA-904-01"
+  feature_name: "Telemetry and Revenue Attribution"
+  requirement_name: "Telemetry and Revenue Attribution"
+  feature_code: "CA-904-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B10", "B11"]
+  outstanding_items: ["M2-OA-16"]
+
+overview:
+  description: |
+    Add the BuildTelemetry table and the service that joins GA4 engagement to Stripe
+    revenue by build_id, fetched on demand when the Program Baseline panel is opened.
+    Attribute webhook payments to the build that earned them rather than recording an
+    unlinked total.
+
+  business_value:
+    - "Turns two disconnected data sources into one answerable question per build"
+    - "Makes the Learn stage possible — correlation needs both halves in one row"
+    - "Keeps GA4 the system of record rather than duplicating a collector"
+
+  user_story: |
+    As the owner, I want to see engagement and revenue for a specific build, so that
+    the system can learn which kinds of build are worth making more of.
+
+  acceptance_criteria:
+    - "A BuildTelemetry table exists, keyed by build_id, with a migration"
+    - "Opening the Program Baseline panel fetches engagement and revenue on demand"
+    - "Stripe webhook payments are attributed to a build via metadata"
+    - "A build with no activity returns zeroes rather than failing"
+    - "Engagement is read from GA4, not from a bespoke collector"
+    - "A synthetic test-mode payment and GA4 event both appear against the right build"
+
+layers:
+  - layer_id: "LAYER-CA-904-01-01"
+    name: "Build Telemetry Store"
+    folder: "LAYER_CA_904_01_01_Build_Telemetry_Store"
+    responsibility: "The BuildTelemetry model, migration and on-demand refresh"
+    technology: "SQLAlchemy, Alembic, PostgreSQL"
+    requirement_file: "LAYER-CA-904-01-01_build_telemetry_store.yaml"
+    requirements:
+      - "LAYER-CA-904-01-01"
+
+  - layer_id: "LAYER-CA-904-01-02"
+    name: "Revenue Attribution Joiner"
+    folder: "LAYER_CA_904_01_02_Revenue_Attribution_Joiner"
+    responsibility: "Join GA4 engagement and Stripe revenue by build_id"
+    technology: "Python, GA4 Data API, Stripe API"
+    requirement_file: "LAYER-CA-904-01-02_revenue_attribution_joiner.yaml"
+    requirements:
+      - "LAYER-CA-904-01-02"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "telemetry"
+  module_name: "build_telemetry"
+  endpoint_prefix: "/api/telemetry"
+  operations:
+    - name: "get_build_telemetry"
+      http_method: "get"
+      path: "/builds/{build_id}"
+      orchestrator_method: "get_build_telemetry"
+      description: "Engagement and revenue for one build"
+    - name: "refresh_telemetry"
+      http_method: "post"
+      path: "/refresh"
+      orchestrator_method: "refresh_telemetry"
+      description: "On-demand refresh when the Program Baseline panel opens"
+
+integration_scenarios:
+  - "A test-mode payment tagged with build_id appears in that build's telemetry row"
+  - "A build with no traffic returns zeroes without raising"
+
+e2e_scenarios:
+  - "Visit a deployed app, pay in test mode, and see both reflected against the build"

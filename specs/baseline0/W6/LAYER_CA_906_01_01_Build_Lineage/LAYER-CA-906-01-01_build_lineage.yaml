@@ -1,0 +1,103 @@
+# ================================================================================
+# LAYER: Build Lineage   (LAYER-CA-906-01-01)
+# Feature: FEATURE-CA-906-01 Iterate and Learn
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-906-01-01"
+  requirement_title: "Build Lineage"
+  layer: "LAYER_CA_906_01_01_Build_Lineage"
+  feature: "FEATURE-CA-906-01_iterate_and_learn"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Build Lineage"
+
+  description: |
+    Add parent_build_id to the build model with a migration, create iterations as
+    descendants rather than replacements, and expose the lineage so a build's
+    ancestors and descendants can be walked in either direction.
+
+  rationale: |
+    Improvement is a claim about a sequence, not a snapshot: without lineage you have a
+    collection of builds with scores and no way to say whether the second attempt beat
+    the first. Preserving the parent rather than overwriting it is what keeps the
+    comparison honest, and it is also the only way the Learn stage can attribute a gain
+    to the change that caused it.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Add a nullable parent_build_id with a reversible migration"
+    - "Carry the originating recommendation through to every descendant"
+    - "Allow lineage to be walked upwards and downwards"
+    - "Reject a cycle in the lineage"
+  must_not:
+    - "Overwrite or delete the parent build"
+    - "Allow an iteration without a parent"
+    - "Break existing builds that have no parent"
+
+specification:
+  structure:
+    entry_point: "services/learning_service.py"
+    modules:
+      - "models.py — parent_build_id on MVPBuild"
+      - "services/learning_service.py — iterate and lineage queries"
+      - "migrations/ — reversible schema migration"
+      - "tests/test_build_lineage.py — unit tests"
+
+  implementation_details:
+    libraries: ["SQLAlchemy"]
+    patterns: ["Adjacency list lineage", "Repository Pattern"]
+    error_handling:
+      - error_type: "LineageCycle"
+        handling: "Refuse the iteration and explain which ancestor it would repeat"
+      - error_type: "MissingParent"
+        handling: "Refuse to create an orphan iteration"
+
+  inputs:
+    - name: "build_id"
+      type: "int"
+      description: "The build to iterate"
+      example: "42"
+
+  outputs:
+    - name: "iteration"
+      type: "dict"
+      description: "The descendant build, with its parent and recommendation"
+      example: '{"build_id": 57, "parent_build_id": 42, "recommendation_id": 1043}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "parent_build_id exists, is nullable, and has a reversible migration"
+  - criterion_id: "AC-002"
+    description: "Iterating a build creates a descendant and leaves the parent intact"
+  - criterion_id: "AC-003"
+    description: "The originating recommendation is carried to every descendant"
+  - criterion_id: "AC-004"
+    description: "Lineage can be walked across at least three generations"
+  - criterion_id: "AC-005"
+    description: "A cycle in the lineage is refused"
+  - criterion_id: "AC-006"
+    description: "Existing builds without a parent continue to work"
+
+test_scenarios:
+  - name: "iteration_preserves_parent"
+    given: "A build with a score"
+    when: "It is iterated"
+    then: "A descendant exists and the original is unchanged"
+  - name: "lineage_walks_three_generations"
+    given: "A build iterated twice"
+    when: "The lineage is queried"
+    then: "All three generations are returned in order"
+  - name: "cycle_is_refused"
+    given: "An iteration that would repeat an ancestor"
+    when: "It is attempted"
+    then: "It is refused with an explanation"

@@ -1,0 +1,138 @@
+# ============================================================
+# b0-setup — common preamble for every Baseline-0 phase workflow
+# ============================================================
+# Checks out the target repo, prepares Python, opens or reuses the tracking issue,
+# and creates the working branch. The calling workflow must have already checked
+# out control_tower at the workspace root, since that is where this action lives.
+
+name: "Baseline-0 phase setup"
+description: "Checkout target repo, install deps, open the tracking issue, cut the working branch"
+
+inputs:
+  phase:
+    description: "Phase identifier, e.g. W1"
+    required: true
+  title:
+    description: "Human-readable phase title"
+    required: true
+  target_repo:
+    description: "owner/repo to change"
+    required: false
+    default: "James-M-Fleming-985/business_ventures"
+  cross_repo_pat:
+    description: "PAT with repo scope for the target repository"
+    required: true
+  github_token:
+    description: "Token for issue operations in this repository"
+    required: true
+  notify_user:
+    description: "GitHub username to assign, so notifications reach their phone"
+    required: false
+    default: ""
+  issue_number:
+    description: "Existing tracking issue to post to; blank opens a new one"
+    required: false
+    default: ""
+  python_version:
+    description: "Python version"
+    required: false
+    default: "3.12"
+
+outputs:
+  issue_number:
+    description: "The tracking issue used for this run"
+    value: ${{ steps.issue.outputs.number }}
+  branch:
+    description: "Working branch created in the target repository"
+    value: ${{ steps.branch.outputs.name }}
+  base_sha:
+    description: "Target repo main SHA before any change — the rollback point"
+    value: ${{ steps.branch.outputs.base_sha }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "📥 Checkout target repository"
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.target_repo }}
+        token: ${{ inputs.cross_repo_pat }}
+        path: target_repo
+        fetch-depth: 0
+
+    - name: "🐍 Set up Python ${{ inputs.python_version }}"
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python_version }}
+        cache: 'pip'
+
+    - name: "📦 Install dependencies"
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade pip
+        pip install anthropic pyyaml requests pytest pytest-json-report \
+                    numpy pandas scipy statsmodels psycopg2-binary \
+                    google-analytics-data
+        for req in target_repo/requirements.txt target_repo/requirements-dev.txt; do
+          [ -f "$req" ] && pip install -r "$req" || true
+        done
+
+    - name: "🔧 Configure git"
+      shell: bash
+      working-directory: target_repo
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: "🌿 Cut the working branch"
+      id: branch
+      shell: bash
+      working-directory: target_repo
+      run: |
+        set -euo pipefail
+        BASE_SHA=$(git rev-parse HEAD)
+        BRANCH="b0/${{ inputs.phase }}-${{ github.run_id }}"
+        git checkout -b "$BRANCH"
+        echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+        echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+        echo "Branch $BRANCH cut from $BASE_SHA"
+
+    - name: "📝 Open or reuse the tracking issue"
+      id: issue
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        set -euo pipefail
+        if [ -n "${{ inputs.issue_number }}" ]; then
+          NUMBER="${{ inputs.issue_number }}"
+        else
+          # The title is what shows on the phone lock screen, so name the phase.
+          TITLE="${{ inputs.phase }} ${{ inputs.title }} — $(date -u '+%d %b %H:%M') UTC"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY_FILE=$(mktemp)
+          {
+            echo "Running **${{ inputs.phase }} — ${{ inputs.title }}**."
+            echo ""
+            echo "You'll get one comment when it finishes, saying plainly whether anything"
+            echo "needs you, followed by the complete report — a link to it and the full"
+            echo "text posted here in parts. No news until then means it's still running."
+            echo ""
+            echo "**Live run:** $RUN_URL"
+          } > "$BODY_FILE"
+          URL=$(gh issue create --repo "${{ github.repository }}" \
+                  --title "$TITLE" --body-file "$BODY_FILE")
+          NUMBER="${URL##*/}"
+        fi
+
+        # The bot opens the issue, so the human is not subscribed by default and would
+        # get no alerts. Assigning them subscribes them.
+        if [ -n "${{ inputs.notify_user }}" ]; then
+          gh issue edit "$NUMBER" --repo "${{ github.repository }}" \
+            --add-assignee "${{ inputs.notify_user }}" \
+            || echo "::warning title=No phone alerts::Could not assign ${{ inputs.notify_user }}."
+        fi
+
+        echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+        echo "Tracking issue #$NUMBER"

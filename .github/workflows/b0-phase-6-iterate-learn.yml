@@ -1,0 +1,58 @@
+# ============================================================
+# W6 — ITERATE & LEARN  (Baseline-0 links B14, B15)
+# ============================================================
+# Closes the loop. Adds parent_build_id lineage so a winner can be iterated with its
+# ancestry intact, persists model versions and holdout accuracy history, and wires
+# the scheduled weight calibration that fires once enough validated events exist
+# (M2-OA-04).
+#
+# The gate here is deliberately strict: it is not enough for learning code to exist.
+# The weights must measurably change and the holdout result must be recorded, or the
+# link stays broken — a loop that cannot show it learned has not learned.
+
+name: "🅆6 Baseline-0 · Iterate & Learn"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate specs, no AI generation, no changes'
+        required: false
+        type: boolean
+        default: true
+      budget_minutes:
+        description: 'Soft time budget in minutes'
+        required: false
+        type: number
+        default: 40
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  phase:
+    uses: ./.github/workflows/b0-phase-template.yml
+    secrets: inherit
+    with:
+      phase: W6
+      title: "Iterate & Learn"
+      module: phase-6
+      budget_minutes: ${{ inputs.budget_minutes }}
+      prod_url: ${{ inputs.prod_url }}
+      dry_run: ${{ inputs.dry_run }}
+      notify_user: ${{ inputs.notify_user }}
+      issue_number: ${{ inputs.issue_number }}

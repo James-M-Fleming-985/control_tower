@@ -1,0 +1,89 @@
+# ====================================================================================
+# FEATURE: Iterate and Learn
+# ====================================================================================
+# Baseline-0 phase W6. Links B14 and B15. Outstanding item M2-OA-04.
+#
+# The last automated phase, and the one that closes the loop: a winner can be iterated
+# with its ancestry intact, and the outcome measurably changes what the system does
+# next. Existing code is not enough here — the gate requires evidence of change.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-906-01"
+  requirement_id: "FEATURE-CA-906-01"
+  feature_name: "Iterate and Learn"
+  requirement_name: "Iterate and Learn"
+  feature_code: "CA-906-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B14", "B15"]
+  outstanding_items: ["M2-OA-04"]
+
+overview:
+  description: |
+    Add parent_build_id lineage so the best-performing app can be rebuilt as a
+    descendant rather than a replacement, persist model versions and holdout accuracy
+    history, and schedule weight calibration to fire once enough validated predictions
+    exist.
+
+  business_value:
+    - "Iteration with lineage means improvement can be measured, not assumed"
+    - "Persisted model versions make a regression visible instead of mysterious"
+    - "Calibration on a threshold keeps the loop self-correcting without a human"
+
+  user_story: |
+    As the owner, I want the system to improve from what it learns, so that the next
+    recommendation and build are measurably better than the last.
+
+  acceptance_criteria:
+    - "A build can be created as an iteration of another, with parent_build_id set"
+    - "Lineage is queryable across more than one generation"
+    - "Model versions are persisted with their weights and a timestamp"
+    - "Holdout accuracy is recorded per model version"
+    - "Calibration fires automatically once the validated-prediction threshold is met"
+    - "Recalibration measurably changes the weights, and the change is recorded"
+
+layers:
+  - layer_id: "LAYER-CA-906-01-01"
+    name: "Build Lineage"
+    folder: "LAYER_CA_906_01_01_Build_Lineage"
+    responsibility: "parent_build_id lineage and iterate-the-winner"
+    technology: "SQLAlchemy, FastAPI"
+    requirement_file: "LAYER-CA-906-01-01_build_lineage.yaml"
+    requirements:
+      - "LAYER-CA-906-01-01"
+
+  - layer_id: "LAYER-CA-906-01-02"
+    name: "Weight Calibration Loop"
+    folder: "LAYER_CA_906_01_02_Weight_Calibration_Loop"
+    responsibility: "Model versioning, holdout history and threshold-triggered calibration"
+    technology: "Python, APScheduler, statsmodels"
+    requirement_file: "LAYER-CA-906-01-02_weight_calibration_loop.yaml"
+    requirements:
+      - "LAYER-CA-906-01-02"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "learning"
+  module_name: "learning_service"
+  endpoint_prefix: "/api/learning"
+  operations:
+    - name: "iterate_build"
+      http_method: "post"
+      path: "/builds/{build_id}/iterate"
+      orchestrator_method: "iterate_build"
+      description: "Rebuild a winner as a descendant, preserving lineage"
+    - name: "get_model_versions"
+      http_method: "get"
+      path: "/model-versions"
+      orchestrator_method: "get_model_versions"
+      description: "Weight history and holdout accuracy per version"
+
+integration_scenarios:
+  - "Iterating a build twice produces a three-generation lineage"
+  - "Crossing the validated-prediction threshold triggers calibration once"
+
+e2e_scenarios:
+  - "Iterate the best app, then see a new model version with a different weight vector"

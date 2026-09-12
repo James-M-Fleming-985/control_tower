@@ -1,0 +1,201 @@
+# ============================================================
+# W7 — FULL-LOOP AUTONOMOUS CANARY  (all fifteen links + C1)
+# ============================================================
+# The unattended dress rehearsal for Baseline 0. Read-only: it changes nothing and
+# fixes nothing. It walks the entire loop, gathers the evidence bundle, and names
+# the FIRST broken link — because that link, not the longest gap list, is the real
+# blocker, and it tells you exactly which earlier phase to re-run.
+#
+# Allow it 90 minutes: a genuine end-to-end trace is slower than a phase build.
+#
+# Stripe is queried in test mode only. Nothing is written to production.
+
+name: "🅆7 Baseline-0 · Full-Loop Canary"
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'How much of the loop to trace'
+        required: true
+        type: choice
+        options:
+          - 'Everything — all fifteen links plus the canary trace'
+          - 'Canary only — just find where the loop dies'
+        default: 'Everything — all fifteen links plus the canary trace'
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+env:
+  BUSINESS_VENTURES_REPO: 'James-M-Fleming-985/business_ventures'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: baseline0-phase
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    name: "W7 — Full-Loop Canary"
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: "📥 Checkout control_tower"
+        uses: actions/checkout@v4
+
+      - name: "⚙️ Set up"
+        id: setup
+        uses: ./.github/actions/b0-setup
+        with:
+          phase: W7
+          title: "Full-Loop Canary"
+          target_repo: ${{ env.BUSINESS_VENTURES_REPO }}
+          cross_repo_pat: ${{ secrets.CROSS_REPO_PAT }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          notify_user: ${{ inputs.notify_user }}
+          issue_number: ${{ inputs.issue_number }}
+
+      - name: "🔍 Trace the whole loop"
+        id: audit
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_CREDENTIALS_JSON: ${{ secrets.GA4_CREDENTIALS_JSON }}
+        run: |
+          set +e
+          case "${{ inputs.scope }}" in
+            "Canary only"*) MODULE="canary" ;;
+            *)              MODULE="everything" ;;
+          esac
+          PYTHONPATH=scripts python -m baseline0_audit \
+            --control-tower . \
+            --business-ventures target_repo \
+            --prod-url "${{ inputs.prod_url }}" \
+            --output audit_results \
+            --report AUDIT.md \
+            --verdict-out VERDICT.md \
+            --no-verdict-comment \
+            --label "W7 — Full-Loop Canary" \
+            --module "$MODULE" \
+            --gate
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: "📦 Assemble the evidence bundle"
+        if: always()
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib
+
+          results = sorted(pathlib.Path("audit_results").glob("*.json")) \
+              if pathlib.Path("audit_results").is_dir() else []
+          links, evidence = [], []
+          for path in results:
+              try:
+                  data = json.loads(path.read_text())
+              except (ValueError, OSError):
+                  continue
+              links.append({
+                  "link": data.get("id"),
+                  "name": data.get("name"),
+                  "before": "—",
+                  "after": data.get("status"),
+                  "verdict": "ok" if data.get("status") in ("IMPLEMENTED", "PASS") else "blocked",
+              })
+              evidence.extend(data.get("evidence", []))
+
+          broken = [l for l in links if l["verdict"] == "blocked"]
+          facts = {
+              "outcome": "loop closed end to end" if not broken
+                         else f"first broken link: {broken[0]['link']} {broken[0]['name']}",
+              "gate": sorted(links, key=lambda l: (l["link"] or "")),
+              "specs": [],
+              "merge": {"decision": "not applicable — this phase is read-only"},
+              "deploy": {"status": "not applicable", "health": "not applicable"},
+              "rollback": "not triggered",
+              "outstanding": [f"{l['link']} {l['name']}" for l in broken],
+              "next": ("Nothing — run W8 and walk the site yourself to confirm it."
+                       if not broken else
+                       f"Re-run the phase that owns {broken[0]['link']}, then W7 again."),
+          }
+          pathlib.Path("phase_facts.json").write_text(json.dumps(facts, indent=2))
+          pathlib.Path("EVIDENCE.md").write_text(
+              "## Evidence collected\n\n" + "\n".join(f"- {e}" for e in evidence) + "\n"
+          )
+          print(facts["outcome"])
+          PY
+
+          PYTHONPATH=scripts python -m b0.phase_report \
+            --phase W7 --title "Full-Loop Canary" \
+            --repo-path target_repo \
+            --facts phase_facts.json \
+            --append AUDIT.md \
+            --out FULL_REPORT.md
+          cat EVIDENCE.md >> FULL_REPORT.md
+
+      - name: "📣 Publish the report in full"
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.audit.outputs.code }}" = "0" ]; then
+            HEADLINE="✅ W7 canary — the loop closed end to end, nothing needs you"
+            FAILED=""
+          else
+            HEADLINE="🔴 W7 canary — the loop breaks, needs you"
+            FAILED="--failed"
+          fi
+          PYTHONPATH=scripts python -m b0.publish_report \
+            --report FULL_REPORT.md \
+            --repo "${{ github.repository }}" \
+            --issue "${{ steps.setup.outputs.issue_number }}" \
+            --headline "$HEADLINE" \
+            --verdict VERDICT.md \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --gist-name "W7-canary-report.md" \
+            --chunk-mode always \
+            $FAILED
+
+      - name: "📎 Upload the evidence bundle"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: W7-canary-${{ github.run_id }}
+          path: |
+            FULL_REPORT.md
+            AUDIT.md
+            VERDICT.md
+            EVIDENCE.md
+            phase_facts.json
+            audit_results/
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: "🛑 Fail the run if the loop is broken"
+        if: always()
+        run: |
+          if [ "${{ steps.audit.outputs.code }}" != "0" ]; then
+            echo "::error title=Loop broken::see the first broken link in the report"
+            exit 1
+          fi

@@ -75,8 +75,14 @@ def build_report(ctx: AuditContext, results: list[StageResult]) -> str:
         lines.append("")
         for n, r in enumerate(blockers, start=1):
             lines.append(f"{n}. **{r.id} {r.name}** — {_oneline(r.summary)}")
-            for gap in r.missing[:4]:
+            shown = r.missing[:4]
+            for gap in shown:
                 lines.append(f"   - {gap}")
+            if len(r.missing) > len(shown):
+                lines.append(
+                    f"   - _Showing {len(shown)} of {len(r.missing)} gaps — "
+                    f"the full list is under {r.id} below._"
+                )
     lines.append("")
 
     for phase, title in PHASE_TITLES.items():

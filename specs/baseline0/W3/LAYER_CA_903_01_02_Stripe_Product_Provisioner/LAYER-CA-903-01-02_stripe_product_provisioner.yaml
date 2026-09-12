@@ -1,0 +1,103 @@
+# ================================================================================
+# LAYER: Stripe Product Provisioner   (LAYER-CA-903-01-02)
+# Feature: FEATURE-CA-903-01 GA4, Stripe and SEO
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-903-01-02"
+  requirement_title: "Stripe Product Provisioner"
+  layer: "LAYER_CA_903_01_02_Stripe_Product_Provisioner"
+  feature: "FEATURE-CA-903-01_ga4_stripe_and_seo"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Stripe Product Provisioner"
+
+  description: |
+    Create the Stripe product and price for each build automatically rather than
+    expecting pre-existing price IDs, attach build_id to the product, price, checkout
+    session and resulting payment metadata, and provision the Stripe environment
+    variables on the deployed service so checkout works where the app actually runs.
+
+  rationale: |
+    Two separate gaps meet here. The code expects price IDs that nobody creates
+    (M2-OA-05), and the deployed environment has no Stripe configuration at all
+    (risk R1) — so even a correct integration cannot take a payment. Tagging every
+    object with build_id is what later lets revenue be attributed rather than merely
+    totalled.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Call stripe.Product.create() and stripe.Price.create() for a build with no price"
+    - "Set build_id in the metadata of the product, price, session and payment"
+    - "Provision the Stripe environment variables on the deployed service"
+    - "Refuse to run against any key that is not a test key"
+  must_not:
+    - "Use a live Stripe key under any circumstances"
+    - "Create duplicate products for a build that already has one"
+    - "Hard-code price identifiers"
+
+specification:
+  structure:
+    entry_point: "services/stripe_service.py"
+    modules:
+      - "services/stripe_service.py — product, price and checkout provisioning"
+      - "services/railway_service.py — environment variable provisioning"
+      - "tests/test_stripe_provisioner.py — unit tests against a stubbed Stripe"
+
+  implementation_details:
+    libraries: ["stripe"]
+    patterns: ["Idempotent provisioning", "Service Layer Pattern"]
+    error_handling:
+      - error_type: "LiveKeyRefused"
+        handling: "Abort immediately without calling Stripe"
+      - error_type: "StripeAPIError"
+        handling: "Record the failure against the build; do not retry blindly"
+
+  inputs:
+    - name: "build"
+      type: "dict"
+      description: "A build needing monetisation"
+      example: '{"build_id": 42, "price_gbp": 9.0}'
+
+  outputs:
+    - name: "stripe_objects"
+      type: "dict"
+      description: "Created product and price identifiers, tagged with build_id"
+      example: '{"product": "prod_x", "price": "price_y", "metadata": {"build_id": "42"}}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "A product and price are created for a build that has none"
+  - criterion_id: "AC-002"
+    description: "Provisioning twice for the same build creates no duplicates"
+  - criterion_id: "AC-003"
+    description: "build_id is present in product, price, session and payment metadata"
+  - criterion_id: "AC-004"
+    description: "Stripe environment variables are set on the deployed service"
+  - criterion_id: "AC-005"
+    description: "A non-test key aborts the operation before any API call"
+  - criterion_id: "AC-006"
+    description: "A checkout session can be created and completed in test mode"
+
+test_scenarios:
+  - name: "product_and_price_created"
+    given: "A build with no Stripe objects"
+    when: "Provisioning runs"
+    then: "A product and price exist, both tagged with the build id"
+  - name: "provisioning_is_idempotent"
+    given: "A build already provisioned"
+    when: "Provisioning runs again"
+    then: "No duplicate objects are created"
+  - name: "live_key_is_refused"
+    given: "A live Stripe key"
+    when: "Provisioning is attempted"
+    then: "It aborts before contacting Stripe"

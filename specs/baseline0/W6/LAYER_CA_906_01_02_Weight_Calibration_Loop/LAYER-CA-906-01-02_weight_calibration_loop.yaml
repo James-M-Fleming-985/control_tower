@@ -1,0 +1,110 @@
+# ================================================================================
+# LAYER: Weight Calibration Loop   (LAYER-CA-906-01-02)
+# Feature: FEATURE-CA-906-01 Iterate and Learn
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-906-01-02"
+  requirement_title: "Weight Calibration Loop"
+  layer: "LAYER_CA_906_01_02_Weight_Calibration_Loop"
+  feature: "FEATURE-CA-906-01_iterate_and_learn"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Weight Calibration Loop"
+
+  description: |
+    Persist each ensemble model version with its weight vector, training window and
+    holdout accuracy, and add the scheduled job that recalibrates the weights once the
+    validated-prediction threshold is crossed. Record the before and after weights and
+    the holdout result for every calibration.
+
+  rationale: |
+    Calibration currently exists only as a function nobody calls on a threshold, which
+    means the loop can learn in principle and never does in practice. Persisting each
+    version with its holdout accuracy is what converts "the weights changed" into
+    "the change helped", and makes a regression something you can point at and roll
+    back to rather than something you infer from worsening results weeks later.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Persist every model version with weights, training window and holdout accuracy"
+    - "Trigger calibration automatically at the validated-prediction threshold"
+    - "Record the previous and new weight vectors for each calibration"
+    - "Evaluate on a holdout set that was not used to fit"
+  must_not:
+    - "Overwrite a previous model version in place"
+    - "Evaluate on the training data"
+    - "Require a human to approve a recalibration"
+
+specification:
+  structure:
+    entry_point: "services/ensemble_model.py"
+    modules:
+      - "services/ensemble_model.py — calibration and holdout evaluation"
+      - "scheduled_tasks.py — threshold-triggered APScheduler job"
+      - "models.py — ModelVersion table"
+      - "tests/test_weight_calibration.py — unit tests"
+
+  implementation_details:
+    libraries: ["statsmodels", "APScheduler"]
+    patterns: ["Append-only versioning", "Threshold trigger"]
+    error_handling:
+      - error_type: "InsufficientValidatedPredictions"
+        handling: "Skip calibration and record why, without failing the scheduler"
+      - error_type: "CalibrationDidNotImprove"
+        handling: "Persist the version with its worse holdout result rather than hiding it"
+
+  inputs:
+    - name: "validated_predictions"
+      type: "list[dict]"
+      description: "Predictions with known outcomes"
+      example: '[{"predicted": "UP", "actual": "UP", "model_version": 3}]'
+
+  outputs:
+    - name: "model_version"
+      type: "dict"
+      description: "The new version, its weights and holdout accuracy"
+      example: '{"version": 4, "weights": {"granger": 0.38, "ols": 0.37, "arima": 0.25}, "holdout_accuracy": 0.58}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Each calibration appends a new model version rather than overwriting one"
+  - criterion_id: "AC-002"
+    description: "Weights, training window and holdout accuracy are persisted per version"
+  - criterion_id: "AC-003"
+    description: "Calibration fires automatically once the threshold is crossed"
+  - criterion_id: "AC-004"
+    description: "Holdout data is excluded from fitting"
+  - criterion_id: "AC-005"
+    description: "Recalibration measurably changes the weight vector and the change is recorded"
+  - criterion_id: "AC-006"
+    description: "A calibration that does not improve accuracy is still recorded"
+  - criterion_id: "AC-007"
+    description: "No human approval is required at any point"
+
+test_scenarios:
+  - name: "threshold_triggers_calibration"
+    given: "One fewer validated prediction than the threshold"
+    when: "One more arrives"
+    then: "Calibration runs exactly once"
+  - name: "weights_actually_change"
+    given: "Validated predictions favouring one model"
+    when: "Calibration runs"
+    then: "The new weight vector differs from the previous one and both are recorded"
+  - name: "holdout_is_not_trained_on"
+    given: "A split training and holdout set"
+    when: "Calibration runs"
+    then: "No holdout row was used to fit the weights"
+  - name: "regression_is_recorded"
+    given: "A calibration that lowers holdout accuracy"
+    when: "It completes"
+    then: "The version is persisted with its worse accuracy"

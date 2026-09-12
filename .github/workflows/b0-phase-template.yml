@@ -1,0 +1,158 @@
+# ============================================================
+# BASELINE-0 PHASE TEMPLATE (reusable)
+# ============================================================
+# The shape every build phase shares: generate the fix, commit it, test it, gate it
+# on the Baseline-0 links that phase owns, merge only on green, health-check
+# production, revert if it broke, then publish the complete report.
+#
+# This workflow is never dispatched directly. Each b0-phase-N-*.yml calls it.
+
+name: "Baseline-0 phase (reusable)"
+
+on:
+  workflow_call:
+    inputs:
+      phase:
+        description: "Phase identifier, e.g. W1"
+        required: true
+        type: string
+      title:
+        required: true
+        type: string
+      module:
+        description: "Audit module to gate on, e.g. phase-1"
+        required: true
+        type: string
+      budget_minutes:
+        description: "Soft time budget — the phase stops cleanly and reports rather than being killed"
+        required: false
+        type: number
+        default: 40
+      test_path:
+        required: false
+        type: string
+        default: "tests"
+      prod_url:
+        required: false
+        type: string
+        default: "https://businessventures-production.up.railway.app"
+      target_repo:
+        required: false
+        type: string
+        default: "James-M-Fleming-985/business_ventures"
+      dry_run:
+        required: false
+        type: boolean
+        default: false
+      issue_number:
+        required: false
+        type: string
+        default: ""
+      notify_user:
+        required: false
+        type: string
+        default: "James-M-Fleming-985"
+      chunk_mode:
+        description: "always | on-failure | never"
+        required: false
+        type: string
+        default: "always"
+
+permissions:
+  contents: read
+  issues: write
+
+# One phase at a time: two phases writing to the same repo would corrupt each
+# other's rollback point.
+concurrency:
+  group: baseline0-phase
+  cancel-in-progress: false
+
+jobs:
+  phase:
+    name: "${{ inputs.phase }} — ${{ inputs.title }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: "📥 Checkout control_tower"
+        uses: actions/checkout@v4
+
+      - name: "⚙️ Set up"
+        id: setup
+        uses: ./.github/actions/b0-setup
+        with:
+          phase: ${{ inputs.phase }}
+          title: ${{ inputs.title }}
+          target_repo: ${{ inputs.target_repo }}
+          cross_repo_pat: ${{ secrets.CROSS_REPO_PAT }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          notify_user: ${{ inputs.notify_user }}
+          issue_number: ${{ inputs.issue_number }}
+
+      - name: "🔨 Build this phase's specifications"
+        id: build
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PYTHONPATH=scripts python -m b0.phase_runner \
+            --phase "${{ inputs.phase }}" \
+            --specs-dir specs/baseline0 \
+            --target target_repo \
+            --control-tower . \
+            --budget-minutes "${{ inputs.budget_minutes }}" \
+            --facts-out phase_facts.json \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: "💾 Commit what was generated"
+        working-directory: target_repo
+        run: |
+          set -euo pipefail
+          if git diff --quiet && git diff --cached --quiet && [ -z "$(git status --porcelain)" ]; then
+            echo "No changes generated"
+            exit 0
+          fi
+          git add -A
+          git commit -m "${{ inputs.phase }}: ${{ inputs.title }} (run ${{ github.run_id }})"
+          echo "Committed to ${{ steps.setup.outputs.branch }}"
+
+      - name: "⚖️ Test, gate, merge, verify and report"
+        uses: ./.github/actions/b0-gate
+        with:
+          phase: ${{ inputs.phase }}
+          title: ${{ inputs.title }}
+          module: ${{ inputs.module }}
+          issue: ${{ steps.setup.outputs.issue_number }}
+          branch: ${{ steps.setup.outputs.branch }}
+          base_sha: ${{ steps.setup.outputs.base_sha }}
+          prod_url: ${{ inputs.prod_url }}
+          test_path: ${{ inputs.test_path }}
+          dry_run: ${{ inputs.dry_run }}
+          chunk_mode: ${{ inputs.chunk_mode }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cross_repo_pat: ${{ secrets.CROSS_REPO_PAT }}
+          database_url: ${{ secrets.DATABASE_URL }}
+          stripe_test_secret_key: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          ga4_property_id: ${{ secrets.GA4_PROPERTY_ID }}
+          ga4_credentials_json: ${{ secrets.GA4_CREDENTIALS_JSON }}
+
+      # The gate posts its own verdict. This is the safety net for the case where the
+      # job died before reaching it — otherwise the phone stays silent.
+      - name: "🔔 Tell me if the phase never finished"
+        if: failure() && steps.setup.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY_FILE=$(mktemp)
+          {
+            echo "## ⚠️ Needs you — ${{ inputs.phase }} stopped before finishing"
+            echo ""
+            echo "No report was published, so the run was cut short (timeout, crash or"
+            echo "cancellation) rather than finding problems. Nothing was merged and"
+            echo "production was not touched."
+            echo ""
+            echo "[Open the run log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$BODY_FILE"
+          gh issue comment "${{ steps.setup.outputs.issue_number }}" \
+            --repo "${{ github.repository }}" --body-file "$BODY_FILE" || true

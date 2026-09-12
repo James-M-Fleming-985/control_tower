@@ -1,0 +1,103 @@
+# ================================================================================
+# LAYER: Revenue Attribution Joiner   (LAYER-CA-904-01-02)
+# Feature: FEATURE-CA-904-01 Telemetry and Revenue Attribution
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-904-01-02"
+  requirement_title: "Revenue Attribution Joiner"
+  layer: "LAYER_CA_904_01_02_Revenue_Attribution_Joiner"
+  feature: "FEATURE-CA-904-01_telemetry_and_revenue_attribution"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Revenue Attribution Joiner"
+
+  description: |
+    Fetch engagement from the GA4 Data API filtered by the build_id custom dimension,
+    fetch revenue from Stripe filtered by build_id metadata, join them into a single
+    BuildTelemetry row, and attribute incoming webhook payments to a build at the
+    moment they arrive.
+
+  rationale: |
+    Revenue recorded without attribution answers "how much" but never "from what",
+    which is precisely the question the Optimise stage needs. Doing the attribution in
+    the webhook as well as the batch join means a payment is linked even if nobody
+    opens the panel for a week.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Filter GA4 by the build_id custom dimension"
+    - "Filter Stripe by build_id metadata, in test mode"
+    - "Attribute webhook payments to a build on receipt"
+    - "Record partial results when one source is unavailable, and say which"
+  must_not:
+    - "Attribute a payment to a build by guessing from timing or amount"
+    - "Fail the whole join because one source is down"
+    - "Contact Stripe with a live key"
+
+specification:
+  structure:
+    entry_point: "services/build_telemetry.py"
+    modules:
+      - "services/build_telemetry.py — the joiner"
+      - "services/ga4_service.py — engagement queries by build_id"
+      - "services/stripe_service.py — revenue queries and webhook attribution"
+      - "tests/test_revenue_attribution.py — unit tests with stubbed APIs"
+
+  implementation_details:
+    libraries: ["google-analytics-data", "stripe"]
+    patterns: ["Adapter per data source", "Partial-result aggregation"]
+    error_handling:
+      - error_type: "GA4Unavailable"
+        handling: "Record revenue only and flag engagement as unavailable"
+      - error_type: "StripeUnavailable"
+        handling: "Record engagement only and flag revenue as unavailable"
+
+  inputs:
+    - name: "build_ids"
+      type: "list[int]"
+      description: "Builds to refresh"
+      example: "[41, 42, 43]"
+
+  outputs:
+    - name: "telemetry_rows"
+      type: "list[dict]"
+      description: "Joined engagement and revenue per build, with source availability"
+      example: '[{"build_id": 42, "sessions": 120, "revenue_gbp": 27.0, "sources": ["ga4", "stripe"]}]'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Engagement is fetched from GA4 filtered by build_id"
+  - criterion_id: "AC-002"
+    description: "Revenue is fetched from Stripe filtered by build_id metadata"
+  - criterion_id: "AC-003"
+    description: "Both halves are written to one BuildTelemetry row per build"
+  - criterion_id: "AC-004"
+    description: "A webhook payment is attributed to its build on receipt"
+  - criterion_id: "AC-005"
+    description: "One source failing yields a partial row that names the missing source"
+  - criterion_id: "AC-006"
+    description: "A payment without build_id metadata is recorded as unattributed, never guessed"
+
+test_scenarios:
+  - name: "join_produces_one_row"
+    given: "Engagement and revenue both exist for a build"
+    when: "The joiner runs"
+    then: "One telemetry row carries both"
+  - name: "partial_source_is_flagged"
+    given: "GA4 is unavailable"
+    when: "The joiner runs"
+    then: "Revenue is recorded and engagement is flagged unavailable"
+  - name: "unattributed_payment_is_not_guessed"
+    given: "A payment with no build_id metadata"
+    when: "The webhook is handled"
+    then: "It is recorded as unattributed and assigned to no build"

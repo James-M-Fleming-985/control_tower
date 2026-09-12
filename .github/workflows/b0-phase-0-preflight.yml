@@ -1,0 +1,234 @@
+# ============================================================
+# W0 — PREFLIGHT, REPORTING FIX & ANTI-DRIFT
+# ============================================================
+# The first phase, and the one that makes the other eight trustworthy.
+#
+# It fixes the reporting first: the audit used to post a short verdict saying "full
+# detail below" with nothing below it, so you only ever saw half a report. From here
+# on every phase publishes the complete report — a gist link plus the full text in
+# the issue thread — and fails itself if a single byte went missing.
+#
+# It then proves the whole merge → deploy → health-check → revert mechanism on a
+# deliberately small change, so no later phase is the first to exercise it.
+#
+# Nothing here is destructive except the manual-recommendation cleanup, which counts
+# rows and prints them before deleting, and can be turned off.
+
+name: "🅆0 Baseline-0 · Preflight, Reporting & Anti-drift"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate everything, change nothing'
+        required: false
+        type: boolean
+        default: true
+      delete_manual_rows:
+        description: "Hard-delete source='manual' recommendations (anti-drift)"
+        required: false
+        type: boolean
+        default: false
+      prod_url:
+        description: 'Live site to health-check'
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: baseline0-phase
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: "W0 — Preflight, Reporting & Anti-drift"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: "📥 Checkout control_tower"
+        uses: actions/checkout@v4
+
+      - name: "⚙️ Set up"
+        id: setup
+        uses: ./.github/actions/b0-setup
+        with:
+          phase: W0
+          title: "Preflight, Reporting & Anti-drift"
+          cross_repo_pat: ${{ secrets.CROSS_REPO_PAT }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          notify_user: ${{ inputs.notify_user }}
+          issue_number: ${{ inputs.issue_number }}
+
+      # ---------------------------------------------------------------- reporting
+      - name: "🧾 Self-test the reporting fix"
+        run: |
+          set -euo pipefail
+          PYTHONPATH=scripts python - <<'PY'
+          from b0.publish_report import split_report, part_header, strip_header
+
+          # A report far larger than a single issue comment can hold.
+          text = "".join(f"## Section {i}\n" + ("x" * 900 + "\n") * 90 for i in range(15))
+          chunks = split_report(text)
+          assert "".join(chunks) == text, "split lost content"
+          bodies = [part_header(i, len(chunks), "selftest") + c
+                    for i, c in enumerate(chunks, 1)]
+          assert "".join(strip_header(b) for b in bodies) == text, "round trip lost content"
+
+          # A single line longer than the comment limit must still survive.
+          huge = "y" * 250_000
+          assert "".join(split_report(huge)) == huge, "long line lost content"
+
+          print(f"Reporting self-test passed: {len(text):,} chars -> {len(chunks)} parts, "
+                f"largest {max(len(c) for c in chunks):,}")
+          PY
+
+      # ---------------------------------------------------------------- preconditions
+      - name: "🔐 Secrets presence matrix"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CROSS_REPO_PAT: ${{ secrets.CROSS_REPO_PAT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_CREDENTIALS_JSON: ${{ secrets.GA4_CREDENTIALS_JSON }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Presence only — no value is ever printed.
+          {
+            echo "| Secret | Present | Needed by |"
+            echo "|---|---|---|"
+            check() { [ -n "${2:-}" ] && echo "| \`$1\` | ✅ | $3 |" || echo "| \`$1\` | ❌ | $3 |"; }
+            check ANTHROPIC_API_KEY       "$ANTHROPIC_API_KEY"      "W1–W6 code generation"
+            check CROSS_REPO_PAT          "$CROSS_REPO_PAT"         "every phase — pushing to business_ventures"
+            check DATABASE_URL            "$DATABASE_URL"           "W4, W5, W8 — telemetry and journey traces"
+            check STRIPE_TEST_SECRET_KEY  "$STRIPE_TEST_SECRET_KEY" "W3, W8 — payments in test mode"
+            check GA4_PROPERTY_ID         "$GA4_PROPERTY_ID"        "W3, W8 — engagement"
+            check GA4_CREDENTIALS_JSON    "$GA4_CREDENTIALS_JSON"   "W3, W8 — engagement"
+            check RAILWAY_TOKEN           "$RAILWAY_TOKEN"          "W2, W3 — deploys and env vars"
+          } > SECRETS.md
+          cat SECRETS.md
+
+      - name: "🛑 Refuse to run against a live Stripe key"
+        env:
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+          case "${STRIPE_TEST_SECRET_KEY:-}" in
+            sk_live_*|rk_live_*)
+              echo "::error title=Live Stripe key::STRIPE_TEST_SECRET_KEY holds a LIVE key. Stop."
+              exit 1 ;;
+            "") echo "No Stripe key set — W3 and W8 will report Stripe as NOT TESTED." ;;
+            *)  echo "Stripe key is test mode." ;;
+          esac
+
+      # ---------------------------------------------------------------- anti-drift
+      - name: "🧹 Count and remove manual recommendations"
+        if: inputs.delete_manual_rows && !inputs.dry_run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          PYTHONPATH=scripts python - <<'PY'
+          import os, sys
+          import psycopg2
+
+          url = os.environ.get("DATABASE_URL", "")
+          if not url:
+              print("::warning title=Skipped::DATABASE_URL not set — manual rows left in place")
+              sys.exit(0)
+          url = url.replace("postgresql+asyncpg://", "postgresql://")
+
+          conn = psycopg2.connect(url, connect_timeout=20)
+          conn.autocommit = False
+          with conn, conn.cursor() as cur:
+              cur.execute(
+                  "SELECT id, title FROM exploitation_recommendations "
+                  "WHERE source = 'manual' ORDER BY id"
+              )
+              rows = cur.fetchall()
+              print(f"{len(rows)} manual recommendation(s) found:")
+              for rid, title in rows:
+                  print(f"  - {rid}: {title}")
+              if not rows:
+                  sys.exit(0)
+              cur.execute("DELETE FROM exploitation_recommendations WHERE source = 'manual'")
+              print(f"Deleted {cur.rowcount} row(s)")
+          conn.close()
+          PY
+
+      - name: "🔨 Build the anti-drift specification"
+        id: build
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PYTHONPATH=scripts python -m b0.phase_runner \
+            --phase W0 \
+            --specs-dir specs/baseline0 \
+            --target target_repo \
+            --control-tower . \
+            --budget-minutes 25 \
+            --facts-out phase_facts.json \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: "💾 Commit what was generated"
+        working-directory: target_repo
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes generated"
+            exit 0
+          fi
+          git add -A
+          git commit -m "W0: remove manual idea-injection paths (run ${{ github.run_id }})"
+
+      # ---------------------------------------------------------------- gate
+      - name: "⚖️ Test, gate, merge, verify and report"
+        uses: ./.github/actions/b0-gate
+        with:
+          phase: W0
+          title: "Preflight, Reporting & Anti-drift"
+          module: phase-0
+          issue: ${{ steps.setup.outputs.issue_number }}
+          branch: ${{ steps.setup.outputs.branch }}
+          base_sha: ${{ steps.setup.outputs.base_sha }}
+          prod_url: ${{ inputs.prod_url }}
+          dry_run: ${{ inputs.dry_run }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cross_repo_pat: ${{ secrets.CROSS_REPO_PAT }}
+          database_url: ${{ secrets.DATABASE_URL }}
+          stripe_test_secret_key: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          ga4_property_id: ${{ secrets.GA4_PROPERTY_ID }}
+          ga4_credentials_json: ${{ secrets.GA4_CREDENTIALS_JSON }}
+
+      - name: "🔔 Tell me if W0 never finished"
+        if: failure() && steps.setup.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY_FILE=$(mktemp)
+          {
+            echo "## ⚠️ Needs you — W0 stopped before finishing"
+            echo ""
+            echo "No report was published, so the run was cut short rather than finding"
+            echo "problems. Nothing was merged and production was not touched."
+            echo ""
+            echo "[Open the run log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$BODY_FILE"
+          gh issue comment "${{ steps.setup.outputs.issue_number }}" \
+            --repo "${{ github.repository }}" --body-file "$BODY_FILE" || true

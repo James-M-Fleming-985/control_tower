@@ -1,0 +1,98 @@
+# ================================================================================
+# LAYER: Manual Path Removal   (LAYER-CA-900-01-01)
+# Feature: FEATURE-CA-900-01 Anti-drift
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-900-01-01"
+  requirement_title: "Manual Path Removal"
+  layer: "LAYER_CA_900_01_01_Manual_Path_Removal"
+  feature: "FEATURE-CA-900-01_anti_drift"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Manual Path Removal"
+
+  description: |
+    Delete the "Add Your Own Idea" affordance in all three places it exists: the
+    template markup and its modal, the client-side submit handler, and the POST
+    endpoint that persisted a recommendation with source='manual'. Reflow the
+    recommendation card grid so the removal leaves no gap.
+
+  rationale: |
+    A deletion spread across three files is only safe if all three go together.
+    Removing the button alone leaves a live, unauthenticated write endpoint; removing
+    the endpoint alone leaves a control that errors. This layer treats them as one
+    change so the system cannot be left half-open.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Delete the modal markup and its trigger from templates/dashboard.html"
+    - "Delete the submit handler and any fetch() to the manual endpoint from static/js/dashboard.js"
+    - "Delete the POST route in routers/dashboard_real.py that sets source='manual'"
+    - "Leave the GET recommendation-listing route untouched"
+  must_not:
+    - "Introduce a feature flag, a hidden route, or a commented-out version of the path"
+    - "Delete or alter recommendations produced by Discovery"
+    - "Change the recommendation model schema"
+
+specification:
+  structure:
+    entry_point: "routers/dashboard_real.py"
+    modules:
+      - "routers/dashboard_real.py — remove the manual POST route"
+      - "templates/dashboard.html — remove the button and modal"
+      - "static/js/dashboard.js — remove the handler"
+      - "tests/test_no_manual_recommendations.py — assert the path is gone"
+
+  implementation_details:
+    patterns: ["Router deletion", "Template pruning"]
+    error_handling:
+      - error_type: "404 Not Found"
+        handling: "Expected response for the removed endpoint — assert it in tests"
+
+  inputs:
+    - name: "dashboard_request"
+      type: "Request"
+      description: "Ordinary dashboard page load"
+      example: "GET /dashboard"
+
+  outputs:
+    - name: "rendered_dashboard"
+      type: "HTMLResponse"
+      description: "Dashboard with a reflowed card grid and no manual-entry control"
+      example: "200 OK, no 'add your own idea' string in the body"
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "templates/dashboard.html contains no add-idea button, modal or trigger"
+  - criterion_id: "AC-002"
+    description: "static/js/dashboard.js contains no handler posting a manual recommendation"
+  - criterion_id: "AC-003"
+    description: "The manual POST route is absent and the path returns 404"
+  - criterion_id: "AC-004"
+    description: "The card grid reflows with no orphan cell where the control was"
+  - criterion_id: "AC-005"
+    description: "No code path can set source='manual' on a recommendation"
+
+test_scenarios:
+  - name: "dashboard_has_no_manual_control"
+    given: "The dashboard is rendered"
+    when: "The HTML is searched for add-idea affordances"
+    then: "None are found"
+  - name: "manual_endpoint_is_gone"
+    given: "The application is running"
+    when: "A POST is made to the former manual recommendation endpoint"
+    then: "The response is 404"
+  - name: "discovery_recommendations_still_listed"
+    given: "Discovery-produced recommendations exist"
+    when: "The dashboard is loaded"
+    then: "They are all still displayed"

@@ -1,0 +1,74 @@
+# ====================================================================================
+# FEATURE: Anti-drift — remove every manual idea-injection path
+# ====================================================================================
+# Baseline-0 phase W0. Track I, outstanding item M2-OA-15 (priority HIGHEST).
+#
+# Causal Affect is an autonomous engine: every build must originate from Discovery.
+# The dashboard's "Add Your Own Idea" control bypasses that entirely, which makes the
+# learning loop unmeasurable — you cannot tell whether the system is improving if a
+# human keeps feeding it answers. This feature removes the path, not just the button.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-900-01"
+  requirement_id: "FEATURE-CA-900-01"
+  feature_name: "Anti-drift — Remove Manual Idea Injection"
+  requirement_name: "Anti-drift — Remove Manual Idea Injection"
+  feature_code: "CA-900-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["A3"]
+  outstanding_items: ["M2-OA-15"]
+
+overview:
+  description: |
+    Remove the manual recommendation entry path from the dashboard UI, the client-side
+    handler and the API, so that no recommendation can exist that Discovery did not
+    produce. Reflow the card grid so removing the control leaves no orphan whitespace.
+
+  business_value:
+    - "Restores the guarantee that every build traces back to a causal signal"
+    - "Makes the learning loop measurable — no human-seeded results to confound it"
+    - "Removes an unauthenticated write path into the recommendation table"
+
+  user_story: |
+    As the owner of an autonomous system, I want no way to hand it an idea, so that
+    every result it produces is genuinely its own and the learning loop means something.
+
+  acceptance_criteria:
+    - "The dashboard contains no control, modal or link for adding an idea manually"
+    - "The POST endpoint that created source='manual' recommendations is removed and returns 404"
+    - "The recommendation card grid reflows with no empty cell where the control was"
+    - "No code path can write a recommendation with source='manual'"
+    - "Existing tests still pass and a new test asserts the endpoint is gone"
+
+layers:
+  - layer_id: "LAYER-CA-900-01-01"
+    name: "Manual Path Removal"
+    folder: "LAYER_CA_900_01_01_Manual_Path_Removal"
+    responsibility: "Strip the manual-entry UI, handler and endpoint; reflow the grid"
+    technology: "FastAPI, Jinja2, vanilla JS"
+    requirement_file: "LAYER-CA-900-01-01_manual_path_removal.yaml"
+    requirements:
+      - "LAYER-CA-900-01-01"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "dashboard_real"
+  module_name: "dashboard_real"
+  endpoint_prefix: "/api/dashboard"
+  operations:
+    - name: "list_recommendations"
+      http_method: "get"
+      path: "/recommendations"
+      orchestrator_method: "list_recommendations"
+      description: "Read-only listing; the manual POST counterpart is deleted"
+
+integration_scenarios:
+  - "Dashboard renders with recommendations and no manual-entry control"
+  - "POST to the former manual endpoint returns 404"
+
+e2e_scenarios:
+  - "Load the dashboard, search the DOM for any add-idea affordance, find none"

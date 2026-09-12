@@ -13,6 +13,7 @@ import argparse
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from .core import AuditContext, Status, run_stage
@@ -39,6 +40,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--every-stage", action="store_true",
                    help="comment after every stage instead of only on problems and completion")
     p.add_argument("--label", help="human-readable name for this run, used in notifications")
+    p.add_argument("--gate", action="store_true",
+                   help="exit non-zero if any selected link is broken (for phase workflows; "
+                        "the diagnostic workflow leaves this off so blockers stay a finding)")
+    p.add_argument("--verdict-out", help="write the plain-English verdict to this file")
+    p.add_argument("--no-verdict-comment", action="store_true",
+                   help="do not post the verdict directly; b0.publish_report posts it "
+                        "alongside the full report instead")
     p.add_argument("--list", action="store_true", help="list modules and stages, then exit")
     return p.parse_args(argv)
 
@@ -73,22 +81,30 @@ def verdict(label: str, results: list) -> str:
     lines = [f"## {headline}", "", f"{len(results) - len(broken)} of {len(results)} checks passed."]
     if broken:
         lines += ["", "**What's broken:**", ""]
-        lines += [f"- {r.status.icon} {r.name} — {' '.join(r.summary.split())[:160]}" for r in broken[:10]]
-        lines += ["", "Full detail is in the report below."]
+        lines += [f"- {r.status.icon} {r.name} — {' '.join(r.summary.split())}" for r in broken]
     return "\n".join(lines)
 
 
 def notify(issue: str | None, body: str) -> None:
-    """Progress goes to a GitHub issue so it reaches the GitHub mobile app."""
+    """Progress goes to a GitHub issue so it reaches the GitHub mobile app.
+
+    Always --body-file: a long --body is passed as a shell argument and would be
+    rejected or silently mangled once the report grows.
+    """
     if not issue:
         return
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as fh:
+        fh.write(body)
+        path = fh.name
     try:
         subprocess.run(
-            ["gh", "issue", "comment", issue, "--body", body],
+            ["gh", "issue", "comment", issue, "--body-file", path],
             check=True, capture_output=True, timeout=60,
         )
     except (subprocess.SubprocessError, FileNotFoundError) as exc:
         print(f"[notify] could not post to issue {issue}: {exc}", file=sys.stderr)
+    finally:
+        os.unlink(path)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -144,7 +160,17 @@ def main(argv: list[str] | None = None) -> int:
     report_path.write_text(build_report(ctx, results), encoding="utf-8")
     print(f"\nReport written to {report_path}")
 
-    notify(args.issue, verdict(label, results))
+    summary = verdict(label, results)
+    if args.verdict_out:
+        Path(args.verdict_out).resolve().write_text(summary, encoding="utf-8")
+    if not args.no_verdict_comment:
+        notify(args.issue, summary)
+
+    broken = [r for r in results if r.status.is_blocking]
+    if args.gate and broken:
+        names = ", ".join(r.id for r in broken)
+        print(f"::error title=Gate failed::broken link(s): {names}", file=sys.stderr)
+        return 2
 
     # Blockers are the expected deliverable, not a build failure.
     return 0 if not any(r.status is Status.ERROR for r in results) else 1

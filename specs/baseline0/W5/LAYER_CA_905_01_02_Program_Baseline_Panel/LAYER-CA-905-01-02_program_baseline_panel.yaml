@@ -1,0 +1,103 @@
+# ================================================================================
+# LAYER: Program Baseline Panel   (LAYER-CA-905-01-02)
+# Feature: FEATURE-CA-905-01 Performance Dashboard and Scoring
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-905-01-02"
+  requirement_title: "Program Baseline Panel"
+  layer: "LAYER_CA_905_01_02_Program_Baseline_Panel"
+  feature: "FEATURE-CA-905-01_performance_dashboard_and_scoring"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Program Baseline Panel"
+
+  description: |
+    Surface per-app performance with its four components on the Performance tab, and
+    extend the Program Baseline tab with two scatter plots — verification quality
+    against engagement, and quality against revenue — plus a plain-English correlation
+    summary. Opening the panel triggers the on-demand telemetry refresh.
+
+  rationale: |
+    This is the one place a human can see whether the machine's own quality signal
+    predicts commercial outcome. It must stay strictly read-only: the moment a panel
+    like this acquires an approve button, the loop stops being autonomous and the
+    learning data becomes a record of human preference instead.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Render both scatter plots and a correlation summary in words"
+    - "Trigger the on-demand telemetry refresh when the panel opens"
+    - "State plainly when there is too little data to correlate"
+    - "Keep every control read-only"
+  must_not:
+    - "Add any approve, reject, promote or override control"
+    - "Present a correlation from fewer than ten points without saying so"
+    - "Block rendering while telemetry refreshes"
+
+specification:
+  structure:
+    entry_point: "routers/dashboard_real.py"
+    modules:
+      - "routers/dashboard_real.py — performance and quality-outcome endpoints"
+      - "static/js/program_baseline.js — scatter and correlation rendering"
+      - "templates/dashboard.html — Program Baseline tab extension"
+      - "tests/test_program_baseline_panel.py — endpoint tests"
+
+  implementation_details:
+    libraries: ["Jinja2"]
+    patterns: ["Read-only projection", "Progressive rendering"]
+    error_handling:
+      - error_type: "InsufficientData"
+        handling: "Render the panel with an explicit 'not enough builds yet' message"
+      - error_type: "TelemetryRefreshFailed"
+        handling: "Render stale data with its age shown, rather than an empty panel"
+
+  inputs:
+    - name: "builds"
+      type: "list[dict]"
+      description: "Builds with verification status and telemetry"
+      example: '[{"build_id": 42, "verification_status": "VERIFIED", "score": 61.4}]'
+
+  outputs:
+    - name: "panel_data"
+      type: "dict"
+      description: "Scatter series and correlation summary"
+      example: '{"points": [...], "correlation": {"quality_revenue": 0.42, "n": 14}}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Each deployed app shows its score and four components"
+  - criterion_id: "AC-002"
+    description: "Both scatter plots render on the Program Baseline tab"
+  - criterion_id: "AC-003"
+    description: "A correlation summary is shown in plain English"
+  - criterion_id: "AC-004"
+    description: "Fewer than ten points is stated explicitly rather than implied"
+  - criterion_id: "AC-005"
+    description: "Opening the panel refreshes telemetry on demand"
+  - criterion_id: "AC-006"
+    description: "No approval or override control exists on any surface"
+
+test_scenarios:
+  - name: "panel_renders_with_data"
+    given: "Fourteen builds with telemetry"
+    when: "The Program Baseline tab is opened"
+    then: "Both scatters and a correlation summary are returned"
+  - name: "sparse_data_is_stated"
+    given: "Three builds with telemetry"
+    when: "The panel is opened"
+    then: "It says there is not enough data to correlate"
+  - name: "panel_is_read_only"
+    given: "The rendered panel"
+    when: "It is searched for mutating controls"
+    then: "None are found"

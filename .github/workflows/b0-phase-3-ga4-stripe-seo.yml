@@ -1,0 +1,59 @@
+# ============================================================
+# W3 — GA4, STRIPE & SEO WIRING  (Baseline-0 links B7, B8, B9)
+# ============================================================
+# Makes a deployed app measurable and able to take money.
+#
+# Injects a real GA4 measurement ID into generated apps with build_id as a custom
+# dimension (M2-OA-13), adds Stripe product and price auto-creation with build_id in
+# the metadata (M2-OA-05), provisions the Stripe environment variables on Railway
+# that risk R1 flags as missing, and emits the SEO block — meta description, Open
+# Graph, canonical, sitemap and JSON-LD.
+#
+# Stripe is touched in TEST mode only. A live key aborts the run.
+
+name: "🅆3 Baseline-0 · GA4, Stripe & SEO"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate specs, no AI generation, no changes'
+        required: false
+        type: boolean
+        default: true
+      budget_minutes:
+        description: 'Soft time budget in minutes'
+        required: false
+        type: number
+        default: 40
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  phase:
+    uses: ./.github/workflows/b0-phase-template.yml
+    secrets: inherit
+    with:
+      phase: W3
+      title: "GA4, Stripe & SEO"
+      module: phase-3
+      budget_minutes: ${{ inputs.budget_minutes }}
+      prod_url: ${{ inputs.prod_url }}
+      dry_run: ${{ inputs.dry_run }}
+      notify_user: ${{ inputs.notify_user }}
+      issue_number: ${{ inputs.issue_number }}

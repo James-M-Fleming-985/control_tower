@@ -1,0 +1,229 @@
+# ============================================================
+# W8 — LIVE USER-JOURNEY CONFIRMATION  (the final check, with you in it)
+# ============================================================
+# Everything before this proves the code works. This proves the product works, by
+# having you use it and then finding independent machine traces of each thing you
+# did. A step you cannot be shown evidence for is reported NOT OBSERVED, never
+# quietly passed.
+#
+# Two modes:
+#   start   — opens a checklist issue and gives you a session token, then optionally
+#             waits while you walk the site and runs the correlation when you tick
+#             the last box.
+#   confirm — run the correlation on its own, for a journey you have already walked.
+#
+# Read-only. Stripe is queried in TEST mode only. Nothing is written to production.
+
+name: "🅆8 Baseline-0 · Live User-Journey Confirmation"
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'What do you want to do?'
+        required: true
+        type: choice
+        options:
+          - 'Start — give me the checklist, then confirm when I finish'
+          - 'Confirm only — I have already walked the journey'
+        default: 'Start — give me the checklist, then confirm when I finish'
+      wait_minutes:
+        description: 'How long to wait for you to finish (0 = post the checklist and stop)'
+        required: false
+        type: number
+        default: 90
+      session:
+        description: 'Confirm-only: the session token from the earlier run'
+        required: false
+        type: string
+      since:
+        description: 'Confirm-only: ISO8601 start of the journey, e.g. 2026-09-12T09:00:00Z'
+        required: false
+        type: string
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  journey:
+    name: "W8 — Live User-Journey Confirmation"
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+
+    steps:
+      - name: "📥 Checkout control_tower"
+        uses: actions/checkout@v4
+
+      - name: "🐍 Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: "📦 Install dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml psycopg2-binary google-analytics-data
+
+      - name: "🔑 Mint the session"
+        id: session
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "Confirm only — I have already walked the journey" ]; then
+            SESSION="${{ inputs.session }}"
+            SINCE="${{ inputs.since }}"
+            if [ -z "$SESSION" ] || [ -z "$SINCE" ]; then
+              echo "::error title=Missing details::Confirm-only needs both session and since"
+              exit 1
+            fi
+          else
+            SESSION="ct-${{ github.run_id }}"
+            SINCE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          fi
+          echo "token=$SESSION" >> "$GITHUB_OUTPUT"
+          echo "since=$SINCE" >> "$GITHUB_OUTPUT"
+          echo "Session $SESSION from $SINCE"
+
+      - name: "📝 Open the checklist issue"
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.issue_number }}" ]; then
+            NUMBER="${{ inputs.issue_number }}"
+          else
+            TITLE="W8 Live journey — $(date -u '+%d %b %H:%M') UTC"
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            BODY_FILE=$(mktemp)
+            {
+              echo "## Walk the live site — this is the last Baseline-0 check"
+              echo ""
+              echo "Your session token is \`${{ steps.session.outputs.token }}\`."
+              echo "Add \`?ct_session=${{ steps.session.outputs.token }}\` to the URL when you"
+              echo "open any deployed app, so your visit is provably yours."
+              echo ""
+              echo "**Site:** ${{ inputs.prod_url }}"
+              echo ""
+              echo "Tick each box as you go. When the last one is ticked, this run checks"
+              echo "every step against the database, GA4 and Stripe, and tells you whether"
+              echo "each one left a trace."
+              echo ""
+              echo "- [ ] **J1** Open the dashboard"
+              echo "- [ ] **J2** Read the recommendations on the Exploitation Board"
+              echo "- [ ] **J3** Confirm there is no way to add your own idea by hand"
+              echo "- [ ] **J4** Select a recommendation and start the build"
+              echo "- [ ] **J5** Watch the build log, then open the build evidence link"
+              echo "- [ ] **J6** Open the GitHub repo it shipped to"
+              echo "- [ ] **J7** Open the deployed app, with \`?ct_session=${{ steps.session.outputs.token }}\`"
+              echo "- [ ] **J8** Click around the deployed app so it reports engagement"
+              echo "- [ ] **J9** Complete a Stripe **test** checkout (card 4242 4242 4242 4242)"
+              echo "- [ ] **J10** Go back to the Performance tab and find that app"
+              echo "- [ ] **J11** Iterate the winner"
+              echo ""
+              echo "- [ ] **DONE — I have finished the journey**"
+              echo ""
+              echo "**Live run:** $RUN_URL"
+            } > "$BODY_FILE"
+            URL=$(gh issue create --repo "${{ github.repository }}" \
+                    --title "$TITLE" --body-file "$BODY_FILE")
+            NUMBER="${URL##*/}"
+          fi
+
+          if [ -n "${{ inputs.notify_user }}" ]; then
+            gh issue edit "$NUMBER" --repo "${{ github.repository }}" \
+              --add-assignee "${{ inputs.notify_user }}" || true
+          fi
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: "⏳ Wait for you to finish"
+        if: inputs.wait_minutes > 0 && inputs.mode != 'Confirm only — I have already walked the journey'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DEADLINE=$(( $(date +%s) + ${{ inputs.wait_minutes }} * 60 ))
+          echo "Waiting up to ${{ inputs.wait_minutes }} minutes for the DONE box."
+          while [ "$(date +%s)" -lt "$DEADLINE" ]; do
+            BODY=$(gh issue view "${{ steps.issue.outputs.number }}" \
+                     --repo "${{ github.repository }}" --json body --jq .body)
+            if echo "$BODY" | grep -qiE '^\- \[x\] \*\*DONE'; then
+              echo "DONE ticked — running the correlation."
+              exit 0
+            fi
+            sleep 60
+          done
+          echo "::warning title=Timed out::The DONE box was never ticked. Checking anyway."
+
+      - name: "🔎 Correlate the journey against the traces"
+        id: correlate
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_CREDENTIALS_JSON: ${{ secrets.GA4_CREDENTIALS_JSON }}
+        run: |
+          set +e
+          PYTHONPATH=scripts python -m b0.session_correlate \
+            --session "${{ steps.session.outputs.token }}" \
+            --since "${{ steps.session.outputs.since }}" \
+            --prod-url "${{ inputs.prod_url }}" \
+            --out JOURNEY_REPORT.md \
+            --strict
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: "📣 Publish the report in full"
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.correlate.outputs.code }}" = "0" ]; then
+            HEADLINE="✅ Baseline 0 CONFIRMED — every step you took left a trace"
+            FAILED=""
+          else
+            HEADLINE="🔴 Baseline 0 not confirmed — some steps left no trace, needs you"
+            FAILED="--failed"
+          fi
+          PYTHONPATH=scripts python -m b0.publish_report \
+            --report JOURNEY_REPORT.md \
+            --repo "${{ github.repository }}" \
+            --issue "${{ steps.issue.outputs.number }}" \
+            --headline "$HEADLINE" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --gist-name "W8-journey-report.md" \
+            --chunk-mode always \
+            $FAILED
+
+      - name: "📎 Upload the journey record"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: W8-journey-${{ github.run_id }}
+          path: JOURNEY_REPORT.md
+          retention-days: 365
+          if-no-files-found: warn
+
+      - name: "🛑 Fail the run if the journey was not confirmed"
+        if: always()
+        run: |
+          if [ "${{ steps.correlate.outputs.code }}" != "0" ]; then
+            echo "::error title=Not confirmed::one or more journey steps left no trace"
+            exit 1
+          fi

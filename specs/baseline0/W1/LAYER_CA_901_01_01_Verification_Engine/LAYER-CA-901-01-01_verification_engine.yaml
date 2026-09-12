@@ -1,0 +1,107 @@
+# ================================================================================
+# LAYER: Verification Engine   (LAYER-CA-901-01-01)
+# Feature: FEATURE-CA-901-01 Test Gate and Verification
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-901-01-01"
+  requirement_title: "Verification Engine"
+  layer: "LAYER_CA_901_01_01_Verification_Engine"
+  feature: "FEATURE-CA-901-01_test_gate_and_verification"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Verification Engine"
+
+  description: |
+    Implement execute_verification_phase() in the AI code generator orchestrator, a
+    true port of the PROJECT-004 verification engine. Inject REQ-AC-NNN tags into the
+    spec, test and implementation prompts so every generated artefact is traceable to
+    the criterion it exists to satisfy, then emit a five-file bundle per build:
+    traceability_matrix.yaml, requirements_verification.yaml, execution_evidence.json,
+    quality_gates_report.yaml and README_VERIFICATION.md.
+
+  rationale: |
+    VERIFICATION is already declared in VALID_PHASES but never implemented, so builds
+    claim a status they never earned. Evidence must be produced by the machine as a
+    by-product of building, not assembled by a human afterwards — otherwise it is
+    documentation rather than proof, and the learning loop has nothing to correlate.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Tag every generated test and implementation block with its REQ-AC-NNN criterion"
+    - "Write all five artefact files for every build, pass or fail"
+    - "Push the bundle to the build's own GitHub repository"
+    - "Persist verification_status and verification_artifacts_url on the MVPBuild row"
+    - "Expose the bundle read-only"
+  must_not:
+    - "Introduce any human approval step, prompt or wait"
+    - "Mark a build verified when any criterion is unmet"
+    - "Fabricate evidence for a phase that did not run"
+
+specification:
+  structure:
+    entry_point: "services/ai_code_generator_orchestrator.py"
+    modules:
+      - "services/ai_code_generator_orchestrator.py — execute_verification_phase()"
+      - "services/verification_engine.py — bundle construction and traceability matrix"
+      - "tests/test_verification_engine.py — unit tests"
+
+  implementation_details:
+    libraries: ["PyYAML", "pytest"]
+    patterns: ["Service Layer Pattern", "Template Method for phase execution"]
+    error_handling:
+      - error_type: "VerificationError"
+        handling: "Record the failure, mark the build unverified, never raise past the phase"
+      - error_type: "ArtifactWriteError"
+        handling: "Log and mark artefacts unavailable; do not claim the build verified"
+
+  inputs:
+    - name: "build_context"
+      type: "dict"
+      description: "Spec, generated tests, implementation and pytest results for one build"
+      example: '{"build_id": 42, "criteria": ["REQ-AC-001"], "tests_passed": 11}'
+
+  outputs:
+    - name: "verification_result"
+      type: "dict"
+      description: "Status, per-criterion outcome and the artefact bundle location"
+      example: '{"status": "VERIFIED", "artifacts_url": "https://github.com/.../Requirements_Verification"}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "execute_verification_phase() runs for every build and returns a status"
+  - criterion_id: "AC-002"
+    description: "All five artefact files are produced, for failing builds as well as passing ones"
+  - criterion_id: "AC-003"
+    description: "Every acceptance criterion appears in the traceability matrix against a test"
+  - criterion_id: "AC-004"
+    description: "verification_status and verification_artifacts_url persist on MVPBuild"
+  - criterion_id: "AC-005"
+    description: "A build with one unmet criterion is never reported as VERIFIED"
+  - criterion_id: "AC-006"
+    description: "The bundle is reachable read-only and requires no approval to proceed"
+  - criterion_id: "AC-007"
+    description: "The phase adds no human wait state anywhere in the pipeline"
+
+test_scenarios:
+  - name: "bundle_written_for_passing_build"
+    given: "A build whose tests all pass"
+    when: "The verification phase runs"
+    then: "Five artefacts exist and the status is VERIFIED"
+  - name: "bundle_written_for_failing_build"
+    given: "A build with one failing criterion"
+    when: "The verification phase runs"
+    then: "Five artefacts exist and the status is not VERIFIED"
+  - name: "traceability_covers_every_criterion"
+    given: "A spec with seven acceptance criteria"
+    when: "The traceability matrix is generated"
+    then: "All seven appear, each mapped to at least one test"

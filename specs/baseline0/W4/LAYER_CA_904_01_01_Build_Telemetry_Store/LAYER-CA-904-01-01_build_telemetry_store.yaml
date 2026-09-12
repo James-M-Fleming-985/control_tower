@@ -1,0 +1,99 @@
+# ================================================================================
+# LAYER: Build Telemetry Store   (LAYER-CA-904-01-01)
+# Feature: FEATURE-CA-904-01 Telemetry and Revenue Attribution
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-904-01-01"
+  requirement_title: "Build Telemetry Store"
+  layer: "LAYER_CA_904_01_01_Build_Telemetry_Store"
+  feature: "FEATURE-CA-904-01_telemetry_and_revenue_attribution"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "Build Telemetry Store"
+
+  description: |
+    Define the BuildTelemetry model — build_id, engagement metrics, revenue metrics,
+    conversion and retention inputs, source timestamps and updated_at — with a
+    migration, and refresh rows on demand rather than on a schedule.
+
+  rationale: |
+    On-demand refresh is a deliberate choice recorded in M2-OA-16: a nightly job or a
+    BigQuery stream would add moving parts and latency for data that is only ever read
+    when someone opens a panel. Keeping updated_at on the row is what later lets the
+    live-journey check prove a specific visit was recorded, rather than merely that
+    data exists.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Key the table on build_id with a unique constraint"
+    - "Provide a migration that is reversible"
+    - "Record updated_at and the source timestamps for each half of the join"
+    - "Return zeroes, not an error, for a build with no activity"
+  must_not:
+    - "Duplicate GA4 as a bespoke event collector"
+    - "Run a scheduled refresh job"
+    - "Drop or rewrite existing tables"
+
+specification:
+  structure:
+    entry_point: "models.py"
+    modules:
+      - "models.py — the BuildTelemetry model"
+      - "migrations/ — reversible schema migration"
+      - "services/build_telemetry.py — refresh and read"
+      - "tests/test_build_telemetry_store.py — unit tests"
+
+  implementation_details:
+    libraries: ["SQLAlchemy", "Alembic"]
+    patterns: ["Repository Pattern", "Upsert on refresh"]
+    error_handling:
+      - error_type: "MissingBuild"
+        handling: "Return an empty telemetry row rather than raising"
+
+  inputs:
+    - name: "build_id"
+      type: "int"
+      description: "The build to read or refresh telemetry for"
+      example: "42"
+
+  outputs:
+    - name: "telemetry"
+      type: "dict"
+      description: "Engagement and revenue for the build, with freshness"
+      example: '{"build_id": 42, "sessions": 120, "revenue_gbp": 27.0, "updated_at": "..."}'
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "BuildTelemetry exists with a unique build_id and a reversible migration"
+  - criterion_id: "AC-002"
+    description: "Refresh upserts rather than duplicating rows"
+  - criterion_id: "AC-003"
+    description: "updated_at and source timestamps are recorded on every refresh"
+  - criterion_id: "AC-004"
+    description: "A build with no activity returns zeroes without raising"
+  - criterion_id: "AC-005"
+    description: "No scheduled job refreshes telemetry"
+
+test_scenarios:
+  - name: "upsert_does_not_duplicate"
+    given: "Telemetry already exists for a build"
+    when: "Refresh runs again"
+    then: "The row is updated and no second row appears"
+  - name: "empty_build_returns_zeroes"
+    given: "A build with no engagement or revenue"
+    when: "Telemetry is read"
+    then: "Zeroes are returned and nothing raises"
+  - name: "migration_is_reversible"
+    given: "The migration is applied"
+    when: "It is rolled back"
+    then: "The schema returns to its previous state"

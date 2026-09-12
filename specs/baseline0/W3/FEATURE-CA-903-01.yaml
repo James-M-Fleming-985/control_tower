@@ -1,0 +1,97 @@
+# ====================================================================================
+# FEATURE: GA4, Stripe and SEO
+# ====================================================================================
+# Baseline-0 phase W3. Links B7, B8 and B9. Items M2-OA-05, M2-OA-13, part of M2-OA-16.
+#
+# Makes a deployed app measurable and able to take money. Stripe is TEST mode only;
+# risk R1 in the ledger is the missing Stripe environment configuration on Railway.
+# ====================================================================================
+
+metadata:
+  feature_id: "FEATURE-CA-903-01"
+  requirement_id: "FEATURE-CA-903-01"
+  feature_name: "GA4, Stripe and SEO"
+  requirement_name: "GA4, Stripe and SEO"
+  feature_code: "CA-903-01"
+  version: "1.0.0"
+  status: "Active"
+  owner: "Causal Affect Team"
+  priority: "MUST HAVE"
+  baseline0_links: ["B7", "B8", "B9"]
+  outstanding_items: ["M2-OA-05", "M2-OA-13", "M2-OA-16"]
+
+overview:
+  description: |
+    Inject a real GA4 measurement ID into every generated application, carrying the
+    build_id as a custom dimension; auto-create the Stripe product and price for a
+    build with build_id in the metadata, and provision the Stripe environment
+    variables on the deployed service; emit the SEO block so the app is indexable.
+
+  business_value:
+    - "Engagement and revenue become attributable to the build that produced them"
+    - "Removes risk R1 — Stripe configured but unusable in the deployed environment"
+    - "An app nobody can find earns nothing, however good it is"
+
+  user_story: |
+    As the owner, I want each deployed app to report its own engagement and revenue
+    and be findable, so that the loop can learn from what actually happened.
+
+  acceptance_criteria:
+    - "Every generated app carries a real GA4 measurement ID, never a placeholder"
+    - "The GA4 beacon sends build_id as a custom dimension"
+    - "A Stripe product and price are created per build, with build_id in the metadata"
+    - "Stripe environment variables are provisioned on the deployed service"
+    - "Checkout completes in Stripe test mode"
+    - "The app emits title, meta description, canonical, Open Graph, JSON-LD, robots and sitemap"
+
+layers:
+  - layer_id: "LAYER-CA-903-01-01"
+    name: "GA4 Beacon Injector"
+    folder: "LAYER_CA_903_01_01_GA4_Beacon_Injector"
+    responsibility: "Inject the GA4 snippet with build_id binding into generated apps"
+    technology: "Python, Jinja2, gtag.js"
+    requirement_file: "LAYER-CA-903-01-01_ga4_beacon_injector.yaml"
+    requirements:
+      - "LAYER-CA-903-01-01"
+
+  - layer_id: "LAYER-CA-903-01-02"
+    name: "Stripe Product Provisioner"
+    folder: "LAYER_CA_903_01_02_Stripe_Product_Provisioner"
+    responsibility: "Auto-create product and price, tag with build_id, configure the service"
+    technology: "Python, Stripe API"
+    requirement_file: "LAYER-CA-903-01-02_stripe_product_provisioner.yaml"
+    requirements:
+      - "LAYER-CA-903-01-02"
+
+  - layer_id: "LAYER-CA-903-01-03"
+    name: "SEO Metadata Emitter"
+    folder: "LAYER_CA_903_01_03_SEO_Metadata_Emitter"
+    responsibility: "Emit metadata, structured data, robots.txt and sitemap.xml"
+    technology: "Python, Jinja2"
+    requirement_file: "LAYER-CA-903-01-03_seo_metadata_emitter.yaml"
+    requirements:
+      - "LAYER-CA-903-01-03"
+
+production_integration:
+  target_router_file: "routers/dashboard_real.py"
+  import_alias: "monetisation"
+  module_name: "monetisation_service"
+  endpoint_prefix: "/api/builds"
+  operations:
+    - name: "get_beacon_config"
+      http_method: "get"
+      path: "/{build_id}/beacon"
+      orchestrator_method: "get_beacon_config"
+      description: "GA4 measurement id and build_id binding for a build"
+    - name: "provision_stripe"
+      http_method: "post"
+      path: "/{build_id}/stripe"
+      orchestrator_method: "provision_stripe_product"
+      description: "Create the test-mode product and price for a build"
+
+integration_scenarios:
+  - "A newly generated app serves HTML containing a real measurement id and its build_id"
+  - "A test-mode checkout session carries the build_id in metadata"
+
+e2e_scenarios:
+  - "Deploy an app, complete a test checkout, and see both the event and the payment tagged"

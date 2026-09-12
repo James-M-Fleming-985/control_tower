@@ -1,0 +1,333 @@
+# ============================================================
+# b0-gate — test, gate, merge, deploy-check, report
+# ============================================================
+# The second half of every Baseline-0 phase. Runs the target repo's tests, gates on
+# the Baseline-0 links that phase was supposed to fix, merges only if both pass,
+# then verifies production still serves traffic and reverts if it does not.
+#
+# Finally it publishes the report IN FULL — verdict comment, gist link, and the
+# whole report posted into the issue thread — and fails the run if any of that
+# was truncated.
+
+name: "Baseline-0 phase gate"
+description: "Run tests, gate on audit links, merge on green, health-check, publish the full report"
+
+inputs:
+  phase:
+    description: "Phase identifier, e.g. W1"
+    required: true
+  title:
+    description: "Human-readable phase title"
+    required: true
+  module:
+    description: "Audit module to gate on, e.g. phase-1"
+    required: true
+  issue:
+    description: "Tracking issue number"
+    required: true
+  branch:
+    description: "Working branch in the target repository"
+    required: true
+  base_sha:
+    description: "Pre-change SHA of the target repo main branch"
+    required: true
+  prod_url:
+    description: "Live site to health-check after merge"
+    required: false
+    default: "https://businessventures-production.up.railway.app"
+  test_path:
+    description: "Pytest target inside the target repo"
+    required: false
+    default: "tests"
+  dry_run:
+    description: "Validate and report only — never merge"
+    required: false
+    default: "false"
+  chunk_mode:
+    description: "always | on-failure | never — when to post the full report in-thread"
+    required: false
+    default: "always"
+  health_wait_seconds:
+    description: "How long to let Railway redeploy before probing"
+    required: false
+    default: "120"
+  github_token:
+    description: "Token for issue and gist operations"
+    required: true
+  cross_repo_pat:
+    description: "PAT with repo scope for pushing to the target repository"
+    required: true
+  database_url:
+    description: "Postgres URL for row-count probes"
+    required: false
+    default: ""
+  stripe_test_secret_key:
+    description: "Stripe TEST key; a live key is refused"
+    required: false
+    default: ""
+  ga4_property_id:
+    required: false
+    default: ""
+  ga4_credentials_json:
+    required: false
+    default: ""
+
+outputs:
+  gate:
+    description: "pass | fail"
+    value: ${{ steps.gate.outputs.result }}
+  merged:
+    description: "Whether the change reached the target repo main branch"
+    value: ${{ steps.merge.outputs.decision }}
+
+runs:
+  using: "composite"
+  steps:
+    # ---------------------------------------------------------------- tests
+    - name: "🧪 Run the target repository's tests"
+      id: tests
+      shell: bash
+      continue-on-error: true
+      working-directory: target_repo
+      run: |
+        set +e
+        if [ ! -d "${{ inputs.test_path }}" ]; then
+          echo "::warning title=No tests::${{ inputs.test_path }} not found in target repo"
+          echo '{"run":0,"passed":0,"failed":0,"failures":[],"note":"no test directory"}' \
+            > "$GITHUB_WORKSPACE/test_facts.json"
+          echo "result=skipped" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        python -m pytest "${{ inputs.test_path }}" -q \
+          --json-report --json-report-file="$GITHUB_WORKSPACE/pytest.json"
+        CODE=$?
+        python - <<'PY'
+        import json, os, pathlib
+        src = pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "pytest.json"
+        out = pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "test_facts.json"
+        if not src.is_file():
+            out.write_text(json.dumps(
+                {"run": 0, "passed": 0, "failed": 0, "failures": [],
+                 "note": "pytest produced no report"}))
+            raise SystemExit(0)
+        data = json.loads(src.read_text())
+        summary = data.get("summary", {})
+        failures = [t.get("nodeid", "?") for t in data.get("tests", [])
+                    if t.get("outcome") not in ("passed", "skipped", "xfailed")]
+        out.write_text(json.dumps({
+            "run": summary.get("total", 0),
+            "passed": summary.get("passed", 0),
+            "failed": summary.get("failed", 0) + summary.get("error", 0),
+            "failures": failures,
+        }, indent=2))
+        PY
+        [ $CODE -eq 0 ] && echo "result=pass" >> "$GITHUB_OUTPUT" \
+                        || echo "result=fail" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    # ---------------------------------------------------------------- audit gate
+    - name: "🔍 Gate on the Baseline-0 links this phase owns"
+      id: audit
+      shell: bash
+      continue-on-error: true
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        DATABASE_URL: ${{ inputs.database_url }}
+        STRIPE_TEST_SECRET_KEY: ${{ inputs.stripe_test_secret_key }}
+        GA4_PROPERTY_ID: ${{ inputs.ga4_property_id }}
+        GA4_CREDENTIALS_JSON: ${{ inputs.ga4_credentials_json }}
+      run: |
+        set +e
+        PYTHONPATH=scripts python -m baseline0_audit \
+          --control-tower . \
+          --business-ventures target_repo \
+          --prod-url "${{ inputs.prod_url }}" \
+          --output "$GITHUB_WORKSPACE/audit_results" \
+          --report "$GITHUB_WORKSPACE/AUDIT.md" \
+          --verdict-out "$GITHUB_WORKSPACE/VERDICT.md" \
+          --no-verdict-comment \
+          --label "${{ inputs.phase }} — ${{ inputs.title }}" \
+          --module "${{ inputs.module }}" \
+          --gate
+        echo "code=$?" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: "⚖️ Decide"
+      id: gate
+      shell: bash
+      run: |
+        set -euo pipefail
+        TESTS="${{ steps.tests.outputs.result }}"
+        AUDIT="${{ steps.audit.outputs.code }}"
+        if [ "$TESTS" = "fail" ] || [ "$AUDIT" != "0" ]; then
+          echo "result=fail" >> "$GITHUB_OUTPUT"
+          echo "::warning title=Gate failed::tests=$TESTS audit_exit=$AUDIT — nothing will be merged"
+        else
+          echo "result=pass" >> "$GITHUB_OUTPUT"
+        fi
+
+    # ---------------------------------------------------------------- merge
+    - name: "🚢 Merge to main (only on green)"
+      id: merge
+      shell: bash
+      working-directory: target_repo
+      env:
+        GH_TOKEN: ${{ inputs.cross_repo_pat }}
+      run: |
+        set -euo pipefail
+        DECISION="not attempted"
+        MERGE_SHA=""
+        if [ "${{ inputs.dry_run }}" = "true" ]; then
+          DECISION="skipped — dry run"
+        elif [ "${{ steps.gate.outputs.result }}" != "pass" ]; then
+          DECISION="refused — the gate did not pass"
+        elif git diff --quiet "${{ inputs.base_sha }}" HEAD; then
+          DECISION="nothing to merge — this phase changed no files"
+        else
+          git push origin "${{ inputs.branch }}"
+          git checkout main
+          git pull --ff-only origin main
+          git merge --no-ff "${{ inputs.branch }}" \
+            -m "${{ inputs.phase }}: ${{ inputs.title }} (run ${{ github.run_id }})"
+          git push origin main
+          MERGE_SHA=$(git rev-parse HEAD)
+          DECISION="merged to main"
+        fi
+        echo "decision=$DECISION" >> "$GITHUB_OUTPUT"
+        echo "sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
+        echo "$DECISION"
+
+    # ---------------------------------------------------------------- health + rollback
+    - name: "🩺 Health-check production, revert if it broke"
+      id: health
+      shell: bash
+      working-directory: target_repo
+      env:
+        GH_TOKEN: ${{ inputs.cross_repo_pat }}
+      run: |
+        set -euo pipefail
+        if [ "${{ steps.merge.outputs.decision }}" != "merged to main" ]; then
+          echo "status=not applicable" >> "$GITHUB_OUTPUT"
+          echo "rollback=not triggered" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        echo "Waiting ${{ inputs.health_wait_seconds }}s for Railway to redeploy…"
+        sleep "${{ inputs.health_wait_seconds }}"
+
+        CODE=0
+        for attempt in 1 2 3 4 5; do
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "${{ inputs.prod_url }}" || echo 000)
+          echo "attempt $attempt: HTTP $CODE"
+          [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ] && break
+          sleep 30
+        done
+
+        if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
+          echo "status=healthy (HTTP $CODE)" >> "$GITHUB_OUTPUT"
+          echo "rollback=not triggered" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Revert rather than reset: main is published, so history must not be rewritten.
+        echo "::error title=Production unhealthy::HTTP $CODE after merge — reverting"
+        git revert --no-edit -m 1 "${{ steps.merge.outputs.sha }}"
+        git push origin main
+        echo "status=unhealthy (HTTP $CODE)" >> "$GITHUB_OUTPUT"
+        echo "rollback=reverted ${{ steps.merge.outputs.sha }}, main restored to ${{ inputs.base_sha }}" >> "$GITHUB_OUTPUT"
+
+    # ---------------------------------------------------------------- report
+    - name: "📝 Assemble the full report"
+      if: always()
+      shell: bash
+      run: |
+        set -euo pipefail
+        python - <<PY
+        import json, pathlib
+        facts = {}
+        runner = pathlib.Path("phase_facts.json")
+        if runner.is_file():
+            facts = json.loads(runner.read_text())
+        tests = pathlib.Path("test_facts.json")
+        facts["tests"] = json.loads(tests.read_text()) if tests.is_file() else {}
+        facts["merge"] = {
+            "decision": """${{ steps.merge.outputs.decision }}""",
+            "sha": """${{ steps.merge.outputs.sha }}""",
+            "base_sha": """${{ inputs.base_sha }}""",
+        }
+        facts["deploy"] = {
+            "status": """${{ steps.merge.outputs.decision }}""",
+            "health": """${{ steps.health.outputs.status }}""",
+        }
+        facts["rollback"] = """${{ steps.health.outputs.rollback }}""" or "not triggered"
+        facts["outcome"] = (
+            "gate passed" if "${{ steps.gate.outputs.result }}" == "pass"
+            else "gate failed — nothing merged"
+        )
+        facts.setdefault("outstanding", [])
+        if "${{ steps.gate.outputs.result }}" != "pass":
+            facts["outstanding"].insert(
+                0, "This phase did not pass its gate, so its Baseline-0 links are still open.")
+        pathlib.Path("phase_facts.json").write_text(json.dumps(facts, indent=2))
+        PY
+
+        HEAD_SHA=$(git -C target_repo rev-parse HEAD)
+        PYTHONPATH=scripts python -m b0.phase_report \
+          --phase "${{ inputs.phase }}" \
+          --title "${{ inputs.title }}" \
+          --repo-path target_repo \
+          --base-sha "${{ inputs.base_sha }}" \
+          --head-sha "$HEAD_SHA" \
+          --facts phase_facts.json \
+          --append AUDIT.md \
+          --out FULL_REPORT.md
+
+    - name: "📣 Publish the report in full"
+      if: always()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        set -euo pipefail
+        if [ "${{ steps.gate.outputs.result }}" = "pass" ]; then
+          HEADLINE="✅ ${{ inputs.phase }} ${{ inputs.title }} — done, nothing needs you"
+          FAILED=""
+        else
+          HEADLINE="🔴 ${{ inputs.phase }} ${{ inputs.title }} — blocked, needs you"
+          FAILED="--failed"
+        fi
+        PYTHONPATH=scripts python -m b0.publish_report \
+          --report FULL_REPORT.md \
+          --repo "${{ github.repository }}" \
+          --issue "${{ inputs.issue }}" \
+          --headline "$HEADLINE" \
+          --verdict VERDICT.md \
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          --gist-name "${{ inputs.phase }}-report.md" \
+          --chunk-mode "${{ inputs.chunk_mode }}" \
+          $FAILED
+
+    - name: "📎 Upload the machine-readable record"
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.phase }}-${{ github.run_id }}
+        path: |
+          FULL_REPORT.md
+          AUDIT.md
+          VERDICT.md
+          phase_facts.json
+          test_facts.json
+          audit_results/
+        retention-days: 90
+        if-no-files-found: warn
+
+    - name: "🛑 Fail the run if the gate did not pass"
+      if: always()
+      shell: bash
+      run: |
+        if [ "${{ steps.gate.outputs.result }}" != "pass" ]; then
+          echo "::error title=Phase blocked::${{ inputs.phase }} did not pass its gate"
+          exit 1
+        fi

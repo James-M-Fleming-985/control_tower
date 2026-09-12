@@ -1,0 +1,97 @@
+# ================================================================================
+# LAYER: GA4 Beacon Injector   (LAYER-CA-903-01-01)
+# Feature: FEATURE-CA-903-01 GA4, Stripe and SEO
+# ================================================================================
+
+metadata:
+  requirement_id: "LAYER-CA-903-01-01"
+  requirement_title: "GA4 Beacon Injector"
+  layer: "LAYER_CA_903_01_01_GA4_Beacon_Injector"
+  feature: "FEATURE-CA-903-01_ga4_stripe_and_seo"
+  version: "1.0.0"
+  status: "Active"
+  priority: "MUST HAVE"
+  owner: "Causal Affect Team"
+
+requirement:
+  title: "GA4 Beacon Injector"
+
+  description: |
+    Inject the gtag.js snippet into every generated application at build time, reading
+    the measurement ID from configuration and setting build_id as a custom dimension on
+    every event so engagement can be attributed to the build that produced it.
+
+  rationale: |
+    GA4 is the system of record for engagement, per the M2-OA-16 decision — the point
+    is not to collect events but to bind them to a build. Engagement that cannot be
+    attributed teaches the loop nothing, because you can never say which build earned
+    it. Injection happens at generation time so no deployed app can exist without it.
+
+technical_constraints:
+  language: "python"
+  framework: "FastAPI"
+  output_file_type: "py"
+
+code_generation_constraints:
+  must:
+    - "Read the measurement id from environment configuration"
+    - "Set build_id as a GA4 custom dimension on every event"
+    - "Fail the build when no real measurement id is configured"
+    - "Inject into the base template so every page carries the beacon"
+  must_not:
+    - "Emit a placeholder id such as G-XXXXXXXXXX"
+    - "Hard-code a measurement id in generated source"
+    - "Send personally identifying information"
+
+specification:
+  structure:
+    entry_point: "services/ga4_service.py"
+    modules:
+      - "services/ga4_service.py — snippet construction and id resolution"
+      - "services/ai_code_generator_orchestrator.py — injection into generated templates"
+      - "tests/test_ga4_beacon_injector.py — unit tests"
+
+  implementation_details:
+    libraries: ["Jinja2"]
+    patterns: ["Template injection at generation time"]
+    error_handling:
+      - error_type: "MissingMeasurementId"
+        handling: "Fail the build rather than emit a placeholder"
+
+  inputs:
+    - name: "build"
+      type: "dict"
+      description: "The build being generated"
+      example: '{"build_id": 42}'
+
+  outputs:
+    - name: "beacon_snippet"
+      type: "str"
+      description: "gtag.js snippet with the build_id custom dimension bound"
+      example: "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-REAL...\">"
+
+acceptance_criteria:
+  - criterion_id: "AC-001"
+    description: "Every generated app contains the gtag.js snippet"
+  - criterion_id: "AC-002"
+    description: "The measurement id comes from configuration, never a literal"
+  - criterion_id: "AC-003"
+    description: "build_id is set as a custom dimension on every event"
+  - criterion_id: "AC-004"
+    description: "A placeholder measurement id fails the build"
+  - criterion_id: "AC-005"
+    description: "The beacon appears on every page, not only the landing page"
+
+test_scenarios:
+  - name: "beacon_is_injected"
+    given: "A generated application"
+    when: "The HTML is rendered"
+    then: "The gtag snippet is present with a real measurement id"
+  - name: "build_id_is_bound"
+    given: "A build with id 42"
+    when: "The beacon config is produced"
+    then: "build_id 42 is set as a custom dimension"
+  - name: "placeholder_fails_the_build"
+    given: "The configured id is G-XXXXXXXXXX"
+    when: "Generation runs"
+    then: "The build fails rather than shipping a placeholder"

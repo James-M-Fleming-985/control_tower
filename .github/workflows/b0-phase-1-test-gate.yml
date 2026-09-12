@@ -1,0 +1,59 @@
+# ============================================================
+# W1 — TEST GATE & VERIFICATION  (Baseline-0 links B3, B4)
+# ============================================================
+# Makes the build pipeline refuse to ship code that fails its own tests.
+#
+# Implements the verification phase (M2-OA-02) with REQ-AC tagging and the five-file
+# evidence bundle, adds the auto-REFACTOR retry loop that blocks deployment when
+# acceptance criteria still fail (M2-OA-18), and reorders the MVP builder so tests
+# run BEFORE the push to GitHub rather than after it.
+#
+# Run this before W2–W6: until the gate exists, every later phase can ship a broken
+# app and call it a success.
+
+name: "🅆1 Baseline-0 · Test Gate & Verification"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — validate specs, no AI generation, no changes'
+        required: false
+        type: boolean
+        default: true
+      budget_minutes:
+        description: 'Soft time budget in minutes'
+        required: false
+        type: number
+        default: 40
+      prod_url:
+        required: false
+        type: string
+        default: 'https://businessventures-production.up.railway.app'
+      notify_user:
+        description: 'Who gets the phone alert'
+        required: false
+        type: string
+        default: 'James-M-Fleming-985'
+      issue_number:
+        description: 'Post to an existing tracking issue (blank opens a new one)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  phase:
+    uses: ./.github/workflows/b0-phase-template.yml
+    secrets: inherit
+    with:
+      phase: W1
+      title: "Test Gate & Verification"
+      module: phase-1
+      budget_minutes: ${{ inputs.budget_minutes }}
+      prod_url: ${{ inputs.prod_url }}
+      dry_run: ${{ inputs.dry_run }}
+      notify_user: ${{ inputs.notify_user }}
+      issue_number: ${{ inputs.issue_number }}
