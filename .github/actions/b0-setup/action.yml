@@ -52,6 +52,88 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # The issue comes first so that anything failing below has somewhere to report.
+    # It used to be created last, which meant a failed checkout left the phone silent.
+    - name: "📝 Open or reuse the tracking issue"
+      id: issue
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        set -euo pipefail
+        if [ -n "${{ inputs.issue_number }}" ]; then
+          NUMBER="${{ inputs.issue_number }}"
+        else
+          # The title is what shows on the phone lock screen, so name the phase.
+          TITLE="${{ inputs.phase }} ${{ inputs.title }} — $(date -u '+%d %b %H:%M') UTC"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY_FILE=$(mktemp)
+          {
+            echo "Running **${{ inputs.phase }} — ${{ inputs.title }}**."
+            echo ""
+            echo "You'll get one comment when it finishes, saying plainly whether anything"
+            echo "needs you, followed by the complete report — a link to it and the full"
+            echo "text posted here in parts. No news until then means it's still running."
+            echo ""
+            echo "**Live run:** $RUN_URL"
+          } > "$BODY_FILE"
+          URL=$(gh issue create --repo "${{ github.repository }}" \
+                  --title "$TITLE" --body-file "$BODY_FILE")
+          NUMBER="${URL##*/}"
+        fi
+
+        # The bot opens the issue, so the human is not subscribed by default and would
+        # get no alerts. Assigning them subscribes them.
+        if [ -n "${{ inputs.notify_user }}" ]; then
+          gh issue edit "$NUMBER" --repo "${{ github.repository }}" \
+            --add-assignee "${{ inputs.notify_user }}" \
+            || echo "::warning title=No phone alerts::Could not assign ${{ inputs.notify_user }}."
+        fi
+
+        echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+        echo "Tracking issue #$NUMBER"
+
+    # Checkout retries a bad token three times over 40s and then reports only
+    # "Bad credentials", which says nothing about which secret or why.
+    - name: "🔑 Check the cross-repo token before using it"
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        CROSS_REPO_PAT: ${{ inputs.cross_repo_pat }}
+      run: |
+        set -uo pipefail
+        TARGET="${{ inputs.target_repo }}"
+
+        if [ -z "${CROSS_REPO_PAT:-}" ]; then
+          REASON="The CROSS_REPO_PAT secret is not set in this repository."
+        elif ! GH_TOKEN="$CROSS_REPO_PAT" gh api user >/dev/null 2>&1; then
+          REASON="CROSS_REPO_PAT was rejected by GitHub — it has expired or been revoked."
+        elif ! GH_TOKEN="$CROSS_REPO_PAT" gh api "repos/$TARGET" >/dev/null 2>&1; then
+          REASON="CROSS_REPO_PAT is valid but cannot see $TARGET — it needs repo scope, or, if it is a fine-grained token, that repository must be added to its access list."
+        else
+          echo "CROSS_REPO_PAT is valid and can read $TARGET"
+          exit 0
+        fi
+
+        BODY_FILE=$(mktemp)
+        {
+          echo "## ⚠️ Needs you — ${{ inputs.phase }} cannot start"
+          echo ""
+          echo "$REASON"
+          echo ""
+          echo "Nothing was changed. Fix the secret at **Settings → Secrets and variables →"
+          echo "Actions → CROSS_REPO_PAT**, then dispatch this phase again."
+          echo ""
+          echo "The token needs read and write access to \`$TARGET\`."
+          echo ""
+          echo "[Open the run log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        } > "$BODY_FILE"
+        gh issue comment "${{ steps.issue.outputs.number }}" \
+          --repo "${{ github.repository }}" --body-file "$BODY_FILE" || true
+
+        echo "::error title=Cross-repo token unusable::$REASON"
+        exit 1
+
     - name: "📥 Checkout target repository"
       uses: actions/checkout@v4
       with:
@@ -97,42 +179,3 @@ runs:
         echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
         echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
         echo "Branch $BRANCH cut from $BASE_SHA"
-
-    - name: "📝 Open or reuse the tracking issue"
-      id: issue
-      shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.github_token }}
-      run: |
-        set -euo pipefail
-        if [ -n "${{ inputs.issue_number }}" ]; then
-          NUMBER="${{ inputs.issue_number }}"
-        else
-          # The title is what shows on the phone lock screen, so name the phase.
-          TITLE="${{ inputs.phase }} ${{ inputs.title }} — $(date -u '+%d %b %H:%M') UTC"
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          BODY_FILE=$(mktemp)
-          {
-            echo "Running **${{ inputs.phase }} — ${{ inputs.title }}**."
-            echo ""
-            echo "You'll get one comment when it finishes, saying plainly whether anything"
-            echo "needs you, followed by the complete report — a link to it and the full"
-            echo "text posted here in parts. No news until then means it's still running."
-            echo ""
-            echo "**Live run:** $RUN_URL"
-          } > "$BODY_FILE"
-          URL=$(gh issue create --repo "${{ github.repository }}" \
-                  --title "$TITLE" --body-file "$BODY_FILE")
-          NUMBER="${URL##*/}"
-        fi
-
-        # The bot opens the issue, so the human is not subscribed by default and would
-        # get no alerts. Assigning them subscribes them.
-        if [ -n "${{ inputs.notify_user }}" ]; then
-          gh issue edit "$NUMBER" --repo "${{ github.repository }}" \
-            --add-assignee "${{ inputs.notify_user }}" \
-            || echo "::warning title=No phone alerts::Could not assign ${{ inputs.notify_user }}."
-        fi
-
-        echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
-        echo "Tracking issue #$NUMBER"

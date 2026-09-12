@@ -217,7 +217,7 @@ jobs:
           ga4_credentials_json: ${{ secrets.GA4_CREDENTIALS_JSON }}
 
       - name: "🔔 Tell me if W0 never finished"
-        if: failure() && steps.setup.outputs.issue_number != ''
+        if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -230,5 +230,16 @@ jobs:
             echo ""
             echo "[Open the run log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           } > "$BODY_FILE"
-          gh issue comment "${{ steps.setup.outputs.issue_number }}" \
-            --repo "${{ github.repository }}" --body-file "$BODY_FILE" || true
+
+          # Setup may have died before the issue number was available; open one rather
+          # than let the failure pass unreported.
+          NUMBER="${{ steps.setup.outputs.issue_number }}"
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "${{ github.repository }}" --body-file "$BODY_FILE" || true
+          else
+            URL=$(gh issue create --repo "${{ github.repository }}" \
+                    --title "W0 failed to start — $(date -u '+%d %b %H:%M') UTC" \
+                    --body-file "$BODY_FILE" \
+                    --assignee "${{ inputs.notify_user }}") || true
+            echo "Opened $URL"
+          fi
